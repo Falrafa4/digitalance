@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('service_id')->constrained()->restrictOnDelete();
             $table->foreignId('client_id')->constrained()->restrictOnDelete();
             $table->text('brief');
-            $table->enum('status', ['Pending', 'Negotiated', 'Paid', 'In Progress', 'Revision', 'Completed', 'Cancelled']);
+            $table->enum('status', ['Pending', 'Negotiated', 'Paid', 'In Progress', 'Revision', 'Completed', 'Cancelled'])->default('Pending');
             $table->decimal('agreed_price', 10, 2);
             $table->date('deadline')->nullable();
             $table->timestamps();

@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('order_id')->constrained()->restrictOnDelete();
             $table->decimal('amount', 10, 2);
             $table->enum('type', ['DP', 'Full', 'Refund']);
-            $table->enum('status', ['Pending', 'Paid', 'Failed']);
+            $table->enum('status', ['Pending', 'Paid', 'Failed'])->default('Pending');
             $table->timestamps();
         });
     }

@@ -18,7 +18,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->decimal('offered_price', 10, 2);
             $table->date('deadline');
-            $table->enum('status', ['Sent', 'Accepted', 'Rejected', 'Expired']);
+            $table->enum('status', ['Sent', 'Accepted', 'Rejected', 'Expired'])->default('Sent');
             $table->timestamps();
         });
     }

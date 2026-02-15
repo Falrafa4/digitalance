@@ -20,7 +20,7 @@ return new class extends Migration
             $table->decimal('price_min', 10, 2);
             $table->decimal('price_max', 10, 2)->nullable();
             $table->unsignedInteger('delivery_time')->nullable();
-            $table->enum('status', ['Draft', 'Pending', 'Approved']);
+            $table->enum('status', ['Draft', 'Pending', 'Approved'])->default('Draft');
             $table->timestamps();
         });
     }
