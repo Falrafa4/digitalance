@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('reviews', function (Blueprint $table) {
+        Schema::create('negotiations', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('order_id')->unique()->constrained()->restrictOnDelete();
-            $table->unsignedTinyInteger('rating');
-            $table->text('comment');
+            $table->foreignId('order_id')->constrained()->onDelete('cascade');
+            $table->enum('sender', ['freelancer', 'client']);
+            $table->text('message');
             $table->timestamps();
         });
     }
@@ -25,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('reviews');
+        Schema::dropIfExists('negotiations');
     }
 };

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('student_id')->constrained('skomda_students', 'id')->restrictOnDelete();
             $table->string('bio')->nullable();
-            $table->string('email')->unique();
+            // $table->string('email')->unique();
             $table->string('password');
             $table->enum('status', ['Pending', 'Approved', 'Suspended']);
             $table->timestamps();

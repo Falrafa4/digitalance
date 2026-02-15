@@ -2,15 +2,17 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Freelancer extends Model
 {
+    use HasFactory;
     protected $fillable = ['student_id', 'bio', 'email', 'password', 'status'];
 
     public function skomda_student()
     {
-        return $this->belongsTo(SkomdaStudent::class);
+        return $this->belongsTo(SkomdaStudent::class, 'student_id');
     }
 
     public function portofolios()

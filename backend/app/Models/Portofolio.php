@@ -2,16 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Portofolio extends Model
 {
-    protected $fillable = ['freelancer_id', 'service_id', 'title', 'description', 'media_url'];
-
-    public function freelancer()
-    {
-        return $this->belongsTo(Freelancer::class);
-    }
+    use HasFactory;
+    protected $fillable = ['service_id', 'title', 'description', 'media_url'];
 
     public function service()
     {

@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('offers', function (Blueprint $table) {
             $table->id();
             $table->foreignId('order_id')->constrained()->restrictOnDelete();
-            $table->foreignId('freelancer_id')->constrained()->cascadeOnDelete();
             $table->string('title');
             $table->text('description')->nullable();
             $table->decimal('offered_price', 10, 2);

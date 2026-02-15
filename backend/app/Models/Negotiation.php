@@ -5,10 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Offer extends Model
+class Negotiation extends Model
 {
     use HasFactory;
-    protected $fillable = ['order_id', 'title', 'description', 'offered_price', 'deadline', 'status'];
+    protected $fillable = ['order_id', 'sender', 'message'];
 
     public function order()
     {
