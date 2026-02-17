@@ -16,12 +16,17 @@ class SkomdaStudentFactory extends Factory
      */
     public function definition(): array
     {
+        $class = $this->faker->randomElement(['X', 'XI', 'XII', 'XIII']);
+        $major = $this->faker->randomElement(['TJAT', 'SIJA']);
+        if ($class == 'XIII') {
+            $major = 'SIJA';
+        }
         return [
             'nis' => $this->faker->unique()->numerify('#########'),
             'name' => $this->faker->name(),
             'email' => $this->faker->unique()->safeEmail(),
-            'class' => $this->faker->randomElement(['X', 'XI', 'XII']),
-            'major' => $this->faker->randomElement(['TJAT', 'SIJA']),
+            'class' => $class,
+            'major' => $major,
         ];
     }
 }
