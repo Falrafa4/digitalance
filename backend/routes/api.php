@@ -4,6 +4,7 @@ use App\Http\Controllers\AdministratorController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\FreelancerController;
+use App\Http\Controllers\SkomdaStudentController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -18,11 +19,14 @@ Route::prefix('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 });
 
+Route::get('/me', [AuthController::class, 'me'])->middleware('auth:sanctum');
+
 // Administrator
 Route::middleware('auth:sanctum', 'role:administrator')->group(function () {
     Route::apiResource('administrators', AdministratorController::class)->only(['index', 'show']);
     Route::apiResource('clients', ClientController::class);
     Route::apiResource('freelancers', FreelancerController::class);
+    Route::apiResource('skomda-students', SkomdaStudentController::class);
 });
 
 // Client
@@ -32,5 +36,5 @@ Route::middleware('auth:sanctum', 'role:client')->group(function () {
 
 // Freelancer
 Route::middleware('auth:sanctum', 'role:freelancer')->group(function () {
-    Route::apiResource('freelancers', FreelancerController::class)->only(['show', 'update']);
+    // Route::apiResource('freelancers', FreelancerController::class)->only(['show', 'update']);
 });
