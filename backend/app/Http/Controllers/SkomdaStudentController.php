@@ -55,7 +55,7 @@ class SkomdaStudentController extends Controller
         if (!$skomda_student) {
             return response()->json([
                 'status' => false,
-                'message' => 'Akun siswa SKOMDA tidak ditemukan'
+                'message' => 'Akun siswa SMK Telkom Sidoarjo tidak ditemukan'
             ], 404);
         }
 
@@ -75,7 +75,7 @@ class SkomdaStudentController extends Controller
         if (!$skomda_student) {
             return response()->json([
                 'status' => false,
-                'message' => 'Akun siswa SKOMDA tidak ditemukan'
+                'message' => 'Akun siswa SMK Telkom Sidoarjo tidak ditemukan'
             ], 404);
         }
 
@@ -103,7 +103,7 @@ class SkomdaStudentController extends Controller
         if (!$skomda_student) {
             return response()->json([
                 'status' => false,
-                'message' => 'Akun siswa SKOMDA tidak ditemukan'
+                'message' => 'Akun siswa SMK Telkom Sidoarjo tidak ditemukan'
             ], 404);
         }
 
@@ -111,7 +111,7 @@ class SkomdaStudentController extends Controller
 
         return response()->json([
             'status' => true,
-            'message' => 'Akun siswa SKOMDA berhasil dihapus'
+            'message' => 'Akun siswa SMK Telkom Sidoarjo berhasil dihapus'
         ]);
     }
 }
