@@ -12,7 +12,7 @@ class Service extends Model
 
     public function service_category()
     {
-        return $this->belongsTo(ServiceCategory::class);
+        return $this->belongsTo(ServiceCategory::class, 'category_id');
     }
 
     public function freelancer()
