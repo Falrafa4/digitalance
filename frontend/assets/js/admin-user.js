@@ -9,8 +9,6 @@ const BADGE_MAP = {
   'In Review': 'badge-progress',
 };
 
-// ─── DATA DUMMY PENDING VERIFICATIONS ───
-// Ganti dengan data dari API saat integrasi backend
 const pendingVerifications = [
   {
     id: 1,
@@ -119,17 +117,6 @@ function handleReject(id) {
 
 // ─── INIT NOTIFIKASI ───
 function initAdminDashboard() {
-  const notifBtn = document.getElementById('notif-btn');
-  if (!notifBtn) {
-    console.error("Element #notif-btn tidak ditemukan.");
-    return;
-  }
-
-  notifBtn.classList.toggle('has-unread', hasUnreadMessages);
-  notifBtn.addEventListener('click', () => {
-    notifBtn.classList.remove('has-unread');
-  });
-
   initSidebarNav();
   renderPendingVerifications();
 }
@@ -270,6 +257,7 @@ const USER_DOT_MAP = {
   'Suspended': 'suspended',
 };
 const ROLE_ICON_MAP = {
+  'Client':       'ri-briefcase-line',
   'Freelancer':     'ri-user-star-line',
   'Skomda Student': 'ri-graduation-cap-line',
 };
@@ -307,8 +295,10 @@ function renderUserCards(data = usersData) {
         <i class="ri-map-pin-line"></i> ${u.location}
       </span>
 
-      <div class="user-card-skills">
-        ${u.skills.map(s => `<span class="skill-chip">${s}</span>`).join('')}
+      <div class="user-card-skills card-skills-grow">
+        ${u.skills.length > 0
+          ? u.skills.map(s => `<span class="skill-chip">${s}</span>`).join('')
+          : '<span class="skill-chip skill-chip-empty">No skills listed</span>'}
       </div>
 
       <div class="user-card-stats">
@@ -336,6 +326,11 @@ function openUserModal(id) {
 
   const overlay = document.getElementById('user-modal-overlay');
   const box     = document.getElementById('user-modal-box');
+
+  const isSuspended = u.status === 'Suspended';
+  const suspendLabel = isSuspended ? 'Unsuspend' : 'Suspend';
+  const suspendIcon  = isSuspended ? 'ri-checkbox-circle-line' : 'ri-forbid-line';
+  const suspendClass = isSuspended ? 'modal-btn-warning' : 'modal-btn-danger';
 
   box.innerHTML = `
     <div class="modal-hero">
@@ -393,16 +388,28 @@ function openUserModal(id) {
 
       <p class="modal-section-title">Skills</p>
       <div class="modal-skills">
-        ${u.skills.map(s => `<span class="modal-skill-chip">${s}</span>`).join('')}
+        ${u.skills.length > 0
+          ? u.skills.map(s => `<span class="modal-skill-chip">${s}</span>`).join('')
+          : '<span style="font-size:13px;color:var(--slate-400)">No skills listed</span>'}
       </div>
 
-      <div class="modal-actions">
-        <button class="modal-btn-primary">
-          <i class="ri-mail-send-line"></i> Kirim Pesan
-        </button>
-        <button class="modal-btn-danger">
-          <i class="ri-forbid-line"></i> Suspend
-        </button>
+      <div class="modal-action-group">
+        <div class="modal-action-row">
+          <button class="modal-btn-primary" onclick="closeUserModal()">
+            <i class="ri-mail-send-line"></i> Kirim Pesan
+          </button>
+          <button class="modal-btn-edit" onclick="openEditUserModal(${u.id})">
+            <i class="ri-edit-line"></i> Edit
+          </button>
+        </div>
+        <div class="modal-action-row">
+          <button class="${suspendClass}" onclick="toggleSuspendUser(${u.id})">
+            <i class="${suspendIcon}"></i> ${suspendLabel}
+          </button>
+          <button class="modal-btn-delete" onclick="confirmDeleteUser(${u.id})">
+            <i class="ri-delete-bin-line"></i> Hapus Akun
+          </button>
+        </div>
       </div>
     </div>
   `;
@@ -413,6 +420,176 @@ function openUserModal(id) {
 // ─── CLOSE MODAL ───
 function closeUserModal() {
   document.getElementById('user-modal-overlay').classList.remove('open');
+}
+
+// ─── TOGGLE SUSPEND ───
+function toggleSuspendUser(id) {
+  const u = usersData.find(u => u.id === id);
+  if (!u) return;
+  u.status = u.status === 'Suspended' ? 'Active' : 'Suspended';
+  refreshAfterChange();
+  openUserModal(id); // re-render modal with new state
+}
+
+// ─── CONFIRM DELETE ───
+function confirmDeleteUser(id) {
+  const u = usersData.find(u => u.id === id);
+  if (!u) return;
+
+  // Inject confirm overlay
+  const confirmEl = document.createElement('div');
+  confirmEl.className = 'confirm-overlay';
+  confirmEl.id = 'confirm-delete-overlay';
+  confirmEl.innerHTML = `
+    <div class="confirm-box">
+      <div class="confirm-icon"><i class="ri-error-warning-line"></i></div>
+      <h3>Hapus Akun?</h3>
+      <p>Akun <strong>${u.name}</strong> akan dihapus secara permanen dan tidak bisa dipulihkan.</p>
+      <div class="confirm-actions">
+        <button class="btn-secondary" onclick="closeConfirmDelete()">Batal</button>
+        <button class="modal-btn-delete" onclick="executeDeleteUser(${id})">
+          <i class="ri-delete-bin-line"></i> Ya, Hapus
+        </button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(confirmEl);
+  requestAnimationFrame(() => confirmEl.classList.add('open'));
+}
+
+function closeConfirmDelete() {
+  const el = document.getElementById('confirm-delete-overlay');
+  if (el) { el.classList.remove('open'); setTimeout(() => el.remove(), 250); }
+}
+
+function executeDeleteUser(id) {
+  const idx = usersData.findIndex(u => u.id === id);
+  if (idx !== -1) usersData.splice(idx, 1);
+  closeConfirmDelete();
+  closeUserModal();
+  refreshAfterChange();
+}
+
+// ─── OPEN EDIT MODAL ───
+function openEditUserModal(id) {
+  const u = usersData.find(u => u.id === id);
+  if (!u) return;
+
+  // Remove existing if any
+  const existing = document.getElementById('edit-user-overlay');
+  if (existing) existing.remove();
+
+  const el = document.createElement('div');
+  el.className = 'modal-overlay';
+  el.id = 'edit-user-overlay';
+  el.innerHTML = `
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Edit User</h2>
+        <button class="close-modal" onclick="closeEditUserModal()">
+          <i class="ri-close-line"></i>
+        </button>
+      </div>
+      <form id="form-edit-user">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="edit-user-name" required value="${u.name}" />
+        </div>
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" id="edit-user-email" required value="${u.email}" />
+        </div>
+        <div class="form-group">
+          <label>Role</label>
+          <div class="custom-role-select" id="edit-role-select">
+            ${buildRoleOptions(u.role)}
+          </div>
+          <input type="hidden" id="edit-user-role" value="${u.role}" />
+        </div>
+        <div class="form-group">
+          <label>Location</label>
+          <input type="text" id="edit-user-location" required value="${u.location}" />
+        </div>
+        <div class="form-group">
+          <label>Phone</label>
+          <input type="text" id="edit-user-phone" value="${u.phone}" />
+        </div>
+        <div class="form-group">
+          <label>Bio</label>
+          <textarea id="edit-user-bio" rows="3" style="padding:11px 14px;border:1.5px solid var(--slate-200);border-radius:11px;font-family:var(--font-sans);font-size:13.5px;resize:vertical;outline:none;transition:all 0.2s;">${u.bio}</textarea>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" onclick="closeEditUserModal()">Batal</button>
+          <button type="submit" class="btn-primary"><i class="ri-save-line"></i> Simpan Perubahan</button>
+        </div>
+      </form>
+    </div>
+  `;
+  document.body.appendChild(el);
+  requestAnimationFrame(() => el.classList.add('open'));
+
+  // Role select logic
+  el.querySelectorAll('.role-option').forEach(opt => {
+    opt.addEventListener('click', () => {
+      el.querySelectorAll('.role-option').forEach(o => o.classList.remove('selected'));
+      opt.classList.add('selected');
+      document.getElementById('edit-user-role').value = opt.dataset.value;
+    });
+  });
+
+  // Close on backdrop click
+  el.addEventListener('click', (e) => { if (e.target === el) closeEditUserModal(); });
+
+  // Submit
+  document.getElementById('form-edit-user').addEventListener('submit', (e) => {
+    e.preventDefault();
+    u.name     = document.getElementById('edit-user-name').value.trim();
+    u.email    = document.getElementById('edit-user-email').value.trim();
+    u.role     = document.getElementById('edit-user-role').value;
+    u.location = document.getElementById('edit-user-location').value.trim();
+    u.phone    = document.getElementById('edit-user-phone').value.trim();
+    u.bio      = document.getElementById('edit-user-bio').value.trim();
+    closeEditUserModal();
+    refreshAfterChange();
+    openUserModal(u.id); // re-open with updated info
+  });
+}
+
+function closeEditUserModal() {
+  const el = document.getElementById('edit-user-overlay');
+  if (el) { el.classList.remove('open'); setTimeout(() => el.remove(), 280); }
+}
+
+// ─── HELPER: build role options HTML ───
+function buildRoleOptions(selected) {
+  const roles = [
+    { value: 'Client',        icon: 'ri-briefcase-line',       label: 'Client',        desc: 'Pemberi kerja / klien' },
+    { value: 'Freelancer',    icon: 'ri-user-star-line',        label: 'Freelancer',    desc: 'Penyedia jasa independen' },
+    { value: 'Skomda Student',icon: 'ri-graduation-cap-line',   label: 'Skomda Student',desc: 'Siswa program Skomda' },
+  ];
+  return roles.map(r => `
+    <div class="role-option${r.value === selected ? ' selected' : ''}" data-value="${r.value}">
+      <div class="role-option-icon"><i class="${r.icon}"></i></div>
+      <div class="role-option-text">
+        <span class="role-option-label">${r.label}</span>
+        <span class="role-option-desc">${r.desc}</span>
+      </div>
+      <div class="role-option-check"><i class="ri-check-line"></i></div>
+    </div>
+  `).join('');
+}
+
+// ─── REFRESH CARDS after data change ───
+function refreshAfterChange() {
+  const activeTab = document.querySelector('.filter-tab.active');
+  const filter    = activeTab ? activeTab.dataset.filter : 'all';
+  const q         = (document.getElementById('user-search-input')?.value || '').toLowerCase();
+  let filtered    = filter === 'all' ? usersData : usersData.filter(u => u.status === filter || u.role === filter);
+  if (q) filtered = filtered.filter(u =>
+    u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q) ||
+    u.role.toLowerCase().includes(q)  || u.location.toLowerCase().includes(q)
+  );
+  renderUserCards(filtered);
 }
 
 // ─── FILTER TABS ───
@@ -447,17 +624,97 @@ function initUserSearch() {
   });
 }
 
+// ─── ADD USER MODAL ───
+function openAddUserModal() {
+  document.getElementById('modal-add-user').classList.add('open');
+}
+
+function closeAddUserModal() {
+  const modal = document.getElementById('modal-add-user');
+  modal.classList.remove('open');
+  document.getElementById('form-add-user').reset();
+  // reset custom role select
+  document.querySelectorAll('#add-role-select .role-option').forEach((opt, i) => {
+    opt.classList.toggle('selected', i === 0);
+  });
+  document.getElementById('new-user-role').value = 'Client';
+}
+
+function initAddUserModal() {
+  // Inject custom role select into add-role-select container
+  const roleContainer = document.getElementById('add-role-select');
+  if (roleContainer) {
+    roleContainer.innerHTML = buildRoleOptions('Client');
+    roleContainer.querySelectorAll('.role-option').forEach(opt => {
+      opt.addEventListener('click', () => {
+        roleContainer.querySelectorAll('.role-option').forEach(o => o.classList.remove('selected'));
+        opt.classList.add('selected');
+        document.getElementById('new-user-role').value = opt.dataset.value;
+      });
+    });
+  }
+
+  const btnAdd    = document.getElementById('btn-add-user');
+  const btnClose  = document.getElementById('btn-close-add-user');
+  const btnCancel = document.getElementById('btn-cancel-add-user');
+  const overlay   = document.getElementById('modal-add-user');
+  const form      = document.getElementById('form-add-user');
+
+  if (btnAdd)    btnAdd.addEventListener('click', openAddUserModal);
+  if (btnClose)  btnClose.addEventListener('click', closeAddUserModal);
+  if (btnCancel) btnCancel.addEventListener('click', closeAddUserModal);
+
+  if (overlay) {
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) closeAddUserModal();
+    });
+  }
+
+  if (form) {
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name     = document.getElementById('new-user-name').value.trim();
+      const email    = document.getElementById('new-user-email').value.trim();
+      const role     = document.getElementById('new-user-role').value;
+      const location = document.getElementById('new-user-location').value.trim();
+
+      const newUser = {
+        id:           Date.now(),
+        name,
+        email,
+        avatar:       `https://picsum.photos/seed/${name.split(' ')[0].toLowerCase()}/200/200`,
+        role,
+        status:       'Active',
+        joinDate:     new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }),
+        location,
+        phone:        '-',
+        skills:       [],
+        totalOrders:  0,
+        totalEarning: '$0',
+        lastActive:   'Just now',
+        bio:          'No bio yet.',
+      };
+
+      usersData.push(newUser);
+      refreshAfterChange();
+      closeAddUserModal();
+    });
+  }
+}
+
 // ─── INIT USER PAGE ───
 function initUserPage() {
   renderUserCards();
   initUserFilters();
   initUserSearch();
+  initAddUserModal();
+  initAdminDashboard();
 
-  // Tutup modal saat klik overlay
-  const overlay = document.getElementById('user-modal-overlay');
-  if (overlay) {
-    overlay.addEventListener('click', (e) => {
-      if (e.target === overlay) closeUserModal();
+  // Tutup user detail modal saat klik overlay
+  const userOverlay = document.getElementById('user-modal-overlay');
+  if (userOverlay) {
+    userOverlay.addEventListener('click', (e) => {
+      if (e.target === userOverlay) closeUserModal();
     });
   }
 
@@ -467,11 +724,7 @@ function initUserPage() {
     notifBtn.classList.toggle('has-unread', hasUnreadMessages);
     notifBtn.addEventListener('click', () => notifBtn.classList.remove('has-unread'));
   }
-
-  initSidebarNav();
 }
 
-// Jalankan jika ada elemen user page
-if (document.getElementById('user-card-grid')) {
-  document.addEventListener('DOMContentLoaded', initUserPage);
-}
+// Jalankan ketika DOM siap
+document.addEventListener('DOMContentLoaded', initUserPage);

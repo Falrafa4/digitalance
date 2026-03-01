@@ -17,16 +17,27 @@
   </head>
   <body>
     <div class="app">
-
       <!-- ── SIDEBAR ── -->
       <aside class="sidebar">
         <div class="sidebar-header">
           <div class="logo">
-            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg
+              width="32"
+              height="32"
+              viewBox="0 0 32 32"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg">
               <rect width="32" height="32" rx="10" fill="url(#logo-gradient)" />
-              <path d="M16 7L25 11.5V20.5L16 25L7 20.5V11.5L16 7Z" fill="white" />
+              <path
+                d="M16 7L25 11.5V20.5L16 25L7 20.5V11.5L16 7Z"
+                fill="white" />
               <defs>
-                <linearGradient id="logo-gradient" x1="0" y1="0" x2="32" y2="32">
+                <linearGradient
+                  id="logo-gradient"
+                  x1="0"
+                  y1="0"
+                  x2="32"
+                  y2="32">
                   <stop stop-color="#0F766E" />
                   <stop offset="1" stop-color="#10B981" />
                 </linearGradient>
@@ -44,17 +55,12 @@
             <i class="ri-user-line"></i> User
           </button>
           <button class="nav-item">
-            <i class="ri-graduation-cap-line"></i> Skomda Student
-          </button>
-          <button class="nav-item">
-            <i class="ri-user-star-line"></i> Freelancer
+            <i class="ri-user-star-line"></i> Admin
           </button>
           <button class="nav-item">
             <i class="ri-file-list-3-line"></i> Orders
           </button>
-          <button class="nav-item">
-            <i class="ri-star-line"></i> Reviews
-          </button>
+          <button class="nav-item"><i class="ri-star-line"></i> Reviews</button>
           <button class="nav-item">
             <i class="ri-tools-line"></i> Services
           </button>
@@ -96,15 +102,20 @@
 
       <!-- ── MAIN ── -->
       <main class="main">
-
         <!-- Header -->
         <header class="main-header">
           <div class="search-wrap">
             <i class="ri-search-line search-icon"></i>
-            <i class="ri-equalizer-line" style="
-              position: absolute; right: 16px; top: 50%;
-              transform: translateY(-50%); color: #94a3b8; cursor: pointer;
-            "></i>
+            <i
+              class="ri-equalizer-line"
+              style="
+                position: absolute;
+                right: 16px;
+                top: 50%;
+                transform: translateY(-50%);
+                color: #94a3b8;
+                cursor: pointer;
+              "></i>
             <input
               class="search-input"
               id="user-search-input"
@@ -136,29 +147,68 @@
             <h1>User Management</h1>
             <p>Kelola seluruh pengguna yang terdaftar di platform Digitalance.</p>
           </div>
+          <div class="page-header-right">
+            <button class="btn-primary" id="btn-add-user">
+              <i class="ri-user-add-line"></i> Add New User
+            </button>
+          </div>
+        </div>
+
+        <div class="modal-overlay" id="modal-add-user">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h2>Add New User</h2>
+              <button class="close-modal" id="btn-close-add-user">
+                <i class="ri-close-line"></i>
+              </button>
+            </div>
+            <form id="form-add-user">
+              <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" id="new-user-name" required placeholder="e.g. John Doe" />
+              </div>
+              <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" id="new-user-email" required placeholder="john@example.com" />
+              </div>
+              <div class="form-group">
+                <label>Role</label>
+                <div class="custom-role-select" id="add-role-select"></div>
+                <input type="hidden" id="new-user-role" value="Client" />
+              </div>
+              <div class="form-group">
+                <label>Location</label>
+                <input type="text" id="new-user-location" required placeholder="e.g. Jakarta, Indonesia" />
+              </div>
+              <div class="modal-actions">
+                <button type="button" class="btn-secondary" id="btn-cancel-add-user">Cancel</button>
+                <button type="submit" class="btn-primary">Save User</button>
+              </div>
+            </form>
+          </div>
         </div>
 
         <!-- Filter Tabs -->
         <div class="filter-tabs">
-          <button class="filter-tab active" data-filter="all">Semua</button>
-          <button class="filter-tab" data-filter="Active">Aktif</button>
-          <button class="filter-tab" data-filter="Inactive">Tidak Aktif</button>
+          <button class="filter-tab active" data-filter="all">All</button>
+          <button class="filter-tab" data-filter="Active">Active</button>
+          <button class="filter-tab" data-filter="Inactive">Inactive</button>
           <button class="filter-tab" data-filter="Suspended">Suspended</button>
-          <button class="filter-tab" data-filter="Freelancer">Freelancer</button>
-          <button class="filter-tab" data-filter="Skomda Student">Skomda</button>
+          <button class="filter-tab" data-filter="Client">Client</button>
+          <button class="filter-tab" data-filter="Freelancer">
+            Freelancer
+          </button>
+          <button class="filter-tab" data-filter="Skomda Student">
+            Skomda Students
+          </button>
         </div>
 
-        <!-- User Card Grid -->
         <div class="user-card-grid" id="user-card-grid"></div>
-
       </main>
     </div>
 
-    <!-- ── MODAL PROFIL ── -->
     <div class="modal-overlay" id="user-modal-overlay">
-      <div class="modal-box" id="user-modal-box">
-        <!-- diisi oleh JS -->
-      </div>
+      <div class="modal-box" id="user-modal-box"></div>
     </div>
 
     <script src="../assets/js/admin-user.js"></script>
