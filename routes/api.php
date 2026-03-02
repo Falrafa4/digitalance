@@ -24,8 +24,8 @@ Route::prefix('auth')->group(function () {
 Route::get('/me', [AuthController::class, 'me'])->middleware('auth:sanctum');
 
 // Administrator
+Route::apiResource('administrators', AdministratorController::class)->only(['index', 'show']);
 Route::middleware('auth:sanctum', 'role:administrator')->group(function () {
-    Route::apiResource('administrators', AdministratorController::class)->only(['index', 'show']);
     Route::apiResource('clients', ClientController::class);
     Route::apiResource('freelancers', FreelancerController::class)->only(['store', 'update', 'destroy']);
     Route::apiResource('skomda-students', SkomdaStudentController::class);
