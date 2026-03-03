@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login & Registration - Sliding Card</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Sora:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+  <link rel="stylesheet" href="{{ asset('css/sign-in.css') }}" />
+  <script src="{{ asset('js/sign-in.js') }}"></script>
+</head>
+
+<body>
+  <div class="grain-overlay"></div>
+  <div class="bg-mesh"></div>
+
+  <div class="app-container">
+    <!-- NAVBAR -->
+    <nav class="navbar">
+      <div class="navbar-container">
+        <a href="../" class="logo">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="32" height="32" rx="8" fill="url(#logo-gradient)" />
+            <path d="M16 8L24 12V20L16 24L8 20V12L16 8Z" fill="white" />
+            <defs>
+              <linearGradient id="logo-gradient" x1="0" y1="0" x2="32" y2="32">
+                <stop offset="0%" stop-color="#0F766E" />
+                <stop offset="100%" stop-color="#10B981" />
+              </linearGradient>
+            </defs>
+          </svg>
+          <span>Digitalance</span>
+        </a>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="auth-container">
+        <!-- Sliding Overlay Panel -->
+        <div class="auth-overlay" id="authOverlay">
+          <div class="overlay-content">
+            <!-- Decorative Background -->
+            <div class="deco-blob deco-blob-top"></div>
+            <div class="deco-blob deco-blob-bottom"></div>
+
+            <div class="overlay-inner">
+              <!-- Hero Image -->
+              <div class="hero-visual">
+                <div class="hero-image-container">
+                  <img
+                    src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&q=80&w=1000"
+                    alt="Professional workspace" class="hero-image" id="heroImage" />
+                  <div class="image-gradient"></div>
+                </div>
+
+                <!-- Float Badge -->
+                <div class="float-badge">
+                  <div class="badge-content">
+                    <div class="badge-icon">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                      </svg>
+                    </div>
+                    <div>
+                      <p class="badge-title">450+ Aktif</p>
+                      <p class="badge-subtitle">Anggota Global</p>
+                    </div>
+                  </div>
+                  <div class="badge-icon-right">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="#0F766E" stroke="#0F766E" stroke-width="2">
+                      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              <div class="overlay-text">
+                <div class="elite-badge">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor"
+                    stroke-width="2">
+                    <path
+                      d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z">
+                    </path>
+                  </svg>
+                  <span>Standar Elite</span>
+                </div>
+                <h2 class="overlay-title" id="overlayTitle">
+                  Jaringan Presisi untuk Solusi Expert
+                </h2>
+                <p class="overlay-description" id="overlayDesc">
+                  Rasakan koneksi tanpa hambatan antara permintaan industri
+                  premium dan output kreatif elite.
+                </p>
+
+                <button class="toggle-link" id="overlayToggle">
+                  <span class="toggle-text" id="toggleText">Bergabung dengan Jaringan</span>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="auth-forms">
+          <!-- Register Form -->
+          <div class="form-panel register-panel" id="registerPanel">
+            <div class="form-header">
+              <div class="security-badge">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                  <path d="m9 12 2 2 4-4"></path>
+                </svg>
+                <span>Protokol Aman</span>
+              </div>
+              <h2 class="form-title">Buat Identitas</h2>
+              <p class="form-subtitle">
+                Bergabunglah dengan jaringan elite profesional digital.
+              </p>
+            </div>
+
+            <!-- Role Toggle -->
+            <div class="role-toggle">
+              <div class="role-slider" id="roleSlider"></div>
+              <button type="button" class="role-btn active" data-role="client" id="clientBtn">
+                Klien
+              </button>
+              <button type="button" class="role-btn" data-role="freelancer" id="freelancerBtn">
+                Freelancer
+              </button>
+            </div>
+
+            <form class="auth-form" id="registerForm">
+              <div class="input-row">
+                <div class="input-group">
+                  <label class="input-label">Nama Depan</label>
+                  <div class="input-wrapper">
+                    <svg class="input-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-width="2">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                      <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    <input type="text" class="input-field" placeholder="John" />
+                  </div>
+                </div>
+                <div class="input-group">
+                  <label class="input-label">Nama Belakang</label>
+                  <div class="input-wrapper">
+                    <svg class="input-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-width="2">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                      <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    <input type="text" class="input-field" placeholder="Doe" />
+                  </div>
+                </div>
+              </div>
+
+              <div class="input-group">
+                <label class="input-label">Email</label>
+                <div class="input-wrapper">
+                  <svg class="input-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                    <polyline points="22,6 12,13 2,6"></polyline>
+                  </svg>
+                  <input type="email" class="input-field" placeholder="john@digitalance.io" />
+                </div>
+              </div>
+
+              <div class="input-group skill-field" id="skillField">
+                <label class="input-label">Keahlian</label>
+                <div class="input-wrapper">
+                  <svg class="input-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="m21 21-4.35-4.35"></path>
+                  </svg>
+                  <input type="text" class="input-field" placeholder="UI/UX Designer..." />
+                </div>
+              </div>
+
+              <div class="input-group">
+                <label class="input-label">Kode Sandi</label>
+                <div class="input-wrapper">
+                  <svg class="input-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                  </svg>
+                  <input type="password" class="input-field" placeholder="••••••••" />
+                </div>
+              </div>
+
+              <button type="submit" class="submit-btn">
+                Inisialisasi Akun
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              </button>
+            </form>
+          </div>
+
+          <!-- Login Form -->
+          <div class="form-panel login-panel active" id="loginPanel">
+            <div class="form-header">
+              <div class="globe-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="2" y1="12" x2="22" y2="12"></line>
+                  <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z">
+                  </path>
+                </svg>
+              </div>
+              <h2 class="form-title">Portal Akses</h2>
+              <p class="form-subtitle">
+                Autentikasi diperlukan untuk mengakses ekosistem.
+              </p>
+            </div>
+
+            <form class="auth-form" id="loginForm" method="post">
+              <div class="input-group">
+                <label class="input-label">Alamat Email</label>
+                <div class="input-wrapper">
+                  <svg class="input-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                    <polyline points="22,6 12,13 2,6"></polyline>
+                  </svg>
+                  <input type="email" name="email" class="input-field" placeholder="nama@domain.com" />
+                </div>
+              </div>
+
+              <div class="input-group">
+                <label class="input-label">Kata Sandi</label>
+                <div class="input-wrapper">
+                  <svg class="input-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                  </svg>
+                  <input type="password" name="password" class="input-field" placeholder="••••••••" />
+                </div>
+                <div class="forgot-link-container">
+                  <button type="button" class="forgot-link">
+                    Lupa Kunci?
+                  </button>
+                </div>
+              </div>
+
+              <button type="submit" class="submit-btn">
+                Otorisasi Sesi
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              </button>
+
+              <div class="divider">
+                <div class="divider-line"></div>
+                <span class="divider-text">Sinkronisasi Eksternal</span>
+                <div class="divider-line"></div>
+              </div>
+
+              <div class="social-buttons">
+                <button type="button" class="social-btn">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <circle cx="12" cy="12" r="4"></circle>
+                    <line x1="21.17" y1="8" x2="12" y2="8"></line>
+                    <line x1="3.95" y1="6.06" x2="8.54" y2="14"></line>
+                    <line x1="10.88" y1="21.94" x2="15.46" y2="14"></line>
+                  </svg>
+                  Google
+                </button>
+                <button type="button" class="social-btn">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                    <path
+                      d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+                  </svg>
+                  GitHub
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="footer-content">
+        <span>© 2026 Digitalance. All rights reserved.</span>
+        <span class="footer-separator">|</span>
+        <a href="#" class="footer-link">Privasi</a>
+        <a href="#" class="footer-link">Ketentuan</a>
+        <a href="#" class="footer-link">Status</a>
+      </div>
+    </footer>
+  </div>
+</body>
+
+</html>
