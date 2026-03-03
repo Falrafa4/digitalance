@@ -38,7 +38,7 @@
                     <li><a href="#services">Services</a></li>
                     <li><a href="#faq">FAQ</a></li>
                 </ul>
-                <button class="btn-primary" onclick="window.location.href='./pages/sign-in.html'">Get Started</button>
+                <button class="btn-primary" onclick="window.location.href='/auth'">Get Started</button>
             </div>
             <button class="mobile-menu-toggle">
                 <span></span>
