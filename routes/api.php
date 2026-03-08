@@ -14,6 +14,13 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
+Route::get('/test', function () {
+    return response()->json([
+        'status' => true,
+        'message' => 'OK'
+    ]);
+});
+
 Route::prefix('auth')->group(function () {
     Route::post('/register-client', [AuthController::class, 'register_client']);
     Route::post('/register-freelancer', [AuthController::class, 'register_freelancer']);
