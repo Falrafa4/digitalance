@@ -12,6 +12,8 @@
         rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
     <script src="{{ asset('js/main.js') }}" defer></script>
+    <script src="{{ asset('js/test.js') }}"></script>
+    @vite(['resources/js/app.js'])
 </head>
 
 <body>
