@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\Route;
 // Main Page
 Route::get('/', [PageController::class, 'home']);
 Route::get('/login', [PageController::class, 'login']);
+Route::get('/register-client', [PageController::class, 'registerClient']);
+Route::get('/register-freelancer', [PageController::class, 'registerFreelancer']);
 
 // Dashboard Admin
 Route::middleware('auth:administrator')->group(function () {

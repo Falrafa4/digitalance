@@ -13,4 +13,14 @@ class PageController
     {
         return view('login');
     }
+
+    public function registerClient()
+    {
+        return view('auth.register_client');
+    }
+
+    public function registerFreelancer()
+    {
+        return view('auth.register_freelancer');
+    }
 }
