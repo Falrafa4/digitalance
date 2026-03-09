@@ -11,16 +11,15 @@ class AdministratorController extends Controller
      */
     public function profile()
     {
-        $administrator = auth()->user();
+        $administrator = auth()->guard('administrator')->user();
 
         return view('dashboard.admin.profile', compact('administrator'));
     }
     
     public function index()
     {
-        $data = Administrator::all();
-
-        return view('dashboard.admin.administrators.index', compact('data'));
+        $administrators = Administrator::all();
+        return view('dashboard.admin.administrators.index', compact('administrators'));
     }
 
     /**
@@ -28,9 +27,6 @@ class AdministratorController extends Controller
      */
     public function show(Administrator $administrator)
     {
-        return response()->json([
-            'status' => true,
-            'data' => $administrator
-        ]);
+        return view('dashboard.admin.administrators.show', compact('administrator'));
     }
 }
