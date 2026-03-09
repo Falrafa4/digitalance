@@ -14,7 +14,7 @@ class ClientController extends Controller
     public function profile()
     {
         $client = auth('client')->user();
-        return view('client.profile', compact('client'));
+        return view('dashboard.client.profile', compact('client'));
     }
 
     /**
@@ -25,7 +25,7 @@ class ClientController extends Controller
         $client = auth('client')->user();
         $client->update($request->validated());
 
-        return redirect()->route('client.profile')->with('success', 'Profil berhasil diperbarui');
+        return redirect()->route('dashboard.client.profile')->with('success', 'Profil berhasil diperbarui');
     }
 
     /**
@@ -36,14 +36,14 @@ class ClientController extends Controller
         $client = auth('client')->user();
 
         if (!Hash::check($request->current_password, $client->password)) {
-            return redirect()->route('client.profile')->withErrors('Password saat ini salah');
+            return redirect()->route('dashboard.client.profile')->withErrors('Password saat ini salah');
         }
 
         $client->update([
             'password' => Hash::make($request->password),
         ]);
 
-        return redirect()->route('client.profile')->with('success', 'Password berhasil diperbarui');
+        return redirect()->route('dashboard.client.profile')->with('success', 'Password berhasil diperbarui');
     }
 
     /**
@@ -52,20 +52,20 @@ class ClientController extends Controller
     public function index()
     {
         $clients = Client::all();
-        return view('admin.clients.index', compact('clients'));
+        return view('dashboard.admin.clients.index', compact('clients'));
     }
 
     public function create()
     {
-        return view('admin.clients.create');
+        return view('dashboard.admin.clients.create');
     }
 
     /**
      * Store New Client
      */
-    public function store(StoreClientRequest $request, Client $client)
+    public function store(StoreClientRequest $request)
     {
-        $client->create($request->validated());
+        Client::create($request->validated());
         return redirect()->route('clients.index')->with('success', 'Akun client berhasil dibuat');
     }
 
@@ -75,12 +75,12 @@ class ClientController extends Controller
     public function show(string $id)
     {
         $client = Client::findOrFail($id);
-        return view('admin.clients.show', compact('client'));
+        return view('dashboard.admin.clients.show', compact('client'));
     }
 
     public function edit(Client $client)
     {
-        return view('admin.clients.edit', compact('client'));
+        return view('dashboard.admin.clients.edit', compact('client'));
     }
 
     /**
