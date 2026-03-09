@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers;
 
 use App\Models\Administrator;
 
@@ -9,14 +9,18 @@ class AdministratorController extends Controller
     /**
      * Get All Administrators
      */
+    public function profile()
+    {
+        $administrator = auth()->user();
+
+        return view('dashboard.admin.profile', compact('administrator'));
+    }
+    
     public function index()
     {
         $data = Administrator::all();
 
-        return response()->json([
-            'status' => true,
-            'data' => $data
-        ]);
+        return view('dashboard.admin.administrators.index', compact('data'));
     }
 
     /**

@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers;
 
-use App\Models\Transaction;
+use App\Models\Negotiation;
 use Illuminate\Http\Request;
 
-class TransactionController extends Controller
+class NegotiationController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -26,7 +26,7 @@ class TransactionController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Transaction $transaction)
+    public function show(Negotiation $negotiation)
     {
         //
     }
@@ -34,7 +34,7 @@ class TransactionController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Transaction $transaction)
+    public function update(Request $request, Negotiation $negotiation)
     {
         //
     }
@@ -42,7 +42,7 @@ class TransactionController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Transaction $transaction)
+    public function destroy(Negotiation $negotiation)
     {
         //
     }

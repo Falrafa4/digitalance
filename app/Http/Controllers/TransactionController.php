@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers;
 
-use App\Models\Result;
+use App\Models\Transaction;
 use Illuminate\Http\Request;
 
-class ResultController extends Controller
+class TransactionController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -26,7 +26,7 @@ class ResultController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Result $result)
+    public function show(Transaction $transaction)
     {
         //
     }
@@ -34,7 +34,7 @@ class ResultController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Result $result)
+    public function update(Request $request, Transaction $transaction)
     {
         //
     }
@@ -42,7 +42,7 @@ class ResultController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Result $result)
+    public function destroy(Transaction $transaction)
     {
         //
     }
