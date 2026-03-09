@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Route;
 
 // Main Page
 Route::get('/', [PageController::class, 'home']);
-Route::get('/auth', [PageController::class, 'signIn']);
+Route::get('/login', [PageController::class, 'login']);
 
 // Dashboard Admin
 Route::middleware('auth:administrator')->group(function () {

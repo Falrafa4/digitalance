@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-
 class PageController
 {
     public function home()
@@ -11,8 +9,8 @@ class PageController
         return view('home');
     }
 
-    public function signIn()
+    public function login()
     {
-        return view('signIn');
+        return view('login');
     }
 }

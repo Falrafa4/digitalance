@@ -12,8 +12,6 @@
         rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
     <script src="{{ asset('js/main.js') }}" defer></script>
-    <script src="{{ asset('js/test.js') }}"></script>
-    @vite(['resources/js/app.js'])
 </head>
 
 <body>
@@ -40,7 +38,7 @@
                     <li><a href="#services">Services</a></li>
                     <li><a href="#faq">FAQ</a></li>
                 </ul>
-                <button class="btn-primary" onclick="window.location.href='/auth'">Get Started</button>
+                <button class="btn-primary" onclick="window.location.href='/login'">Get Started</button>
             </div>
             <button class="mobile-menu-toggle">
                 <span></span>
