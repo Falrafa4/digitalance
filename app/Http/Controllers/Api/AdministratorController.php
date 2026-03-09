@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
 use App\Models\Administrator;
 
 class AdministratorController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Get All Administrators
      */
     public function index()
     {
@@ -20,7 +20,7 @@ class AdministratorController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Get Administrator By ID
      */
     public function show(Administrator $administrator)
     {

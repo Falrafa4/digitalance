@@ -1,12 +1,12 @@
 <?php
 
-use App\Http\Controllers\AdministratorController;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\ClientController;
-use App\Http\Controllers\FreelancerController;
-use App\Http\Controllers\ServiceCategoryController;
-use App\Http\Controllers\ServiceController;
-use App\Http\Controllers\SkomdaStudentController;
+use App\Http\Controllers\Api\AdministratorController;
+use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\ClientController;
+use App\Http\Controllers\Api\FreelancerController;
+use App\Http\Controllers\Api\ServiceCategoryController;
+use App\Http\Controllers\Api\ServiceController;
+use App\Http\Controllers\Api\SkomdaStudentController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 

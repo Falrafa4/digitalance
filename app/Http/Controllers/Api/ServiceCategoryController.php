@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
 use App\Models\ServiceCategory;
 use Illuminate\Http\Request;
@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 class ServiceCategoryController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Get All Service Categories
      */
     public function index()
     {
@@ -21,7 +21,7 @@ class ServiceCategoryController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store New Service Category
      */
     public function store(Request $request)
     {
@@ -42,7 +42,7 @@ class ServiceCategoryController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Get Service Category By ID
      */
     public function show(string $id)
     {
@@ -62,7 +62,7 @@ class ServiceCategoryController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update Service Category By ID
      */
     public function update(Request $request, string $id)
     {
@@ -89,7 +89,7 @@ class ServiceCategoryController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Delete Service Category By ID
      */
     public function destroy(string $id)
     {

@@ -1,19 +1,19 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
-use App\Models\Freelancer;
+use App\Models\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
-class FreelancerController extends Controller
+class ClientController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Get All Client.
      */
     public function index()
     {
-        $data = Freelancer::with('skomda_student')->get();
+        $data = Client::all();
 
         return response()->json([
             'status' => true,
@@ -22,18 +22,18 @@ class FreelancerController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store New Client
      */
     public function store(Request $request)
     {
         $request->validate([
             'name' => 'required|string',
-            'email' => 'required|email|unique:freelancers,email',
+            'email' => 'required|email|unique:clients,email',
             'phone' => 'required|string',
             'password' => 'required|string|min:6',
         ]);
 
-        $freelancer = Freelancer::create([
+        $client = Client::create([
             'name' => $request->name,
             'email' => $request->email,
             'phone' => $request->phone,
@@ -42,118 +42,107 @@ class FreelancerController extends Controller
 
         return response()->json([
             'status' => true,
-            'data' => $freelancer
+            'data' => $client
         ], 201);
     }
 
     /**
-     * Display the specified resource.
+     * Get Client By ID
      */
     public function show(string $id)
     {
-        $freelancer = Freelancer::with('skomda_student')->where('id', $id)->first();
+        $client = Client::find($id);
 
-        if (!$freelancer) {
+        if (!$client) {
             return response()->json([
                 'status' => false,
-                'message' => 'Akun freelancer tidak ditemukan'
+                'message' => 'Akun client tidak ditemukan'
             ], 404);
         }
 
         return response()->json([
             'status' => true,
-            'data' => $freelancer
-        ]);
-    }
-
-    public function show_services(string $id)
-    {
-        $freelancer = Freelancer::with('services', 'skomda_student')->where('id', $id)->first();
-
-        if (!$freelancer) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Akun freelancer tidak ditemukan'
-            ], 404);
-        }
-
-        return response()->json([
-            'status' => true,
-            'data' => $freelancer
+            'data' => $client
         ]);
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update Client By ID
      */
     public function update(Request $request, string $id)
     {
-        $freelancer = Freelancer::find($id);
+        $client = Client::find($id);
 
-        if (!$freelancer) {
+        if (!$client) {
             return response()->json([
                 'status' => false,
-                'message' => 'Akun freelancer tidak ditemukan'
+                'message' => 'Akun client tidak ditemukan'
             ], 404);
         }
 
         $request->validate([
             'name' => 'required|string',
-            'email' => 'required|email|unique:freelancers,email,' . $id,
+            'email' => 'required|email|unique:clients,email,' . $id,
             'phone' => 'required|string',
         ]);
 
-        $freelancer->update($request->all());
+        $client->update($request->all());
 
         return response()->json([
             'status' => true,
-            'data' => $freelancer
+            'data' => $client
         ]);
     }
 
+    /**
+     * Update Client Profile
+     */
     public function update_profile(Request $request)
     {
-        $freelancer = $request->user();
+        $client = $request->user();
 
-        if (!$freelancer) {
+        if (!$client) {
             return response()->json([
                 'status' => false,
-                'message' => 'Akun freelancer tidak ditemukan'
+                'message' => 'Akun client tidak ditemukan'
             ], 404);
         }
 
         $request->validate([
             'name' => 'required|string',
-            'email' => 'required|email|unique:freelancers,email,' . $freelancer->id,
+            'email' => 'required|email|unique:clients,email,' . $client->id,
             'phone' => 'required|string',
         ]);
 
-        $freelancer->update($request->only(['name', 'email', 'phone']));
+        $client->update($request->only(['name', 'email', 'phone']));
 
         return response()->json([
             'status' => true,
             'message' => 'Profil berhasil diperbarui',
-            'data' => $freelancer
+            'data' => $client
         ]);
     }
 
+    /**
+     * Update Client Password
+     */
     public function update_password(Request $request)
     {
-        $freelancer = $request->user();
+        $client = $request->user();
 
         $request->validate([
             'current_password' => 'required|string',
             'password' => 'required|string|min:6|confirmed',
         ]);
 
-        if (!Hash::check($request->current_password, $freelancer->password)) {
+        if (!Hash::check($request->current_password, $client->password)) {
             return response()->json([
                 'status' => false,
                 'message' => 'Password lama salah'
             ], 422);
         }
 
-        $freelancer->update([
+        $client->update([
             'password' => Hash::make($request->password),
         ]);
 
@@ -164,24 +153,24 @@ class FreelancerController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Delete Client By ID
      */
     public function destroy(string $id)
     {
-        $freelancer = Freelancer::find($id);
+        $client = Client::find($id);
 
-        if (!$freelancer) {
+        if (!$client) {
             return response()->json([
                 'status' => false,
-                'message' => 'Akun freelancer tidak ditemukan'
+                'message' => 'Akun client tidak ditemukan'
             ], 404);
         }
 
-        $freelancer->delete();
+        $client->delete();
 
         return response()->json([
             'status' => true,
-            'message' => 'Akun freelancer berhasil dihapus'
+            'message' => 'Akun client berhasil dihapus'
         ]);
     }
 }

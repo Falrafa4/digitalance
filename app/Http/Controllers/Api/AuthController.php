@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
 use App\Models\Administrator;
 use App\Models\Client;
@@ -12,6 +12,9 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
+    /**
+     * Register Client.
+     */
     public function register_client(Request $request)
     {
         // create client account
@@ -35,6 +38,9 @@ class AuthController extends Controller
         ]);
     }
 
+    /**
+     * Register Freelancer.
+     */
     public function register_freelancer(Request $request)
     {
         // create freelancer account
@@ -71,6 +77,9 @@ class AuthController extends Controller
         ]);
     }
 
+    /**
+     * Login All Role.
+     */
     public function login(Request $request)
     {
         $credentials = $request->validate([
@@ -130,6 +139,9 @@ class AuthController extends Controller
         ], 401);
     }
 
+    /**
+     * Get My Info (Me).
+     */
     public function me(Request $request)
     {
         $user = $request->user();
@@ -162,6 +174,9 @@ class AuthController extends Controller
         ]);
     }
 
+    /**
+     * Logout All Role.
+     */
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();
