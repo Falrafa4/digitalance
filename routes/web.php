@@ -6,6 +6,6 @@ Route::get('/', function () {
     return view('home');
 });
 
-Route::get('/{signIn}', function ($auth) {
-    return view(view: 'signIn', data: ['signIn' => $auth]);
-})->where('signIn', '.*');
+Route::get('/signin', function () {
+    return view('signIn');
+});
