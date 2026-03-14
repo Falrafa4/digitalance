@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 class ServiceController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Get All Services
      */
     public function index()
     {
@@ -29,7 +29,7 @@ class ServiceController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store New Service
      */
     public function store(Request $request)
     {
@@ -60,7 +60,7 @@ class ServiceController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Get Service By ID
      */
     public function show(string $id)
     {
@@ -88,7 +88,7 @@ class ServiceController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update Service By ID
      */
     public function update(Request $request, string $id)
     {
@@ -128,7 +128,7 @@ class ServiceController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Delete Service By ID
      */
     public function destroy(string $id)
     {

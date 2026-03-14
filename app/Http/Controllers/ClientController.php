@@ -2,169 +2,102 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreClientRequest;
+use App\Http\Requests\UpdateClientPasswordRequest;
+use App\Http\Requests\UpdateClientProfileRequest;
 use App\Models\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
 class ClientController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function profile()
     {
-        $data = Client::all();
-
-        return response()->json([
-            'status' => true,
-            'data' => $data
-        ]);
+        $client = auth('client')->user();
+        return view('dashboard.client.profile', compact('client'));
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Update Client Profile
      */
-    public function store(Request $request)
+    public function updateProfile(UpdateClientProfileRequest $request)
     {
-        $request->validate([
-            'name' => 'required|string',
-            'email' => 'required|email|unique:clients,email',
-            'phone' => 'required|string',
-            'password' => 'required|string|min:6',
-        ]);
+        $client = auth('client')->user();
+        $client->update($request->validated());
 
-        $client = Client::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'password' => bcrypt($request->password),
-        ]);
-
-        return response()->json([
-            'status' => true,
-            'data' => $client
-        ], 201);
+        return redirect()->route('dashboard.client.profile')->with('success', 'Profil berhasil diperbarui');
     }
 
     /**
-     * Display the specified resource.
+     * Update Client Password
      */
-    public function show(string $id)
+    public function updatePassword(UpdateClientPasswordRequest $request)
     {
-        $client = Client::find($id);
-
-        if (!$client) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Akun client tidak ditemukan'
-            ], 404);
-        }
-
-        return response()->json([
-            'status' => true,
-            'data' => $client
-        ]);
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        $client = Client::find($id);
-
-        if (!$client) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Akun client tidak ditemukan'
-            ], 404);
-        }
-
-        $request->validate([
-            'name' => 'required|string',
-            'email' => 'required|email|unique:clients,email,' . $id,
-            'phone' => 'required|string',
-        ]);
-
-        $client->update($request->all());
-
-        return response()->json([
-            'status' => true,
-            'data' => $client
-        ]);
-    }
-
-    public function update_profile(Request $request)
-    {
-        $client = $request->user();
-
-        if (!$client) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Akun client tidak ditemukan'
-            ], 404);
-        }
-
-        $request->validate([
-            'name' => 'required|string',
-            'email' => 'required|email|unique:clients,email,' . $client->id,
-            'phone' => 'required|string',
-        ]);
-
-        $client->update($request->only(['name', 'email', 'phone']));
-
-        return response()->json([
-            'status' => true,
-            'message' => 'Profil berhasil diperbarui',
-            'data' => $client
-        ]);
-    }
-
-    public function update_password(Request $request)
-    {
-        $client = $request->user();
-
-        $request->validate([
-            'current_password' => 'required|string',
-            'password' => 'required|string|min:6|confirmed',
-        ]);
+        $client = auth('client')->user();
 
         if (!Hash::check($request->current_password, $client->password)) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Password lama salah'
-            ], 422);
+            return redirect()->route('dashboard.client.profile')->withErrors('Password saat ini salah');
         }
 
         $client->update([
             'password' => Hash::make($request->password),
         ]);
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Password berhasil diperbarui'
-        ]);
+        return redirect()->route('dashboard.client.profile')->with('success', 'Password berhasil diperbarui');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Get All Client.
      */
-    public function destroy(string $id)
+    public function index()
     {
-        $client = Client::find($id);
+        $clients = Client::all();
+        return view('dashboard.admin.clients.index', compact('clients'));
+    }
 
-        if (!$client) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Akun client tidak ditemukan'
-            ], 404);
-        }
+    public function create()
+    {
+        return view('dashboard.admin.clients.create');
+    }
 
+    /**
+     * Store New Client
+     */
+    public function store(StoreClientRequest $request)
+    {
+        Client::create($request->validated());
+        return redirect()->route('clients.index')->with('success', 'Akun client berhasil dibuat');
+    }
+
+    /**
+     * Get Client By ID
+     */
+    public function show(string $id)
+    {
+        $client = Client::findOrFail($id);
+        return view('dashboard.admin.clients.show', compact('client'));
+    }
+
+    public function edit(Client $client)
+    {
+        return view('dashboard.admin.clients.edit', compact('client'));
+    }
+
+    /**
+     * Update Client By ID
+     */
+    public function update(Request $request, Client $client)
+    {
+        $client->update($request->validated());
+        return redirect()->route('clients.index')->with('success', 'Akun client berhasil diperbarui');
+    }
+
+    /**
+     * Delete Client By ID
+     */
+    public function destroy(Client $client)
+    {
         $client->delete();
-
-        return response()->json([
-            'status' => true,
-            'message' => 'Akun client berhasil dihapus'
-        ]);
+        return redirect()->route('clients.index')->with('success', 'Akun client berhasil dihapus');
     }
 }

@@ -7,26 +7,26 @@ use App\Models\Administrator;
 class AdministratorController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Get All Administrators
      */
+    public function profile()
+    {
+        $administrator = auth()->guard('administrator')->user();
+
+        return view('dashboard.admin.profile', compact('administrator'));
+    }
+    
     public function index()
     {
-        $data = Administrator::all();
-
-        return response()->json([
-            'status' => true,
-            'data' => $data
-        ]);
+        $administrators = Administrator::all();
+        return view('dashboard.admin.administrators.index', compact('administrators'));
     }
 
     /**
-     * Display the specified resource.
+     * Get Administrator By ID
      */
     public function show(Administrator $administrator)
     {
-        return response()->json([
-            'status' => true,
-            'data' => $administrator
-        ]);
+        return view('dashboard.admin.administrators.show', compact('administrator'));
     }
 }

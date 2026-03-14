@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 class SkomdaStudentController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Get All Skomda Students
      */
     public function index()
     {
@@ -21,7 +21,7 @@ class SkomdaStudentController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store New Skomda Student
      */
     public function store(Request $request)
     {
@@ -46,7 +46,7 @@ class SkomdaStudentController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Get Skomda Student By ID
      */
     public function show(string $id)
     {
@@ -66,7 +66,7 @@ class SkomdaStudentController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update Skomda Student By ID
      */
     public function update(Request $request, string $id)
     {
@@ -94,7 +94,7 @@ class SkomdaStudentController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Delete Skomda Student By ID
      */
     public function destroy(string $id)
     {

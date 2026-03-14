@@ -10,6 +10,7 @@ class Freelancer extends Authenticatable
 {
     use HasFactory, HasApiTokens;
     protected $fillable = ['student_id', 'bio', 'email', 'password', 'status'];
+    protected $hidden = ['password'];
 
     public function skomda_student()
     {
