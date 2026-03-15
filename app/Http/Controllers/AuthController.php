@@ -67,46 +67,48 @@ class AuthController extends Controller
      * Login All Role.
      */
     public function login(Request $request)
-    {
-        $credentials = $request->validate([
-            'email' => 'required|email',
-            'password' => 'required'
-        ]);
+{
+    $credentials = $request->validate([
+        'email' => 'required|email',
+        'password' => 'required',
+    ]);
 
-        // admin
-        if (Auth::guard('administrator')->attempt($credentials)) {
-            return redirect('/admin/dashboard');
-        }
+    // --- 1. CEK CLIENT (Akun Biasa Kayak Lo) ---
+    // Laravel bakal nyari di tabel 'clients'
+    if (Auth::guard('client')->attempt($credentials)) {
+        $request->session()->regenerate();
+        return redirect()->intended('/client');
+    }
 
-        // client
-        if (Auth::guard('client')->attempt($credentials)) {
-            return redirect('/client/dashboard');
-        }
+    // --- 2. CEK ADMIN ---
+    if (Auth::guard('administrator')->attempt($credentials)) {
+        $request->session()->regenerate();
+        return redirect()->intended('/admin');
+    }
 
-        // freelancer
-        $student = SkomdaStudent::where('email', $credentials['email'])
-            ->with('freelancer')
-            ->first();
-
-        if (
-            $student && $student->freelancer &&
-            Hash::check($credentials['password'], $student->freelancer->password)
-        ) {
-
+    // --- 3. CEK FREELANCER (Khusus Student Skomda) ---
+    $student = \App\Models\SkomdaStudent::where('email', $request->email)->first();
+    if ($student && $student->freelancer) {
+        if (Hash::check($request->password, $student->freelancer->password)) {
             Auth::guard('freelancer')->login($student->freelancer);
-
-            return redirect('/freelancer/dashboard');
+            $request->session()->regenerate();
+            return redirect()->intended('/freelancer');
         }
-
-        return back()->withErrors('Email atau password salah');
     }
 
-    public function logout()
-    {
-        Auth::guard('administrator')->logout();
-        Auth::guard('client')->logout();
-        Auth::guard('freelancer')->logout();
+    // Kalau sampai sini berarti emang gak ada datanya
+    return back()->withErrors(['email' => 'Email atau Password salah, atau akun belum terdaftar!']);
+}
 
-        return redirect('/login');
-    }
+    public function logout(Request $request)
+{
+    Auth::guard('administrator')->logout();
+    Auth::guard('client')->logout();
+    Auth::guard('freelancer')->logout();
+
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
+
+    return redirect('/');
+}
 }

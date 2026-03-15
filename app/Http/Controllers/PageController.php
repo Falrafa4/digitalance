@@ -24,3 +24,4 @@ class PageController
         return view('auth.register_freelancer');
     }
 }
+

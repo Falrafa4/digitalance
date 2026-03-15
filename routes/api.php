@@ -1,12 +1,12 @@
 <?php
 
-use App\Http\Controllers\Api\AdministratorController;
-use App\Http\Controllers\Api\AuthController;
-use App\Http\Controllers\Api\ClientController;
-use App\Http\Controllers\Api\FreelancerController;
-use App\Http\Controllers\Api\ServiceCategoryController;
-use App\Http\Controllers\Api\ServiceController;
-use App\Http\Controllers\Api\SkomdaStudentController;
+use App\Http\Controllers\AdministratorController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ClientController;
+use App\Http\Controllers\FreelancerController;
+use App\Http\Controllers\ServiceCategoryController;
+use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\SkomdaStudentController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -30,8 +30,10 @@ Route::prefix('auth')->group(function () {
 
 Route::get('/me', [AuthController::class, 'me'])->middleware('auth:sanctum');
 
-// Administrator
+// Administrator (public)
 Route::apiResource('administrators', AdministratorController::class)->only(['index', 'show']);
+
+// Administrator only
 Route::middleware('auth:sanctum', 'role:administrator')->group(function () {
     Route::apiResource('clients', ClientController::class);
     Route::apiResource('freelancers', FreelancerController::class)->only(['store', 'update', 'destroy']);
@@ -40,21 +42,19 @@ Route::middleware('auth:sanctum', 'role:administrator')->group(function () {
     Route::apiResource('service-categories', ServiceCategoryController::class)->only(['store', 'update', 'destroy']);
 });
 
-// Client
+// Client only
 Route::middleware('auth:sanctum', 'role:client')->group(function () {
     Route::put('/clients/profile', [ClientController::class, 'update_profile']);
     Route::put('/clients/password', [ClientController::class, 'update_password']);
     Route::apiResource('clients', ClientController::class)->only(['show', 'update']);
 });
 
-// Freelancer
+// Freelancer only
 Route::middleware('auth:sanctum', 'role:freelancer')->group(function () {
     Route::put('/freelancers/profile', [FreelancerController::class, 'update_profile']);
     Route::put('/freelancers/password', [FreelancerController::class, 'update_password']);
-    // Route::apiResource('freelancers', FreelancerController::class)->only(['show', 'update']);
 });
 
-// MULTIPLE ROLES
 // Administrator + Freelancer
 Route::middleware('auth:sanctum', 'role:administrator,freelancer')->group(function () {
     Route::apiResource('service-categories', ServiceCategoryController::class)->only(['index', 'show']);

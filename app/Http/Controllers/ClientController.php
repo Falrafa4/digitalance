@@ -12,10 +12,15 @@ use Illuminate\Support\Facades\Hash;
 class ClientController extends Controller
 {
     public function profile()
-    {
-        $client = auth('client')->user();
-        return view('dashboard.client.profile', compact('client'));
-    }
+{
+    // Hanya ngambil sesi client
+    $user = auth('client')->user();
+
+    return view('profile', [
+        'user' => $user,
+        'role' => 'Client'
+    ]);
+}
 
     /**
      * Update Client Profile
@@ -51,8 +56,58 @@ class ClientController extends Controller
      */
     public function index()
     {
-        $clients = Client::all();
-        return view('dashboard.admin.clients.index', compact('clients'));
+        $clientsData = \App\Models\Client::all()->map(fn($c) => [
+            'id'          => $c->id,
+            'name'        => $c->name,
+            'email'       => $c->email,
+            'phone'       => $c->phone ?? '-',
+            'role'        => 'Client',
+            'status'      => 'Active',
+            'joinDate'    => $c->created_at?->format('d M Y') ?? '-',
+            'location'    => '-',
+            'skills'      => [],
+            'totalOrders' => 0,
+            'totalEarning'=> 'Rp 0',
+            'lastActive'  => '-',
+            'bio'         => '-',
+            'avatar'      => 'https://ui-avatars.com/api/?name=' . urlencode($c->name) . '&background=0f766e&color=fff',
+        ]);
+
+        $freelancersData = \App\Models\Freelancer::with('skomda_student')->get()->map(fn($f) => [
+            'id'          => $f->id,
+            'name'        => $f->skomda_student->name ?? '-',
+            'email'       => $f->skomda_student->email ?? '-',
+            'phone'       => $f->skomda_student->phone ?? '-',
+            'role'        => 'Freelancer',
+            'status'      => ucfirst($f->status ?? 'Pending'),
+            'joinDate'    => $f->created_at?->format('d M Y') ?? '-',
+            'location'    => '-',
+            'skills'      => [],
+            'totalOrders' => 0,
+            'totalEarning'=> 'Rp 0',
+            'lastActive'  => '-',
+            'bio'         => '-',
+            'avatar'      => 'https://ui-avatars.com/api/?name=' . urlencode($f->skomda_student->name ?? 'F') . '&background=0f766e&color=fff',
+        ]);
+
+        $skomdaData = \App\Models\SkomdaStudent::all()->map(fn($s) => [
+            'id'          => $s->id,
+            'name'        => $s->name,
+            'email'       => $s->email,
+            'phone'       => $s->phone ?? '-',
+            'role'        => 'Skomda Student',
+            'status'      => 'Active',
+            'joinDate'    => $s->created_at?->format('d M Y') ?? '-',
+            'location'    => '-',
+            'skills'      => [],
+            'totalOrders' => 0,
+            'totalEarning'=> 'Rp 0',
+            'lastActive'  => '-',
+            'bio'         => '-',
+            'avatar'      => 'https://ui-avatars.com/api/?name=' . urlencode($s->name) . '&background=0f766e&color=fff',
+        ]);
+
+        return view('admin-user', compact('clientsData', 'freelancersData', 'skomdaData'));
     }
 
     public function create()

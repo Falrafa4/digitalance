@@ -10,10 +10,23 @@ use Illuminate\Support\Facades\Hash;
 
 class FreelancerController extends Controller
 {
-    public function profile() {
-        $freelancer = auth('freelancer')->user();
-        return view('freelancer.profile', compact('freelancer'));
-    }
+    public function profile() 
+{
+    // Hanya ngambil sesi freelancer
+    $freelancer = auth('freelancer')->user();
+    
+    // Tarik relasi datanya
+    $freelancer->load('skomda_student');
+    
+    // Akalin properti name & email biar sama kayak Admin & Client di Blade
+    $freelancer->name = $freelancer->skomda_student->name ?? 'Siswa Skomda';
+    $freelancer->email = $freelancer->skomda_student->email ?? '-';
+
+    return view('profile', [
+        'user' => $freelancer,
+        'role' => 'Freelancer'
+    ]);
+}
 
     public function updateProfile(UpdateFreelancerRequest $request)
     {
