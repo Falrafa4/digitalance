@@ -6,22 +6,22 @@ class PageController
 {
     public function home()
     {
-        return view('home');
+        return view('public.home');
     }
 
     public function login()
     {
-        return view('login');
+        return view('public.login');
     }
 
     public function registerClient()
     {
-        return view('auth.register_client');
+        return view('auth.register-client');
     }
 
     public function registerFreelancer()
     {
-        return view('auth.register_freelancer');
+        return view('auth.register-freelancer');
     }
 }
 

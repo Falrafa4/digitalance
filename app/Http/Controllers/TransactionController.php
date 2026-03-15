@@ -7,6 +7,10 @@ use Illuminate\Http\Request;
 
 class TransactionController extends Controller
 {
+    public function adminIndex() {
+        return view('dashboard.admin.transactions');
+    }
+    
     /**
      * Display a listing of the resource.
      */

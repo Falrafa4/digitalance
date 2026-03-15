@@ -9,7 +9,6 @@ use App\Models\SkomdaStudent;
 
 class DashboardController extends Controller
 {
-
     public function admin()
     {
         $totalUsers = Client::count() + Freelancer::count();
@@ -23,7 +22,7 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
-        return view('admin-dashboard', compact(
+        return view('dashboard.admin.dashboard', compact(
             'totalUsers',
             'activeProjects',
             'totalRevenue',
@@ -54,12 +53,12 @@ class DashboardController extends Controller
             ->take(3)
             ->get();
 
-        return view('client-dashboard', compact('user', 'projects', 'activeProjects', 'totalSpent', 'completedProjects'));
+        return view('dashboard.client.dashboard', compact('user', 'projects', 'activeProjects', 'totalSpent', 'completedProjects'));
     }
 
     public function freelancer()
     {
-        return view('freelancer-dashboard');
+        return view('dashboard.freelancer.dashboard');
     }
 
     public function verifyFreelancer($id)

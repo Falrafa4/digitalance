@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Administrator;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class AdministratorController extends Controller
 {
@@ -23,7 +25,7 @@ class AdministratorController extends Controller
     public function index()
     {
         $administrators = Administrator::all();
-        return view('admin-admins', compact('administrators'));
+        return view('dashboard.admin.admins', compact('administrators'));
     }
 
     /**
