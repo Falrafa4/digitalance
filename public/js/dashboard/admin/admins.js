@@ -11,49 +11,6 @@ let adminsData = [
 const STATUS_DOT_MAP  = { 'Active': 'online', 'Inactive': 'offline', 'Suspended': 'suspended' };
 const STATUS_PILL_MAP = { 'Active': 'active',  'Inactive': 'inactive', 'Suspended': 'suspended' };
 
-function renderStats() {
-  const row = document.getElementById('stats-row');
-  if (!row) return;
-  const total     = adminsData.length;
-  const active    = adminsData.filter(a => a.status === 'Active').length;
-  const inactive  = adminsData.filter(a => a.status === 'Inactive').length;
-  const suspended = adminsData.filter(a => a.status === 'Suspended').length;
-  row.innerHTML = `
-    <div class="stat-card"><div class="stat-icon teal"><i class="ri-shield-user-line"></i></div><div class="stat-text"><span class="stat-value">${total}</span><span class="stat-label">Total Admin</span></div></div>
-    <div class="stat-card"><div class="stat-icon blue"><i class="ri-checkbox-circle-line"></i></div><div class="stat-text"><span class="stat-value">${active}</span><span class="stat-label">Admin Aktif</span></div></div>
-    <div class="stat-card"><div class="stat-icon amber"><i class="ri-moon-line"></i></div><div class="stat-text"><span class="stat-value">${inactive}</span><span class="stat-label">Nonaktif</span></div></div>
-    <div class="stat-card"><div class="stat-icon red"><i class="ri-forbid-line"></i></div><div class="stat-text"><span class="stat-value">${suspended}</span><span class="stat-label">Suspended</span></div></div>
-  `;
-}
-
-function renderCards(data = adminsData) {
-  const grid = document.getElementById('admin-card-grid');
-  if (!grid) return;
-  if (!data || data.length === 0) {
-    grid.innerHTML = `<div class="empty-state"><div class="empty-icon"><i class="ri-shield-user-line"></i></div><h3>Tidak ada admin ditemukan</h3><p>Coba ubah filter atau kata kunci pencarian.</p></div>`;
-    return;
-  }
-  grid.innerHTML = data.map(a => `
-    <div class="user-card-item">
-      <div class="user-card-top">
-        <div class="user-card-avatar-wrap">
-          <img class="user-card-avatar" src="${a.avatar}" alt="${a.name}" />
-          <span class="user-online-dot ${STATUS_DOT_MAP[a.status] ?? 'offline'}"></span>
-        </div>
-        <span class="status-pill ${STATUS_PILL_MAP[a.status] ?? 'inactive'}">
-          <i class="ri-circle-fill" style="font-size:7px;"></i> ${a.status}
-        </span>
-      </div>
-      <h3 class="user-card-name">${a.name}</h3>
-      <span class="user-card-role"><i class="ri-shield-user-line"></i> Admin</span>
-      <span class="user-card-location"><i class="ri-mail-line"></i> ${a.email}</span>
-      <button class="btn-detail" style="margin-top:auto;" onclick="openAdminModal(${a.id})">
-        <i class="ri-eye-line"></i> Lihat Profil
-      </button>
-    </div>
-  `).join('');
-}
-
 function openAdminModal(id) {
   const a = adminsData.find(a => a.id === id);
   if (!a) return;
@@ -136,53 +93,29 @@ function executeDeleteAdmin(id) {
 }
 
 function openAddAdminModal() {
-  const existing = document.getElementById('add-admin-overlay');
-  if (existing) existing.remove();
-  const el = document.createElement('div');
-  el.className = 'modal-overlay'; el.id = 'add-admin-overlay';
-  el.innerHTML = `
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>Tambah Admin Baru</h2>
-        <button class="close-modal" id="btn-close-add-admin"><i class="ri-close-line"></i></button>
-      </div>
-      <form id="form-add-admin">
-        <div class="form-row">
-          <div class="form-group"><label>Nama Lengkap</label><input type="text" id="add-admin-name" required placeholder="e.g. Budi Santoso" /></div>
-          <div class="form-group"><label>Email</label><input type="email" id="add-admin-email" required placeholder="budi@digitalance.id" /></div>
-        </div>
-        <div class="form-group"><label>No. Telepon</label><input type="text" id="add-admin-phone" placeholder="+62 812-xxxx-xxxx" /></div>
-        <div class="form-group"><label>Bio</label><textarea id="add-admin-bio" rows="2" placeholder="Deskripsi singkat..."></textarea></div>
-        <div class="modal-actions">
-          <button type="button" class="btn-secondary" id="btn-cancel-add-admin">Batal</button>
-          <button type="submit" class="btn-primary"><i class="ri-save-line"></i> Simpan Admin</button>
-        </div>
-      </form>
-    </div>`;
-  document.body.appendChild(el);
+  const el = document.getElementById('modalCreate');
+  if (!el) return;
+
+  const closeHandler = (event) => {
+    if (event) event.preventDefault();
+    closeAddAdminModal('modalCreate');
+  };
+
   requestAnimationFrame(() => el.classList.add('open'));
-  el.querySelector('#btn-close-add-admin').addEventListener('click', closeAddAdminModal);
-  el.querySelector('#btn-cancel-add-admin').addEventListener('click', closeAddAdminModal);
-  el.addEventListener('click', (e) => { if (e.target === el) closeAddAdminModal(); });
-  el.querySelector('#form-add-admin').addEventListener('submit', (e) => {
-    e.preventDefault();
-    const name = el.querySelector('#add-admin-name').value.trim();
-    adminsData.push({
-      id: Date.now(), name,
-      email:    el.querySelector('#add-admin-email').value.trim(),
-      avatar:   `https://picsum.photos/seed/${name.split(' ')[0].toLowerCase()}/200/200`,
-      status:   'Active',
-      joinDate: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }),
-      phone:    el.querySelector('#add-admin-phone').value.trim() || '-',
-      bio:      el.querySelector('#add-admin-bio').value.trim() || 'Belum ada bio.',
-    });
-    closeAddAdminModal(); refreshAfterChange();
-  });
+
+  const closeButton = document.getElementById('btn-close-add-admin');
+  const cancelButton = document.getElementById('btn-cancel-add-admin');
+
+  if (closeButton) closeButton.onclick = closeHandler;
+  if (cancelButton) cancelButton.onclick = closeHandler;
+  el.onclick = (e) => {
+    if (e.target === el) closeAddAdminModal('modalCreate');
+  };
 }
 
-function closeAddAdminModal() {
-  const el = document.getElementById('add-admin-overlay');
-  if (el) { el.classList.remove('open'); setTimeout(() => el.remove(), 280); }
+function closeAddAdminModal(id) {
+  const el = document.getElementById(id);
+  if (el) el.classList.remove('open');
 }
 
 function openEditAdminModal(id) {
@@ -272,8 +205,6 @@ function refreshAfterChange() {
 }
 
 function initPage() {
-  renderStats();
-  renderCards();
   initFilters();
   initSearch();
   const btnAdd = document.getElementById('btn-add-admin');
