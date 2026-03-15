@@ -2,19 +2,22 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Client;
+use App\Models\Freelancer;
 use App\Models\Order;
+use App\Models\SkomdaStudent;
 
 class DashboardController extends Controller
 {
 
     public function admin()
     {
-        $totalUsers = \App\Models\Client::count() + \App\Models\Freelancer::count();
-        $activeProjects = \App\Models\Order::whereIn('status', ['pending', 'in progress'])->count();
-        $totalRevenue = \App\Models\Order::where('status', 'completed')->sum('agreed_price');
-        $openDisputes = \App\Models\Order::where('status', 'disputed')->count();
+        $totalUsers = Client::count() + Freelancer::count();
+        $activeProjects = Order::whereIn('status', ['pending', 'in progress'])->count();
+        $totalRevenue = Order::where('status', 'completed')->sum('agreed_price');
+        $openDisputes = Order::where('status', 'disputed')->count();
 
-        $pendingVerifications = \App\Models\Freelancer::with('user')
+        $pendingVerifications = Freelancer::with('user')
             ->where('status', 'pending')  // sesuaikan value status pending di DB kamu
             ->orderBy('created_at', 'desc')
             ->limit(5)
@@ -34,7 +37,7 @@ class DashboardController extends Controller
         $user = auth()->guard('client')->user();
 
         // 1. Ambil semua order milik client ini
-        $allOrders = \App\Models\Order::where('client_id', $user->id)->get();
+        $allOrders = Order::where('client_id', $user->id)->get();
 
         // 2. Hitung statistik
         $activeProjects = $allOrders->whereIn('status', ['pending', 'in progress'])->count();
@@ -45,7 +48,7 @@ class DashboardController extends Controller
         $completedProjects = $allOrders->where('status', 'completed')->count();
 
         // 3. Ambil 3 project terbaru buat list di bawah (sama kayak sebelumnya)
-        $projects = \App\Models\Order::with('service')
+        $projects = Order::with('service')
             ->where('client_id', $user->id)
             ->latest()
             ->take(3)
@@ -61,23 +64,23 @@ class DashboardController extends Controller
 
     public function verifyFreelancer($id)
     {
-        $freelancer = \App\Models\Freelancer::findOrFail($id);
+        $freelancer = Freelancer::findOrFail($id);
         $freelancer->update(['status' => 'Approved']); // Pastikan kolom status ada di tabel freelancers
         return response()->json(['message' => 'Success']);
     }
 
     public function rejectFreelancer($id)
     {
-        $freelancer = \App\Models\Freelancer::findOrFail($id);
+        $freelancer = Freelancer::findOrFail($id);
         $freelancer->update(['status' => 'Rejected']);
         return response()->json(['message' => 'Success']);
     }
 
     public function user()
     {
-        $clients = \App\Models\Client::latest()->get();
-        $freelancers = \App\Models\Freelancer::with('user')->latest()->get();
-        $skomdaStudents = \App\Models\SkomdaStudent::latest()->get();
+        $clients = Client::latest()->get();
+        $freelancers = Freelancer::with('user')->latest()->get();
+        $skomdaStudents = SkomdaStudent::latest()->get();
 
         return view('admin.admin-user', compact('clients', 'freelancers', 'skomdaStudents'));
     }
