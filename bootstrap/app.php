@@ -19,18 +19,5 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        $exceptions->render(function(AuthenticationException $e, $request) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Invalid token'
-            ], 401);
-        });
-
-        $exceptions->render(function(ValidationException $e, $request) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Invalid fields',
-                'errors' => $e->errors()
-            ], 422);
-        });
+        //
     })->create();
