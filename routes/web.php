@@ -13,7 +13,7 @@ use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 
 // ── PUBLIC ──────────────────────────────────────────────
-Route::get('/', [PageController::class, 'home']);
+Route::get('/', [PageController::class, 'home'])->name('home');
 Route::get('/login', [PageController::class, 'login'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login-process');
 Route::get('/register-client', [PageController::class, 'registerClient']);
@@ -35,8 +35,8 @@ Route::middleware('auth:administrator')->prefix('admin')->name('admin.')->group(
     Route::get('/user', [ClientController::class, 'index'])->name('user');
 
     // Administrators
-    Route::get('/super', [AdministratorController::class, 'index'])->name('super');
-    Route::get('/super/{administrator}', [AdministratorController::class, 'show'])->name('super.show');
+    Route::get('/admins', [AdministratorController::class, 'index'])->name('admins');
+    Route::get('/admins/{administrator}', [AdministratorController::class, 'show'])->name('admins.show');
 
     // Clients (CRUD)
     Route::get('/clients', [ClientController::class, 'index'])->name('clients.index');
