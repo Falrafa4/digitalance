@@ -128,9 +128,9 @@
                 {{ request()->routeIs('admin.clients.*','admin.freelancers.*','admin.skomda-students.*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
         <i class="ri-user-line text-[17px]"></i> User
       </a>
-      <a href="{{ route('admin.super') }}"
+      <a href="{{ route('admin.admins') }}"
          class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
-                {{ request()->routeIs('admin.super*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
+                {{ request()->routeIs('admin.admins*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
         <i class="ri-user-star-line text-[17px]"></i> Admin
       </a>
       <span class="flex items-center justify-between gap-[11px] px-[14px] py-[11px] rounded-[11px] text-slate-300 font-semibold text-[13.5px] cursor-not-allowed select-none">
@@ -228,8 +228,8 @@
       <!-- Page Header -->
       <div class="flex items-end justify-between mb-8 gap-4 flex-wrap animate-fadeUp">
         <div>
-          <h1 class="font-display text-[2.1rem] font-extrabold text-slate-900">User Management</h1>
-          <p class="text-slate-500 text-[0.95rem] mt-1">Kelola seluruh pengguna yang terdaftar di platform Digitalance.</p>
+          <h1 class="font-display text-[2.1rem] font-extrabold text-slate-900">Client Management</h1>
+          <p class="text-slate-500 text-[0.95rem] mt-1">Kelola seluruh client yang terdaftar di platform Digitalance.</p>
         </div>
         <button id="btn-add-user"
                 class="inline-flex items-center gap-2 px-[22px] py-[11px] bg-[#0f766e] text-white font-display font-bold text-[13px] rounded-[12px] shadow-teal-md hover:bg-[#0a5e58] hover:shadow-teal-lg transition-all duration-200 hover:-translate-y-0.5 cursor-pointer border-none whitespace-nowrap">
@@ -838,7 +838,7 @@
     { label:'Clients',           sub:'User › Daftar client',       icon:'ri-user-line',         url:'{{ route("admin.clients.index") }}' },
     { label:'Freelancers',       sub:'User › Daftar freelancer',   icon:'ri-user-star-line',    url:'{{ route("admin.freelancers.index") }}' },
     { label:'Skomda Students',   sub:'User › Data siswa skomda',   icon:'ri-user-line',         url:'{{ route("admin.skomda-students.index") }}' },
-    { label:'Administrators',    sub:'Admin › Daftar admin',       icon:'ri-user-star-line',    url:'{{ route("admin.super") }}' },
+    { label:'Administrators',    sub:'Admin › Daftar admin',       icon:'ri-user-star-line',    url:'{{ route("admin.admins") }}' },
     { label:'Services',          sub:'Daftar layanan',             icon:'ri-tools-line',        url:'{{ route("admin.services") }}' },
     { label:'Service Categories',sub:'Kategori layanan',           icon:'ri-layout-grid-line',  url:'{{ route("admin.service-categories") }}' },
     { label:'Transactions',      sub:'Riwayat transaksi',          icon:'ri-bank-card-line',    url:'{{ route("admin.transactions") }}' },

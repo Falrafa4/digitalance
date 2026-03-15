@@ -1,3 +1,6 @@
+@php
+  $user = Auth::user();
+@endphp
 <!doctype html>
 <html lang="en">
   <head>
@@ -7,7 +10,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Sora:wght@600;700;800&display=swap" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet" />
-    <link rel="stylesheet" href="../assets/css/admin-super.css" />
+    <link rel="stylesheet" href="{{ asset('css/admin-super.css') }}" />
   </head>
   <body>
     <div class="app">
@@ -68,8 +71,8 @@
             <div class="user-card">
               <img class="user-avatar" src="https://picsum.photos/seed/admin/100/100" alt="Admin Profile" />
               <div class="user-info">
-                <span class="user-name">Reva</span>
-                <span class="user-role">System Manager</span>
+                <span class="user-name">{{$user->email}}</span>
+                <span class="user-role">Administrator</span>
               </div>
             </div>
           </div>
@@ -89,14 +92,35 @@
 
         <div class="stats-row" id="stats-row"></div>
 
-        <div class="filter-tabs">
+        {{-- <div class="filter-tabs">
           <button class="filter-tab active" data-filter="all">Semua</button>
           <button class="filter-tab" data-filter="Active">Aktif</button>
           <button class="filter-tab" data-filter="Inactive">Nonaktif</button>
           <button class="filter-tab" data-filter="Suspended">Suspended</button>
-        </div>
+        </div> --}}
 
-        <div class="admin-card-grid" id="admin-card-grid"></div>
+        <div class="admin-card-grid" id="admin-card-grid">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Email</th>
+                <th>Created At</th>
+                <th>Updated At</th>
+              </tr>
+            </thead>
+            <tbody>
+              @foreach ($administrators as $admin)
+                <tr>
+                  <td>{{$admin->id}}</td>
+                  <td>{{$admin->email}}</td>
+                  <td>{{$admin->created_at}}</td>
+                  <td>{{$admin->updated_at}}</td>
+                </tr>
+              @endforeach
+            </tbody>
+          </table>
+        </div>
       </main>
     </div>
 
