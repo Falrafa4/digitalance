@@ -1,0 +1,225 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+/* Grain overlay */
+.grain-overlay {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 999;
+    opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* Overlay slide transition */
+.auth-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 50%;
+    height: 100%;
+    z-index: 20;
+    overflow: hidden;
+    transition: transform 0.65s cubic-bezier(0.25, 1, 0.5, 1);
+    transform: translateX(0%);
+}
+
+.auth-overlay.register-mode {
+    transform: translateX(100%);
+}
+
+/* Form panel transitions */
+.form-panel {
+    position: absolute;
+    top: 0;
+    width: 50%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.65s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.login-panel {
+    left: 50%;
+    transform: translateX(0);
+}
+
+.login-panel.inactive {
+    transform: translateX(48px);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.login-panel.active {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateX(0);
+}
+
+.register-panel {
+    left: 0;
+    transform: translateX(-50px);
+}
+
+.register-panel.active {
+    transform: translateX(0);
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Image gradient */
+.image-gradient {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.88) 0%, rgba(0, 0, 0, 0.4) 50%, rgba(0, 0, 0, 0.05) 100%);
+}
+
+/* Tag pop animation */
+.tag-item {
+    animation: popIn 0.2s ease forwards;
+}
+
+/* Skill wrapper animated (grid rows trick) */
+.skill-wrapper-anim {
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    transform: scale(0.98);
+    transform-origin: top;
+    overflow: hidden;
+    transition:
+        grid-template-rows 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+        opacity 0.4s ease,
+        transform 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+        margin 0.4s ease;
+    margin-top: 0;
+}
+
+.skill-wrapper-anim.open {
+    grid-template-rows: 1fr;
+    opacity: 1;
+    transform: scale(1);
+    margin-top: 0.75rem;
+}
+
+.skill-inner-content {
+    min-height: 0;
+}
+
+/* Input focus ring */
+.input-field:focus {
+    outline: none;
+    border-color: #0F766E;
+    box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.08);
+}
+
+/* Hero image hover zoom */
+.hero-image-container:hover .hero-image {
+    transform: scale(1.05);
+}
+
+.hero-image {
+    transition: transform 1s ease, opacity 0.4s ease;
+}
+
+.hero-image.fade-out {
+    opacity: 0;
+}
+
+/* Overlay text transition */
+.overlay-text-item {
+    transition: opacity 0.3s ease;
+}
+
+/* Role slider */
+.role-slider {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    height: calc(100% - 8px);
+    width: calc(50% - 4px);
+    background: white;
+    border-radius: 9999px;
+    z-index: 0;
+    transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+.role-toggle.freelancer-active .role-slider {
+    transform: translateX(100%);
+}
+
+@media (max-width: 1024px) {
+    body {
+        overflow: auto;
+    }
+
+    .auth-overlay {
+        position: relative;
+        width: 100%;
+        height: 200px;
+        transform: none !important;
+    }
+
+    .auth-overlay.register-mode {
+        transform: none !important;
+    }
+
+    .form-panel {
+        position: relative;
+        width: 100%;
+        opacity: 1;
+        pointer-events: auto;
+        transform: none !important;
+        left: auto;
+        max-height: none !important;
+        overflow: visible !important;
+    }
+
+    .login-panel.inactive {
+        display: none;
+    }
+
+    .register-panel:not(.active) {
+        display: none;
+    }
+
+    .login-panel.active,
+    .register-panel.active {
+        display: flex;
+    }
+
+    #authContainer {
+        height: auto !important;
+        min-height: auto !important;
+        flex-direction: column;
+        border-radius: 24px;
+        margin: 1rem 0;
+    }
+
+    .form-panel>div {
+        max-height: none !important;
+        overflow: visible !important;
+        padding: 1.5rem 1.5rem 2rem !important;
+    }
+}
+
+@media (max-width: 640px) {
+    .form-panel>div {
+        padding: 1.25rem 1.25rem 1.75rem !important;
+    }
+
+    .grid.grid-cols-2 {
+        grid-template-columns: 1fr !important;
+    }
+}
