@@ -2,114 +2,85 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StorePortofolioRequest;
+use App\Http\Requests\UpdatePortofolioRequest;
 use App\Models\Portofolio;
-use Illuminate\Http\Request;
 
 class PortofolioController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display a listing of the resource. (ADMIN ONLY)
      */
     public function index()
     {
-        $data = Portofolio::all();
+        $portofolios = Portofolio::with('service.freelancer')->paginate(10);
 
-        return response()->json([
-            'status' => true,
-            'data' => $data
-        ]);
+        return view('dashboard.admin.portofolios', compact('portofolios'));
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Display a listing of the resource. (FREELANCER ONLY)
      */
-    public function store(Request $request)
+    public function freelancerIndex()
     {
-        $validated = $request->validate([
-            'service_id' => 'required|exists:services,id',
-            'title' => 'required|string',
-            'description' => 'required|string',
-            'media_url' => 'required|url',
-        ]);
+        $freelancer = auth('freelancer')->user();
+        $portofolios = Portofolio::with('service')->where('freelancer_id', $freelancer->id)->get();
+        $services = $freelancer->services();
 
-        $portofolio = Portofolio::create($validated);
-
-        return response()->json([
-            'status' => true,
-            'message' => 'Portofolio berhasil dibuat',
-            'data' => $portofolio
-        ], 201);
+        return view('dashboard.freelancer.portofolios', compact('portofolios', 'services'));
     }
 
     /**
-     * Display the specified resource.
+     * Store a newly created resource in storage. (FREELANCER ONLY)
+     */
+    public function store(StorePortofolioRequest $request)
+    {
+        Portofolio::create($request->validated());
+
+        return redirect()->route('freelancer.portofolios.index')->with('success', 'Portofolio berhasil ditambahkan');
+    }
+
+    /**
+     * Display the specified resource. (FREELANCER ONLY)
      */
     public function show(string $id)
     {
-        $service_category = Portofolio::find($id);
+        $portofolio = Portofolio::with('service')->findOrFail($id);
 
-        if (!$service_category) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Portofolio tidak ditemukan'
-            ], 404);
-        }
-
-        return response()->json([
-            'status' => true,
-            'data' => $service_category
-        ], 201);
+        return view('dashboard.freelancer.portofolios', compact('portofolio'));
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update the specified resource in storage. (FREELANCER ONLY)
      */
-    public function update(Request $request, string $id)
+    public function update(UpdatePortofolioRequest $request, string $id)
     {
-        $portofolio = Portofolio::find($id);
+        $freelancer = auth('freelancer')->user();
+        $portofolio = Portofolio::with('service')->findOrFail($id);
 
-        if (!$portofolio) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Portofolio tidak ditemukan'
-            ], 404);
+        if ($freelancer->id !== $portofolio->service->freelancer_id) {
+            return redirect()->route('freelancer.portofolios.index')->with('error', 'Anda tidak memiliki akses untuk mengedit portofolio ini');
         }
 
-        $validated = $request->validate([
-            'service_id' => 'required|exists:services,id',
-            'title' => 'required|string',
-            'description' => 'required|string',
-            'media_url' => 'required|url',
-        ]);
+        $portofolio->update($request->validated());
 
-        $portofolio->update($validated);
-
-        return response()->json([
-            'status' => true,
-            'message' => 'Portofolio berhasil diperbarui',
-            'data' => $portofolio,
-        ], 201);
+        return redirect()->route('freelancer.portofolios.index')->with('success', 'Portofolio berhasil diperbarui');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified resource from storage. (FREELANCER ONLY)
      */
     public function destroy(string $id)
     {
-        $portofolio = Portofolio::find($id);
+        $freelancer = auth('freelancer')->user();
+        $portofolio = Portofolio::with('service')->findOrFail($id);
 
-        if (!$portofolio) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Portofolio tidak ditemukan'
-            ], 404);
+        if ($freelancer->id !== $portofolio->service->freelancer_id) {
+            return redirect()->route('freelancer.portofolios.index')->with('error', 'Anda tidak memiliki akses untuk menghapus portofolio ini');
         }
-
+        
         $portofolio->delete();
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Portofolio berhasil dihapus'
-        ], 204);
+        return redirect()->route('freelancer.portofolios.index')->with('success', 'Portofolio berhasil dihapus');
     }
 }

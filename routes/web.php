@@ -1,15 +1,16 @@
 <?php
 
 use App\Http\Controllers\AdministratorController;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FreelancerController;
 use App\Http\Controllers\PageController;
+use App\Http\Controllers\PortofolioController;
 use App\Http\Controllers\ServiceCategoryController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\SkomdaStudentController;
 use App\Http\Controllers\TransactionController;
-use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 
 // ── PUBLIC ──────────────────────────────────────────────
@@ -77,6 +78,9 @@ Route::middleware('auth:administrator')->prefix('admin')->name('admin.')->group(
     Route::put('/service-categories/{service_category}', [ServiceCategoryController::class, 'update'])->name('service-categories.update');
     Route::delete('/service-categories/{service_category}', [ServiceCategoryController::class, 'destroy'])->name('service-categories.destroy');
 
+    // Portofolios
+    Route::get('/portofolios', [PortofolioController::class, 'index'])->name('portofolios.index');
+
     // Transactions
     Route::get('/transactions', [TransactionController::class, 'index'])->name('transactions.index');
     Route::get('/transactions/create', [TransactionController::class, 'create'])->name('transactions.create');
@@ -106,4 +110,11 @@ Route::middleware('auth:freelancer')->prefix('freelancer')->name('freelancer.')-
     Route::get('/services/{service}/edit', [ServiceController::class, 'edit'])->name('services.edit');
     Route::put('/services/{service}', [ServiceController::class, 'update'])->name('services.update');
     Route::delete('/services/{service}', [ServiceController::class, 'destroy'])->name('services.destroy');
+
+    // crud portofolios
+    Route::get('/portofolios', [PortofolioController::class, 'freelancerIndex'])->name('portofolios.index');
+    Route::post('/portofolios', [PortofolioController::class, 'store'])->name('portofolios.store');
+    Route::get('/portofolios/{portofolio}', [PortofolioController::class, 'show'])->name('portofolios.show');
+    Route::put('/portofolios/{portofolio}', [PortofolioController::class, 'update'])->name('portofolios.update');
+    Route::delete('/portofolios/{portofolio}', [PortofolioController::class, 'destroy'])->name('portofolios.destroy');
 });
