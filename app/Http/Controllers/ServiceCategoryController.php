@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreServiceCategoryRequest;
+use App\Http\Requests\UpdateServiceCategoryRequest;
 use App\Models\ServiceCategory;
-use Illuminate\Http\Request;
 
 class ServiceCategoryController extends Controller
 {
@@ -12,33 +13,18 @@ class ServiceCategoryController extends Controller
      */
     public function index()
     {
-        $data = ServiceCategory::all();
-
-        return response()->json([
-            'status' => true,
-            'data' => $data
-        ]);
+        $serviceCategories = ServiceCategory::paginate(10);
+        return view('dashboard.admin.service_categories', compact('serviceCategories'));
     }
 
     /**
      * Store New Service Category
      */
-    public function store(Request $request)
+    public function store(StoreServiceCategoryRequest $request)
     {
-        $request->validate([
-            'name' => 'required|string',
-            'description' => 'required|string',
-        ]);
+        ServiceCategory::create($request->validated());
 
-        $service_category = ServiceCategory::create([
-            'name' => $request->name,
-            'description' => $request->description,
-        ]);
-
-        return response()->json([
-            'status' => true,
-            'data' => $service_category
-        ], 201);
+        return redirect()->route('admin.service-categories')->with('success', 'Kategori layanan berhasil ditambahkan');
     }
 
     /**
@@ -46,46 +32,20 @@ class ServiceCategoryController extends Controller
      */
     public function show(string $id)
     {
-        $service_category = ServiceCategory::find($id);
+        $serviceCategory = ServiceCategory::findOrFail($id);
 
-        if (!$service_category) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Kategori layanan tidak ditemukan'
-            ], 404);
-        }
-
-        return response()->json([
-            'status' => true,
-            'data' => $service_category
-        ]);
+        return view('dashboard.admin.service_categories', compact('serviceCategory'));
     }
 
     /**
      * Update Service Category By ID
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateServiceCategoryRequest $request, string $id)
     {
-        $service_category = ServiceCategory::find($id);
+        $serviceCategory = ServiceCategory::findOrFail($id);
+        $serviceCategory->update($request->validated());
 
-        if (!$service_category) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Kategori layanan tidak ditemukan'
-            ], 404);
-        }
-
-        $request->validate([
-            'name' => 'required|string',
-            'description' => 'required|string',
-        ]);
-
-        $service_category->update($request->all());
-
-        return response()->json([
-            'status' => true,
-            'data' => $service_category
-        ]);
+        return redirect()->route('admin.service-categories')->with('success', 'Kategori layanan berhasil diperbarui');
     }
 
     /**
@@ -93,20 +53,10 @@ class ServiceCategoryController extends Controller
      */
     public function destroy(string $id)
     {
-        $service_category = ServiceCategory::find($id);
+        $serviceCategory = ServiceCategory::findOrFail($id);
 
-        if (!$service_category) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Kategori layanan tidak ditemukan'
-            ], 404);
-        }
+        $serviceCategory->delete();
 
-        $service_category->delete();
-
-        return response()->json([
-            'status' => true,
-            'message' => 'Kategori layanan berhasil dihapus'
-        ]);
+        return redirect()->route('admin.service-categories')->with('success', 'Kategori layanan berhasil dihapus');
     }
 }
