@@ -91,7 +91,7 @@ class ClientController extends Controller
             'avatar'      => 'https://ui-avatars.com/api/?name=' . urlencode($s->name) . '&background=0f766e&color=fff',
         ]);
 
-        return view('admin-user', compact('clientsData', 'freelancersData', 'skomdaData'));
+        return view('dashboard.admin.clients', compact('clientsData', 'freelancersData', 'skomdaData'));
     }
 
     public function create()
