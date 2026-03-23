@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreSkomdaStudentRequest;
+use App\Http\Requests\UpdateSkomdaStudentRequest;
 use App\Models\SkomdaStudent;
-use Illuminate\Http\Request;
 
 class SkomdaStudentController extends Controller
 {
@@ -12,37 +13,28 @@ class SkomdaStudentController extends Controller
      */
     public function index()
     {
-        $data = SkomdaStudent::all();
-
-        return response()->json([
-            'status' => true,
-            'data' => $data
-        ]);
+        $skomdaStudents = SkomdaStudent::paginate(10);
+        return view('dashboard.admin.skomda_students', compact('skomdaStudents'));
     }
 
     /**
      * Store New Skomda Student
      */
-    public function store(Request $request)
+    public function store(StoreSkomdaStudentRequest $request)
     {
-        $request->validate([
-            'name' => 'required|string',
-            'email' => 'required|email|unique:skomda_students,email',
-            'phone' => 'required|string',
-            'password' => 'required|string|min:6',
-        ]);
+        $request->validated();
 
-        $skomda_student = SkomdaStudent::create([
+        SkomdaStudent::create([
             'name' => $request->name,
             'email' => $request->email,
             'phone' => $request->phone,
             'password' => bcrypt($request->password),
         ]);
 
-        return response()->json([
-            'status' => true,
-            'data' => $skomda_student
-        ], 201);
+        return view('dashboard.admin.skomda_students', [
+            'skomdaStudents' => SkomdaStudent::paginate(10),
+            'success' => 'Akun siswa SMK Telkom Sidoarjo berhasil ditambahkan'
+        ]);
     }
 
     /**
@@ -50,46 +42,21 @@ class SkomdaStudentController extends Controller
      */
     public function show(string $id)
     {
-        $skomda_student = SkomdaStudent::find($id);
-
-        if (!$skomda_student) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Akun siswa SMK Telkom Sidoarjo tidak ditemukan'
-            ], 404);
-        }
-
-        return response()->json([
-            'status' => true,
-            'data' => $skomda_student
-        ]);
+        $skomda_student = SkomdaStudent::findOrFail($id);
+        return view('dashboard.admin.skomda_students.show', compact('skomda_student'));
     }
 
     /**
      * Update Skomda Student By ID
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateSkomdaStudentRequest $request, string $id)
     {
-        $skomda_student = SkomdaStudent::find($id);
+        $skomda_student = SkomdaStudent::findOrFail($id);
+        $skomda_student->update($request->validated());
 
-        if (!$skomda_student) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Akun siswa SMK Telkom Sidoarjo tidak ditemukan'
-            ], 404);
-        }
-
-        $request->validate([
-            'name' => 'required|string',
-            'email' => 'required|email|unique:skomda_students,email,' . $id,
-            'phone' => 'required|string',
-        ]);
-
-        $skomda_student->update($request->all());
-
-        return response()->json([
-            'status' => true,
-            'data' => $skomda_student
+        return view('dashboard.admin.skomda_students', [
+            'skomdaStudents' => SkomdaStudent::paginate(10),
+            'success' => 'Akun siswa SMK Telkom Sidoarjo berhasil diperbarui'
         ]);
     }
 
@@ -98,20 +65,12 @@ class SkomdaStudentController extends Controller
      */
     public function destroy(string $id)
     {
-        $skomda_student = SkomdaStudent::find($id);
-
-        if (!$skomda_student) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Akun siswa SMK Telkom Sidoarjo tidak ditemukan'
-            ], 404);
-        }
-
+        $skomda_student = SkomdaStudent::findOrFail($id);
         $skomda_student->delete();
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Akun siswa SMK Telkom Sidoarjo berhasil dihapus'
+        return view('dashboard.admin.skomda_students', [
+            'skomdaStudents' => SkomdaStudent::paginate(10),
+            'success' => 'Akun siswa SMK Telkom Sidoarjo berhasil dihapus'
         ]);
     }
 }
