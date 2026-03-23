@@ -67,13 +67,13 @@ composer install
 5. Salin file `.env.example` menjadi `.env` dan sesuaikan konfigurasi database
 6. Buat tabel database dengan menjalankan migrasi:
 ```bash
-php artisan migrate
+php artisan migrate --seed
 ```
-7. Untuk menjalankan API Laravel, jalankan perintah berikut:
+7. Untuk menjalankan aplikasi, jalankan perintah berikut:
 ```bash
 php artisan serve
 ```
-8. Untuk menjalankan frontend, masuk ke file `index.html` di folder `frontend` menggunakan browser (rekomendasi menggunakan ekstensi Live Server di Visual Studio Code).
+8. Akses aplikasi pada URL `http://localhost:8000`.
 
 ## 👨‍💻 Contributors
 1. Muhammad Naufal Rafa Al As'ad – Backend Development – [GitHub](https://github.com/falrafa4/)
