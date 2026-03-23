@@ -3,30 +3,30 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreFreelancerRequest;
+use App\Http\Requests\UpdateFreelancerPasswordRequest;
 use App\Http\Requests\UpdateFreelancerRequest;
 use App\Models\Freelancer;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
 class FreelancerController extends Controller
 {
-    public function profile() 
-{
-    // Hanya ngambil sesi freelancer
-    $freelancer = auth('freelancer')->user();
-    
-    // Tarik relasi datanya
-    $freelancer->load('skomda_student');
-    
-    // Akalin properti name & email biar sama kayak Admin & Client di Blade
-    $freelancer->name = $freelancer->skomda_student->name ?? 'Siswa Skomda';
-    $freelancer->email = $freelancer->skomda_student->email ?? '-';
+    public function profile()
+    {
+        // Hanya ngambil sesi freelancer
+        $freelancer = auth('freelancer')->user();
 
-    return view('profile', [
-        'user' => $freelancer,
-        'role' => 'Freelancer'
-    ]);
-}
+        // Tarik relasi datanya
+        $freelancer->load('skomda_student');
+
+        // Akalin properti name & email biar sama kayak Admin & Client di Blade
+        $freelancer->name = $freelancer->skomda_student->name ?? 'Siswa Skomda';
+        $freelancer->email = $freelancer->skomda_student->email ?? '-';
+
+        return view('freelancer.profile', [
+            'user' => $freelancer,
+            'role' => 'Freelancer'
+        ]);
+    }
 
     public function updateProfile(UpdateFreelancerRequest $request)
     {
@@ -39,30 +39,19 @@ class FreelancerController extends Controller
     /**
      * Update Freelancer Password
      */
-    public function update_password(Request $request)
+    public function update_password(UpdateFreelancerPasswordRequest $request)
     {
-        $freelancer = $request->user();
+        $freelancer = auth('freelancer')->user();
 
-        $request->validate([
-            'current_password' => 'required|string',
-            'password' => 'required|string|min:6|confirmed',
-        ]);
-
+        // Cek password lama
         if (!Hash::check($request->current_password, $freelancer->password)) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Password lama salah'
-            ], 422);
+            return redirect()->route('freelancer.profile')->with('error', 'Password lama salah');
         }
 
-        $freelancer->update([
-            'password' => Hash::make($request->password),
-        ]);
-
-        return response()->json([
-            'status' => true,
-            'message' => 'Password berhasil diperbarui'
-        ]);
+        // Update password baru
+        $freelancer->password = Hash::make($request->password);
+        $freelancer->save();
+        return redirect()->route('freelancer.profile')->with('success', 'Password berhasil diperbarui');
     }
 
     /**
@@ -71,12 +60,7 @@ class FreelancerController extends Controller
     public function index()
     {
         $freelancers = Freelancer::with('skomda_student')->get();
-        return view('dashboard.admin.freelancers.index', compact('freelancers'));
-    }
-
-    public function create()
-    {
-        return view('dashboard.admin.freelancers.create');
+        return view('dashboard.admin.freelancers', compact('freelancers'));
     }
 
     /**
@@ -88,7 +72,7 @@ class FreelancerController extends Controller
         $data['password'] = Hash::make($data['password']);
 
         Freelancer::create($data);
-        return redirect()->route('dashboard.admin.freelancers.index')->with('success', 'Akun freelancer berhasil dibuat');
+        return redirect()->route('admin.freelancers.index')->with('success', 'Akun freelancer berhasil dibuat');
     }
 
     /**
@@ -97,7 +81,7 @@ class FreelancerController extends Controller
     public function show(Freelancer $freelancer)
     {
         $freelancer->load('skomda_student');
-        return view('dashboard.admin.freelancers.show', compact('freelancer'));
+        return view('dashboard.admin.freelancers', compact('freelancer'));
     }
 
     /**
@@ -115,7 +99,7 @@ class FreelancerController extends Controller
     public function update(UpdateFreelancerRequest $request, Freelancer $freelancer)
     {
         $freelancer->update($request->validated());
-        return redirect()->route('dashboard.admin.freelancers.show', $freelancer->id)->with('success', 'Akun freelancer berhasil diperbarui');
+        return redirect()->route('admin.freelancers.index')->with('success', 'Akun freelancer berhasil diperbarui');
     }
 
     /**
@@ -123,20 +107,9 @@ class FreelancerController extends Controller
      */
     public function destroy(string $id)
     {
-        $freelancer = Freelancer::find($id);
-
-        if (!$freelancer) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Akun freelancer tidak ditemukan'
-            ], 404);
-        }
-
+        $freelancer = Freelancer::findOrFail($id);
         $freelancer->delete();
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Akun freelancer berhasil dihapus'
-        ]);
+        return redirect()->route('admin.freelancers.index')->with('success', 'Akun freelancer berhasil dihapus');
     }
 }
