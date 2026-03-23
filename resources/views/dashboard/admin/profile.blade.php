@@ -151,15 +151,15 @@
         <span class="text-[9px] bg-slate-100 text-slate-400 px-1.5 py-0.5 rounded-full font-bold">Soon</span>
       </span>
 
-      <a href="{{ route('admin.services') }}"
+      <a href="{{ route('admin.services.index') }}"
          class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
-                {{ request()->routeIs('admin.services*','admin.service-categories*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
+                {{ request()->routeIs('admin.services.index*','admin.service-categories.index*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
         <i class="ri-tools-line text-[17px]"></i> Services
       </a>
 
-      <a href="{{ route('admin.transactions') }}"
+      <a href="{{ route('admin.transactions.index') }}"
          class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
-                {{ request()->routeIs('admin.transactions*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
+                {{ request()->routeIs('admin.transactions.index*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
         <i class="ri-bank-card-line text-[17px]"></i> Transactions
       </a>
 

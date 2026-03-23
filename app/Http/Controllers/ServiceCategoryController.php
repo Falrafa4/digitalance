@@ -24,7 +24,7 @@ class ServiceCategoryController extends Controller
     {
         ServiceCategory::create($request->validated());
 
-        return redirect()->route('admin.service-categories')->with('success', 'Kategori layanan berhasil ditambahkan');
+        return redirect()->route('admin.service-categories.index')->with('success', 'Kategori layanan berhasil ditambahkan');
     }
 
     /**
@@ -45,7 +45,7 @@ class ServiceCategoryController extends Controller
         $serviceCategory = ServiceCategory::findOrFail($id);
         $serviceCategory->update($request->validated());
 
-        return redirect()->route('admin.service-categories')->with('success', 'Kategori layanan berhasil diperbarui');
+        return redirect()->route('admin.service-categories.index')->with('success', 'Kategori layanan berhasil diperbarui');
     }
 
     /**
@@ -57,6 +57,6 @@ class ServiceCategoryController extends Controller
 
         $serviceCategory->delete();
 
-        return redirect()->route('admin.service-categories')->with('success', 'Kategori layanan berhasil dihapus');
+        return redirect()->route('admin.service-categories.index')->with('success', 'Kategori layanan berhasil dihapus');
     }
 }

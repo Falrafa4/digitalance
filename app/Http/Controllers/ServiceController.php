@@ -6,11 +6,7 @@ use App\Models\Service;
 use Illuminate\Http\Request;
 
 class ServiceController extends Controller
-{
-  public function adminIndex() {
-    return view('dashboard.admin.services');
-  }
-  
+{  
   /**
    * Get All Services
    */

@@ -814,19 +814,19 @@
                 label: 'Services',
                 sub: 'Daftar layanan',
                 icon: 'ri-tools-line',
-                url: '{{ route('admin.services') }}'
+                url: '{{ route('admin.services.index') }}'
             },
             {
                 label: 'Service Categories',
                 sub: 'Kategori layanan',
                 icon: 'ri-layout-grid-line',
-                url: '{{ route('admin.service-categories') }}'
+                url: '{{ route('admin.service-categories.index') }}'
             },
             {
                 label: 'Transactions',
                 sub: 'Riwayat transaksi',
                 icon: 'ri-bank-card-line',
-                url: '{{ route('admin.transactions') }}'
+                url: '{{ route('admin.transactions.index') }}'
             },
             {
                 label: 'Profile Admin',

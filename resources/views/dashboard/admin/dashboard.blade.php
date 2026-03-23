@@ -320,21 +320,21 @@
                 label: 'Services',
                 sub: 'Daftar layanan',
                 icon: 'ri-tools-line',
-                url: '{{ route('admin.services') }}',
+                url: '{{ route('admin.services.index') }}',
                 available: true
             },
             {
                 label: 'Service Categories',
                 sub: 'Kategori layanan',
                 icon: 'ri-layout-grid-line',
-                url: '{{ route('admin.service-categories') }}',
+                url: '{{ route('admin.service-categories.index') }}',
                 available: true
             },
             {
                 label: 'Transactions',
                 sub: 'Riwayat transaksi',
                 icon: 'ri-bank-card-line',
-                url: '{{ route('admin.transactions') }}',
+                url: '{{ route('admin.transactions.index') }}',
                 available: true
             },
             {
