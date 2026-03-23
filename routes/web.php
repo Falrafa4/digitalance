@@ -57,7 +57,7 @@ Route::middleware('auth:administrator')->prefix('admin')->name('admin.')->group(
     Route::delete('/freelancers/{freelancer}', [FreelancerController::class, 'destroy'])->name('freelancers.destroy');
 
     // Skomda Students (CRUD)
-    Route::get('/skomda-students', [SkomdaStudentController::class, 'adminIndex'])->name('skomda-students.index');
+    Route::get('/skomda-students', [SkomdaStudentController::class, 'index'])->name('skomda-students.index');
     Route::get('/skomda-students/create', [SkomdaStudentController::class, 'create'])->name('skomda-students.create');
     Route::post('/skomda-students', [SkomdaStudentController::class, 'store'])->name('skomda-students.store');
     Route::get('/skomda-students/{skomda_student}', [SkomdaStudentController::class, 'show'])->name('skomda-students.show');
@@ -66,7 +66,7 @@ Route::middleware('auth:administrator')->prefix('admin')->name('admin.')->group(
     Route::delete('/skomda-students/{skomda_student}', [SkomdaStudentController::class, 'destroy'])->name('skomda-students.destroy');
 
     // Services
-    Route::get('/services', [ServiceController::class, 'adminIndex'])->name('services');
+    Route::get('/services', [ServiceController::class, 'index'])->name('services');
     Route::get('/services/create', [ServiceController::class, 'create'])->name('services.create');
     Route::post('/services', [ServiceController::class, 'store'])->name('services.store');
     Route::get('/services/{service}', [ServiceController::class, 'show'])->name('services.show');
@@ -75,7 +75,7 @@ Route::middleware('auth:administrator')->prefix('admin')->name('admin.')->group(
     Route::delete('/services/{service}', [ServiceController::class, 'destroy'])->name('services.destroy');
 
     // Service Categories
-    Route::get('/service-categories', [ServiceCategoryController::class, 'adminIndex'])->name('service-categories');
+    Route::get('/service-categories', [ServiceCategoryController::class, 'index'])->name('service-categories');
     Route::get('/service-categories/create', [ServiceCategoryController::class, 'create'])->name('service-categories.create');
     Route::post('/service-categories', [ServiceCategoryController::class, 'store'])->name('service-categories.store');
     Route::get('/service-categories/{service_category}', [ServiceCategoryController::class, 'show'])->name('service-categories.show');
@@ -84,7 +84,7 @@ Route::middleware('auth:administrator')->prefix('admin')->name('admin.')->group(
     Route::delete('/service-categories/{service_category}', [ServiceCategoryController::class, 'destroy'])->name('service-categories.destroy');
 
     // Transactions
-    Route::get('/transactions', [TransactionController::class, 'adminIndex'])->name('transactions');
+    Route::get('/transactions', [TransactionController::class, 'index'])->name('transactions');
     Route::get('/transactions/create', [TransactionController::class, 'create'])->name('transactions.create');
     Route::post('/transactions', [TransactionController::class, 'store'])->name('transactions.store');
     Route::get('/transactions/{transaction}', [TransactionController::class, 'show'])->name('transactions.show');

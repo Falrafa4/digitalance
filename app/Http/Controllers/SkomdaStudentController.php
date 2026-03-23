@@ -31,10 +31,7 @@ class SkomdaStudentController extends Controller
             'password' => bcrypt($request->password),
         ]);
 
-        return view('dashboard.admin.skomda_students', [
-            'skomdaStudents' => SkomdaStudent::paginate(10),
-            'success' => 'Akun siswa SMK Telkom Sidoarjo berhasil ditambahkan'
-        ]);
+        return redirect()->route('admin.skomda-students.index')->with('success', 'Akun siswa SMK Telkom Sidoarjo berhasil ditambahkan');
     }
 
     /**
@@ -42,8 +39,8 @@ class SkomdaStudentController extends Controller
      */
     public function show(string $id)
     {
-        $skomda_student = SkomdaStudent::findOrFail($id);
-        return view('dashboard.admin.skomda_students.show', compact('skomda_student'));
+        $skomdaStudent = SkomdaStudent::findOrFail($id);
+        return view('dashboard.admin.skomda_students', compact('skomdaStudent'));
     }
 
     /**
@@ -51,13 +48,10 @@ class SkomdaStudentController extends Controller
      */
     public function update(UpdateSkomdaStudentRequest $request, string $id)
     {
-        $skomda_student = SkomdaStudent::findOrFail($id);
-        $skomda_student->update($request->validated());
+        $skomdaStudent = SkomdaStudent::findOrFail($id);
+        $skomdaStudent->update($request->validated());
 
-        return view('dashboard.admin.skomda_students', [
-            'skomdaStudents' => SkomdaStudent::paginate(10),
-            'success' => 'Akun siswa SMK Telkom Sidoarjo berhasil diperbarui'
-        ]);
+        return redirect()->route('admin.skomda-students.index')->with('success', 'Akun siswa SMK Telkom Sidoarjo berhasil diperbarui');
     }
 
     /**
@@ -65,12 +59,9 @@ class SkomdaStudentController extends Controller
      */
     public function destroy(string $id)
     {
-        $skomda_student = SkomdaStudent::findOrFail($id);
-        $skomda_student->delete();
+        $skomdaStudent = SkomdaStudent::findOrFail($id);
+        $skomdaStudent->delete();
 
-        return view('dashboard.admin.skomda_students', [
-            'skomdaStudents' => SkomdaStudent::paginate(10),
-            'success' => 'Akun siswa SMK Telkom Sidoarjo berhasil dihapus'
-        ]);
+        return redirect()->route('admin.skomda-students.index')->with('success', 'Akun siswa SMK Telkom Sidoarjo berhasil dihapus');
     }
 }
