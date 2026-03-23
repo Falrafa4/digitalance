@@ -19,7 +19,7 @@ class Freelancer extends Authenticatable
 
     public function portofolios()
     {
-        return $this->hasMany(Portofolio::class);
+        return $this->hasManyThrough(Portofolio::class, Service::class);
     }
 
     public function services()
