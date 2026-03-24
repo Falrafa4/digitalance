@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FreelancerController;
+use App\Http\Controllers\OfferController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\PortofolioController;
@@ -83,6 +84,9 @@ Route::middleware('auth:administrator')->prefix('admin')->name('admin.')->group(
     // Order (CRUD)
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::post('/orders/{id}/status', [OrderController::class, 'updateStatus'])->name('orders.updateStatus');
+
+    // Offer (CRUD)
+    Route::get('/offers', [OfferController::class, 'index'])->name('offers.index');
 
     // Transactions (CRUD)
     Route::get('/transactions', [TransactionController::class, 'index'])->name('transactions.index');
