@@ -18,7 +18,7 @@ class ClientController extends Controller
         // Hanya ngambil sesi client
         $user = auth('client')->user();
 
-        return view('profile', [
+        return view('dashboard.client.profile', [
             'user' => $user,
             'role' => 'Client'
         ]);
@@ -94,18 +94,13 @@ class ClientController extends Controller
         return view('dashboard.admin.clients', compact('clientsData', 'freelancersData', 'skomdaData'));
     }
 
-    public function create()
-    {
-        return view('dashboard.admin.clients.create');
-    }
-
     /**
      * Store New Client
      */
     public function store(StoreClientRequest $request)
     {
         Client::create($request->validated());
-        return redirect()->route('clients.index')->with('success', 'Akun client berhasil dibuat');
+        return redirect()->route('admin.clients.index')->with('success', 'Akun client berhasil dibuat');
     }
 
     /**
@@ -114,12 +109,7 @@ class ClientController extends Controller
     public function show(string $id)
     {
         $client = Client::findOrFail($id);
-        return view('dashboard.admin.clients.show', compact('client'));
-    }
-
-    public function edit(Client $client)
-    {
-        return view('dashboard.admin.clients.edit', compact('client'));
+        return view('dashboard.admin.clients', compact('client'));
     }
 
     /**
@@ -128,7 +118,7 @@ class ClientController extends Controller
     public function update(Request $request, Client $client)
     {
         $client->update($request->validated());
-        return redirect()->route('clients.index')->with('success', 'Akun client berhasil diperbarui');
+        return redirect()->route('admin.clients.index')->with('success', 'Akun client berhasil diperbarui');
     }
 
     /**
@@ -137,6 +127,6 @@ class ClientController extends Controller
     public function destroy(Client $client)
     {
         $client->delete();
-        return redirect()->route('clients.index')->with('success', 'Akun client berhasil dihapus');
+        return redirect()->route('admin.clients.index')->with('success', 'Akun client berhasil dihapus');
     }
 }
