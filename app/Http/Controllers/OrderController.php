@@ -7,38 +7,15 @@ use Illuminate\Http\Request;
 
 class OrderController extends Controller
 {
-    // FOR ADMIN
+    // ADMIN ONLY
     public function index()
     {
-        $data = Order::with('service', 'client')->get();
-
-        return response()->json([
-            'status' => true,
-            'data' => $data
-        ]);
+        $orders = Order::with('service', 'client')->get();
+        return view('dashboard.admin.orders', compact('orders'));
     }
 
-    public function adminShow(Order $order)
-    {
-        $order->load('service', 'client');
-
-        return response()->json([
-            'status' => true,
-            'data' => $order
-        ]);
-    }
-
-    public function update(Request $request, Order $order)
-    {
-        //
-    }
-
-    public function destroy(Order $order)
-    {
-        //
-    }
-
-    // FOR CLIENT
+    // CLIENT ONLY
+    // TODO: selesaikan fitur order untuk client (all), termasuk validasi dan return view yang sesuai
     public function store(Request $request)
     {
         $client = $request->user('client');
@@ -72,21 +49,5 @@ class OrderController extends Controller
                 'status' => true,
                 'data' => $orders
             ]);
-    }
-
-    public function clientShow(Order $order) {
-        if ($order->client_id !== auth('client')->id()) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Unauthorized.'
-            ], 403);
-        }
-
-        $order->load('service');
-
-        return response()->json([
-            'status' => true,
-            'data' => $order
-        ]);
     }
 }
