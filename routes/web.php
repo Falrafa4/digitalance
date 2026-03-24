@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FreelancerController;
+use App\Http\Controllers\NegotiationController;
 use App\Http\Controllers\OfferController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PageController;
@@ -98,6 +99,9 @@ Route::middleware('auth:administrator')->prefix('admin')->name('admin.')->group(
 
     // Reviews (CRUD)
     Route::get('/reviews', [ReviewController::class, 'index'])->name('reviews.index');
+
+    // Negotiations (CRUD)
+    Route::get('/negotiations', [NegotiationController::class, 'index'])->name('negotiations.index');
 });
 
 // ── CLIENT ───────────────────────────────────────────────

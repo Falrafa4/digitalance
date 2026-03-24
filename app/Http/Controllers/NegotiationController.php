@@ -7,17 +7,15 @@ use Illuminate\Http\Request;
 
 class NegotiationController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    // ADMIN ONLY
     public function index()
     {
-        //
+        $negotiations = Negotiation::with('order.service.freelancer')->get();
+        return view('dashboard.admin.negotiations', compact('negotiations'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    // CLIENT ONLY
+    // TODO: selesaikan fitur negosiasi untuk client (all), termasuk validasi dan return view yang sesuai
     public function store(Request $request)
     {
         //
@@ -46,4 +44,7 @@ class NegotiationController extends Controller
     {
         //
     }
+
+    // FREELANCER ONLY
+    // TODO: selesaikan fitur negosiasi untuk freelancer (all), termasuk validasi dan return view yang sesuai
 }
