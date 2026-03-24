@@ -9,6 +9,7 @@ use App\Http\Controllers\OfferController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\PortofolioController;
+use App\Http\Controllers\ResultController;
 use App\Http\Controllers\ServiceCategoryController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\SkomdaStudentController;
@@ -90,6 +91,9 @@ Route::middleware('auth:administrator')->prefix('admin')->name('admin.')->group(
 
     // Transactions (CRUD)
     Route::get('/transactions', [TransactionController::class, 'index'])->name('transactions.index');
+
+    // Results (CRUD)
+    Route::get('/results', [ResultController::class, 'index'])->name('results.index');
 });
 
 // ── CLIENT ───────────────────────────────────────────────
