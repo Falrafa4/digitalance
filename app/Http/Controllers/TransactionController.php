@@ -6,22 +6,16 @@ use App\Models\Transaction;
 use Illuminate\Http\Request;
 
 class TransactionController extends Controller
-{
-    public function adminIndex() {
-        return view('dashboard.admin.transactions');
-    }
-    
-    /**
-     * Display a listing of the resource.
-     */
+{    
+    // ADMIN ONLY
     public function index()
     {
-        //
+        $transactions = Transaction::with('order')->get();
+        return view('dashboard.admin.transactions', compact('transactions'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    // CLIENT ONLY
+    // TODO: selesaikan fitur transaction untuk client (all), termasuk validasi dan return view yang sesuai
     public function store(Request $request)
     {
         //
@@ -50,4 +44,7 @@ class TransactionController extends Controller
     {
         //
     }
+
+    // FREELANCER ONLY
+    // TODO: selesaikan fitur transaction untuk freelancer (all), termasuk validasi dan return view yang sesuai
 }
