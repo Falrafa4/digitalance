@@ -7,17 +7,15 @@ use Illuminate\Http\Request;
 
 class ReviewController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    // ADMIN ONLY
     public function index()
     {
-        //
+        $reviews = Review::with('order.service.freelancer')->get();
+        return view('dashboard.admin.reviews', compact('reviews'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    // CLIENT ONLY
+    // TODO: selesaikan fitur review untuk client (all), termasuk validasi dan return view yang sesuai
     public function store(Request $request)
     {
         //
@@ -46,4 +44,7 @@ class ReviewController extends Controller
     {
         //
     }
+
+    // FREELANCER ONLY
+    // TODO: selesaikan fitur review untuk freelancer (all), termasuk validasi dan return view yang sesuai
 }
