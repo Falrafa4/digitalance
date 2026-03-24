@@ -2,21 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreAdminProfileRequest;
+use App\Http\Requests\UpdateAdminProfileRequest;
 use App\Models\Administrator;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
 class AdministratorController extends Controller
 {
-    /**
-     * Get All Administrators
-     */
+    // ADMIN ONLY
     public function profile()
     {
         // Hanya ngambil sesi admin
         $user = auth()->guard('administrator')->user();
 
-        return view('profile', [
+        return view('dashboard.admin.profile', [
             'user' => $user,
             'role' => 'Admin'
         ]);
@@ -27,28 +26,46 @@ class AdministratorController extends Controller
         $administrators = Administrator::all();
         return view('dashboard.admin.admins', compact('administrators'));
     }
-
-    /**
-     * Get Administrator By ID
-     */
+    
     public function show(Administrator $administrator)
     {
-        return view('dashboard.admin.administrators.show', compact('administrator'));
+        return view('dashboard.admin.admins', compact('administrator'));
     }
 
-    public function updateProfile(Request $request)
+    public function store(StoreAdminProfileRequest $request)
+    {
+        $data = $request->validated();
+        $data['password'] = Hash::make($data['password']);
+
+        Administrator::create($data);
+        return redirect()->route('admin.admins.index')->with('success', 'Akun administrator berhasil dibuat');
+    }
+
+    public function update(UpdateAdminProfileRequest $request, Administrator $administrator) {
+        $data = $request->validated();
+
+        if ($request->filled('password')) {
+            if (!Hash::check($request->current_password, $administrator->password)) {
+                return back()->withErrors(['current_password' => 'Password saat ini salah.']);
+            }
+            $data['password'] = Hash::make($data['password']);
+        } else {
+            unset($data['password']);
+        }
+
+        $administrator->update($data);
+        return redirect()->route('admin.admins.index')->with('success', 'Profil administrator berhasil diperbarui.');
+    }
+
+    public function destroy(Administrator $administrator)
+    {
+        $administrator->delete();
+        return redirect()->route('admin.admins.index')->with('success', 'Akun administrator berhasil dihapus');
+    }
+
+    public function updateProfile(UpdateAdminProfileRequest $request)
     {
         $user = auth()->guard('administrator')->user();
-
-        $request->validate([
-            'name'  => 'required|string|max:255',
-            'email' => 'required|email|unique:administrators,email,' . $user->id,
-            'password' => 'nullable|min:8|confirmed',
-            'current_password' => 'required_with:password',
-        ]);
-
-        $user->name  = $request->name;
-        $user->email = $request->email;
 
         if ($request->filled('password')) {
             if (!Hash::check($request->current_password, $user->password)) {
@@ -57,7 +74,7 @@ class AdministratorController extends Controller
             $user->password = Hash::make($request->password);
         }
 
-        $user->save();
-        return back()->with('success', 'Profil berhasil diperbarui.');
+        $user->update($request->validated());
+        return back()->with('success', 'Profil Administrator berhasil diperbarui.');
     }
 }
