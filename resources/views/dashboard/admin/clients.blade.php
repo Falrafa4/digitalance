@@ -808,7 +808,7 @@
                 label: 'Administrators',
                 sub: 'Admin › Daftar admin',
                 icon: 'ri-user-star-line',
-                url: '{{ route('admin.admins') }}'
+                url: '{{ route('admin.admins.index') }}'
             },
             {
                 label: 'Services',

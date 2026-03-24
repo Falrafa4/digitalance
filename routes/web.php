@@ -41,8 +41,11 @@ Route::middleware('auth:administrator')->prefix('admin')->name('admin.')->group(
     Route::get('/user', [ClientController::class, 'index'])->name('user');
 
     // Administrators
-    Route::get('/admins', [AdministratorController::class, 'index'])->name('admins');
+    Route::get('/admins', [AdministratorController::class, 'index'])->name('admins.index');
     Route::get('/admins/{administrator}', [AdministratorController::class, 'show'])->name('admins.show');
+    Route::post('/admins', [AdministratorController::class, 'store'])->name('admins.store');
+    Route::put('/admins/{administrator}', [AdministratorController::class, 'update'])->name('admins.update');
+    Route::delete('/admins/{administrator}', [AdministratorController::class, 'destroy'])->name('admins.destroy');
 
     // Clients (CRUD)
     Route::get('/clients', [ClientController::class, 'index'])->name('clients.index');

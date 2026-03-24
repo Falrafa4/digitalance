@@ -36,9 +36,9 @@
         </a>
 
         {{-- Admin --}}
-        <a href="{{ route('admin.admins') }}"
+        <a href="{{ route('admin.admins.index') }}"
             class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
-        {{ request()->routeIs('admin.admins*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
+        {{ request()->routeIs('admin.admins.index*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
             <i class="ri-user-star-line text-[17px]"></i> Admin
         </a>
 
