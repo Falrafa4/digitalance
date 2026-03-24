@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FreelancerController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\PortofolioController;
 use App\Http\Controllers\ServiceCategoryController;
@@ -66,22 +67,24 @@ Route::middleware('auth:administrator')->prefix('admin')->name('admin.')->group(
     Route::put('/skomda-students/{skomda_student}', [SkomdaStudentController::class, 'update'])->name('skomda-students.update');
     Route::delete('/skomda-students/{skomda_student}', [SkomdaStudentController::class, 'destroy'])->name('skomda-students.destroy');
 
-    // Services
+    // Services (CRUD)
     Route::get('/services', [ServiceController::class, 'index'])->name('services.index');
 
-    // Service Categories
+    // Service Categories (CRUD)
     Route::get('/service-categories', [ServiceCategoryController::class, 'index'])->name('service-categories.index');
-    Route::get('/service-categories/create', [ServiceCategoryController::class, 'create'])->name('service-categories.create');
     Route::post('/service-categories', [ServiceCategoryController::class, 'store'])->name('service-categories.store');
     Route::get('/service-categories/{service_category}', [ServiceCategoryController::class, 'show'])->name('service-categories.show');
-    Route::get('/service-categories/{service_category}/edit', [ServiceCategoryController::class, 'edit'])->name('service-categories.edit');
     Route::put('/service-categories/{service_category}', [ServiceCategoryController::class, 'update'])->name('service-categories.update');
     Route::delete('/service-categories/{service_category}', [ServiceCategoryController::class, 'destroy'])->name('service-categories.destroy');
 
-    // Portofolios
+    // Portofolios (CRUD)
     Route::get('/portofolios', [PortofolioController::class, 'index'])->name('portofolios.index');
 
-    // Transactions
+    // Order (CRUD)
+    Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
+    Route::post('/orders/{id}/status', [OrderController::class, 'updateStatus'])->name('orders.updateStatus');
+
+    // Transactions (CRUD)
     Route::get('/transactions', [TransactionController::class, 'index'])->name('transactions.index');
     Route::get('/transactions/create', [TransactionController::class, 'create'])->name('transactions.create');
     Route::post('/transactions', [TransactionController::class, 'store'])->name('transactions.store');

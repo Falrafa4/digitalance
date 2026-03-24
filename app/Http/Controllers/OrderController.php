@@ -14,6 +14,18 @@ class OrderController extends Controller
         return view('dashboard.admin.orders', compact('orders'));
     }
 
+    public function updateStatus(Request $request, string $id)
+    {
+        $validated = $request->validate([
+            'status' => 'required|in:Pending,Negotiated,Paid,In Progress,Revision,Completed,Cancelled'
+        ]);
+
+        $order = Order::findOrFail($id);
+        $order->update($validated);
+
+        return redirect()->route('admin.orders.index')->with('success', 'Status order berhasil diperbarui');
+    }
+
     // CLIENT ONLY
     // TODO: selesaikan fitur order untuk client (all), termasuk validasi dan return view yang sesuai
     public function store(Request $request)
@@ -38,16 +50,20 @@ class OrderController extends Controller
         ]);
     }
 
-    public function clientIndex(Request $request) {
+    public function clientIndex(Request $request)
+    {
         $client = auth('client')->user();
 
         $orders = Order::with('service')
             ->where('client_id', $client->id)
             ->get();
-        
-            return response()->json([
-                'status' => true,
-                'data' => $orders
-            ]);
+
+        return response()->json([
+            'status' => true,
+            'data' => $orders
+        ]);
     }
+
+    // FREELANCER ONLY
+    // TODO: selesaikan fitur order untuk freelancer (all), termasuk validasi dan return view yang sesuai
 }
