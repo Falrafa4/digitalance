@@ -2,150 +2,87 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreServiceRequest;
+use App\Http\Requests\UpdateServiceRequest;
 use App\Models\Service;
-use Illuminate\Http\Request;
 
 class ServiceController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        $data = Service::select('id', 'category_id', 'freelancer_id', 'title', 'description', 'price_min', 'price_max', 'delivery_time', 'status')
-            ->with([
-                'service_category:id,name',
-                'freelancer' => function ($query) {
-                    $query->select('id', 'student_id')
-                        ->with('skomda_student:id,name');
-                }
-            ])
-            ->get();
+  /**
+   * Get All Services (ADMIN ONLY)
+   */
+  public function index()
+  {
+    $services = Service::with([
+      'service_category:id,name',
+      'freelancer' => function ($query) {
+        $query->select('id', 'student_id')
+          ->with('skomda_student:id,name');
+      }
+    ])->get();
 
-        return response()->json([
-            'status' => true,
-            'data' => $data
-        ]);
+    return view('dashboard.admin.services', compact('services'));
+  }
+
+  public function freelancerIndex()
+  {
+    $freelancer = auth('freelancer')->user();
+    $services = Service::with('service_category:id,name')
+      ->where('freelancer_id', $freelancer->id)
+      ->get();
+
+    return view('dashboard.freelancer.services', compact('services'));
+  }
+
+  /**
+   * Store New Service (FREELANCER ONLY)
+   */
+  public function store(StoreServiceRequest $request)
+  {
+    $freelancer = auth('freelancer')->user();
+    Service::create(array_merge($request->validated(), ['freelancer_id' => $freelancer->id]));
+
+    return redirect()->route('freelancer.services.index')->with('success', 'Layanan berhasil ditambahkan');
+  }
+
+  /**
+   * Get Service By ID (FREELANCER ONLY)
+   */
+  public function show(string $id)
+  {
+    $freelancer = auth('freelancer')->user();
+    $service = Service::with([
+      'service_category:id,name'
+    ])->where('id', $id)->first();
+
+    if (!$service) {
+      return redirect()->route('freelancer.services.index')->with('error', 'Layanan tidak ditemukan');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        $request->validate([
-            'category_id' => 'required|exists:service_categories,id',
-            'freelancer_id' => 'required|exists:freelancers,id',
-            'title' => 'required|string',
-            'description' => 'required|string',
-            'price_min' => 'required|numeric',
-            'price_max' => 'required|numeric|gte:price_min',
-            'delivery_time' => 'required|integer',
-        ]);
+    return view('freelancer.services.show', compact('service'));
+  }
 
-        $service = Service::create([
-            'title' => $request->title,
-            'description' => $request->description,
-            'category_id' => $request->category_id,
-            'freelancer_id' => $request->freelancer_id,
-            'delivery_time' => $request->delivery_time,
-            'price_min' => $request->price_min,
-            'price_max' => $request->price_max,
-        ]);
+  /**
+   * Update Service By ID (FREELANCER ONLY)
+   */
+  public function update(UpdateServiceRequest $request, string $id)
+  {
+    $freelancer = auth('freelancer')->user();
+    $service = Service::where('freelancer_id', $freelancer->id)->findOrFail($id);
+    $service->update($request->validated());
 
-        return response()->json([
-            'status' => true,
-            'data' => $service
-        ], 201);
-    }
+    return redirect()->route('freelancer.services.index')->with('success', 'Layanan berhasil diperbarui');
+  }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        $service = Service::select('id', 'category_id', 'freelancer_id', 'title', 'description', 'price_min', 'price_max', 'delivery_time', 'status')
-            ->with([
-                'service_category:id,name',
-                'freelancer' => function ($query) {
-                    $query->select('id', 'student_id')
-                        ->with('skomda_student:id,name');
-                }
-            ])
-            ->where('id', $id)->first();
+  /**
+   * Delete Service By ID (FREELANCER ONLY)
+   */
+  public function destroy(string $id)
+  {
+    $freelancer = auth('freelancer')->user();
+    $service = Service::where('freelancer_id', $freelancer->id)->findOrFail($id);
+    $service->delete();
 
-        if (!$service) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Layanan tidak ditemukan'
-            ], 404);
-        }
-
-        return response()->json([
-            'status' => true,
-            'data' => $service
-        ]);
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        $service = Service::find($id);
-
-        if (!$service) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Layanan tidak ditemukan'
-            ], 404);
-        }
-
-        $request->validate([
-            'category_id' => 'required|exists:service_categories,id',
-            'freelancer_id' => 'required|exists:freelancers,id',
-            'title' => 'required|string',
-            'delivery_time' => 'required|integer',
-            'price_min' => 'required|numeric',
-            'price_max' => 'required|numeric|gte:price_min',
-            'description' => 'required|string',
-        ]);
-
-        $service->update([
-            'title' => $request->title,
-            'description' => $request->description,
-            'category_id' => $request->category_id,
-            'freelancer_id' => $request->freelancer_id,
-            'delivery_time' => $request->delivery_time,
-            'price_min' => $request->price_min,
-            'price_max' => $request->price_max,
-        ]);
-
-        return response()->json([
-            'status' => true,
-            'data' => $service
-        ]);
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        $service = Service::find($id);
-
-        if (!$service) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Layanan tidak ditemukan'
-            ], 404);
-        }
-
-        $service->delete();
-
-        return response()->json([
-            'status' => true,
-            'message' => 'Layanan berhasil dihapus'
-        ]);
-    }
+    return redirect()->route('freelancer.services.index')->with('success', 'Layanan berhasil dihapus');
+  }
 }

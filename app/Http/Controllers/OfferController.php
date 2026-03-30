@@ -7,17 +7,15 @@ use Illuminate\Http\Request;
 
 class OfferController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    // ADMIN ONLY
     public function index()
     {
-        //
+        $offers = Offer::with('order.service.freelancer')->get();
+        return view('dashboard.admin.offers', compact('offers'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    // FREELANCER ONLY
+    // TODO: selesaikan fitur offer untuk freelancer (all), termasuk validasi dan return view yang sesuai
     public function store(Request $request)
     {
         //
@@ -46,4 +44,7 @@ class OfferController extends Controller
     {
         //
     }
+
+    // CLIENT ONLY
+    // TODO: selesaikan fitur offer untuk client (all), termasuk validasi dan return view yang sesuai
 }

@@ -7,38 +7,27 @@ use Illuminate\Http\Request;
 
 class OrderController extends Controller
 {
-    // FOR ADMIN
+    // ADMIN ONLY
     public function index()
     {
-        $data = Order::with('service', 'client')->get();
+        $orders = Order::with('service', 'client')->get();
+        return view('dashboard.admin.orders', compact('orders'));
+    }
 
-        return response()->json([
-            'status' => true,
-            'data' => $data
+    public function updateStatus(Request $request, string $id)
+    {
+        $validated = $request->validate([
+            'status' => 'required|in:Pending,Negotiated,Paid,In Progress,Revision,Completed,Cancelled'
         ]);
+
+        $order = Order::findOrFail($id);
+        $order->update($validated);
+
+        return redirect()->route('admin.orders.index')->with('success', 'Status order berhasil diperbarui');
     }
 
-    public function adminShow(Order $order)
-    {
-        $order->load('service', 'client');
-
-        return response()->json([
-            'status' => true,
-            'data' => $order
-        ]);
-    }
-
-    public function update(Request $request, Order $order)
-    {
-        //
-    }
-
-    public function destroy(Order $order)
-    {
-        //
-    }
-
-    // FOR CLIENT
+    // CLIENT ONLY
+    // TODO: selesaikan fitur order untuk client (all), termasuk validasi dan return view yang sesuai
     public function store(Request $request)
     {
         $client = $request->user('client');
@@ -61,32 +50,20 @@ class OrderController extends Controller
         ]);
     }
 
-    public function clientIndex(Request $request) {
+    public function clientIndex(Request $request)
+    {
         $client = auth('client')->user();
 
         $orders = Order::with('service')
             ->where('client_id', $client->id)
             ->get();
-        
-            return response()->json([
-                'status' => true,
-                'data' => $orders
-            ]);
-    }
-
-    public function clientShow(Order $order) {
-        if ($order->client_id !== auth('client')->id()) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Unauthorized.'
-            ], 403);
-        }
-
-        $order->load('service');
 
         return response()->json([
             'status' => true,
-            'data' => $order
+            'data' => $orders
         ]);
     }
+
+    // FREELANCER ONLY
+    // TODO: selesaikan fitur order untuk freelancer (all), termasuk validasi dan return view yang sesuai
 }

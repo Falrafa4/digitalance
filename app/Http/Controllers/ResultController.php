@@ -7,17 +7,15 @@ use Illuminate\Http\Request;
 
 class ResultController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    // ADMIN ONLY
     public function index()
     {
-        //
+        $results = Result::with('order.service.freelancer')->get();
+        return view('dashboard.admin.results', compact('results'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    // FREELANCER ONLY
+    // TODO: selesaikan fitur result untuk freelancer (all), termasuk validasi dan return view yang sesuai
     public function store(Request $request)
     {
         //
@@ -46,4 +44,7 @@ class ResultController extends Controller
     {
         //
     }
+
+    // CLIENT ONLY
+    // TODO: selesaikan fitur result untuk client (all), termasuk validasi dan return view yang sesuai
 }

@@ -2,169 +2,131 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreClientRequest;
+use App\Http\Requests\UpdateClientPasswordRequest;
+use App\Http\Requests\UpdateClientProfileRequest;
 use App\Models\Client;
+use App\Models\Freelancer;
+use App\Models\SkomdaStudent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
 class ClientController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function profile()
     {
-        $data = Client::all();
+        // Hanya ngambil sesi client
+        $user = auth('client')->user();
 
-        return response()->json([
-            'status' => true,
-            'data' => $data
+        return view('dashboard.client.profile', [
+            'user' => $user,
+            'role' => 'Client'
         ]);
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Update Client Profile
      */
-    public function store(Request $request)
+    public function updateProfile(UpdateClientProfileRequest $request)
     {
-        $request->validate([
-            'name' => 'required|string',
-            'email' => 'required|email|unique:clients,email',
-            'phone' => 'required|string',
-            'password' => 'required|string|min:6',
-        ]);
+        $client = auth('client')->user();
+        $client->update($request->validated());
 
-        $client = Client::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'password' => bcrypt($request->password),
-        ]);
-
-        return response()->json([
-            'status' => true,
-            'data' => $client
-        ], 201);
+        return redirect()->route('dashboard.client.profile')->with('success', 'Profil berhasil diperbarui');
     }
 
     /**
-     * Display the specified resource.
+     * Update Client Password
      */
-    public function show(string $id)
+    public function updatePassword(UpdateClientPasswordRequest $request)
     {
-        $client = Client::find($id);
-
-        if (!$client) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Akun client tidak ditemukan'
-            ], 404);
-        }
-
-        return response()->json([
-            'status' => true,
-            'data' => $client
-        ]);
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        $client = Client::find($id);
-
-        if (!$client) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Akun client tidak ditemukan'
-            ], 404);
-        }
-
-        $request->validate([
-            'name' => 'required|string',
-            'email' => 'required|email|unique:clients,email,' . $id,
-            'phone' => 'required|string',
-        ]);
-
-        $client->update($request->all());
-
-        return response()->json([
-            'status' => true,
-            'data' => $client
-        ]);
-    }
-
-    public function update_profile(Request $request)
-    {
-        $client = $request->user();
-
-        if (!$client) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Akun client tidak ditemukan'
-            ], 404);
-        }
-
-        $request->validate([
-            'name' => 'required|string',
-            'email' => 'required|email|unique:clients,email,' . $client->id,
-            'phone' => 'required|string',
-        ]);
-
-        $client->update($request->only(['name', 'email', 'phone']));
-
-        return response()->json([
-            'status' => true,
-            'message' => 'Profil berhasil diperbarui',
-            'data' => $client
-        ]);
-    }
-
-    public function update_password(Request $request)
-    {
-        $client = $request->user();
-
-        $request->validate([
-            'current_password' => 'required|string',
-            'password' => 'required|string|min:6|confirmed',
-        ]);
+        $client = auth('client')->user();
 
         if (!Hash::check($request->current_password, $client->password)) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Password lama salah'
-            ], 422);
+            return redirect()->route('dashboard.client.profile')->withErrors('Password saat ini salah');
         }
 
         $client->update([
             'password' => Hash::make($request->password),
         ]);
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Password berhasil diperbarui'
-        ]);
+        return redirect()->route('dashboard.client.profile')->with('success', 'Password berhasil diperbarui');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Get All Client.
      */
-    public function destroy(string $id)
+    public function index()
     {
-        $client = Client::find($id);
-
-        if (!$client) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Akun client tidak ditemukan'
-            ], 404);
-        }
-
-        $client->delete();
-
-        return response()->json([
-            'status' => true,
-            'message' => 'Akun client berhasil dihapus'
+        $clientsData = Client::paginate(9)->map(fn($c) => [
+            'id'          => $c->id,
+            'name'        => $c->name,
+            'email'       => $c->email,
+            'phone'       => $c->phone,
+            'role'        => 'Client',
+            'status'      => 'Active',
+            'joinDate'    => $c->created_at?->format('d M Y') ?? '-',
+            'avatar'      => 'https://ui-avatars.com/api/?name=' . urlencode($c->name) . '&background=0f766e&color=fff',
         ]);
+
+        $freelancersData = Freelancer::with('skomda_student')->get()->map(fn($f) => [
+            'id'          => $f->id,
+            'name'        => $f->skomda_student->name ?? '-',
+            'email'       => $f->skomda_student->email ?? '-',
+            'phone'       => $f->skomda_student->phone ?? '-',
+            'role'        => 'Freelancer',
+            'status'      => ucfirst($f->status ?? 'Pending'),
+            'joinDate'    => $f->created_at?->format('d M Y') ?? '-',
+            'avatar'      => 'https://ui-avatars.com/api/?name=' . urlencode($f->skomda_student->name ?? 'F') . '&background=0f766e&color=fff',
+        ]);
+
+        $skomdaData = SkomdaStudent::all()->map(fn($s) => [
+            'id'          => $s->id,
+            'name'        => $s->name,
+            'email'       => $s->email,
+            'phone'       => $s->phone ?? '-',
+            'role'        => 'Skomda Student',
+            'status'      => 'Active',
+            'joinDate'    => $s->created_at?->format('d M Y') ?? '-',
+            'avatar'      => 'https://ui-avatars.com/api/?name=' . urlencode($s->name) . '&background=0f766e&color=fff',
+        ]);
+
+        return view('dashboard.admin.clients', compact('clientsData', 'freelancersData', 'skomdaData'));
+    }
+
+    /**
+     * Store New Client
+     */
+    public function store(StoreClientRequest $request)
+    {
+        Client::create($request->validated());
+        return redirect()->route('admin.clients.index')->with('success', 'Akun client berhasil dibuat');
+    }
+
+    /**
+     * Get Client By ID
+     */
+    public function show(string $id)
+    {
+        $client = Client::findOrFail($id);
+        return view('dashboard.admin.clients', compact('client'));
+    }
+
+    /**
+     * Update Client By ID
+     */
+    public function update(Request $request, Client $client)
+    {
+        $client->update($request->validated());
+        return redirect()->route('admin.clients.index')->with('success', 'Akun client berhasil diperbarui');
+    }
+
+    /**
+     * Delete Client By ID
+     */
+    public function destroy(Client $client)
+    {
+        $client->delete();
+        return redirect()->route('admin.clients.index')->with('success', 'Akun client berhasil dihapus');
     }
 }

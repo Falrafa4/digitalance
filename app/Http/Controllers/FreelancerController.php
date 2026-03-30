@@ -2,186 +2,114 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreFreelancerRequest;
+use App\Http\Requests\UpdateFreelancerPasswordRequest;
+use App\Http\Requests\UpdateFreelancerRequest;
 use App\Models\Freelancer;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
 class FreelancerController extends Controller
 {
+    public function profile()
+    {
+        // Hanya ngambil sesi freelancer
+        $freelancer = auth('freelancer')->user();
+
+        // Tarik relasi datanya
+        $freelancer->load('skomda_student');
+
+        // Akalin properti name & email biar sama kayak Admin & Client di Blade
+        $freelancer->name = $freelancer->skomda_student->name ?? 'Siswa Skomda';
+        $freelancer->email = $freelancer->skomda_student->email ?? '-';
+
+        return view('freelancer.profile', [
+            'user' => $freelancer,
+            'role' => 'Freelancer'
+        ]);
+    }
+
+    public function updateProfile(UpdateFreelancerRequest $request)
+    {
+        $freelancer = auth('freelancer')->user();
+        $freelancer->update($request->only(['name', 'email', 'phone']));
+
+        return redirect()->route('freelancer.profile')->with('success', 'Profil berhasil diperbarui');
+    }
+
     /**
-     * Display a listing of the resource.
+     * Update Freelancer Password
+     */
+    public function update_password(UpdateFreelancerPasswordRequest $request)
+    {
+        $freelancer = auth('freelancer')->user();
+
+        // Cek password lama
+        if (!Hash::check($request->current_password, $freelancer->password)) {
+            return redirect()->route('freelancer.profile')->with('error', 'Password lama salah');
+        }
+
+        // Update password baru
+        $freelancer->password = Hash::make($request->password);
+        $freelancer->save();
+        return redirect()->route('freelancer.profile')->with('success', 'Password berhasil diperbarui');
+    }
+
+    /**
+     * Get All Freelancers
      */
     public function index()
     {
-        $data = Freelancer::with('skomda_student')->get();
-
-        return response()->json([
-            'status' => true,
-            'data' => $data
-        ]);
+        $freelancers = Freelancer::with('skomda_student')->get();
+        return view('dashboard.admin.freelancers', compact('freelancers'));
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store New Freelancer
      */
-    public function store(Request $request)
+    public function store(StoreFreelancerRequest $request)
     {
-        $request->validate([
-            'name' => 'required|string',
-            'email' => 'required|email|unique:freelancers,email',
-            'phone' => 'required|string',
-            'password' => 'required|string|min:6',
-        ]);
+        $data = $request->validated();
+        $data['password'] = Hash::make($data['password']);
 
-        $freelancer = Freelancer::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'password' => bcrypt($request->password),
-        ]);
-
-        return response()->json([
-            'status' => true,
-            'data' => $freelancer
-        ], 201);
+        Freelancer::create($data);
+        return redirect()->route('admin.freelancers.index')->with('success', 'Akun freelancer berhasil dibuat');
     }
 
     /**
-     * Display the specified resource.
+     * Get Freelancer By ID
      */
-    public function show(string $id)
+    public function show(Freelancer $freelancer)
     {
-        $freelancer = Freelancer::with('skomda_student')->where('id', $id)->first();
-
-        if (!$freelancer) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Akun freelancer tidak ditemukan'
-            ], 404);
-        }
-
-        return response()->json([
-            'status' => true,
-            'data' => $freelancer
-        ]);
-    }
-
-    public function show_services(string $id)
-    {
-        $freelancer = Freelancer::with('services', 'skomda_student')->where('id', $id)->first();
-
-        if (!$freelancer) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Akun freelancer tidak ditemukan'
-            ], 404);
-        }
-
-        return response()->json([
-            'status' => true,
-            'data' => $freelancer
-        ]);
+        $freelancer->load('skomda_student');
+        return view('dashboard.admin.freelancers', compact('freelancer'));
     }
 
     /**
-     * Update the specified resource in storage.
+     * Get Freelancer Services By ID
      */
-    public function update(Request $request, string $id)
+    public function showServices(Freelancer $freelancer)
     {
-        $freelancer = Freelancer::find($id);
-
-        if (!$freelancer) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Akun freelancer tidak ditemukan'
-            ], 404);
-        }
-
-        $request->validate([
-            'name' => 'required|string',
-            'email' => 'required|email|unique:freelancers,email,' . $id,
-            'phone' => 'required|string',
-        ]);
-
-        $freelancer->update($request->all());
-
-        return response()->json([
-            'status' => true,
-            'data' => $freelancer
-        ]);
-    }
-
-    public function update_profile(Request $request)
-    {
-        $freelancer = $request->user();
-
-        if (!$freelancer) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Akun freelancer tidak ditemukan'
-            ], 404);
-        }
-
-        $request->validate([
-            'name' => 'required|string',
-            'email' => 'required|email|unique:freelancers,email,' . $freelancer->id,
-            'phone' => 'required|string',
-        ]);
-
-        $freelancer->update($request->only(['name', 'email', 'phone']));
-
-        return response()->json([
-            'status' => true,
-            'message' => 'Profil berhasil diperbarui',
-            'data' => $freelancer
-        ]);
-    }
-
-    public function update_password(Request $request)
-    {
-        $freelancer = $request->user();
-
-        $request->validate([
-            'current_password' => 'required|string',
-            'password' => 'required|string|min:6|confirmed',
-        ]);
-
-        if (!Hash::check($request->current_password, $freelancer->password)) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Password lama salah'
-            ], 422);
-        }
-
-        $freelancer->update([
-            'password' => Hash::make($request->password),
-        ]);
-
-        return response()->json([
-            'status' => true,
-            'message' => 'Password berhasil diperbarui'
-        ]);
+        $freelancer->load(['services', 'skomda_student', 'services.category']);
+        return view('dashboard.admin.freelancers.services', compact('freelancer'));
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Update Freelancer By ID
+     */
+    public function update(UpdateFreelancerRequest $request, Freelancer $freelancer)
+    {
+        $freelancer->update($request->validated());
+        return redirect()->route('admin.freelancers.index')->with('success', 'Akun freelancer berhasil diperbarui');
+    }
+
+    /**
+     * Delete Freelancer By ID
      */
     public function destroy(string $id)
     {
-        $freelancer = Freelancer::find($id);
-
-        if (!$freelancer) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Akun freelancer tidak ditemukan'
-            ], 404);
-        }
-
+        $freelancer = Freelancer::findOrFail($id);
         $freelancer->delete();
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Akun freelancer berhasil dihapus'
-        ]);
+        return redirect()->route('admin.freelancers.index')->with('success', 'Akun freelancer berhasil dihapus');
     }
 }

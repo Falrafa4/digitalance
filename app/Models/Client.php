@@ -10,6 +10,7 @@ class Client extends Authenticatable
 {
     use HasFactory, HasApiTokens;
     protected $fillable = ['name', 'email', 'password', 'phone'];
+    protected $hidden = ['password'];
 
     public function orders()
     {

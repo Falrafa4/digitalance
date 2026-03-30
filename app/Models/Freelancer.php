@@ -10,6 +10,7 @@ class Freelancer extends Authenticatable
 {
     use HasFactory, HasApiTokens;
     protected $fillable = ['student_id', 'bio', 'email', 'password', 'status'];
+    protected $hidden = ['password'];
 
     public function skomda_student()
     {
@@ -18,7 +19,7 @@ class Freelancer extends Authenticatable
 
     public function portofolios()
     {
-        return $this->hasMany(Portofolio::class);
+        return $this->hasManyThrough(Portofolio::class, Service::class);
     }
 
     public function services()
