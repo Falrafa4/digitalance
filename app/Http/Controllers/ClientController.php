@@ -58,7 +58,8 @@ class ClientController extends Controller
      */
     public function index()
     {
-        $clientsData = Client::paginate(9)->map(fn($c) => [
+        $clientsData = Client::paginate(3);
+        $clientsData->getCollection()->transform(fn($c) => [
             'id'          => $c->id,
             'name'        => $c->name,
             'email'       => $c->email,
@@ -69,7 +70,8 @@ class ClientController extends Controller
             'avatar'      => 'https://ui-avatars.com/api/?name=' . urlencode($c->name) . '&background=0f766e&color=fff',
         ]);
 
-        $freelancersData = Freelancer::with('skomda_student')->get()->map(fn($f) => [
+        $freelancersData = Freelancer::with('skomda_student')->paginate(3);
+        $freelancersData->getCollection()->transform(fn($f) => [
             'id'          => $f->id,
             'name'        => $f->skomda_student->name ?? '-',
             'email'       => $f->skomda_student->email ?? '-',
@@ -80,7 +82,8 @@ class ClientController extends Controller
             'avatar'      => 'https://ui-avatars.com/api/?name=' . urlencode($f->skomda_student->name ?? 'F') . '&background=0f766e&color=fff',
         ]);
 
-        $skomdaData = SkomdaStudent::all()->map(fn($s) => [
+        $skomdaData = SkomdaStudent::paginate(3);
+        $skomdaData->getCollection()->transform(fn($s) => [
             'id'          => $s->id,
             'name'        => $s->name,
             'email'       => $s->email,

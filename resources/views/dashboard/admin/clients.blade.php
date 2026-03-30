@@ -245,18 +245,22 @@
         const freelancersData = @json($freelancersData ?? []);
         const skomdaData = @json($skomdaData ?? []);
 
+        console.log(clientsData);
+        console.log(freelancersData);
+        console.log(skomdaData);
+
         let usersData = [
-            ...clientsData.map(u => ({
+            ...clientsData.data.map(u => ({
                 ...u,
                 _uid: 'c_' + u.id,
                 role: 'Client'
             })),
-            ...freelancersData.map(u => ({
+            ...freelancersData.data.map(u => ({
                 ...u,
                 _uid: 'f_' + u.id,
                 role: 'Freelancer'
             })),
-            ...skomdaData.map(u => ({
+            ...skomdaData.data.map(u => ({
                 ...u,
                 _uid: 's_' + u.id,
                 role: 'Skomda Student'
@@ -313,10 +317,10 @@
 
         /* ── STATS ── */
         function renderStats() {
-            const total = usersData.length;
-            const cl = usersData.filter(u => u.role === 'Client').length;
-            const fr = usersData.filter(u => u.role === 'Freelancer').length;
-            const sk = usersData.filter(u => u.role === 'Skomda Student').length;
+            const total = clientsData.total + freelancersData.total + skomdaData.total;
+            const cl = clientsData.total;
+            const fr = freelancersData.total;
+            const sk = skomdaData.total;
 
             document.getElementById('stats-row').innerHTML = [{
                     icon: 'ri-group-fill',
