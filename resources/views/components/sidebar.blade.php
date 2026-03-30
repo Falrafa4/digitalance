@@ -43,21 +43,18 @@
         </a>
 
         {{-- Orders — belum ada route --}}
-        <span
-            class="flex items-center justify-between gap-[11px] px-[14px] py-[11px] rounded-[11px] text-slate-300 font-semibold text-[13.5px] cursor-not-allowed select-none">
-            <span class="flex items-center gap-[11px]"><i class="ri-file-list-3-line text-[17px]"></i>
-                Orders</span>
-            <span
-                class="text-[9px] bg-slate-100 text-slate-400 px-1.5 py-0.5 rounded-full font-bold">Soon</span>
-        </span>
+        <a href="{{ \Illuminate\Support\Facades\Route::has('admin.orders.index') ? route('admin.orders.index') : '#' }}"
+            class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
+                {{ request()->routeIs('admin.orders.*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
+            <i class="ri-file-list-3-line text-[17px]"></i> Orders
+        </a>
 
         {{-- Reviews — belum ada route --}}
-        <span
-            class="flex items-center justify-between gap-[11px] px-[14px] py-[11px] rounded-[11px] text-slate-300 font-semibold text-[13.5px] cursor-not-allowed select-none">
-            <span class="flex items-center gap-[11px]"><i class="ri-star-line text-[17px]"></i> Reviews</span>
-            <span
-                class="text-[9px] bg-slate-100 text-slate-400 px-1.5 py-0.5 rounded-full font-bold">Soon</span>
-        </span>
+        <a href="{{ \Illuminate\Support\Facades\Route::has('admin.reviews.index') ? route('admin.reviews.index') : '#' }}"
+            class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
+                {{ request()->routeIs('admin.reviews.*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
+            <i class="ri-star-line text-[17px]"></i> Reviews
+        </a>
 
         {{-- Services --}}
         <a href="{{ route('admin.services.index') }}"
@@ -74,39 +71,32 @@
         </a>
 
         {{-- Portofolios — belum ada route --}}
-        <span
-            class="flex items-center justify-between gap-[11px] px-[14px] py-[11px] rounded-[11px] text-slate-300 font-semibold text-[13.5px] cursor-not-allowed select-none">
-            <span class="flex items-center gap-[11px]"><i class="ri-folder-user-line text-[17px]"></i>
-                Portofolios</span>
-            <span
-                class="text-[9px] bg-slate-100 text-slate-400 px-1.5 py-0.5 rounded-full font-bold">Soon</span>
-        </span>
+       <a href="{{ \Illuminate\Support\Facades\Route::has('admin.portofolios.index') ? route('admin.portofolios.index') : '#' }}"
+            class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
+                {{ request()->routeIs('admin.portofolios.*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
+            <i class="ri-folder-user-line text-[17px]"></i> Portofolios
+        </a>
 
         {{-- Offers — belum ada route --}}
-        <span
-            class="flex items-center justify-between gap-[11px] px-[14px] py-[11px] rounded-[11px] text-slate-300 font-semibold text-[13.5px] cursor-not-allowed select-none">
-            <span class="flex items-center gap-[11px]"><i class="ri-price-tag-3-line text-[17px]"></i>
-                Offers</span>
-            <span
-                class="text-[9px] bg-slate-100 text-slate-400 px-1.5 py-0.5 rounded-full font-bold">Soon</span>
-        </span>
+        <a href="{{ \Illuminate\Support\Facades\Route::has('admin.offers.index') ? route('admin.offers.index') : '#' }}"
+            class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
+                {{ request()->routeIs('admin.offers.*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
+            <i class="ri-price-tag-3-line text-[17px]"></i> Offers
+        </a>
 
         {{-- Working — belum ada route --}}
-        <span
-            class="flex items-center justify-between gap-[11px] px-[14px] py-[11px] rounded-[11px] text-slate-300 font-semibold text-[13.5px] cursor-not-allowed select-none">
-            <span class="flex items-center gap-[11px]"><i class="ri-hammer-line text-[17px]"></i> Working</span>
-            <span
-                class="text-[9px] bg-slate-100 text-slate-400 px-1.5 py-0.5 rounded-full font-bold">Soon</span>
-        </span>
+        <a href="{{ \Illuminate\Support\Facades\Route::has('admin.working.index') ? route('admin.working.index') : '#' }}"
+            class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
+                {{ request()->routeIs('admin.working.*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
+            <i class="ri-hammer-line text-[17px]"></i> Working
+        </a>
 
         {{-- Negotiations — belum ada route --}}
-        <span
-            class="flex items-center justify-between gap-[11px] px-[14px] py-[11px] rounded-[11px] text-slate-300 font-semibold text-[13.5px] cursor-not-allowed select-none">
-            <span class="flex items-center gap-[11px]"><i class="ri-discuss-line text-[17px]"></i>
-                Negotiations</span>
-            <span
-                class="text-[9px] bg-slate-100 text-slate-400 px-1.5 py-0.5 rounded-full font-bold">Soon</span>
-        </span>
+         <a href="{{ \Illuminate\Support\Facades\Route::has('admin.negotiations.index') ? route('admin.negotiations.index') : '#' }}"
+            class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
+                {{ request()->routeIs('admin.negotiations.*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
+            <i class="ri-discuss-line text-[17px]"></i> Negotiations
+        </a>
 
     </nav>
 

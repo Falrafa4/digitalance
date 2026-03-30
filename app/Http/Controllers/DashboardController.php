@@ -11,13 +11,13 @@ class DashboardController extends Controller
 {
     public function admin()
     {
-        $totalUsers = Client::count() + Freelancer::count();
-        $activeProjects = Order::whereIn('status', ['pending', 'in progress'])->count();
-        $totalRevenue = Order::where('status', 'completed')->sum('agreed_price');
-        $openDisputes = Order::where('status', 'disputed')->count();
+        $totalUsers = Client::count() + Freelancer::count() + SkomdaStudent::count();
+        $activeProjects = Order::whereIn('status', ['Pending', 'In Progress'])->count();
+        $totalRevenue = Order::where('status', 'Completed')->sum('agreed_price');
+        $openDisputes = Order::where('status', 'Disputed')->count();
 
         $pendingVerifications = Freelancer::with('user')
-            ->where('status', 'pending')  // sesuaikan value status pending di DB kamu
+            ->where('status', 'Pending') 
             ->orderBy('created_at', 'desc')
             ->limit(5)
             ->get();
@@ -39,12 +39,12 @@ class DashboardController extends Controller
         $allOrders = Order::where('client_id', $user->id)->get();
 
         // 2. Hitung statistik
-        $activeProjects = $allOrders->whereIn('status', ['pending', 'in progress'])->count();
+        $activeProjects = $allOrders->whereIn('status', ['Pending', 'In Progress'])->count();
 
         // Hitung total pengeluaran (agreed_price) dari order yang statusnya bukan ditolak/cancel
-        $totalSpent = $allOrders->where('status', '!=', 'cancelled')->sum('agreed_price');
+        $totalSpent = $allOrders->where('status', '!=', 'Cancelled')->sum('agreed_price');
 
-        $completedProjects = $allOrders->where('status', 'completed')->count();
+        $completedProjects = $allOrders->where('status', 'Completed')->count();
 
         // 3. Ambil 3 project terbaru buat list di bawah (sama kayak sebelumnya)
         $projects = Order::with('service')

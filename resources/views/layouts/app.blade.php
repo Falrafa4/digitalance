@@ -44,13 +44,10 @@
     <x-navbar />
 
     @yield('content')
-
+    
     <!-- FOOTER -->
     <x-footer />
 
-    <!-- ══════════════════════════════════════════════
-       JAVASCRIPT — clean, complete, no loose globals
-  ══════════════════════════════════════════════ -->
     <script>
         (() => {
             "use strict";

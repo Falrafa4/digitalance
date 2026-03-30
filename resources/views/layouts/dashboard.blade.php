@@ -83,8 +83,11 @@
 
     @yield('modals');
 
-    <!-- Toast Container -->
+        <!-- Toast Container -->
     <div id="toast-container"></div>
+
+    {{-- Notification Drawer --}}
+    <x-notification-drawer />
 
     @yield('scripts')
 </body>
