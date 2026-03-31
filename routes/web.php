@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\Route;
 
 // ── PUBLIC ──────────────────────────────────────────────
 Route::get('/', [PageController::class, 'home'])->name('home');
-Route::get('/login', [PageController::class, 'login'])->name('login');
+Route::get('/login', [PageController::class, 'login'])->name('login')->middleware(['guest', 'throttle:5,1']);
 Route::post('/login', [AuthController::class, 'login'])->name('login-process');
 Route::get('/register-client', [PageController::class, 'registerClient']);
 Route::get('/register-freelancer', [PageController::class, 'registerFreelancer']);
@@ -115,6 +115,28 @@ Route::middleware('auth:client')->prefix('client')->group(function () {
 Route::middleware('auth:freelancer')->prefix('freelancer')->name('freelancer.')->group(function () {
     Route::get('/', [DashboardController::class, 'freelancer'])->name('dashboard');
     Route::get('/profile', [FreelancerController::class, 'profile'])->name('profile');
+
+    // crud skomda students
+    Route::get('/skomda-students', [SkomdaStudentController::class, 'freelancerIndex'])->name('skomda-students.index');
+
+    // crud service categories
+    Route::get('/service-categories', [ServiceCategoryController::class, 'freelancerIndex'])->name('service-categories.index');
+
+    // crud client
+    Route::get('/clients', [ClientController::class, 'freelancerIndex'])->name('clients.index');
+
+    // crud order
+    Route::get('/orders', [OrderController::class, 'freelancerIndex'])->name('orders.index');
+    Route::patch('/orders/{id}/status', [OrderController::class, 'updateStatus'])->name('orders.updateStatus');
+    Route::patch('/orders/{id}/price', [OrderController::class, 'updateAgreedPrice'])->name('orders.updateAgreedPrice');
+
+    // crud review
+    Route::get('/reviews', [ReviewController::class, 'freelancerIndex'])->name('reviews.index');
+    Route::get('/reviews/order/{orderId}', [ReviewController::class, 'showReviewByOrderId'])->name('reviews.showByOrderId');
+
+    // crud transaction
+    Route::get('/transactions', [TransactionController::class, 'freelancerIndex'])->name('transactions.index');
+    Route::get('/transactions/order/{orderId}', [TransactionController::class, 'showTransactionByOrderId'])->name('transactions.showByOrderId');
 
     // crud services
     Route::get('/services', [ServiceController::class, 'freelancerIndex'])->name('services.index');
