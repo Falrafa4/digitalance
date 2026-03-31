@@ -16,35 +16,29 @@ class TransactionController extends Controller
 
     // CLIENT ONLY
     // TODO: selesaikan fitur transaction untuk client (all), termasuk validasi dan return view yang sesuai
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Transaction $transaction)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Transaction $transaction)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Transaction $transaction)
-    {
-        //
-    }
 
     // FREELANCER ONLY
-    // TODO: selesaikan fitur transaction untuk freelancer (all), termasuk validasi dan return view yang sesuai
+    public function freelancerIndex(Request $request)
+    {
+        $freelancer = auth('freelancer')->user();
+
+        $transactions = Transaction::with('order.service')
+            ->whereHas('order.service', function ($query) use ($freelancer) {
+                $query->where('freelancer_id', $freelancer->id);
+            })
+            ->get();
+
+        return view('dashboard.freelancer.transactions', compact('transactions'));
+    }
+
+    public function showTransactionByOrderId(string $orderId)
+    {
+        $transaction = Transaction::with('order.service.freelancer')
+            ->whereHas('order', function ($query) use ($orderId) {
+                $query->where('id', $orderId);
+            })
+            ->firstOrFail();
+
+        return view('dashboard.freelancer.transaction-detail', compact('transaction'));
+    }
 }
