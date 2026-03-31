@@ -65,5 +65,40 @@ class OrderController extends Controller
     }
 
     // FREELANCER ONLY
-    // TODO: selesaikan fitur order untuk freelancer (all), termasuk validasi dan return view yang sesuai
+    public function freelancerIndex(Request $request)
+    {
+        $freelancer = $request->user('freelancer');
+
+        $orders = Order::with('service', 'client')
+            ->whereHas('service', function ($query) use ($freelancer) {
+                $query->where('freelancer_id', $freelancer->id);
+            })
+            ->get();
+
+        return view('dashboard.freelancer.orders', compact('orders'));
+    }
+
+    public function updateStatusFreelancer(Request $request, string $id)
+    {
+        $validated = $request->validate([
+            'status' => 'required|in:Pending,Negotiated,Paid,In Progress,Revision,Completed,Cancelled'
+        ]);
+
+        $order = Order::findOrFail($id);
+        $order->update($validated);
+
+        return redirect()->route('freelancer.orders.index')->with('success', 'Status order berhasil diperbarui');
+    }
+
+    public function updateAgreedPrice(Request $request, string $id)
+    {
+        $validated = $request->validate([
+            'agreed_price' => 'required|decimal:2'
+        ]);
+
+        $order = Order::findOrFail($id);
+        $order->update($validated);
+
+        return redirect()->route('freelancer.orders.index')->with('success', 'Harga yang disepakati berhasil diperbarui');
+    }
 }
