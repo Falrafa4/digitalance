@@ -52,10 +52,4 @@ class ServiceCategoryController extends Controller
         $serviceCategories = ServiceCategory::paginate(10);
         return view('dashboard.freelancer.service_categories', compact('serviceCategories'));
     }
-
-    public function freelancerShow(string $id)
-    {
-        $serviceCategory = ServiceCategory::findOrFail($id);
-        return view('dashboard.freelancer.service_categories', compact('serviceCategory'));
-    }
 }
