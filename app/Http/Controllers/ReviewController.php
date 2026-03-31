@@ -16,35 +16,27 @@ class ReviewController extends Controller
 
     // CLIENT ONLY
     // TODO: selesaikan fitur review untuk client (all), termasuk validasi dan return view yang sesuai
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Review $review)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Review $review)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Review $review)
-    {
-        //
-    }
 
     // FREELANCER ONLY
-    // TODO: selesaikan fitur review untuk freelancer (all), termasuk validasi dan return view yang sesuai
+    public function freelancerIndex(Request $request)
+    {
+        $freelancer = auth('freelancer')->user();
+
+        $reviews = Review::with('order.service')
+            ->whereHas('order.service', function ($query) use ($freelancer) {
+                $query->where('freelancer_id', $freelancer->id);
+            })
+            ->get();
+
+        return view('dashboard.freelancer.reviews', compact('reviews'));
+    }
+
+    public function showReviewByOrderId(string $orderId)
+    {
+        $review = Review::with('order.service.freelancer')
+            ->where('order_id', $orderId)
+            ->firstOrFail();
+
+        return view('dashboard.freelancer.review-detail', compact('review'));
+    }
 }
