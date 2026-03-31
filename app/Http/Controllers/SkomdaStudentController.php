@@ -8,18 +8,13 @@ use App\Models\SkomdaStudent;
 
 class SkomdaStudentController extends Controller
 {
-    /**
-     * Get All Skomda Students
-     */
+    // ADMIN ONLY
     public function index()
     {
         $skomdaStudents = SkomdaStudent::paginate(10);
         return view('dashboard.admin.skomda_students', compact('skomdaStudents'));
     }
 
-    /**
-     * Store New Skomda Student
-     */
     public function store(StoreSkomdaStudentRequest $request)
     {
         $request->validated();
@@ -34,18 +29,12 @@ class SkomdaStudentController extends Controller
         return redirect()->route('admin.skomda-students.index')->with('success', 'Akun siswa SMK Telkom Sidoarjo berhasil ditambahkan');
     }
 
-    /**
-     * Get Skomda Student By ID
-     */
     public function show(string $id)
     {
         $skomdaStudent = SkomdaStudent::findOrFail($id);
         return view('dashboard.admin.skomda_students', compact('skomdaStudent'));
     }
 
-    /**
-     * Update Skomda Student By ID
-     */
     public function update(UpdateSkomdaStudentRequest $request, string $id)
     {
         $skomdaStudent = SkomdaStudent::findOrFail($id);
@@ -54,14 +43,20 @@ class SkomdaStudentController extends Controller
         return redirect()->route('admin.skomda-students.index')->with('success', 'Akun siswa SMK Telkom Sidoarjo berhasil diperbarui');
     }
 
-    /**
-     * Delete Skomda Student By ID
-     */
     public function destroy(string $id)
     {
         $skomdaStudent = SkomdaStudent::findOrFail($id);
         $skomdaStudent->delete();
 
         return redirect()->route('admin.skomda-students.index')->with('success', 'Akun siswa SMK Telkom Sidoarjo berhasil dihapus');
+    }
+
+    // FREELANCER ONLY
+    public function freelancerIndex()
+    {
+        // Freelancer hanya bisa melihat data siswa, tidak bisa melakukan CRUD
+        // data siswa untuk mendaftarkan diri mereka ke freelancer, jadi freelancer harus berasal dari siswa SMK Telkom Sidoarjo
+        $skomdaStudents = SkomdaStudent::paginate(10);
+        return view('dashboard.freelancer.skomda_students', compact('skomdaStudents'));
     }
 }
