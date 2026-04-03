@@ -14,12 +14,9 @@ class NegotiationController extends Controller
         return view('dashboard.admin.negotiations', compact('negotiations'));
     }
 
-    // CLIENT ONLY
-    // TODO: selesaikan fitur negosiasi untuk client (all), termasuk validasi dan return view yang sesuai
     public function store(Request $request)
     {
-        //
-    }
+    }       
 
     /**
      * Display the specified resource.

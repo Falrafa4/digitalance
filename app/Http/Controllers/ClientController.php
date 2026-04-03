@@ -13,51 +13,69 @@ use Illuminate\Support\Facades\Hash;
 
 class ClientController extends Controller
 {
-    // ADMIN ONLY (CRUD)
+    // ADMIN ONLY (CRUD & MANAGEMENT)
+
+    /**
+     * Get All Data for User Management (Admin Dashboard)
+     */
     public function index()
     {
-        $clientsData = Client::paginate(3);
-        $clientsData->getCollection()->transform(fn($c) => [
-            'id'          => $c->id,
-            'name'        => $c->name,
-            'email'       => $c->email,
-            'phone'       => $c->phone,
-            'role'        => 'Client',
-            'status'      => 'Active',
-            'joinDate'    => $c->created_at?->format('d M Y') ?? '-',
-            'avatar'      => 'https://ui-avatars.com/api/?name=' . urlencode($c->name) . '&background=0f766e&color=fff',
+        $clientsData = Client::all()->transform(fn($c) => [
+            'id' => $c->id,
+            'name' => $c->name,
+            'email' => $c->email,
+            'phone' => $c->phone,
+            'role' => 'Client',
+            'status' => 'Active',
+            'joinDate' => $c->created_at?->format('d M Y') ?? '-',
+            'avatar' => 'https://ui-avatars.com/api/?name=' . urlencode($c->name) . '&background=0f766e&color=fff',
         ]);
 
-        $freelancersData = Freelancer::with('skomda_student')->paginate(3);
-        $freelancersData->getCollection()->transform(fn($f) => [
-            'id'          => $f->id,
-            'name'        => $f->skomda_student->name ?? '-',
-            'email'       => $f->skomda_student->email ?? '-',
-            'phone'       => $f->skomda_student->phone ?? '-',
-            'role'        => 'Freelancer',
-            'status'      => ucfirst($f->status ?? 'Pending'),
-            'joinDate'    => $f->created_at?->format('d M Y') ?? '-',
-            'avatar'      => 'https://ui-avatars.com/api/?name=' . urlencode($f->skomda_student->name ?? 'F') . '&background=0f766e&color=fff',
-        ]);
+        $freelancersData = Freelancer::with('skomda_student')->get()
+            ->map(function ($f) {
+                return [
+                    'id' => $f->id,
+                    'name' => $f->skomda_student->name ?? '-',
+                    'email' => $f->skomda_student->email ?? '-',
+                    'phone' => $f->skomda_student->phone ?? '-',
+                    'location' => $f->skomda_student->location ?? 'Unknown',
+                    'skills' => $f->skills ?? [],
+                    'role' => 'Freelancer',
+                    'status' => ucfirst($f->status ?? 'Pending'),
+                    'joinDate' => $f->created_at?->format('d M Y') ?? '-',
+                    'avatar' => 'https://ui-avatars.com/api/?name='
+                        . urlencode($f->skomda_student->name ?? 'F')
+                        . '&background=0f766e&color=fff',
+                ];
+            });
 
-        $skomdaData = SkomdaStudent::paginate(3);
-        $skomdaData->getCollection()->transform(fn($s) => [
-            'id'          => $s->id,
-            'name'        => $s->name,
-            'email'       => $s->email,
-            'phone'       => $s->phone ?? '-',
-            'role'        => 'Skomda Student',
-            'status'      => 'Active',
-            'joinDate'    => $s->created_at?->format('d M Y') ?? '-',
-            'avatar'      => 'https://ui-avatars.com/api/?name=' . urlencode($s->name) . '&background=0f766e&color=fff',
-        ]);
+        $skomdaData = SkomdaStudent::all()
+            ->transform(fn($s) => [
+                'id' => $s->id,
+                'name' => $s->name,
+                'email' => $s->email,
+                'phone' => $s->phone ?? '-',
+                'role' => 'Skomda Student',
+                'status' => 'Active',
+                'joinDate' => $s->created_at?->format('d M Y') ?? '-',
+                'avatar' => 'https://ui-avatars.com/api/?name=' . urlencode($s->name) . '&background=0f766e&color=fff',
+            ]);
 
-        return view('dashboard.admin.clients', compact('clientsData', 'freelancersData', 'skomdaData'));
+        return view('dashboard.admin.clients', [
+            'clientsData' => ['data' => $clientsData],
+            'freelancersData' => ['data' => $freelancersData],
+            'skomdaData' => ['data' => $skomdaData],
+        ]);
     }
 
     public function store(StoreClientRequest $request)
     {
         Client::create($request->validated());
+
+        if ($request->expectsJson()) {
+            return response()->json(['message' => 'Akun client berhasil dibuat'], 201);
+        }
+
         return redirect()->route('admin.clients.index')->with('success', 'Akun client berhasil dibuat');
     }
 
@@ -67,22 +85,32 @@ class ClientController extends Controller
         return view('dashboard.admin.clients', compact('client'));
     }
 
-    public function update(Request $request, Client $client)
+    public function update(UpdateClientProfileRequest $request, Client $client)
     {
         $client->update($request->validated());
+
+        if ($request->expectsJson()) {
+            return response()->json(['message' => 'Akun client berhasil diperbarui'], 200);
+        }
+
         return redirect()->route('admin.clients.index')->with('success', 'Akun client berhasil diperbarui');
     }
 
-    public function destroy(Client $client)
+    public function destroy(Request $request, Client $client)
     {
         $client->delete();
+
+        if ($request->expectsJson()) {
+            return response()->json(['message' => 'Akun client berhasil dihapus'], 200);
+        }
+
         return redirect()->route('admin.clients.index')->with('success', 'Akun client berhasil dihapus');
     }
 
-    // CLIENT ONLY (profil & update profil & update password)
+    // CLIENT SELF-SERVICE (PROFILE & PASSWORD)
+
     public function profile()
     {
-        // Hanya ngambil sesi client
         $user = auth('client')->user();
 
         return view('dashboard.client.profile', [
@@ -93,6 +121,7 @@ class ClientController extends Controller
 
     public function updateProfile(UpdateClientProfileRequest $request)
     {
+        /** @var Client $client */
         $client = auth('client')->user();
         $client->update($request->validated());
 
@@ -101,6 +130,7 @@ class ClientController extends Controller
 
     public function updatePassword(UpdateClientPasswordRequest $request)
     {
+        /** @var Client $client */
         $client = auth('client')->user();
 
         if (!Hash::check($request->current_password, $client->password)) {
@@ -114,10 +144,12 @@ class ClientController extends Controller
         return redirect()->route('dashboard.client.profile')->with('success', 'Password berhasil diperbarui');
     }
 
-    // FREELANCER ONLY (lihat daftar client)
+    // ==========================================
+    // FREELANCER ONLY
+    // ==========================================
+
     public function freelancerIndex()
     {
-        // untuk ditampilkan di halaman freelancer, agar freelancer bisa melihat daftar client yang ada
         $clients = Client::all();
         return view('dashboard.freelancer.clients', compact('clients'));
     }

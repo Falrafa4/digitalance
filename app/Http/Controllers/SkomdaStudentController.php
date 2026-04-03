@@ -11,7 +11,7 @@ class SkomdaStudentController extends Controller
     // ADMIN ONLY
     public function index()
     {
-        $skomdaStudents = SkomdaStudent::paginate(10);
+        $skomdaStudents = SkomdaStudent::all();
         return view('dashboard.admin.skomda_students', compact('skomdaStudents'));
     }
 

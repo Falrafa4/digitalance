@@ -18,7 +18,14 @@ body {
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
 }
 
-/* Overlay slide transition */
+/* AUTH CONTAINER  */
+#authContainer {
+    position: relative;
+    overflow: hidden;
+    background: white;
+}
+
+/* OVERLAY SLIDE TRANSITION */
 .auth-overlay {
     position: absolute;
     top: 0;
@@ -27,121 +34,159 @@ body {
     height: 100%;
     z-index: 20;
     overflow: hidden;
-    transition: transform 0.65s cubic-bezier(0.25, 1, 0.5, 1);
-    transform: translateX(0%);
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateX(0);
 }
 
 .auth-overlay.register-mode {
     transform: translateX(100%);
 }
 
-/* Form panel transitions */
+/* FORM PANEL TRANSITIONS */
 .form-panel {
     position: absolute;
     top: 0;
     width: 50%;
     height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    opacity: 0;
-    pointer-events: none;
-    transition: all 0.65s cubic-bezier(0.25, 1, 0.5, 1);
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow-y: auto;
 }
 
+/* Login Panel */
 .login-panel {
-    left: 50%;
-    transform: translateX(0);
-}
-
-.login-panel.inactive {
-    transform: translateX(48px);
-    opacity: 0;
-    pointer-events: none;
+    right: 0;
+    opacity: 1;
+    visibility: visible;
+    z-index: 10;
+    pointer-events: auto;
 }
 
 .login-panel.active {
     opacity: 1;
+    visibility: visible;
+    z-index: 10;
     pointer-events: auto;
-    transform: translateX(0);
 }
 
+.login-panel.inactive {
+    opacity: 0;
+    visibility: hidden;
+    z-index: 5;
+    pointer-events: none;
+}
+
+/* Register Panel */
 .register-panel {
     left: 0;
-    transform: translateX(-50px);
+    opacity: 0;
+    visibility: hidden;
+    z-index: 5;
+    pointer-events: none;
 }
 
 .register-panel.active {
-    transform: translateX(0);
     opacity: 1;
+    visibility: visible;
+    z-index: 10;
     pointer-events: auto;
 }
 
-/* Image gradient */
+/* IMAGE GRADIENT */
 .image-gradient {
     position: absolute;
     inset: 0;
     background: linear-gradient(to top, rgba(0, 0, 0, 0.88) 0%, rgba(0, 0, 0, 0.4) 50%, rgba(0, 0, 0, 0.05) 100%);
+    pointer-events: none;
 }
 
-/* Tag pop animation */
+/* TAG POP ANIMATION */
+@keyframes popIn {
+    0% {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
 .tag-item {
     animation: popIn 0.2s ease forwards;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background-color: #ecfdf5;
+    color: #047857;
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 500;
 }
 
-/* Skill wrapper animated (grid rows trick) */
+.tag-close {
+    cursor: pointer;
+    margin-left: 4px;
+}
+
+.tag-close:hover {
+    color: #064e3b;
+}
+
+/* SKILL WRAPPER ANIMATION */
 .skill-wrapper-anim {
-    display: grid;
-    grid-template-rows: 0fr;
-    opacity: 0;
-    transform: scale(0.98);
-    transform-origin: top;
-    overflow: hidden;
-    transition:
-        grid-template-rows 0.45s cubic-bezier(0.4, 0, 0.2, 1),
-        opacity 0.4s ease,
-        transform 0.45s cubic-bezier(0.4, 0, 0.2, 1),
-        margin 0.4s ease;
-    margin-top: 0;
+    transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
-.skill-wrapper-anim.open {
-    grid-template-rows: 1fr;
-    opacity: 1;
-    transform: scale(1);
-    margin-top: 0.75rem;
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
-.skill-inner-content {
-    min-height: 0;
-}
-
-/* Input focus ring */
+/* INPUT FOCUS RING */
 .input-field:focus {
     outline: none;
     border-color: #0F766E;
     box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.08);
 }
 
-/* Hero image hover zoom */
-.hero-image-container:hover .hero-image {
-    transform: scale(1.05);
+/* HERO IMAGE */
+.hero-image-container {
+    overflow: hidden;
 }
 
 .hero-image {
     transition: transform 1s ease, opacity 0.4s ease;
 }
 
+.hero-image-container:hover .hero-image {
+    transform: scale(1.05);
+}
+
 .hero-image.fade-out {
     opacity: 0;
 }
 
-/* Overlay text transition */
+/* OVERLAY TEXT TRANSITION */
 .overlay-text-item {
     transition: opacity 0.3s ease;
 }
 
-/* Role slider */
+/* ROLE SLIDER */
+.role-toggle {
+    position: relative;
+    display: inline-flex;
+    background-color: #f1f5f9;
+    border-radius: 9999px;
+    padding: 4px;
+}
+
 .role-slider {
     position: absolute;
     top: 4px;
@@ -159,67 +204,109 @@ body {
     transform: translateX(100%);
 }
 
+.role-btn {
+    position: relative;
+    z-index: 10;
+    transition: all 0.3s ease;
+}
+
+.role-btn.active {
+    color: #0F766E !important;
+    font-weight: 800 !important;
+}
+
+/* Scrollbar */
+.register-panel::-webkit-scrollbar {
+    width: 4px;
+}
+
+.register-panel::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 10px;
+}
+
+.register-panel::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+/* RESPONSIVE */
 @media (max-width: 1024px) {
-    body {
-        overflow: auto;
-    }
-
-    .auth-overlay {
-        position: relative;
-        width: 100%;
-        height: 200px;
-        transform: none !important;
-    }
-
-    .auth-overlay.register-mode {
-        transform: none !important;
-    }
-
-    .form-panel {
-        position: relative;
-        width: 100%;
-        opacity: 1;
-        pointer-events: auto;
-        transform: none !important;
-        left: auto;
-        max-height: none !important;
-        overflow: visible !important;
-    }
-
-    .login-panel.inactive {
-        display: none;
-    }
-
-    .register-panel:not(.active) {
-        display: none;
-    }
-
-    .login-panel.active,
-    .register-panel.active {
-        display: flex;
-    }
-
     #authContainer {
+        flex-direction: column !important;
         height: auto !important;
         min-height: auto !important;
-        flex-direction: column;
-        border-radius: 24px;
-        margin: 1rem 0;
+        max-width: 100% !important;
+        margin: 1rem;
     }
 
-    .form-panel>div {
+    /* Update di login.css */
+
+.auth-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 50%;
+    height: 100%;
+    z-index: 100; 
+    overflow: hidden;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: all; 
+}
+
+.form-panel {
+    position: absolute;
+    top: 0;
+    width: 50%;
+    height: 100%;
+    z-index: 10; 
+    transition: all 0.5s ease;
+}
+
+.form-panel.inactive {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.form-panel.active {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: all;
+}
+    
+    .auth-overlay.register-mode {
+    transform: translateX(100%);
+}
+
+    .login-panel {
+    right: 0;
+    z-index: 10;
+}
+
+.register-panel {
+    left: 0;
+    z-index: 10;
+    display: block !important;
+}
+    .form-panel > div {
         max-height: none !important;
         overflow: visible !important;
-        padding: 1.5rem 1.5rem 2rem !important;
     }
 }
 
 @media (max-width: 640px) {
-    .form-panel>div {
-        padding: 1.25rem 1.25rem 1.75rem !important;
+    .form-panel > div {
+        padding: 1.25rem !important;
     }
 
     .grid.grid-cols-2 {
         grid-template-columns: 1fr !important;
+        gap: 0.75rem !important;
+    }
+    
+    .px-10 {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
     }
 }

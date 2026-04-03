@@ -1,46 +1,7 @@
 let hasUnreadMessages = true;
 
-let ordersData = [
-  {
-    id: 'ORD-001',
-    client_id: 'C-101',
-    client_name: 'Budi Santoso',
-    freelancer_id: 'F-201',
-    freelancer_name: 'Reva Anindya',
-    service_id: 'SRV-005',
-    service_name: 'UI/UX Design',
-    brief: 'Membuat desain aplikasi mobile untuk e-commerce sayuran organik.',
-    status: 'in_progress',
-    agreed_price: 3500000,
-    created_at: '2026-02-20'
-  },
-  {
-    id: 'ORD-002',
-    client_id: 'C-102',
-    client_name: 'PT Maju Bersama',
-    freelancer_id: 'F-202',
-    freelancer_name: 'Dimas Prasetyo',
-    service_id: 'SRV-012',
-    service_name: 'Video Editing',
-    brief: 'Editing video company profile durasi 5 menit.',
-    status: 'pending',
-    agreed_price: 1500000,
-    created_at: '2026-02-25'
-  },
-  {
-    id: 'ORD-003',
-    client_id: 'C-103',
-    client_name: 'Ayu Lestari',
-    freelancer_id: 'F-203',
-    freelancer_name: 'Sari Wulandari',
-    service_id: 'SRV-008',
-    service_name: 'Social Media Management',
-    brief: 'Mengelola konten instagram selama 1 bulan penuh.',
-    status: 'completed',
-    agreed_price: 2000000,
-    created_at: '2026-01-10'
-  }
-];
+const rawOrders = window.__ORDERS_PAGE__?.data;
+let ordersData = Array.isArray(rawOrders) ? rawOrders : (rawOrders?.data || []);
 
 const STATUS_OPTIONS = ['pending', 'negotiated', 'paid', 'in_progress', 'revision', 'completed', 'cancelled'];
 
@@ -48,6 +9,7 @@ function formatRupiah(number) {
   return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(number);
 }
 
+// RENDER STATS
 function renderStats() {
   const row = document.getElementById('stats-row');
   if (!row) return;
@@ -88,6 +50,7 @@ function renderStats() {
   `;
 }
 
+// RENDER TABLE
 function renderTable(data = ordersData) {
   const tbody = document.getElementById('order-tbody');
   const emptyEl = document.getElementById('order-empty');
@@ -102,35 +65,41 @@ function renderTable(data = ordersData) {
   tableEl.style.display = 'table';
   emptyEl.style.display = 'none';
 
-  tbody.innerHTML = data.map(o => `
+  tbody.innerHTML = data.map(o => {
+    const clientName = o.client?.user?.name ?? o.client?.name ?? 'Client';
+    const freeName = o.service?.freelancer?.user?.name ?? o.service?.freelancer?.name ?? 'Freelancer';
+    const srvTitle = o.service?.title ?? 'Service';
+    const rawStatus = o.status || 'Pending';
+    const statusClass = String(rawStatus).toLowerCase().replace(' ', '_');
+    const date = o.created_at ? new Date(o.created_at).toLocaleDateString('id-ID') : '-';
+
+    return `
     <tr>
-      <td><span class="order-id-badge">${o.id}</span></td>
+      <td><span class="order-id-badge">#${o.id}</span></td>
       <td>
         <div class="user-pair">
-          <span class="user-name"><i class="ri-user-line"></i> ${o.client_name} <span class="user-label">(${o.client_id})</span></span>
-          <span class="user-name"><i class="ri-briefcase-line"></i> ${o.freelancer_name} <span class="user-label">(${o.freelancer_id})</span></span>
+          <span class="user-name"><i class="ri-user-line"></i> ${clientName}</span>
+          <span class="user-name"><i class="ri-briefcase-line"></i> ${freeName}</span>
         </div>
       </td>
       <td>
         <div class="user-pair">
-          <span class="user-name">${o.service_name}</span>
-          <span class="user-label">${o.service_id}</span>
+          <span class="user-name" title="${srvTitle}">${srvTitle.slice(0,25)}...</span>
         </div>
       </td>
-      <td><span class="price-text">${formatRupiah(o.agreed_price)}</span></td>
-      <td><span class="status-pill status-${o.status}">${o.status.replace('_', ' ')}</span></td>
-      <td>${o.created_at}</td>
+      <td><span class="price-text">${formatRupiah(o.agreed_price || 0)}</span></td>
+      <td><span class="status-pill status-${statusClass}">${rawStatus}</span></td>
+      <td>${date}</td>
       <td>
         <div class="action-btns">
           <button class="btn-action" title="Detail" onclick="openOrderModal('${o.id}')"><i class="ri-eye-line"></i></button>
-          <button class="btn-action" title="Edit" onclick="openEditOrderModal('${o.id}')"><i class="ri-edit-line"></i></button>
-          <button class="btn-action danger" title="Hapus" onclick="deleteOrder('${o.id}')"><i class="ri-delete-bin-line"></i></button>
         </div>
       </td>
     </tr>
-  `).join('');
+  `}).join('');
 }
 
+// OPEN ORDER MODAL
 function openOrderModal(id) {
   const o = ordersData.find(x => x.id === id);
   if (!o) return;
@@ -182,10 +151,12 @@ function openOrderModal(id) {
   overlay.classList.add('open');
 }
 
+// CLOSE ORDER MODAL
 function closeOrderModal() {
   document.getElementById('detail-modal-overlay').classList.remove('open');
 }
 
+// OPEN ADD ORDER MODAL
 function openAddOrderModal() {
   const existing = document.getElementById('add-order-overlay');
   if (existing) existing.remove();
@@ -259,6 +230,7 @@ function openAddOrderModal() {
   });
 }
 
+// OPEN EDIT ORDER MODAL
 function openEditOrderModal(id) {
   const o = ordersData.find(x => x.id === id);
   if (!o) return;
@@ -331,6 +303,7 @@ function openEditOrderModal(id) {
   });
 }
 
+// DELETE ORDER
 function deleteOrder(id) {
   if (confirm(`Yakin ingin menghapus order ${id}?`)) {
     ordersData = ordersData.filter(o => o.id !== id);
@@ -338,6 +311,7 @@ function deleteOrder(id) {
   }
 }
 
+// INITIALIZE FILTERS
 function initFilters() {
   const tabs = document.querySelectorAll('.filter-tab');
   tabs.forEach(tab => {
@@ -349,11 +323,13 @@ function initFilters() {
   });
 }
 
+// INITIALIZE SEARCH
 function initSearch() {
   const input = document.getElementById('order-search-input');
   if (input) input.addEventListener('input', applyFilterAndSearch);
 }
 
+// APPLY FILTER AND SEARCH
 function applyFilterAndSearch() {
   const activeTab = document.querySelector('.filter-tab.active');
   const filter = activeTab ? activeTab.dataset.filter : 'all';
@@ -373,11 +349,13 @@ function applyFilterAndSearch() {
   renderTable(filtered);
 }
 
+// REFRESH UI
 function refreshUI() {
   renderStats();
   applyFilterAndSearch();
 }
 
+// INITIALIZE PAGE
 function initPage() {
   renderStats();
   renderTable();

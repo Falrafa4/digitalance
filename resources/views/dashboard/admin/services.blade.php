@@ -43,6 +43,8 @@
 @endsection
 
 @section('scripts')
+    <script>
+        window.__SERVICES_PAGE__ = { data: @json($services ?? []) };
+    </script>
     <script src="{{ asset('js/dashboard/admin/services.js') }}"></script>
-
 @endsection

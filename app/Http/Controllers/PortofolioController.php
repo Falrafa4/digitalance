@@ -13,7 +13,7 @@ class PortofolioController extends Controller
      */
     public function index()
     {
-        $portofolios = Portofolio::with('service.freelancer')->paginate(10);
+        $portofolios = Portofolio::with('service.freelancer')->get();
 
         return view('dashboard.admin.portofolios', compact('portofolios'));
     }
@@ -25,7 +25,7 @@ class PortofolioController extends Controller
     {
         $freelancer = auth('freelancer')->user();
         $portofolios = Portofolio::with('service')->where('freelancer_id', $freelancer->id)->get();
-        $services = $freelancer->services();
+        $services = $freelancer->service()->get();
 
         return view('dashboard.freelancer.portofolios', compact('portofolios', 'services'));
     }

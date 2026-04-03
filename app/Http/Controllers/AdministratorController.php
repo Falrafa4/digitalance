@@ -6,6 +6,8 @@ use App\Http\Requests\StoreAdminProfileRequest;
 use App\Http\Requests\UpdateAdminProfileRequest;
 use App\Models\Administrator;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\Request;
 
 class AdministratorController extends Controller
 {
@@ -62,19 +64,40 @@ class AdministratorController extends Controller
         $administrator->delete();
         return redirect()->route('admin.admins.index')->with('success', 'Akun administrator berhasil dihapus');
     }
-
-    public function updateProfile(UpdateAdminProfileRequest $request)
+    
+    public function updateProfile(Request $request)
     {
         $user = auth()->guard('administrator')->user();
+        
+        // Validasi cuma untuk name dan email
+        $data = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|max:255|unique:administrators,email,' . $user->id,
+        ]);
 
-        if ($request->filled('password')) {
-            if (!Hash::check($request->current_password, $user->password)) {
-                return back()->withErrors(['current_password' => 'Password saat ini salah.']);
-            }
-            $user->password = Hash::make($request->password);
+        $user->update($data);
+        return back()->with('success', 'Profil Administrator berhasil diperbarui.');
+    }
+
+    // --- FUNGSI BARU KHUSUS UNTUK UPDATE PASSWORD ---
+
+    public function updatePassword(Request $request)
+    {
+        $request->validate([
+            'current_password' => 'required',
+            'password' => 'required|min:8|confirmed',
+        ]);
+
+        $user = auth()->guard('administrator')->user();
+
+        if (!Hash::check($request->current_password, $user->password)) {
+            return back()->withErrors(['current_password' => 'Password saat ini salah.']);
         }
 
-        $user->update($request->validated());
-        return back()->with('success', 'Profil Administrator berhasil diperbarui.');
+        $user->update([
+            'password' => Hash::make($request->password)
+        ]);
+
+        return back()->with('password_success', 'Password berhasil diperbarui.');
     }
 }

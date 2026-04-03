@@ -11,7 +11,7 @@ class ServiceCategoryController extends Controller
     // ADMIN ONLY
     public function index()
     {
-        $serviceCategories = ServiceCategory::paginate(10);
+        $serviceCategories = ServiceCategory::paginate(50);
         return view('dashboard.admin.service_categories', compact('serviceCategories'));
     }
 

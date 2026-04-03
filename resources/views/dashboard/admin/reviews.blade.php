@@ -1,7 +1,7 @@
 @extends('layouts.dashboard')
 @section('title', 'Review Management | Digitalance')
 @section('styles')
-    <link rel="stylesheet" href="{{ asset('css/dashboard/admin/admin-reviews.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/dashboard/admin/reviews.css') }}">
 @endsection
 
 @section('content')
@@ -42,5 +42,8 @@
 @endsection
 
 @section('scripts')
-    <script src="{{ asset('js/dashboard/admin/admin-reviews.js') }}"></script>
+        <script>
+            window.__REVIEWS_PAGE__ = { data: @json($reviews ?? []) };
+        </script>
+    <script src="{{ asset('js/dashboard/admin/reviews.js') }}"></script>
 @endsection

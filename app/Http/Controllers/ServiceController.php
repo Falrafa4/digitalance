@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreServiceRequest;
 use App\Http\Requests\UpdateServiceRequest;
 use App\Models\Service;
+use Illuminate\Http\Request;
 
 class ServiceController extends Controller
 {
@@ -19,7 +20,7 @@ class ServiceController extends Controller
         $query->select('id', 'student_id')
           ->with('skomda_student:id,name');
       }
-    ])->get();
+    ])->latest()->get();
 
     return view('dashboard.admin.services', compact('services'));
   }
@@ -84,5 +85,33 @@ class ServiceController extends Controller
     $service->delete();
 
     return redirect()->route('freelancer.services.index')->with('success', 'Layanan berhasil dihapus');
+  }
+
+  /**
+   * Update Service Status (ADMIN ONLY)
+   */
+  public function updateStatus(Request $request, $id)
+  {
+    $request->validate([
+      'status' => 'required|in:Approved,Rejected',
+      'reject_reason' => 'nullable|string'
+    ]);
+
+    $service = Service::findOrFail($id);
+    $service->status = $request->status;
+    
+    if ($request->status === 'Rejected') {
+      $service->reject_reason = $request->reject_reason;
+    } else {
+      $service->reject_reason = null;
+    }
+
+    $service->save();
+
+    return response()->json([
+      'success' => true,
+      'message' => 'Status layanan berhasil diperbarui!',
+      'data' => $service
+    ]);
   }
 }

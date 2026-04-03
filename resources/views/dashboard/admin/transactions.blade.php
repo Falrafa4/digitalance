@@ -56,5 +56,10 @@
 @endsection
 
 @section('scripts')
+<script>
+    window.__TRANSACTIONS_PAGE__ = {
+        data: @json($transactions ?? [])
+    };
+</script>
     <script src="{{ asset('js/dashboard/admin/transactions.js') }}"></script>
 @endsection

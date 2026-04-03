@@ -8,7 +8,10 @@ use Laravel\Sanctum\HasApiTokens;
 class Administrator extends Authenticatable
 {
     use HasApiTokens;
-    protected $fillable = ['email', 'password'];
+    protected $fillable = ['name',
+        'email',
+        'password',
+        'status'];
 
     public function getRole()
     {

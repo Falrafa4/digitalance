@@ -40,12 +40,10 @@
 <body class="bg-slate-100 text-slate-900 overflow-x-hidden">
     @yield('additional-header')
 
-    <!-- NAVBAR -->
     <x-navbar />
 
     @yield('content')
-    
-    <!-- FOOTER -->
+
     <x-footer />
 
     <script>
@@ -57,7 +55,7 @@
                 ...ctx.querySelectorAll(sel),
             ];
 
-            /* ── 1. MOBILE MENU ─────────────────────────── */
+            <!-- MOBILE MENU -->
             const hamburger = $("#hamburgerBtn");
             const mobileMenu = $("#mobileMenu");
 
@@ -71,7 +69,7 @@
                 mobileMenu.classList.toggle("open");
             });
 
-            /* ── 2. SMOOTH SCROLL ───────────────────────── */
+            // SMOOTH SCROLL
             document.addEventListener("click", (e) => {
                 const a = e.target.closest('a[href^="#"]');
                 if (!a) return;
@@ -87,7 +85,7 @@
                 closeMobileMenu();
             });
 
-            /* ── 3. NAVBAR: scroll shadow + active link ─── */
+            // NAVBAR SCROLL SHADOW + ACTIVE LINK
             const navbar = $("#navbar");
             const sections = $$("section[id]");
             const navLinks = $$(".nav-link");
@@ -111,8 +109,7 @@
             });
             updateNav();
 
-            /* ── 4. ROLE TOGGLE ─────────────────────────── */
-            // Active state lives in CSS (.role-btn.active) — NOT Tailwind JIT
+            // ROLE TOGGLE
             const roleBtns = $$(".role-btn");
             const heroSearch = $("#heroSearch");
             const phMap = {
@@ -126,11 +123,10 @@
                     btn.classList.add("active");
                     if (heroSearch)
                         heroSearch.placeholder =
-                        phMap[btn.dataset.role] ?? "";
+                            phMap[btn.dataset.role] ?? "";
                 }),
             );
 
-            // Search tags fill the input
             $$(".search-tag").forEach((tag) =>
                 tag.addEventListener("click", () => {
                     if (heroSearch) {
@@ -142,7 +138,7 @@
                 }),
             );
 
-            /* ── 5. ACCORDION ───────────────────────────── */
+            // ACCORDION
             $$(".accordion-item").forEach((item) => {
                 const hdr = $(".accordion-header", item);
                 if (!hdr) return;
@@ -155,8 +151,7 @@
                 });
             });
 
-            /* ── 6. HOW IT WORKS TABS ───────────────────── */
-            // Use el.style instead of classList for Tailwind-incompatible dynamic values
+            // HOW IT WORKS TABS
             const switchBtns = $$(".switch-btn");
             const flowContents = $$(".flow-content");
 
@@ -182,13 +177,12 @@
                 }),
             );
 
-            // Init
             const initBtn = switchBtns.find(
                 (b) => b.dataset.target === "client-flow",
             );
             if (initBtn) setSwitch(initBtn);
 
-            /* ── 7. FAQ ─────────────────────────────────── */
+            // FAQ
             $$(".faq-item").forEach((item) => {
                 const q = $(".faq-question", item);
                 if (!q) return;
@@ -197,7 +191,7 @@
                 );
             });
 
-            /* ── 8. TYPING EFFECT ───────────────────────── */
+            // TYPING EFFECT
             const typingEl = $("#typingTarget");
             if (typingEl) {
                 const phrases = [
@@ -234,7 +228,7 @@
                 setTimeout(tick, 1000);
             }
 
-            /* ── 9. SCROLL REVEAL ───────────────────────── */
+            // SCROLL REVEAL
             const revealObs = new IntersectionObserver(
                 (entries) => {
                     entries.forEach((e) => {
@@ -243,14 +237,14 @@
                         revealObs.unobserve(e.target);
                     });
                 }, {
-                    threshold: 0.1,
-                    rootMargin: "0px 0px -50px 0px"
-                },
+                threshold: 0.1,
+                rootMargin: "0px 0px -50px 0px"
+            },
             );
 
             $$(".reveal").forEach((el) => revealObs.observe(el));
 
-            /* ── 10. ANIMATED COUNTER ───────────────────── */
+            // ANIMATED COUNTER
             const counterObs = new IntersectionObserver(
                 (entries) => {
                     entries.forEach((e) => {
@@ -259,8 +253,8 @@
                         runCounter(e.target);
                     });
                 }, {
-                    threshold: 0.6
-                },
+                threshold: 0.6
+            },
             );
 
             $$(".stat-number").forEach((el) => counterObs.observe(el));
@@ -275,13 +269,13 @@
 
                 (function step(now) {
                     const p = Math.min((now - t0) / dur, 1);
-                    const v = target * (1 - Math.pow(1 - p, 3)); // ease-out cubic
+                    const v = target * (1 - Math.pow(1 - p, 3));
                     el.textContent = prefix + v.toFixed(dec) + suffix;
                     if (p < 1) requestAnimationFrame(step);
                 })(t0);
             }
 
-            /* ── 11. PROGRESS RING ──────────────────────── */
+            // PROGRESS RING
             const ring = $("#progressRing");
             if (ring) {
                 new IntersectionObserver(
@@ -291,12 +285,12 @@
                             ring.classList.add("animated");
                         });
                     }, {
-                        threshold: 0.5
-                    },
+                    threshold: 0.5
+                },
                 ).observe(ring);
             }
 
-            /* ── 12. SUBTLE PARALLAX (hero blobs only) ──── */
+            // SUBTLE PARALLAX
             const blob1 = $(".blob-1");
             const blob2 = $(".blob-2");
             window.addEventListener(
@@ -308,11 +302,12 @@
                     if (blob2)
                         blob2.style.transform = `translateY(${y * 0.04}px)`;
                 }, {
-                    passive: true
-                },
+                passive: true
+            },
             );
         })();
     </script>
+    @yield('scripts')
 </body>
 
 </html>
