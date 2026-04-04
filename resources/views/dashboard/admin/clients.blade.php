@@ -169,6 +169,14 @@
                     <div class="flex flex-col gap-1.5 mb-4">
                         <label class="text-[11px] font-bold text-slate-500 uppercase tracking-[.1em]">Student ID
                             (skomda_students.id)</label>
+                        {{-- ini contoh dari database, bisa kamu kembangkan UI nya --}}
+                        <select name="skomda-student-id" id="add-student-id">
+                            <option value="" selected disabled>Pilih Skomda Student</option>
+                            {{-- @dd($skomdaData) --}}
+                            @foreach ($skomdaData['data'] as $student)
+                                <option value="{{ $student['id'] }}">{{ $student['name'] }} ({{ $student['nis'] }})</option>
+                            @endforeach
+                        </select>
                         <input id="add-student-id" type="number" placeholder="Contoh: 1"
                             class="py-[10px] px-[13px] bg-slate-50 border-[1.5px] border-slate-200 rounded-[11px] text-[13.5px] font-sans outline-none transition-all duration-200 focus:border-[#0f766e] focus:bg-white focus:shadow-[0_0_0_3px_rgba(15,118,110,0.08)]" />
                         <p class="text-[11px] text-slate-400 mt-1">Freelancer harus terhubung ke data Skomda Student.</p>

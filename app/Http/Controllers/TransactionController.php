@@ -14,7 +14,7 @@ class TransactionController extends Controller
     {
         // Tetap pakai eager loading agar nama client muncul dan anti N+1
         $transactions = Transaction::with([
-            'order.client.skomda_student' 
+            'order.client' 
         ])->latest()->get();
 
         return view('dashboard.admin.transactions', compact('transactions'));
