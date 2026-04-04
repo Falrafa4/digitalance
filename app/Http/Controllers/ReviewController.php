@@ -14,7 +14,7 @@ class ReviewController extends Controller
     {
         // Pakai perbaikan audit kita agar nama asli muncul (eager loading skomda_student)
         $reviews = Review::with([
-            'order.client.skomda_student', 
+            'order.client', 
             'order.service.freelancer.skomda_student' 
         ])->latest()->get();
 
