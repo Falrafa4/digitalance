@@ -88,44 +88,24 @@
     return `/admin/clients/${u.id}`;
   }
 
-  // TOAST
-  function showToast(msg, type = 'success') {
-    const icons = { success: 'ri-check-double-line', danger: 'ri-close-circle-line', warn: 'ri-alert-line' };
-    const colors = {
-      success: 'bg-white border-[#10b981] text-emerald-800',
-      danger: 'bg-white border-red-400 text-red-800',
-      warn: 'bg-white border-orange-400 text-orange-800',
-    };
-
-    const el = document.createElement('div');
-    el.className =
-      `toast flex items-center gap-2.5 px-[18px] py-[13px] border-[1.5px] rounded-[13px] text-[13px] font-semibold max-w-[320px] shadow-lg ${colors[type] || colors.success}`;
-    el.innerHTML =
-      `<i class="text-[17px] flex-shrink-0 ${icons[type] || icons.success}"></i>
-       <span>${msg}</span>
-       <button type="button" class="ml-auto bg-transparent border-none cursor-pointer opacity-50 hover:opacity-100 text-[15px] text-inherit p-0 leading-none">
-         <i class="ri-close-line"></i>
-       </button>`;
-
-    const c = $('toast-container');
-    if (!c) return;
-
-    el.querySelector('button')?.addEventListener('click', () => dismissToast(el));
-    c.appendChild(el);
-    setTimeout(() => dismissToast(el), 3500);
-  }
-  window.showToast = showToast;
-
-  function dismissToast(el) {
-    if (!el || el.classList.contains('hide')) return;
-    el.classList.add('hide');
-    setTimeout(() => el.remove(), 280);
+  // TOAST - Menggunakan notif-drawer.js yang sudah ada (jangan duplicate)
+  // showToast sudah disediakan oleh notif-drawer.js, cek apakah window.showToast ada
+  function ensureToastExists() {
+    if (!window.showToast) {
+      console.warn('showToast dari notif-drawer.js belum loaded, fallback ke alert');
+      window.showToast = (msg, type = 'success') => {
+        alert(msg);
+      };
+    }
   }
 
-  // MODAL
+  // MODAL - Pastikan modal functions tersedia global
   function openModal(id) {
     const el = $(id);
-    if (!el) return;
+    if (!el) {
+      console.error(`Modal ${id} tidak ditemukan`);
+      return;
+    }
     el.classList.add('open');
     el.style.opacity = '1';
     el.style.pointerEvents = 'all';
@@ -133,7 +113,10 @@
 
   function closeModal(id) {
     const el = $(id);
-    if (!el) return;
+    if (!el) {
+      console.error(`Modal ${id} tidak ditemukan`);
+      return;
+    }
     el.classList.remove('open');
     el.style.opacity = '0';
     el.style.pointerEvents = 'none';
@@ -142,9 +125,14 @@
   window.openModal = openModal;
   window.closeModal = closeModal;
 
-  document.querySelectorAll('.overlay').forEach(ov => {
-    ov.addEventListener('click', e => { if (e.target === ov) closeModal(ov.id); });
-  });
+  // Setup overlay click to close modal
+  function setupOverlayListeners() {
+    document.querySelectorAll('.overlay').forEach(ov => {
+      ov.addEventListener('click', e => { 
+        if (e.target === ov) closeModal(ov.id); 
+      });
+    });
+  }
 
   // PAGINATION
   function setMeta(totalShown, totalAll) {
@@ -267,15 +255,15 @@
           </div>
 
           <div class="flex gap-2 mt-auto relative z-10">
-            <button type="button" onclick="openDetail('${u._uid}')" class="flex-1 btn-soft">
+            <button type="button" onclick="window.openDetail('${u._uid}')" class="flex-1 btn-soft">
               <i class="ri-eye-line"></i> View
             </button>
 
-            <button type="button" onclick="openEdit('${u._uid}')" class="flex-1 btn-soft btn-soft-primary">
+            <button type="button" onclick="window.openEdit('${u._uid}')" class="flex-1 btn-soft btn-soft-primary">
               <i class="ri-pencil-line"></i> Edit
             </button>
 
-            <button type="button" onclick="openDelete('${u._uid}')" class="btn-soft btn-soft-danger" title="Delete">
+            <button type="button" onclick="window.openDelete('${u._uid}')" class="btn-soft btn-soft-danger" title="Delete">
               <i class="ri-delete-bin-line"></i>
             </button>
           </div>
@@ -291,14 +279,23 @@
   // DETAIL
   function openDetail(uid) {
     const u = usersData.find(x => x._uid === uid);
-    if (!u) return;
+    if (!u) {
+      console.error(`User dengan uid ${uid} tidak ditemukan`);
+      return;
+    }
+
+    const detailContent = $('detail-content');
+    if (!detailContent) {
+      console.error('Element detail-content tidak ditemukan');
+      return;
+    }
 
     const rm = ROLE_META[u.role] || {};
     const skills = Array.isArray(u.skills) ? u.skills : [];
 
-    $('detail-content').innerHTML = `
+    detailContent.innerHTML = `
       <div class="h-[110px] bg-gradient-to-r from-[#0f766e] to-[#10b981] relative flex-shrink-0">
-        <button type="button" onclick="closeModal('modal-detail')"
+        <button type="button" onclick="window.closeModal('modal-detail')"
           class="absolute top-3.5 right-3.5 w-8 h-8 bg-white/20 border-none rounded-full flex items-center justify-center text-white text-[18px] cursor-pointer hover:bg-white/30 transition-all">
           <i class="ri-close-line"></i>
         </button>
@@ -330,12 +327,12 @@
         }
 
         <div class="flex gap-2.5 pt-4 border-t border-slate-100">
-          <button type="button" onclick="closeModal('modal-detail');openEdit('${u._uid}')"
+          <button type="button" onclick="window.closeModal('modal-detail');window.openEdit('${u._uid}')"
             class="flex-1 py-2.5 rounded-[11px] bg-[#0f766e] text-white font-bold text-[13px] flex items-center justify-center gap-1.5 cursor-pointer border-none shadow-teal-sm hover:bg-[#0a5e58] transition-all duration-150">
             <i class="ri-pencil-line"></i> Edit
           </button>
 
-          <button type="button" onclick="closeModal('modal-detail');openDelete('${u._uid}')"
+          <button type="button" onclick="window.closeModal('modal-detail');window.openDelete('${u._uid}')"
             class="flex-1 py-2.5 rounded-[11px] bg-red-500 text-white font-bold text-[13px] flex items-center justify-center gap-1.5 cursor-pointer border-none shadow-[0_3px_10px_rgba(239,68,68,.25)] hover:bg-red-600 transition-all duration-150">
             <i class="ri-delete-bin-line"></i> Delete
           </button>
@@ -350,15 +347,31 @@
   // EDIT
   function openEdit(uid) {
     const u = usersData.find(x => x._uid === uid);
-    if (!u) return;
+    if (!u) {
+      console.error(`User dengan uid ${uid} tidak ditemukan`);
+      return;
+    }
 
-    $('edit-uid').value = uid;
-    $('edit-name').value = u.name || '';
-    $('edit-email').value = u.email || '';
-    $('edit-status').value = u.status || 'Active';
-    $('edit-location').value = u.location || '';
-    $('edit-phone').value = u.phone || '';
-    $('edit-bio').value = u.bio || '';
+    const editUidEl = $('edit-uid');
+    if (!editUidEl) {
+      console.error('Element edit-uid tidak ditemukan');
+      return;
+    }
+
+    editUidEl.value = uid;
+    const nameEl = $('edit-name');
+    const emailEl = $('edit-email');
+    const statusEl = $('edit-status');
+    const locationEl = $('edit-location');
+    const phoneEl = $('edit-phone');
+    const bioEl = $('edit-bio');
+
+    if (nameEl) nameEl.value = u.name || '';
+    if (emailEl) emailEl.value = u.email || '';
+    if (statusEl) statusEl.value = u.status || 'Active';
+    if (locationEl) locationEl.value = u.location || '';
+    if (phoneEl) phoneEl.value = u.phone || '';
+    if (bioEl) bioEl.value = u.bio || '';
 
     const sg = $('edit-skills-group');
     if (sg) sg.style.display = 'none';
@@ -368,27 +381,44 @@
   window.openEdit = openEdit;
 
   async function submitEditUser() {
-    const uid = $('edit-uid').value;
-    const u = usersData.find(x => x._uid === uid);
-    if (!u) return;
-
-    if (u.role !== 'Client') {
-      showToast('Edit hanya tersedia untuk Client (endpoint update role lain belum ada).', 'danger');
+    const editUidEl = $('edit-uid');
+    if (!editUidEl) {
+      console.error('Element edit-uid tidak ditemukan');
       return;
     }
 
+    const uid = editUidEl.value;
+    const u = usersData.find(x => x._uid === uid);
+    if (!u) {
+      console.error(`User dengan uid ${uid} tidak ditemukan`);
+      return;
+    }
+
+    if (u.role !== 'Client') {
+      ensureToastExists();
+      window.showToast('Edit hanya tersedia untuk Client (endpoint update role lain belum ada).', 'danger');
+      return;
+    }
+
+    const nameEl = $('edit-name');
+    const emailEl = $('edit-email');
+    const phoneEl = $('edit-phone');
+
     const payload = {
-      name: $('edit-name').value.trim(),
-      email: $('edit-email').value.trim(),
-      phone: $('edit-phone').value.trim(),
+      name: (nameEl?.value || '').trim(),
+      email: (emailEl?.value || '').trim(),
+      phone: (phoneEl?.value || '').trim(),
     };
 
     try {
       await apiRequest(`/admin/clients/${u.id}`, { method: 'PUT', body: payload });
       closeModal('modal-edit');
+      ensureToastExists();
+      window.showToast('Client berhasil diupdate', 'success');
       window.location.reload();
     } catch (err) {
-      showToast(err?.message || 'Gagal update client.', 'danger');
+      ensureToastExists();
+      window.showToast(err?.message || 'Gagal update client.', 'danger');
     }
   }
   window.submitEditUser = submitEditUser;
@@ -398,11 +428,17 @@
 
   function openDelete(uid) {
     const u = usersData.find(x => x._uid === uid);
-    if (!u) return;
+    if (!u) {
+      console.error(`User dengan uid ${uid} tidak ditemukan`);
+      return;
+    }
 
     deleteTargetUid = uid;
-    $('delete-text').innerHTML =
-      `Tindakan ini tidak dapat dibatalkan. Akun <strong>${u.name}</strong> dan semua datanya akan dihapus permanen.`;
+    const deleteTextEl = $('delete-text');
+    if (deleteTextEl) {
+      deleteTextEl.innerHTML =
+        `Tindakan ini tidak dapat dibatalkan. Akun <strong>${u.name}</strong> dan semua datanya akan dihapus permanen.`;
+    }
 
     openModal('modal-delete');
   }
@@ -412,20 +448,30 @@
     if (!deleteTargetUid) return;
 
     const u = usersData.find(x => x._uid === deleteTargetUid);
-    if (!u) return;
+    if (!u) {
+      console.error(`User dengan uid ${deleteTargetUid} tidak ditemukan`);
+      return;
+    }
 
     try {
       await apiRequest(deleteUrlFor(u), { method: 'DELETE' });
       closeModal('modal-delete');
+      ensureToastExists();
+      window.showToast('User berhasil dihapus', 'success');
       window.location.reload();
     } catch (err) {
-      showToast(err?.message || 'Gagal hapus user.', 'danger');
+      ensureToastExists();
+      window.showToast(err?.message || 'Gagal hapus user.', 'danger');
     }
   }
+  window.confirmDelete = confirmDelete;
 
   // ADD_USER
   function updateAddFormByRole() {
-    const role = $('add-role')?.value || 'Client';
+    const roleSelect = $('add-role');
+    if (!roleSelect) return;
+
+    const role = roleSelect.value || 'Client';
 
     const clientGroup = $('add-client-group');
     const pwGroup = $('add-password-group');
@@ -449,20 +495,29 @@
   }
 
   async function submitAddUser() {
-    const role = $('add-role')?.value || 'Client';
+    const roleSelect = $('add-role');
+    const role = roleSelect?.value || 'Client';
 
-    const name = $('add-name')?.value.trim() || '';
-    const email = $('add-email')?.value.trim() || '';
-    const phone = $('add-phone')?.value.trim() || '';
+    const nameEl = $('add-name');
+    const emailEl = $('add-email');
+    const phoneEl = $('add-phone');
+    const pwEl = $('add-password');
+    const pwcEl = $('add-password-confirmation');
 
-    const pw = $('add-password')?.value || '';
-    const pwc = $('add-password-confirmation')?.value || '';
+    const name = nameEl?.value.trim() || '';
+    const email = emailEl?.value.trim() || '';
+    const phone = phoneEl?.value.trim() || '';
+
+    const pw = pwEl?.value || '';
+    const pwc = pwcEl?.value || '';
+
+    ensureToastExists();
 
     try {
       if (role === 'Client') {
-        if (!name || !email || !phone) return showToast('Nama, email, dan phone wajib diisi.', 'danger');
-        if (!pw) return showToast('Password wajib diisi.', 'danger');
-        if (pw !== pwc) return showToast('Konfirmasi password tidak sama.', 'danger');
+        if (!name || !email || !phone) return window.showToast('Nama, email, dan phone wajib diisi.', 'danger');
+        if (!pw) return window.showToast('Password wajib diisi.', 'danger');
+        if (pw !== pwc) return window.showToast('Konfirmasi password tidak sama.', 'danger');
 
         await apiRequest('/admin/clients', {
           method: 'POST',
@@ -470,17 +525,22 @@
         });
 
         closeModal('modal-add');
+        window.showToast('Client berhasil ditambahkan', 'success');
         window.location.reload();
         return;
       }
 
       if (role === 'Skomda Student') {
-        const nis = $('add-nis')?.value.trim() || '';
-        const cls = $('add-class')?.value.trim() || '';
-        const major = $('add-major')?.value || 'SIJA';
+        const nisEl = $('add-nis');
+        const clsEl = $('add-class');
+        const majorEl = $('add-major');
+
+        const nis = nisEl?.value.trim() || '';
+        const cls = clsEl?.value.trim() || '';
+        const major = majorEl?.value || 'SIJA';
 
         if (!nis || !name || !email || !cls || !major) {
-          return showToast('NIS, Nama, Email, Class, Major wajib diisi.', 'danger');
+          return window.showToast('NIS, Nama, Email, Class, Major wajib diisi.', 'danger');
         }
 
         await apiRequest('/admin/skomda-students', {
@@ -489,23 +549,26 @@
         });
 
         closeModal('modal-add');
+        window.showToast('Skomda Student berhasil ditambahkan', 'success');
         window.location.reload();
         return;
       }
 
       if (role === 'Freelancer') {
-        const studentIdRaw = $('add-student-id')?.value || '';
+        const studentIdEl = $('add-student-id');
+        const studentIdRaw = studentIdEl?.value || '';
         const student_id = parseInt(studentIdRaw, 10);
+        const bioEl = $('add-bio');
 
-        if (!student_id) return showToast('Student ID wajib diisi untuk Freelancer.', 'danger');
-        if (!pw) return showToast('Password wajib diisi.', 'danger');
-        if (pw !== pwc) return showToast('Konfirmasi password tidak sama.', 'danger');
+        if (!student_id) return window.showToast('Student ID wajib diisi untuk Freelancer.', 'danger');
+        if (!pw) return window.showToast('Password wajib diisi.', 'danger');
+        if (pw !== pwc) return window.showToast('Konfirmasi password tidak sama.', 'danger');
 
         await apiRequest('/admin/freelancers', {
           method: 'POST',
           body: {
             student_id,
-            bio: $('add-bio')?.value.trim() || null,
+            bio: bioEl?.value.trim() || null,
             password: pw,
             password_confirmation: pwc,
             status: 'Pending',
@@ -513,13 +576,14 @@
         });
 
         closeModal('modal-add');
+        window.showToast('Freelancer berhasil ditambahkan', 'success');
         window.location.reload();
         return;
       }
 
-      showToast('Role tidak dikenali.', 'danger');
+      window.showToast('Role tidak dikenali.', 'danger');
     } catch (err) {
-      showToast(err?.message || 'Gagal menambah user.', 'danger');
+      window.showToast(err?.message || 'Gagal menambah user.', 'danger');
     }
   }
   window.submitAddUser = submitAddUser;
@@ -567,7 +631,10 @@
         chk.classList.add('bg-[#0f766e]', 'border-[#0f766e]', 'text-white');
         chk.classList.remove('border-slate-300', 'text-transparent');
 
-        $('add-role').value = opt.dataset.val;
+        const roleSelect = $('add-role');
+        if (roleSelect) {
+          roleSelect.value = opt.dataset.val;
+        }
         updateAddFormByRole();
       });
     });
@@ -575,6 +642,10 @@
 
   // INIT
   function init() {
+    // Setup overlay listeners untuk modal
+    setupOverlayListeners();
+
+    // Setup filter tabs
     document.querySelectorAll('.filter-tab').forEach(tab => {
       tab.addEventListener('click', () => {
         document.querySelectorAll('.filter-tab').forEach(t => {
@@ -587,7 +658,13 @@
       });
     });
 
-    $('user-search')?.addEventListener('input', refreshGrid);
+    // Setup search
+    const searchEl = $('user-search');
+    if (searchEl) {
+      searchEl.addEventListener('input', refreshGrid);
+    }
+
+    // Setup per page
     const perPageSelect = $('per-page');
     if (perPageSelect) {
       perPageSelect.addEventListener('change', function () {
@@ -597,18 +674,35 @@
       });
     }
 
-    $('btn-add-user')?.addEventListener('click', () => {
-      updateAddFormByRole();
-      openModal('modal-add');
-    });
+    // Setup add user button
+    const btnAddUser = $('btn-add-user');
+    if (btnAddUser) {
+      btnAddUser.addEventListener('click', () => {
+        updateAddFormByRole();
+        openModal('modal-add');
+      });
+    }
 
-    $('btn-confirm-delete')?.addEventListener('click', confirmDelete);
+    // Setup confirm delete button
+    const btnConfirmDelete = $('btn-confirm-delete');
+    if (btnConfirmDelete) {
+      btnConfirmDelete.addEventListener('click', confirmDelete);
+    }
 
+    // Initialize roles picker dan form
     initAddRoles();
     updateAddFormByRole();
+
+    // Render initial content
+    ensureToastExists();
     renderStats();
     refreshGrid();
   }
 
-  document.addEventListener('DOMContentLoaded', init);
+  // Jalankan init saat DOM siap
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
 })();

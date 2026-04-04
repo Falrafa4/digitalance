@@ -59,7 +59,7 @@
             <div class="pagination-right">
                 <label class="per-page">
                     <span>Per page</span>
-                    <select id="per-page" class="per-page-select" disabled>
+                    <select id="per-page" class="per-page-select">
                         <option value="8">8</option>
                         <option value="12" selected>12</option>
                         <option value="16">16</option>
@@ -86,7 +86,7 @@
             class="modal-box bg-white rounded-3xl w-full max-w-[520px] max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
             <div class="flex items-center justify-between px-[26px] py-[22px] border-b border-slate-100 flex-shrink-0">
                 <span class="font-display text-[1.1rem] font-extrabold text-slate-900">Add New User</span>
-                <button onclick="closeModal('modal-add')"
+                <button onclick="window.closeModal('modal-add')"
                     class="w-[34px] h-[34px] bg-slate-100 rounded-[9px] flex items-center justify-center text-[18px] text-slate-500 cursor-pointer border-none hover:bg-red-50 hover:text-red-500 transition-all duration-150">
                     <i class="ri-close-line"></i>
                 </button>
@@ -114,8 +114,7 @@
                     </div>
 
                     <div class="flex flex-col gap-1.5">
-                        <label class="text-[11px] font-bold text-slate-500 uppercase tracking-[.1em]">Confirm
-                            Password</label>
+                        <label class="text-[11px] font-bold text-slate-500 uppercase tracking-[.1em]">Confirm Password</label>
                         <input id="add-password-confirmation" type="password" placeholder="Repeat password"
                             class="py-[10px] px-[13px] bg-slate-50 border-[1.5px] border-slate-200 rounded-[11px] text-[13.5px] font-sans outline-none transition-all duration-200 focus:border-[#0f766e] focus:bg-white focus:shadow-[0_0_0_3px_rgba(15,118,110,0.08)]" />
                     </div>
@@ -167,35 +166,47 @@
 
                 <div id="add-freelancer-group" style="display:none;">
                     <div class="flex flex-col gap-1.5 mb-4">
-                        <label class="text-[11px] font-bold text-slate-500 uppercase tracking-[.1em]">Student ID
-                            (skomda_students.id)</label>
-                        {{-- ini contoh dari database, bisa kamu kembangkan UI nya --}}
-                        <select name="skomda-student-id" id="add-student-id">
-                            <option value="" selected disabled>Pilih Skomda Student</option>
-                            {{-- @dd($skomdaData) --}}
-                            @foreach ($skomdaData['data'] as $student)
-                                <option value="{{ $student['id'] }}">{{ $student['name'] }} ({{ $student['nis'] }})</option>
-                            @endforeach
-                        </select>
-                        <input id="add-student-id" type="number" placeholder="Contoh: 1"
-                            class="py-[10px] px-[13px] bg-slate-50 border-[1.5px] border-slate-200 rounded-[11px] text-[13.5px] font-sans outline-none transition-all duration-200 focus:border-[#0f766e] focus:bg-white focus:shadow-[0_0_0_3px_rgba(15,118,110,0.08)]" />
+                        <label class="text-[11px] font-bold text-slate-500 uppercase tracking-[.1em]">
+                            Student ID (skomda_students.id)
+                        </label>
+                        
+                        <div class="relative w-full">
+                            <select name="skomda-student-id" id="add-student-id"
+                                class="w-full py-[10px] pl-[13px] pr-[36px] appearance-none bg-slate-50 border-[1.5px] border-slate-200 rounded-[11px] text-[13.5px] font-sans outline-none cursor-pointer transition-all duration-200 focus:border-[#0f766e] focus:bg-white focus:shadow-[0_0_0_3px_rgba(15,118,110,0.08)]">
+                                <option value="" selected disabled>Pilih Skomda Student...</option>
+                                
+                                @if(isset($skomdaData['data']) && is_array($skomdaData['data']))
+                                    @foreach ($skomdaData['data'] as $student)
+                                        <option value="{{ $student['id'] ?? '' }}">
+                                            {{ $student['name'] ?? 'Unknown' }} ({{ $student['nis'] ?? 'N/A' }})
+                                        </option>
+                                    @endforeach
+                                @endif
+                            </select>
+                            
+                            <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-slate-400">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </div>
+                        </div>
+
                         <p class="text-[11px] text-slate-400 mt-1">Freelancer harus terhubung ke data Skomda Student.</p>
                     </div>
-                </div>
 
-                <div class="flex flex-col gap-1.5">
-                    <label class="text-[11px] font-bold text-slate-500 uppercase tracking-[.1em]">Bio</label>
-                    <textarea id="add-bio" placeholder="Short bio…" rows="3"
-                        class="py-[10px] px-[13px] bg-slate-50 border-[1.5px] border-slate-200 rounded-[11px] text-[13.5px] font-sans outline-none transition-all duration-200 resize-y focus:border-[#0f766e] focus:bg-white focus:shadow-[0_0_0_3px_rgba(15,118,110,0.08)]"></textarea>
+                    <div class="flex flex-col gap-1.5 mb-4">
+                        <label class="text-[11px] font-bold text-slate-500 uppercase tracking-[.1em]">Bio</label>
+                        <textarea id="add-bio" rows="3" placeholder="Optional bio..."
+                            class="py-[10px] px-[13px] bg-slate-50 border-[1.5px] border-slate-200 rounded-[11px] text-[13.5px] font-sans outline-none transition-all duration-200 resize-y focus:border-[#0f766e] focus:bg-white focus:shadow-[0_0_0_3px_rgba(15,118,110,0.08)]"></textarea>
+                    </div>
                 </div>
             </div>
 
             <div class="flex gap-2.5 px-[26px] py-[16px] border-t border-slate-100 bg-slate-50 flex-shrink-0">
-                <button onclick="closeModal('modal-add')"
+                <button onclick="window.closeModal('modal-add')"
                     class="flex-1 py-[11px] rounded-[11px] bg-slate-100 text-slate-500 font-bold text-[13px] cursor-pointer border-none hover:bg-slate-200 transition-all duration-150">Cancel</button>
-                <button onclick="submitAddUser()"
-                    class="flex-1 py-[11px] rounded-[11px] bg-[#0f766e] text-white font-bold text-[13px] cursor-pointer border-none shadow-teal-sm hover:bg-[#0a5e58] transition-all duration-150">Save
-                    User</button>
+                <button onclick="window.submitAddUser()"
+                    class="flex-1 py-[11px] rounded-[11px] bg-[#0f766e] text-white font-bold text-[13px] cursor-pointer border-none shadow-teal-sm hover:bg-[#0a5e58] transition-all duration-150">Save User</button>
             </div>
         </div>
     </div>
@@ -207,7 +218,7 @@
             class="modal-box bg-white rounded-3xl w-full max-w-[520px] max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
             <div class="flex items-center justify-between px-[26px] py-[22px] border-b border-slate-100 flex-shrink-0">
                 <span class="font-display text-[1.1rem] font-extrabold text-slate-900">Edit User</span>
-                <button onclick="closeModal('modal-edit')"
+                <button onclick="window.closeModal('modal-edit')"
                     class="w-[34px] h-[34px] bg-slate-100 rounded-[9px] flex items-center justify-center text-[18px] text-slate-500 cursor-pointer border-none hover:bg-red-50 hover:text-red-500 transition-all duration-150">
                     <i class="ri-close-line"></i>
                 </button>
@@ -260,7 +271,7 @@
                         class="py-[10px] px-[13px] bg-slate-50 border-[1.5px] border-slate-200 rounded-[11px] text-[13.5px] font-sans outline-none transition-all duration-200 resize-y focus:border-[#0f766e] focus:bg-white focus:shadow-[0_0_0_3px_rgba(15,118,110,0.08)]"></textarea>
                 </div>
 
-                <div class="flex flex-col gap-1.5" id="edit-skills-group">
+                <div class="flex flex-col gap-1.5" id="edit-skills-group" style="display:none;">
                     <label class="text-[11px] font-bold text-slate-500 uppercase tracking-[.1em]">Skills <span
                             class="normal-case tracking-normal font-normal text-slate-400">(comma separated)</span></label>
                     <input id="edit-skills" type="text" placeholder="UI Design, React, Node.js"
@@ -269,11 +280,10 @@
             </div>
 
             <div class="flex gap-2.5 px-[26px] py-[16px] border-t border-slate-100 bg-slate-50 flex-shrink-0">
-                <button onclick="closeModal('modal-edit')"
+                <button onclick="window.closeModal('modal-edit')"
                     class="flex-1 py-[11px] rounded-[11px] bg-slate-100 text-slate-500 font-bold text-[13px] cursor-pointer border-none hover:bg-slate-200 transition-all duration-150">Cancel</button>
-                <button onclick="submitEditUser()"
-                    class="flex-1 py-[11px] rounded-[11px] bg-[#0f766e] text-white font-bold text-[13px] cursor-pointer border-none shadow-teal-sm hover:bg-[#0a5e58] transition-all duration-150">Save
-                    Changes</button>
+                <button onclick="window.submitEditUser()"
+                    class="flex-1 py-[11px] rounded-[11px] bg-[#0f766e] text-white font-bold text-[13px] cursor-pointer border-none shadow-teal-sm hover:bg-[#0a5e58] transition-all duration-150">Save Changes</button>
             </div>
         </div>
     </div>
@@ -300,24 +310,28 @@
                 <p class="text-[13.5px] text-slate-500 leading-relaxed" id="delete-text"></p>
             </div>
             <div class="flex gap-2.5 px-[26px] py-[16px] border-t border-slate-100 bg-slate-50">
-                <button onclick="closeModal('modal-delete')"
+                <button onclick="window.closeModal('modal-delete')"
                     class="flex-1 py-[11px] rounded-[11px] bg-slate-100 text-slate-500 font-bold text-[13px] cursor-pointer border-none hover:bg-slate-200 transition-all duration-150">Batal</button>
                 <button id="btn-confirm-delete"
-                    class="flex-1 py-[11px] rounded-[11px] bg-red-500 text-white font-bold text-[13px] cursor-pointer border-none shadow-[0_3px_10px_rgba(239,68,68,.25)] hover:bg-red-600 transition-all duration-150">Ya,
-                    Hapus</button>
+                    class="flex-1 py-[11px] rounded-[11px] bg-red-500 text-white font-bold text-[13px] cursor-pointer border-none shadow-[0_3px_10px_rgba(239,68,68,.25)] hover:bg-red-600 transition-all duration-150">Ya, Hapus</button>
             </div>
         </div>
     </div>
 @endsection
 
 @section('scripts')
+    <!-- ✅ IMPORTANT: notif-drawer.js HARUS di-load SEBELUM clients.js -->
+    <script src="{{ asset('js/notif-drawer.js') }}"></script>
+    
+    <!-- Data untuk JavaScript -->
     <script>
         window.__CLIENTS_PAGE__ = {
-            clientsData: @json($clientsData ?? []),
-            freelancersData: @json($freelancersData ?? []),
-            skomdaData: @json($skomdaData ?? []),
+            clientsData: {{ json_encode($clientsData ?? ['total' => 0, 'data' => []]) }},
+            freelancersData: {{ json_encode($freelancersData ?? ['total' => 0, 'data' => []]) }},
+            skomdaData: {{ json_encode($skomdaData ?? ['total' => 0, 'data' => []]) }},
         };
     </script>
 
+    <!-- Baru load clients.js SETELAH notif-drawer.js dan data di-set -->
     <script src="{{ asset('js/dashboard/admin/clients.js') }}"></script>
 @endsection

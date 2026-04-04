@@ -2,9 +2,20 @@
     $user = Auth::guard('administrator')->user()
         ?? Auth::guard('freelancer')->user()
         ?? Auth::guard('client')->user();
+
+    $segment = request()->segment(1);
+
+    if ($segment === 'admin') {
+        $urlProfil = route('admin.profile');
+    } elseif ($segment === 'client') {
+        $urlProfil = route('client.profile');
+    } elseif ($segment === 'freelancer') {
+        $urlProfil = route('freelancer.profile');
+    } else {
+        $urlProfil = route('login');
+    }
 @endphp
 
-<!-- Header -->
 <header class="flex items-center justify-between mb-9">
     <div class="relative w-[340px]" id="search-wrapper">
         <i class="ri-search-line absolute left-[15px] top-2 text-slate-400 text-[17px] pointer-events-none z-10"></i>
@@ -18,7 +29,6 @@
 
     <div class="flex items-center gap-3.5">
 
-        <!-- Notification -->
         <div class="relative">
             <button id="notif-btn"
                 class="w-11 h-11 rounded-xl border-[1.5px] border-slate-200 bg-white cursor-pointer flex items-center justify-center text-slate-500 text-[19px] transition-all duration-200 hover:border-[#0f766e] hover:text-[#0f766e]">
@@ -28,18 +38,19 @@
             </button>
         </div>
 
-        <!-- Profile -->
-        <div class="flex items-center gap-[11px] cursor-pointer">
+        <a href="{{ $urlProfil }}"
+            class="flex items-center gap-[11px] cursor-pointer hover:opacity-80 transition-opacity">
+
             <img class="w-[42px] h-[42px] rounded-xl object-cover"
                 src="{{ $user?->profile_photo
     ? asset('storage/' . $user->profile_photo)
     : 'https://ui-avatars.com/api/?name=' . urlencode($user?->name ?? $user?->email) . '&background=0f766e&color=fff' }}" alt="{{ $user?->name ?? 'Profile' }}" />
 
-            <div class="flex flex-col">
-                <span class="font-bold text-[13.5px] text-slate-800">
+            <div class="hidden sm:flex flex-col">
+                <span class="font-bold text-[13.5px] text-slate-800 leading-none">
                     {{ $user?->name ?? $user?->email }}
                 </span>
-                <span class="text-[11px] text-slate-500">
+                <span class="text-[11px] text-slate-500 mt-1">
                     @if ($user instanceof App\Models\Administrator)
                         Administrator
                     @elseif ($user instanceof App\Models\Freelancer)
@@ -51,6 +62,7 @@
                     @endif
                 </span>
             </div>
-        </div>
+
+        </a>
     </div>
 </header>

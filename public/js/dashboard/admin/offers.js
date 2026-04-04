@@ -1,284 +1,279 @@
-// OFFERS.JS - WARAS VERSION (OFFERS & NEGOTIATIONS)
-let hasUnreadMessages = true;
+let offersData = [];
+let negoData = [];
 
-const rawOffers = window.__OFFERS_PAGE__?.offersData;
-let offersData = Array.isArray(rawOffers) ? rawOffers : (rawOffers?.data || []);
+document.addEventListener('DOMContentLoaded', function() {
+    // 1. Ambil data dari Bridge yang ada di Blade
+    const pageData = window.OFFERS_PAGE || {};
+    offersData = Array.isArray(pageData.offers) ? pageData.offers : [];
+    negoData = Array.isArray(pageData.negotiations) ? pageData.negotiations : [];
+    
+    // 2. Jalankan Inisialisasi
+    initPage();
+});
 
-const rawNego = window.__OFFERS_PAGE__?.negoData;
-let negoData = Array.isArray(rawNego) ? rawNego : (rawNego?.data || []);
+function initPage() {
+    renderStats();
+    renderOffersTable();
+    renderNegoTable();
+    initTabEvents();
+    initFilterEvents();
+    
+    // Event listener untuk menutup modal jika klik di luar box (overlay)
+    const overlay = document.getElementById('detail-modal-overlay');
+    if (overlay) {
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) closeModal();
+        });
+    }
 
-// HELPER FUNCTIONS
-function formatRupiah(number) {
-  if (!number) return 'Rp 0';
-  return new Intl.NumberFormat('id-ID', { 
-    style: 'currency', 
-    currency: 'IDR', 
-    minimumFractionDigits: 0 
-  }).format(number);
+    // Support tutup modal pakai tombol ESC
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeModal();
+    });
 }
 
-// RENDER STATS
+// ==========================================
+// RENDERER FUNCTIONS
+// ==========================================
+
 function renderStats() {
-  const row = document.getElementById('stats-row');
-  if (!row) return;
+    const row = document.getElementById('stats-row');
+    if (!row) return;
 
-  const totalOffers = offersData.length;
-  const pendingOffers = offersData.filter(o => 
-    String(o.status).toLowerCase() === 'sent' || 
-    String(o.status).toLowerCase() === 'pending'
-  ).length;
-  const totalNego = negoData.length;
+    const totalOffers = offersData.length;
+    const pendingOffers = offersData.filter(o => String(o.status).toLowerCase() === 'sent').length;
+    const totalNego = negoData.length;
 
-  row.innerHTML = `
-  <div class="stat-card">
-    <div class="stat-icon blue"><i class="ri-price-tag-3-line"></i></div>
-    <div class="stat-text">
-    <span class="stat-value">${totalOffers}</span>
-    <span class="stat-label">Total Tawaran</span>
-    </div>
-  </div>
-  <div class="stat-card">
-    <div class="stat-icon amber"><i class="ri-time-line"></i></div>
-    <div class="stat-text">
-    <span class="stat-value">${pendingOffers}</span>
-    <span class="stat-label">Tawaran Pending</span>
-    </div>
-  </div>
-  <div class="stat-card">
-    <div class="stat-icon teal"><i class="ri-discuss-line"></i></div>
-    <div class="stat-text">
-    <span class="stat-value">${totalNego}</span>
-    <span class="stat-label">Total Pesan Nego</span>
-    </div>
-  </div>
-  <div class="stat-card">
-    <div class="stat-icon purple"><i class="ri-message-3-line"></i></div>
-    <div class="stat-text">
-    <span class="stat-value">${totalNego > 0 ? 'Active' : 'Empty'}</span>
-    <span class="stat-label">Status Negosiasi</span>
-    </div>
-  </div>
-  `;
+    row.innerHTML = `
+        <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex items-center gap-4">
+            <div class="w-12 h-12 rounded-lg bg-teal-50 flex items-center justify-center text-teal-600 text-2xl">
+                <i class="ri-price-tag-3-line"></i>
+            </div>
+            <div>
+                <div class="text-2xl font-bold text-gray-800">${totalOffers}</div>
+                <div class="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Total Offers</div>
+            </div>
+        </div>
+        <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex items-center gap-4">
+            <div class="w-12 h-12 rounded-lg bg-amber-50 flex items-center justify-center text-amber-600 text-2xl">
+                <i class="ri-time-line"></i>
+            </div>
+            <div>
+                <div class="text-2xl font-bold text-gray-800">${pendingOffers}</div>
+                <div class="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Pending</div>
+            </div>
+        </div>
+        <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex items-center gap-4">
+            <div class="w-12 h-12 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600 text-2xl">
+                <i class="ri-discuss-line"></i>
+            </div>
+            <div>
+                <div class="text-2xl font-bold text-gray-800">${totalNego}</div>
+                <div class="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Negotiations</div>
+            </div>
+        </div>
+    `;
 }
 
-// RENDER OFFERS TABLE
 function renderOffersTable(data = offersData) {
-  const tbody = document.getElementById('offers-tbody');
-  const emptyEl = document.getElementById('offers-empty');
-  const tableEl = document.getElementById('offers-table');
-  if (!tbody) return;
+    const tbody = document.getElementById('offers-tbody');
+    const emptyState = document.getElementById('offers-empty');
+    if (!tbody) return;
 
-  if (!data || data.length === 0) {
-    tableEl.style.display = 'none';
-    emptyEl.style.display = 'block';
-    return;
-  }
-  tableEl.style.display = 'table';
-  emptyEl.style.display = 'none';
+    tbody.innerHTML = '';
+    if (data.length === 0) {
+        if (emptyState) emptyState.classList.remove('hidden');
+        return;
+    }
 
-  tbody.innerHTML = data.map(o => {
-    const clientName = o.order?.client?.skomda_student?.name ?? o.order?.client?.name ?? 'Client';
-    const freeName = o.order?.service?.freelancer?.skomda_student?.name ?? 'Freelancer';
-    const rawStatus = String(o.status || 'Sent').toLowerCase();
-
-    return `
-  <tr>
-    <td><span class="id-badge">#${o.id}</span></td>
-    <td>
-    <div class="user-pair">
-      <span class="user-name" title="Klien"><i class="ri-user-line"></i> ${clientName}</span>
-      <span class="user-name" title="Freelancer"><i class="ri-briefcase-line"></i> ${freeName}</span>
-    </div>
-    </td>
-    <td>
-    <div class="offer-detail-cell">
-      <span class="offer-title">${o.title}</span>
-      <span class="offer-desc" title="${o.description ?? '-'}">${(o.description ?? '-').slice(0, 45)}...</span>
-    </div>
-    </td>
-    <td>
-    <div class="price-time-cell">
-      <span class="price-val">${formatRupiah(o.offered_price)}</span>
-      <span class="time-val"><i class="ri-calendar-line"></i> ${o.deadline ?? '-'}</span>
-    </div>
-    </td>
-    <td><span class="status-pill status-${rawStatus}">${o.status}</span></td>
-    <td>
-    <div class="action-btns">
-      <button class="btn-action" title="Detail" onclick="openOfferModal('${o.id}')"><i class="ri-eye-line"></i></button>
-    </div>
-    </td>
-  </tr>
-  `}).join('');
+    if (emptyState) emptyState.classList.add('hidden');
+    data.forEach(offer => {
+        const row = `
+            <tr class="hover:bg-gray-50 transition border-b border-gray-50">
+                <td class="px-6 py-4 text-sm font-bold text-gray-700">#OFF-${offer.id}</td>
+                <td class="px-6 py-4">
+                    <div class="text-sm font-semibold text-gray-800">${offer.order?.client?.name || 'User'}</div>
+                    <div class="text-[10px] text-gray-400 uppercase font-medium">To: ${offer.order?.service?.freelancer?.name || 'Freelancer'}</div>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-600">${offer.order?.service?.title || 'N/A'}</td>
+                <td class="px-6 py-4 text-sm font-bold text-teal-600">Rp ${Number(offer.offered_price || offer.amount || 0).toLocaleString('id-ID')}</td>
+                <td class="px-6 py-4">
+                    <span class="px-3 py-1 text-[10px] font-bold uppercase rounded-full ${getStatusColor(offer.status)}">
+                        ${offer.status}
+                    </span>
+                </td>
+                <td class="px-6 py-4 text-center">
+                    <button onclick="openOfferModal(${offer.id})" class="p-2 text-teal-600 hover:bg-teal-50 rounded-lg transition group">
+                        <i class="ri-eye-line text-lg group-hover:scale-110"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+        tbody.insertAdjacentHTML('beforeend', row);
+    });
 }
 
-// RENDER NEGO TABLE
 function renderNegoTable(data = negoData) {
-  const tbody = document.getElementById('nego-tbody');
-  const emptyEl = document.getElementById('nego-empty');
-  const tableEl = document.getElementById('nego-table');
-  if (!tbody) return;
+    const tbody = document.getElementById('nego-tbody');
+    const emptyState = document.getElementById('nego-empty');
+    if (!tbody) return;
 
-  if (!data || data.length === 0) {
-    tableEl.style.display = 'none';
-    emptyEl.style.display = 'block';
-    return;
-  }
-  tableEl.style.display = 'table';
-  emptyEl.style.display = 'none';
+    tbody.innerHTML = '';
+    if (data.length === 0) {
+        if (emptyState) emptyState.classList.remove('hidden');
+        return;
+    }
 
-  tbody.innerHTML = data.map(n => {
-    const isClient = String(n.sender).toLowerCase() === 'client';
-    const senderName = isClient 
-      ? (n.order?.client?.skomda_student?.name ?? 'Client') 
-      : (n.order?.service?.freelancer?.skomda_student?.name ?? 'Freelancer');
-      
-    const date = n.created_at ? new Date(n.created_at).toLocaleString('id-ID', {
-      day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
-    }) : '-';
-
-    return `
-  <tr>
-    <td><span class="id-badge">#${n.id}</span></td>
-    <td><span class="ref-badge"><i class="ri-file-list-3-line"></i> #${n.order_id}</span></td>
-    <td>
-    <div class="user-pair">
-      <span class="user-name">${senderName}</span>
-      <span style="font-size:10px; color:var(--slate-400); font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">
-       ${n.sender}
-      </span>
-    </div>
-    </td>
-    <td><div class="msg-cell" title="${n.message}">${n.message.slice(0, 55)}...</div></td>
-    <td style="font-size:12px; color:var(--slate-500); white-space:nowrap;">${date}</td>
-    <td>
-    <div class="action-btns">
-      <button class="btn-action" title="Baca Pesan" onclick="openNegoModal('${n.id}')"><i class="ri-eye-line"></i></button>
-    </div>
-    </td>
-  </tr>
-  `}).join('');
+    if (emptyState) emptyState.classList.add('hidden');
+    data.forEach(n => {
+        const row = `
+            <tr class="hover:bg-gray-50 transition border-b border-gray-50">
+                <td class="px-6 py-4 text-sm font-bold text-gray-700">#NG-${n.id}</td>
+                <td class="px-6 py-4 text-sm text-gray-500">#ORD-${n.order_id}</td>
+                <td class="px-6 py-4">
+                    <div class="text-sm font-semibold text-gray-800 uppercase">${n.sender_type}</div>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-600 truncate max-w-[200px]">${n.message}</td>
+                <td class="px-6 py-4 text-center">
+                    <button onclick="openNegoModal(${n.id})" class="p-2 text-teal-600 hover:bg-teal-50 rounded-lg transition">
+                        <i class="ri-chat-search-line text-lg"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+        tbody.insertAdjacentHTML('beforeend', row);
+    });
 }
 
-// MODALS
-function openOfferModal(id) {
-  const o = offersData.find(x => String(x.id) === String(id));
-  if (!o) return;
-  const overlay = document.getElementById('detail-modal-overlay');
-  const box = document.getElementById('detail-modal-box');
+// ==========================================
+// CORE LOGIC (TAB, MODAL, FILTER)
+// ==========================================
 
-  box.innerHTML = `
-  <div class="modal-hero">
-    <button class="modal-close" onclick="closeModal()"><i class="ri-close-line"></i></button>
-  </div>
-  <div class="modal-body">
-    <h2 class="modal-name">Detail Tawaran #${o.id}</h2>
-    <div class="modal-info-list">
-    <div class="modal-info-row">
-      <i class="ri-money-dollar-circle-line"></i>
-      <div class="modal-info-text"><strong>Harga</strong>${formatRupiah(o.offered_price)}</div>
-    </div>
-    <div class="modal-info-row">
-      <i class="ri-calendar-event-line"></i>
-      <div class="modal-info-text"><strong>Deadline</strong>${o.deadline ?? '-'}</div>
-    </div>
-    <div class="modal-info-row">
-      <i class="ri-checkbox-circle-line"></i>
-      <div class="modal-info-text"><strong>Status</strong><span class="status-pill status-${String(o.status).toLowerCase()}">${o.status}</span></div>
-    </div>
-    </div>
-    <p class="modal-section-title">Isi Tawaran</p>
-    <div class="msg-box"><strong>${o.title}</strong><br>${o.description ?? '-'}</div>
-  </div>`;
-  overlay.classList.add('open');
+function initTabEvents() {
+    const tabs = document.querySelectorAll('.section-tab');
+    tabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+            // Remove active state
+            tabs.forEach(t => t.classList.remove('active', 'text-teal-600', 'border-teal-600'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+            // Add active state to clicked tab
+            this.classList.add('active', 'text-teal-600', 'border-teal-600');
+            const target = this.getAttribute('data-target');
+            const targetEl = document.getElementById(target);
+            if (targetEl) targetEl.classList.add('active');
+        });
+    });
+}
+
+function initFilterEvents() {
+    const filters = document.querySelectorAll('.filter-tab');
+    filters.forEach(f => {
+        f.addEventListener('click', function() {
+            filters.forEach(t => {
+                t.classList.remove('active', 'bg-teal-600', 'text-white');
+                t.classList.add('bg-white', 'text-gray-600');
+            });
+            this.classList.add('active', 'bg-teal-600', 'text-white');
+            
+            const filterValue = this.getAttribute('data-filter');
+            const filtered = filterValue === 'all' 
+                ? offersData 
+                : offersData.filter(o => String(o.status).toLowerCase() === filterValue.toLowerCase());
+            renderOffersTable(filtered);
+        });
+    });
+}
+
+function handleSearch() {
+    const q = document.getElementById('global-search-input').value.toLowerCase();
+    
+    const filteredOffers = offersData.filter(o => 
+        String(o.id).includes(q) || 
+        (o.order?.client?.name || '').toLowerCase().includes(q) ||
+        (o.order?.service?.title || '').toLowerCase().includes(q)
+    );
+    renderOffersTable(filteredOffers);
+
+    const filteredNego = negoData.filter(n => 
+        String(n.id).includes(q) || 
+        n.message.toLowerCase().includes(q)
+    );
+    renderNegoTable(filteredNego);
+}
+
+function openOfferModal(id) {
+    const o = offersData.find(x => x.id == id);
+    if (!o) return;
+
+    const box = document.getElementById('detail-modal-box');
+    const overlay = document.getElementById('detail-modal-overlay');
+
+    box.innerHTML = `
+        <div class="p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold text-gray-800">Detail Tawaran #${o.id}</h2>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600"><i class="ri-close-line text-2xl"></i></button>
+            </div>
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <div class="p-4 bg-gray-50 rounded-2xl">
+                    <span class="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Harga Ditawarkan</span>
+                    <div class="text-lg font-bold text-teal-600">Rp ${Number(o.offered_price || o.amount || 0).toLocaleString('id-ID')}</div>
+                </div>
+                <div class="p-4 bg-gray-50 rounded-2xl">
+                    <span class="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Status</span>
+                    <div><span class="px-2 py-0.5 text-[10px] font-bold rounded-full ${getStatusColor(o.status)}">${o.status}</span></div>
+                </div>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <span class="text-xs text-gray-400 uppercase font-bold">Client / Freelancer</span>
+                    <p class="font-semibold text-gray-800">${o.order?.client?.name} ⮕ ${o.order?.service?.freelancer?.name}</p>
+                </div>
+                <div>
+                    <span class="text-xs text-gray-400 uppercase font-bold">Pesan Tambahan</span>
+                    <div class="p-4 bg-teal-50/50 border border-teal-100 rounded-xl text-gray-600 italic mt-1">
+                        "${o.message || 'Tidak ada pesan khusus.'}"
+                    </div>
+                </div>
+            </div>
+            <button onclick="closeModal()" class="mt-8 w-full py-3 bg-gray-900 text-white font-bold rounded-xl hover:bg-black transition">Tutup Detail</button>
+        </div>
+    `;
+    overlay.classList.remove('hidden');
 }
 
 function openNegoModal(id) {
-  const n = negoData.find(x => String(x.id) === String(id));
-  if (!n) return;
-  const overlay = document.getElementById('detail-modal-overlay');
-  const box = document.getElementById('detail-modal-box');
+    const n = negoData.find(x => x.id == id);
+    if (!n) return;
 
-  box.innerHTML = `
-  <div class="modal-hero">
-    <button class="modal-close" onclick="closeModal()"><i class="ri-close-line"></i></button>
-  </div>
-  <div class="modal-body">
-    <h2 class="modal-name">Log Negosiasi #${n.id}</h2>
-    <div class="modal-info-list">
-    <div class="modal-info-row"><i class="ri-file-list-3-line"></i><div><strong>Order</strong>#${n.order_id}</div></div>
-    <div class="modal-info-row"><i class="ri-user-smile-line"></i><div><strong>Pengirim</strong>${n.sender}</div></div>
-    </div>
-    <p class="modal-section-title">Pesan</p>
-    <div class="msg-box">${n.message}</div>
-  </div>`;
-  overlay.classList.add('open');
+    const box = document.getElementById('detail-modal-box');
+    const overlay = document.getElementById('detail-modal-overlay');
+
+    box.innerHTML = `
+        <div class="p-6 text-center">
+            <div class="w-16 h-16 bg-teal-50 text-teal-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+                <i class="ri-discuss-line"></i>
+            </div>
+            <h2 class="text-xl font-bold text-gray-800 mb-2">Pesan Negosiasi</h2>
+            <p class="text-xs text-gray-400 uppercase font-bold mb-6">Dari: ${n.sender_type} | Order #${n.order_id}</p>
+            <div class="bg-gray-50 p-6 rounded-2xl text-gray-700 leading-relaxed font-medium italic">
+                "${n.message}"
+            </div>
+            <button onclick="closeModal()" class="mt-8 w-full py-3 bg-teal-600 text-white font-bold rounded-xl hover:bg-teal-700 transition">Selesai Membaca</button>
+        </div>
+    `;
+    overlay.classList.remove('hidden');
 }
 
 function closeModal() {
-  document.getElementById('detail-modal-overlay').classList.remove('open');
+    document.getElementById('detail-modal-overlay').classList.add('hidden');
 }
 
-// TABS & SEARCH
-function initTabs() {
-  const tabs = document.querySelectorAll('.section-tab');
-  const contents = document.querySelectorAll('.tab-content');
-  tabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-      tabs.forEach(t => t.classList.remove('active'));
-      contents.forEach(c => c.classList.remove('active'));
-      tab.classList.add('active');
-      document.getElementById(tab.dataset.target).classList.add('active');
-      applySearchAndFilter();
-    });
-  });
+function getStatusColor(status) {
+    const s = String(status).toLowerCase();
+    if (s === 'accepted') return 'bg-green-100 text-green-700';
+    if (s === 'rejected') return 'bg-red-100 text-red-700';
+    if (s === 'sent') return 'bg-amber-100 text-amber-700';
+    return 'bg-gray-100 text-gray-600';
 }
-
-function initFilters() {
-  const tabs = document.querySelectorAll('#offers-filters .filter-tab');
-  tabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-      tabs.forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-      applySearchAndFilter();
-    });
-  });
-}
-
-function initSearch() {
-  const input = document.getElementById('global-search-input');
-  if (input) input.addEventListener('input', applySearchAndFilter);
-}
-
-function applySearchAndFilter() {
-  const activeSection = document.querySelector('.section-tab.active').dataset.target;
-  const q = (document.getElementById('global-search-input')?.value || '').toLowerCase();
-
-  if (activeSection === 'offers-section') {
-    const filter = document.querySelector('#offers-filters .filter-tab.active')?.dataset.filter.toLowerCase() || 'all';
-    let filtered = offersData.filter(o => {
-      const matchesFilter = filter === 'all' || String(o.status).toLowerCase() === filter;
-      const matchesSearch = !q || o.title.toLowerCase().includes(q) || String(o.id).includes(q);
-      return matchesFilter && matchesSearch;
-    });
-    renderOffersTable(filtered);
-  } else {
-    let filtered = negoData.filter(n => !q || n.message.toLowerCase().includes(q) || String(n.order_id).includes(q));
-    renderNegoTable(filtered);
-  }
-}
-
-// PAGE BOOTSTRAP
-function initPage() {
-  initTabs();
-  initFilters();
-  initSearch();
-  renderStats();
-  renderOffersTable();
-  renderNegoTable();
-
-  const overlay = document.getElementById('detail-modal-overlay');
-  if (overlay) overlay.addEventListener('click', (e) => { if (e.target === overlay) closeModal(); });
-}
-
-document.addEventListener('DOMContentLoaded', initPage);
