@@ -52,8 +52,11 @@ class ClientController extends Controller
         $skomdaData = SkomdaStudent::all()
             ->transform(fn($s) => [
                 'id' => $s->id,
+                'nis' => $s->nis,
                 'name' => $s->name,
                 'email' => $s->email,
+                'class' => $s->class,
+                'major' => $s->major,
                 'phone' => $s->phone ?? '-',
                 'role' => 'Skomda Student',
                 'status' => 'Active',
