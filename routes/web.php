@@ -96,6 +96,8 @@ Route::post('/freelancers/{freelancer}/unsuspend', [FreelancerController::class,
     // Order (CRUD)
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::post('/orders/{id}/status', [OrderController::class, 'updateStatus'])->name('orders.updateStatus');
+    Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
+    Route::delete('/orders/{id}', [OrderController::class, 'destroy'])->name('orders.destroy');
 
     // Offer (CRUD)
     Route::get('/offers', [OfferController::class, 'index'])->name('offers.index');

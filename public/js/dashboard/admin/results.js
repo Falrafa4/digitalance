@@ -1,189 +1,160 @@
-const META = document.querySelector('meta[name="csrf-token"]');
-const CSRF = META ? META.getAttribute('content') : '';
-const BASE = window.location.origin;
+(() => {
+    // 1. AMBIL DATA DARI WINDOW YANG SUDAH DI-SET DI BLADE
+    const pageData = window.__RESULTS_PAGE__ || {};
+    let allResults = Array.isArray(pageData.data) ? pageData.data : [];
 
-let allResults = [];
-let activeFilter = 'all';
+    // State Filter
+    let activeFilter = 'all';
 
-const STATUS_MAP = {
-    pending:  { label: 'Pending',  cls: 'bg-slate-100 text-slate-500' },
-    accepted: { label: 'Diterima', cls: 'bg-emerald-100 text-emerald-700' },
-    revision: { label: 'Revisi',   cls: 'bg-amber-100 text-amber-700' },
-};
+    const $ = (id) => document.getElementById(id);
 
-// LOAD RESULTS
-async function loadResults() {
-    try {
-        const res  = await fetch(`${BASE}/api/admin/results`, {
-            headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF }
-        });
-        const json = await res.json();
-        console.log("Data API Results:", json);
-        allResults = Array.isArray(json) ? json : (json?.data || []);
-    } catch (e) { 
-        console.error("Gagal mengambil data:", e);
-        allResults = []; 
-    }
-    renderStats();
-    renderTable(allResults);
-}
+    // 2. KONFIGURASI STATUS SESUAI DATABASE
+    // Key harus sama persis dengan string yang ada di database
+    const STATUS_CONFIG = {
+        'paid': { label: 'Paid', color: 'text-emerald-700', bg: 'bg-emerald-100' },
+        'pending': { label: 'Pending', color: 'text-amber-700', bg: 'bg-amber-100' },
+        'in_progress': { label: 'In Progress', color: 'text-blue-700', bg: 'bg-blue-100' },
+        'cancelled': { label: 'Cancelled', color: 'text-red-700', bg: 'bg-red-100' }
+    };
 
-// RENDER STATS
-function renderStats() {
-    document.getElementById('stat-total').textContent    = allResults.length;
-    document.getElementById('stat-accepted').textContent = allResults.filter(r => String(r.order?.status || 'pending').toLowerCase() === 'accepted').length;
-    document.getElementById('stat-revision').textContent = allResults.filter(r => String(r.order?.status || 'pending').toLowerCase() === 'revision').length;
-    document.getElementById('stat-pending').textContent  = allResults.filter(r => String(r.order?.status || 'pending').toLowerCase() === 'pending').length;
-}
-
-// INIT FILTERS
-function initFilters() {
-    const tabs = document.querySelectorAll('#filter-tabs .filter-tab');
-    tabs.forEach(btn => {
-        btn.addEventListener('click', () => {
-            tabs.forEach(b => {
-                b.className = 'filter-tab px-[18px] py-2 rounded-full border-[1.5px] border-slate-200 bg-white text-slate-500 font-bold text-[12.5px] cursor-pointer transition-all duration-150 hover:border-[#0f766e] hover:text-[#0f766e]';
-            });
-            btn.className = 'filter-tab px-[18px] py-2 rounded-full border-[1.5px] border-[#0f766e] bg-[#0f766e] text-white font-bold text-[12.5px] shadow-teal-sm cursor-pointer transition-all duration-150';
-            activeFilter = btn.dataset.filter.toLowerCase();
-            applyFilter();
-        });
-    });
-}
-
-// APPLY FILTER
-function applyFilter() {
-    const searchInput = document.getElementById('result-search');
-    const q = searchInput ? searchInput.value.toLowerCase() : '';
-    
-    let filtered = [...allResults];
-
-    if (activeFilter !== 'all') {
-        filtered = filtered.filter(r => String(r.order?.status || 'pending').toLowerCase() === activeFilter);
+    // Helper untuk mendapat status string (fallback jika kosong)
+    function getStatusKey(item) {
+        // Cek di result.status, jika tidak ada cek di order.status
+        const s = (item.status || item.order?.status || 'pending').toLowerCase();
+        return s;
     }
 
-    if (q) {
-        filtered = filtered.filter(r => {
-            const orderId = String(r.order_id ?? '').toLowerCase();
-            const fName = String(r.order?.service?.freelancer?.name ?? r.order?.service?.freelancer?.user?.name ?? '').toLowerCase();
-            const version = String(r.version ?? '').toLowerCase();
+    // 3. FUNGSI RENDER STATS
+    function renderStats() {
+        let stats = { paid: 0, pending: 0, in_progress: 0, cancelled: 0 };
+
+        allResults.forEach(item => {
+            const key = getStatusKey(item);
+            if (stats[key] !== undefined) {
+                stats[key]++;
+            }
+        });
+
+        if ($('stat-paid')) $('stat-paid').textContent = stats.paid;
+        if ($('stat-pending')) $('stat-pending').textContent = stats.pending;
+        if ($('stat-in_progress')) $('stat-in_progress').textContent = stats.in_progress;
+        if ($('stat-cancelled')) $('stat-cancelled').textContent = stats.cancelled;
+    }
+
+    // 4. FUNGSI RENDER TABLE
+    function renderTable(data) {
+        const tbody = $('result-tbody');
+        const emptyEl = $('result-empty');
+        const table = document.querySelector('table');
+
+        if (!tbody) return;
+
+        if (!data || data.length === 0) {
+            if (table) table.style.display = 'none';
+            if (emptyEl) emptyEl.classList.remove('hidden');
+            return;
+        }
+
+        if (table) table.style.display = 'table';
+        if (emptyEl) emptyEl.classList.add('hidden');
+
+        tbody.innerHTML = data.map(item => {
+            const key = getStatusKey(item);
+            const style = STATUS_CONFIG[key] || { label: item.status, color: 'text-slate-700', bg: 'bg-slate-100' };
             
-            return orderId.includes(q) || fName.includes(q) || version.includes(q);
+            const date = item.created_at ? new Date(item.created_at).toLocaleDateString('id-ID') : '-';
+            const orderId = item.order_id || item.order?.id || '-';
+
+            return `
+                <tr class="border-b border-slate-50 hover:bg-slate-50 transition-colors duration-150">
+                    <td class="px-6 py-4 text-[12px] font-mono text-slate-400">#${item.id}</td>
+                    <td class="px-6 py-4 text-[13px] font-semibold text-[#0f766e]">#${orderId}</td>
+                    <td class="px-6 py-4">
+                        ${item.file_url ? 
+                            `<a href="/storage/${item.file_url}" target="_blank" class="inline-flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-600 rounded-md text-xs font-bold hover:bg-blue-100">
+                                <i class="ri-file-link-line"></i> View
+                            </a>` : '<span class="text-slate-300 text-xs">—</span>'
+                        }
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold ${style.bg} ${style.color}">
+                            ${style.label}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 text-[12px] text-slate-400">${date}</td>
+                    <td class="px-6 py-4 text-center">
+                        <button onclick="alert('Detail fitur belum aktif')" class="w-8 h-8 rounded-[9px] bg-slate-100 text-slate-500 flex items-center justify-center text-[14px] hover:bg-[#f0fdf9] hover:text-[#0f766e] transition-all duration-150 border-none cursor-pointer">
+                            <i class="ri-eye-line"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    // 5. FUNGSI FILTER & SEARCH
+    function applyFilter() {
+        const searchVal = $('result-search')?.value.toLowerCase() || '';
+        
+        let filtered = allResults.filter(item => {
+            // 1. Filter Status
+            if (activeFilter !== 'all') {
+                const itemStatus = getStatusKey(item);
+                if (itemStatus !== activeFilter) return false;
+            }
+
+            // 2. Filter Search
+            if (searchVal) {
+                const orderId = String(item.order_id || item.order?.id || '').toLowerCase();
+                const id = String(item.id).toLowerCase();
+                return orderId.includes(searchVal) || id.includes(searchVal);
+            }
+
+            return true;
         });
+
+        renderTable(filtered);
     }
-    
-    renderTable(filtered);
-}
 
-document.getElementById('result-search')?.addEventListener('input', applyFilter);
+    // 6. INITIALIZATION
+    function init() {
+        // Jalankan Stats & Table awal
+        renderStats();
+        renderTable(allResults);
 
-// RENDER TABLE
-function renderTable(list) {
-    const tbody = document.getElementById('result-tbody');
-    const empty = document.getElementById('result-empty');
-    
-    if (!list.length) { 
-        tbody.innerHTML = ''; 
-        empty.classList.remove('hidden'); 
-        return; 
+        // Setup Filter Tabs
+        document.querySelectorAll('.filter-tab').forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Hapus active dari semua tombol
+                document.querySelectorAll('.filter-tab').forEach(b => {
+                    b.classList.remove('active', 'bg-[#0f766e]', 'text-white', 'border-[#0f766e]');
+                    b.classList.add('bg-white', 'text-slate-500', 'border-slate-200');
+                });
+                
+                // Tambah active ke tombol yang diklik
+                btn.classList.add('active', 'bg-[#0f766e]', 'text-white', 'border-[#0f766e]');
+                btn.classList.remove('bg-white', 'text-slate-500', 'border-slate-200');
+
+                // Set state filter
+                activeFilter = btn.dataset.filter;
+                
+                // Render ulang table
+                applyFilter();
+            });
+        });
+
+        // Setup Search Input
+        const searchInput = $('result-search');
+        if (searchInput) {
+            searchInput.addEventListener('input', applyFilter);
+        }
     }
-    
-    empty.classList.add('hidden');
-    
-    tbody.innerHTML = list.map(r => {
-        const statusKey = String(r.order?.status || 'pending').toLowerCase();
-        const st   = STATUS_MAP[statusKey] ?? { label: statusKey, cls: 'bg-slate-100 text-slate-500' };
-        const date = r.created_at ? new Date(r.created_at).toLocaleDateString('id-ID', { day:'2-digit', month:'short', year:'numeric' }) : '-';
-        const note = (r.note ?? '-').slice(0, 50) + ((r.note ?? '').length > 50 ? '…' : '');
-        const ext  = (r.file_url ?? '').split('.').pop().toLowerCase();
-        const fileIcon = ['jpg','jpeg','png','gif','webp'].includes(ext) ? 'ri-image-line' :
-                         ['pdf'].includes(ext) ? 'ri-file-pdf-line' :
-                         ['zip','rar'].includes(ext) ? 'ri-folder-zip-line' : 'ri-file-line';
-        const fName = r.order?.service?.freelancer?.name ?? r.order?.service?.freelancer?.user?.name ?? 'Freelancer';
 
-        return `
-        <tr class="border-b border-slate-50 hover:bg-slate-50 transition-colors duration-150">
-            <td class="px-6 py-4 text-[12px] font-mono text-slate-400">#${r.id}</td>
-            <td class="px-6 py-4 text-[13px] font-semibold text-[#0f766e]">#${r.order_id ?? '-'}</td>
-            <td class="px-6 py-4">
-                <div class="flex items-center gap-2">
-                    <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(fName)}&background=0f766e&color=fff&size=64"
-                        class="w-8 h-8 rounded-xl object-cover flex-shrink-0" />
-                    <div>
-                        <p class="font-semibold text-[13px] text-slate-900">${fName}</p>
-                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">${r.version ?? 'v1'}</p>
-                    </div>
-                </div>
-            </td>
-            <td class="px-6 py-4">
-                ${r.file_url ? `<a href="${BASE}/storage/${r.file_url}" target="_blank"
-                    class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#f0fdf9] text-[#0f766e] rounded-[9px] text-[12px] font-bold hover:bg-[#d1fae5] transition-all duration-150">
-                    <i class="${fileIcon}"></i>Lihat File
-                </a>` : '<span class="text-slate-300 text-[12px]">—</span>'}
-            </td>
-            <td class="px-6 py-4 text-[13px] text-slate-600 max-w-[180px]">${note}</td>
-            <td class="px-6 py-4">
-                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold ${st.cls}">
-                    <i class="ri-circle-fill text-[6px]"></i>${st.label}
-                </span>
-            </td>
-            <td class="px-6 py-4 text-[12px] text-slate-400">${date}</td>
-            <td class="px-6 py-4">
-                <button onclick="openDetail('${r.id}')" class="w-8 h-8 rounded-[9px] bg-slate-100 text-slate-500 flex items-center justify-center text-[14px] hover:bg-[#f0fdf9] hover:text-[#0f766e] transition-all duration-150 border-none cursor-pointer" title="Detail">
-                    <i class="ri-eye-line"></i>
-                </button>
-            </td>
-        </tr>`;
-    }).join('');
-}
+    // Run when DOM ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
 
-// MODAL DETAIL
-function openDetail(id) {
-    const r = allResults.find(x => String(x.id) === String(id));
-    if (!r) return;
-
-    const statusKey = String(r.order?.status || 'pending').toLowerCase();
-    const st   = STATUS_MAP[statusKey] ?? { label: statusKey, cls: 'bg-slate-100 text-slate-500' };
-    const date = r.created_at ? new Date(r.created_at).toLocaleString('id-ID') : '-';
-    const fName = r.order?.service?.freelancer?.name ?? r.order?.service?.freelancer?.user?.name ?? 'Freelancer';
-
-    document.getElementById('modal-detail-content').innerHTML = `
-        <div class="grid grid-cols-2 gap-3 mb-4 text-[13px]">
-            <div class="bg-slate-50 rounded-2xl p-3"><p class="text-slate-400 text-[11px] font-bold uppercase mb-1">ID Hasil</p><p class="font-mono font-semibold text-slate-700">#${r.id}</p></div>
-            <div class="bg-slate-50 rounded-2xl p-3"><p class="text-slate-400 text-[11px] font-bold uppercase mb-1">Order</p><p class="font-semibold text-[#0f766e]">#${r.order_id ?? '-'}</p></div>
-            <div class="bg-slate-50 rounded-2xl p-3"><p class="text-slate-400 text-[11px] font-bold uppercase mb-1">Freelancer</p><p class="font-semibold text-slate-700">${fName}</p></div>
-            <div class="bg-slate-50 rounded-2xl p-3"><p class="text-slate-400 text-[11px] font-bold uppercase mb-1">Status / Versi</p>
-                <div class="flex items-center gap-2 mt-1">
-                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold ${st.cls}"><i class="ri-circle-fill text-[6px]"></i>${st.label}</span>
-                    <span class="text-xs font-bold text-slate-400">${r.version ?? '-'}</span>
-                </div>
-            </div>
-            <div class="bg-slate-50 rounded-2xl p-3 col-span-2"><p class="text-slate-400 text-[11px] font-bold uppercase mb-1">Dikirim</p><p class="font-semibold text-slate-700">${date}</p></div>
-        </div>
-        ${r.note ? `<div class="bg-slate-50 rounded-2xl p-3 mb-4"><p class="text-slate-400 text-[11px] font-bold uppercase mb-1">Catatan</p><p class="text-[13px] text-slate-700 leading-relaxed">${r.note}</p></div>` : ''}
-        ${r.file_url ? `<a href="${BASE}/storage/${r.file_url}" target="_blank"
-            class="flex items-center gap-3 px-4 py-3 bg-[#f0fdf9] border border-[#10B981]/30 rounded-2xl hover:bg-[#d1fae5] transition-all duration-150">
-            <i class="ri-download-line text-[#0f766e] text-[18px]"></i>
-            <span class="text-[13px] font-bold text-[#0f766e]">Unduh File ${r.version ?? ''}</span>
-        </a>` : ''}
-    `;
-    openModal('modal-detail');
-}
-
-// OPEN MODAL
-function openModal(id)  { 
-    const m = document.getElementById(id); 
-    if(m) { m.classList.remove('opacity-0','pointer-events-none'); m.classList.add('opacity-100'); }
-}
-
-// CLOSE MODAL
-function closeModal(id) { 
-    const m = document.getElementById(id); 
-    if(m) { m.classList.add('opacity-0','pointer-events-none'); m.classList.remove('opacity-100'); }
-}
-
-// INIT
-document.addEventListener('DOMContentLoaded', () => {
-    initFilters();
-    loadResults();
-});
+})();

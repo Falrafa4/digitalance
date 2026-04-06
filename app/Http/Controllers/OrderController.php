@@ -26,8 +26,6 @@ class OrderController extends Controller
         return redirect()->route('admin.orders.index')->with('success', 'Status order berhasil diperbarui');
     }
 
-    // CLIENT ONLY
-    // TODO: selesaikan fitur order untuk client (all), termasuk validasi dan return view yang sesuai
     public function store(Request $request)
     {
         $client = $request->user('client');
