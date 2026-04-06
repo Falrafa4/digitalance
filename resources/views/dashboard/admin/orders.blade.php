@@ -1,7 +1,7 @@
 @extends('layouts.dashboard')
 @section('title', 'Order Management | Digitalance')
 @section('styles')
-    <link rel="stylesheet" href="{{ asset('css/dashboard/admin/admin-orders.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/dashboard/admin/orders.css') }}">
 @endsection
 
 @section('content')
@@ -59,5 +59,13 @@
 @endsection
 
 @section('scripts')
-    <script src="{{ asset('js/dashboard/admin/admin-orders.js') }}"></script>
+    <script>
+        window.__ORDERS_PAGE__ = { 
+            data: @json($orders ?? []),
+            clients: @json($clients ?? []), 
+            freelancers: @json($freelancers ?? []),
+            services: @json($services ?? [])
+        };
+    </script>
+    <script src="{{ asset('js/dashboard/admin/orders.js') }}"></script>
 @endsection

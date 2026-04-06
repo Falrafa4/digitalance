@@ -1,730 +1,708 @@
-// ─── PENGATURAN NOTIFIKASI ADMIN ───
-const hasUnreadMessages = true;
+(() => {
+  const page = window.__CLIENTS_PAGE__ || {};
+  const clientsData = page.clientsData || {};
+  const freelancersData = page.freelancersData || {};
+  const skomdaData = page.skomdaData || {};
 
-// ─── BADGE MAP ───
-const BADGE_MAP = {
-  'Pending':   'badge-pending',
-  'Approved':  'badge-completed',
-  'Rejected':  'badge-new',
-  'In Review': 'badge-progress',
-};
-
-const pendingVerifications = [
-  {
-    id: 1,
-    name: 'Arya Wicaksana',
-    role: 'Freelancer',
-    avatar: 'https://picsum.photos/seed/arya/100/100',
-    skill: 'UI/UX Designer',
-    submittedAt: '2 hours ago',
-    status: 'Pending',
-  },
-  {
-    id: 2,
-    name: 'Sinta Rahayu',
-    role: 'Skomda Student',
-    avatar: 'https://picsum.photos/seed/sinta/100/100',
-    skill: 'Front-end Developer',
-    submittedAt: '5 hours ago',
-    status: 'In Review',
-  },
-  {
-    id: 3,
-    name: 'Bimo Prakoso',
-    role: 'Freelancer',
-    avatar: 'https://picsum.photos/seed/bimo/100/100',
-    skill: 'Mobile Developer',
-    submittedAt: 'Yesterday',
-    status: 'Pending',
-  },
-];
-
-// ─── RENDER PENDING VERIFICATIONS ───
-function renderPendingVerifications() {
-  const grid = document.getElementById('admin-approval-grid');
-  if (!grid) return;
-
-  if (!pendingVerifications || pendingVerifications.length === 0) {
-    grid.innerHTML = `
-      <div class="empty-state">
-        <div class="empty-icon"><i class="ri-shield-check-line"></i></div>
-        <h3>All clear!</h3>
-        <p>No pending verifications at the moment. Everything is up to date.</p>
-      </div>`;
-    return;
-  }
-
-  grid.innerHTML = pendingVerifications.map(v => `
-    <div class="approval-card" data-id="${v.id}">
-      <div class="approval-card-top">
-        <img class="approval-avatar" src="${v.avatar}" alt="${v.name}" />
-        <div class="approval-info">
-          <span class="approval-name">${v.name}</span>
-          <span class="approval-meta">
-            <i class="ri-briefcase-line"></i> ${v.role} &middot; ${v.skill}
-          </span>
-          <span class="approval-time">
-            <i class="ri-time-line"></i> Submitted ${v.submittedAt}
-          </span>
-        </div>
-        <span class="badge ${BADGE_MAP[v.status] ?? 'badge-pending'}">${v.status}</span>
-      </div>
-      <div class="approval-actions">
-        <button class="btn-approve" onclick="handleApprove(${v.id})">
-          <i class="ri-check-line"></i> Approve
-        </button>
-        <button class="btn-reject" onclick="handleReject(${v.id})">
-          <i class="ri-close-line"></i> Reject
-        </button>
-      </div>
-    </div>
-  `).join('');
-}
-
-// ─── HANDLE APPROVE ───
-function handleApprove(id) {
-  const card = document.querySelector(`.approval-card[data-id="${id}"]`);
-  if (!card) return;
-  card.classList.add('card-approved');
-  card.querySelector('.approval-actions').innerHTML = `
-    <span class="action-feedback approved">
-      <i class="ri-check-double-line"></i> Approved
-    </span>`;
-  setTimeout(() => {
-    card.style.transition = 'opacity 0.3s, transform 0.3s';
-    card.style.opacity = '0';
-    card.style.transform = 'translateX(20px)';
-    setTimeout(() => card.remove(), 320);
-  }, 1200);
-}
-
-// ─── HANDLE REJECT ───
-function handleReject(id) {
-  const card = document.querySelector(`.approval-card[data-id="${id}"]`);
-  if (!card) return;
-  card.classList.add('card-rejected');
-  card.querySelector('.approval-actions').innerHTML = `
-    <span class="action-feedback rejected">
-      <i class="ri-close-circle-line"></i> Rejected
-    </span>`;
-  setTimeout(() => {
-    card.style.transition = 'opacity 0.3s, transform 0.3s';
-    card.style.opacity = '0';
-    card.style.transform = 'translateX(20px)';
-    setTimeout(() => card.remove(), 320);
-  }, 1200);
-}
-
-// ─── INIT NOTIFIKASI ───
-function initAdminDashboard() {
-  initSidebarNav();
-  renderPendingVerifications();
-}
-
-// ─── INIT SIDEBAR NAV ───
-// Nav item tidak bisa pindah active karena belum ada path/halaman yang terhubung.
-// Active state hanya diset via class di HTML secara manual sesuai halaman aktif.
-function initSidebarNav() {
-  const navItems = document.querySelectorAll('.nav-item');
-  navItems.forEach(item => {
-    // Cegah perpindahan active state saat diklik
-    item.addEventListener('click', (e) => {
-      if (!item.classList.contains('active')) {
-        e.preventDefault();
-        // Tidak ada aksi — hanya hover yang berfungsi
-      }
-    });
-  });
-}
-
-// Jalankan ketika DOM siap
-document.addEventListener('DOMContentLoaded', initAdminDashboard);
-
-
-// ════════════════════════════════════════
-// ─── USER PAGE ───
-// ════════════════════════════════════════
-
-// ─── DATA DUMMY USERS ───
-const usersData = [
-  {
-    id: 1,
-    name: 'Arya Wicaksana',
-    email: 'arya.wicaksana@email.com',
-    avatar: 'https://picsum.photos/seed/arya/200/200',
-    role: 'Freelancer',
-    status: 'Active',
-    joinDate: '12 Jan 2025',
-    location: 'Jakarta, Indonesia',
-    phone: '+62 812-3456-7890',
-    skills: ['UI/UX Design', 'Figma', 'Prototyping'],
-    totalOrders: 24,
-    totalEarning: '$3,200',
-    lastActive: '2 hours ago',
-    bio: 'UI/UX Designer dengan 4 tahun pengalaman menciptakan pengalaman digital yang berpusat pada pengguna untuk startup dan perusahaan.',
-  },
-  {
-    id: 2,
-    name: 'Sinta Rahayu',
-    email: 'sinta.rahayu@email.com',
-    avatar: 'https://picsum.photos/seed/sinta/200/200',
-    role: 'Skomda Student',
-    status: 'Active',
-    joinDate: '3 Feb 2025',
-    location: 'Bandung, Indonesia',
-    phone: '+62 821-9876-5432',
-    skills: ['React', 'Tailwind CSS', 'JavaScript'],
-    totalOrders: 8,
-    totalEarning: '$640',
-    lastActive: '1 day ago',
-    bio: 'Mahasiswa front-end developer yang antusias membangun proyek nyata dan mendapatkan pengalaman profesional.',
-  },
-  {
-    id: 3,
-    name: 'Bimo Prakoso',
-    email: 'bimo.prakoso@email.com',
-    avatar: 'https://picsum.photos/seed/bimo/200/200',
-    role: 'Freelancer',
-    status: 'Inactive',
-    joinDate: '27 Nov 2024',
-    location: 'Surabaya, Indonesia',
-    phone: '+62 857-1122-3344',
-    skills: ['Flutter', 'Dart', 'Firebase'],
-    totalOrders: 17,
-    totalEarning: '$2,150',
-    lastActive: '3 weeks ago',
-    bio: 'Mobile developer spesialis cross-platform menggunakan Flutter. Telah menyelesaikan 17+ proyek dari berbagai industri.',
-  },
-  {
-    id: 4,
-    name: 'Nadya Kusuma',
-    email: 'nadya.kusuma@email.com',
-    avatar: 'https://picsum.photos/seed/nadya/200/200',
-    role: 'Skomda Student',
-    status: 'Active',
-    joinDate: '18 Mar 2025',
-    location: 'Yogyakarta, Indonesia',
-    phone: '+62 878-5544-6677',
-    skills: ['Graphic Design', 'Illustrator', 'Branding'],
-    totalOrders: 5,
-    totalEarning: '$380',
-    lastActive: '30 minutes ago',
-    bio: 'Mahasiswa komunikasi visual dengan passion di brand identity dan ilustrasi digital.',
-  },
-  {
-    id: 5,
-    name: 'Rizky Aditya',
-    email: 'rizky.aditya@email.com',
-    avatar: 'https://picsum.photos/seed/rizky/200/200',
-    role: 'Freelancer',
-    status: 'Active',
-    joinDate: '5 Dec 2024',
-    location: 'Medan, Indonesia',
-    phone: '+62 813-6677-8899',
-    skills: ['Node.js', 'Express', 'PostgreSQL'],
-    totalOrders: 31,
-    totalEarning: '$5,800',
-    lastActive: '5 hours ago',
-    bio: 'Full-stack engineer dengan keahlian mendalam di sistem backend. Suka membangun REST API yang scalable.',
-  },
-  {
-    id: 6,
-    name: 'Layla Permata',
-    email: 'layla.permata@email.com',
-    avatar: 'https://picsum.photos/seed/layla/200/200',
-    role: 'Skomda Student',
-    status: 'Suspended',
-    joinDate: '9 Jan 2025',
-    location: 'Makassar, Indonesia',
-    phone: '+62 852-3344-5566',
-    skills: ['Content Writing', 'SEO', 'Copywriting'],
-    totalOrders: 2,
-    totalEarning: '$90',
-    lastActive: '2 months ago',
-    bio: 'Content creator dengan kemampuan menulis persuasif dan artikel teroptimasi SEO.',
-  },
-];
-
-// ─── MAPS ───
-const USER_STATUS_MAP = {
-  'Active':    'badge-completed',
-  'Inactive':  'badge-pending',
-  'Suspended': 'badge-new',
-};
-const USER_DOT_MAP = {
-  'Active':    'online',
-  'Inactive':  'offline',
-  'Suspended': 'suspended',
-};
-const ROLE_ICON_MAP = {
-  'Client':       'ri-briefcase-line',
-  'Freelancer':     'ri-user-star-line',
-  'Skomda Student': 'ri-graduation-cap-line',
-};
-
-// ─── RENDER USER CARDS ───
-function renderUserCards(data = usersData) {
-  const grid = document.getElementById('user-card-grid');
-  if (!grid) return;
-
-  if (!data || data.length === 0) {
-    grid.innerHTML = `
-      <div class="empty-state">
-        <div class="empty-icon"><i class="ri-user-search-line"></i></div>
-        <h3>No users found</h3>
-        <p>Try adjusting the filter or search keyword.</p>
-      </div>`;
-    return;
-  }
-
-  grid.innerHTML = data.map(u => `
-    <div class="user-card-item">
-      <div class="user-card-top">
-        <div class="user-card-avatar-wrap">
-          <img class="user-card-avatar" src="${u.avatar}" alt="${u.name}" />
-          <span class="user-online-dot ${USER_DOT_MAP[u.status] ?? 'offline'}"></span>
-        </div>
-        <span class="badge ${USER_STATUS_MAP[u.status] ?? 'badge-pending'} badge-inline">${u.status}</span>
-      </div>
-
-      <h3 class="user-card-name">${u.name}</h3>
-      <span class="user-card-role">
-        <i class="${ROLE_ICON_MAP[u.role] ?? 'ri-user-line'}"></i> ${u.role}
-      </span>
-      <span class="user-card-location">
-        <i class="ri-map-pin-line"></i> ${u.location}
-      </span>
-
-      <div class="user-card-skills card-skills-grow">
-        ${u.skills.length > 0
-          ? u.skills.map(s => `<span class="skill-chip">${s}</span>`).join('')
-          : '<span class="skill-chip skill-chip-empty">No skills listed</span>'}
-      </div>
-
-      <div class="user-card-stats">
-        <div class="user-stat-item">
-          <span class="user-stat-value">${u.totalOrders}</span>
-          <span class="user-stat-label">Orders</span>
-        </div>
-        <div class="user-stat-item">
-          <span class="user-stat-value">${u.totalEarning}</span>
-          <span class="user-stat-label">Earned</span>
-        </div>
-      </div>
-
-      <button class="btn-detail" onclick="openUserModal(${u.id})">
-        <i class="ri-eye-line"></i> Lihat Profil
-      </button>
-    </div>
-  `).join('');
-}
-
-// ─── OPEN MODAL ───
-function openUserModal(id) {
-  const u = usersData.find(u => u.id === id);
-  if (!u) return;
-
-  const overlay = document.getElementById('user-modal-overlay');
-  const box     = document.getElementById('user-modal-box');
-
-  const isSuspended = u.status === 'Suspended';
-  const suspendLabel = isSuspended ? 'Unsuspend' : 'Suspend';
-  const suspendIcon  = isSuspended ? 'ri-checkbox-circle-line' : 'ri-forbid-line';
-  const suspendClass = isSuspended ? 'modal-btn-warning' : 'modal-btn-danger';
-
-  box.innerHTML = `
-    <div class="modal-hero">
-      <button class="modal-close" onclick="closeUserModal()">
-        <i class="ri-close-line"></i>
-      </button>
-      <div class="modal-avatar-wrap">
-        <img class="modal-avatar" src="${u.avatar}" alt="${u.name}" />
-      </div>
-    </div>
-
-    <div class="modal-body">
-      <h2 class="modal-name">${u.name}</h2>
-      <div class="modal-role-row">
-        <span class="badge ${USER_STATUS_MAP[u.status] ?? 'badge-pending'} badge-inline">${u.status}</span>
-        <span class="user-card-role" style="margin:0">
-          <i class="${ROLE_ICON_MAP[u.role] ?? 'ri-user-line'}"></i> ${u.role}
-        </span>
-      </div>
-      <p class="modal-bio">${u.bio}</p>
-
-      <div class="modal-stats">
-        <div class="modal-stat">
-          <span class="modal-stat-value">${u.totalOrders}</span>
-          <span class="modal-stat-label">Orders</span>
-        </div>
-        <div class="modal-stat">
-          <span class="modal-stat-value">${u.totalEarning}</span>
-          <span class="modal-stat-label">Earned</span>
-        </div>
-        <div class="modal-stat">
-          <span class="modal-stat-value">${u.lastActive}</span>
-          <span class="modal-stat-label">Last Active</span>
-        </div>
-      </div>
-
-      <div class="modal-info-list">
-        <div class="modal-info-row">
-          <i class="ri-mail-line"></i>
-          <span>${u.email}</span>
-        </div>
-        <div class="modal-info-row">
-          <i class="ri-phone-line"></i>
-          <span>${u.phone}</span>
-        </div>
-        <div class="modal-info-row">
-          <i class="ri-map-pin-line"></i>
-          <span>${u.location}</span>
-        </div>
-        <div class="modal-info-row">
-          <i class="ri-calendar-line"></i>
-          <span>Bergabung ${u.joinDate}</span>
-        </div>
-      </div>
-
-      <p class="modal-section-title">Skills</p>
-      <div class="modal-skills">
-        ${u.skills.length > 0
-          ? u.skills.map(s => `<span class="modal-skill-chip">${s}</span>`).join('')
-          : '<span style="font-size:13px;color:var(--slate-400)">No skills listed</span>'}
-      </div>
-
-      <div class="modal-action-group">
-        <div class="modal-action-row">
-          <button class="modal-btn-primary" onclick="closeUserModal()">
-            <i class="ri-mail-send-line"></i> Kirim Pesan
-          </button>
-          <button class="modal-btn-edit" onclick="openEditUserModal(${u.id})">
-            <i class="ri-edit-line"></i> Edit
-          </button>
-        </div>
-        <div class="modal-action-row">
-          <button class="${suspendClass}" onclick="toggleSuspendUser(${u.id})">
-            <i class="${suspendIcon}"></i> ${suspendLabel}
-          </button>
-          <button class="modal-btn-delete" onclick="confirmDeleteUser(${u.id})">
-            <i class="ri-delete-bin-line"></i> Hapus Akun
-          </button>
-        </div>
-      </div>
-    </div>
-  `;
-
-  overlay.classList.add('open');
-}
-
-// ─── CLOSE MODAL ───
-function closeUserModal() {
-  document.getElementById('user-modal-overlay').classList.remove('open');
-}
-
-// ─── TOGGLE SUSPEND ───
-function toggleSuspendUser(id) {
-  const u = usersData.find(u => u.id === id);
-  if (!u) return;
-  u.status = u.status === 'Suspended' ? 'Active' : 'Suspended';
-  refreshAfterChange();
-  openUserModal(id); // re-render modal with new state
-}
-
-// ─── CONFIRM DELETE ───
-function confirmDeleteUser(id) {
-  const u = usersData.find(u => u.id === id);
-  if (!u) return;
-
-  // Inject confirm overlay
-  const confirmEl = document.createElement('div');
-  confirmEl.className = 'confirm-overlay';
-  confirmEl.id = 'confirm-delete-overlay';
-  confirmEl.innerHTML = `
-    <div class="confirm-box">
-      <div class="confirm-icon"><i class="ri-error-warning-line"></i></div>
-      <h3>Hapus Akun?</h3>
-      <p>Akun <strong>${u.name}</strong> akan dihapus secara permanen dan tidak bisa dipulihkan.</p>
-      <div class="confirm-actions">
-        <button class="btn-secondary" onclick="closeConfirmDelete()">Batal</button>
-        <button class="modal-btn-delete" onclick="executeDeleteUser(${id})">
-          <i class="ri-delete-bin-line"></i> Ya, Hapus
-        </button>
-      </div>
-    </div>
-  `;
-  document.body.appendChild(confirmEl);
-  requestAnimationFrame(() => confirmEl.classList.add('open'));
-}
-
-function closeConfirmDelete() {
-  const el = document.getElementById('confirm-delete-overlay');
-  if (el) { el.classList.remove('open'); setTimeout(() => el.remove(), 250); }
-}
-
-function executeDeleteUser(id) {
-  const idx = usersData.findIndex(u => u.id === id);
-  if (idx !== -1) usersData.splice(idx, 1);
-  closeConfirmDelete();
-  closeUserModal();
-  refreshAfterChange();
-}
-
-// ─── OPEN EDIT MODAL ───
-function openEditUserModal(id) {
-  const u = usersData.find(u => u.id === id);
-  if (!u) return;
-
-  // Remove existing if any
-  const existing = document.getElementById('edit-user-overlay');
-  if (existing) existing.remove();
-
-  const el = document.createElement('div');
-  el.className = 'modal-overlay';
-  el.id = 'edit-user-overlay';
-  el.innerHTML = `
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>Edit User</h2>
-        <button class="close-modal" onclick="closeEditUserModal()">
-          <i class="ri-close-line"></i>
-        </button>
-      </div>
-      <form id="form-edit-user">
-        <div class="form-group">
-          <label>Full Name</label>
-          <input type="text" id="edit-user-name" required value="${u.name}" />
-        </div>
-        <div class="form-group">
-          <label>Email Address</label>
-          <input type="email" id="edit-user-email" required value="${u.email}" />
-        </div>
-        <div class="form-group">
-          <label>Role</label>
-          <div class="custom-role-select" id="edit-role-select">
-            ${buildRoleOptions(u.role)}
-          </div>
-          <input type="hidden" id="edit-user-role" value="${u.role}" />
-        </div>
-        <div class="form-group">
-          <label>Location</label>
-          <input type="text" id="edit-user-location" required value="${u.location}" />
-        </div>
-        <div class="form-group">
-          <label>Phone</label>
-          <input type="text" id="edit-user-phone" value="${u.phone}" />
-        </div>
-        <div class="form-group">
-          <label>Bio</label>
-          <textarea id="edit-user-bio" rows="3" style="padding:11px 14px;border:1.5px solid var(--slate-200);border-radius:11px;font-family:var(--font-sans);font-size:13.5px;resize:vertical;outline:none;transition:all 0.2s;">${u.bio}</textarea>
-        </div>
-        <div class="modal-actions">
-          <button type="button" class="btn-secondary" onclick="closeEditUserModal()">Batal</button>
-          <button type="submit" class="btn-primary"><i class="ri-save-line"></i> Simpan Perubahan</button>
-        </div>
-      </form>
-    </div>
-  `;
-  document.body.appendChild(el);
-  requestAnimationFrame(() => el.classList.add('open'));
-
-  // Role select logic
-  el.querySelectorAll('.role-option').forEach(opt => {
-    opt.addEventListener('click', () => {
-      el.querySelectorAll('.role-option').forEach(o => o.classList.remove('selected'));
-      opt.classList.add('selected');
-      document.getElementById('edit-user-role').value = opt.dataset.value;
-    });
-  });
-
-  // Close on backdrop click
-  el.addEventListener('click', (e) => { if (e.target === el) closeEditUserModal(); });
-
-  // Submit
-  document.getElementById('form-edit-user').addEventListener('submit', (e) => {
-    e.preventDefault();
-    u.name     = document.getElementById('edit-user-name').value.trim();
-    u.email    = document.getElementById('edit-user-email').value.trim();
-    u.role     = document.getElementById('edit-user-role').value;
-    u.location = document.getElementById('edit-user-location').value.trim();
-    u.phone    = document.getElementById('edit-user-phone').value.trim();
-    u.bio      = document.getElementById('edit-user-bio').value.trim();
-    closeEditUserModal();
-    refreshAfterChange();
-    openUserModal(u.id); // re-open with updated info
-  });
-}
-
-function closeEditUserModal() {
-  const el = document.getElementById('edit-user-overlay');
-  if (el) { el.classList.remove('open'); setTimeout(() => el.remove(), 280); }
-}
-
-// ─── HELPER: build role options HTML ───
-function buildRoleOptions(selected) {
-  const roles = [
-    { value: 'Client',        icon: 'ri-briefcase-line',       label: 'Client',        desc: 'Pemberi kerja / klien' },
-    { value: 'Freelancer',    icon: 'ri-user-star-line',        label: 'Freelancer',    desc: 'Penyedia jasa independen' },
-    { value: 'Skomda Student',icon: 'ri-graduation-cap-line',   label: 'Skomda Student',desc: 'Siswa program Skomda' },
+  let usersData = [
+    ...((clientsData?.data ?? []).map(u => ({ ...u, _uid: 'c_' + u.id, role: 'Client' }))),
+    ...((freelancersData?.data ?? []).map(u => ({ ...u, _uid: 'f_' + u.id, role: 'Freelancer' }))),
+    ...((skomdaData?.data ?? []).map(u => ({ ...u, _uid: 's_' + u.id, role: 'Skomda Student' }))),
   ];
-  return roles.map(r => `
-    <div class="role-option${r.value === selected ? ' selected' : ''}" data-value="${r.value}">
-      <div class="role-option-icon"><i class="${r.icon}"></i></div>
-      <div class="role-option-text">
-        <span class="role-option-label">${r.label}</span>
-        <span class="role-option-desc">${r.desc}</span>
-      </div>
-      <div class="role-option-check"><i class="ri-check-line"></i></div>
-    </div>
-  `).join('');
-}
 
-// ─── REFRESH CARDS after data change ───
-function refreshAfterChange() {
-  const activeTab = document.querySelector('.filter-tab.active');
-  const filter    = activeTab ? activeTab.dataset.filter : 'all';
-  const q         = (document.getElementById('user-search-input')?.value || '').toLowerCase();
-  let filtered    = filter === 'all' ? usersData : usersData.filter(u => u.status === filter || u.role === filter);
-  if (q) filtered = filtered.filter(u =>
-    u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q) ||
-    u.role.toLowerCase().includes(q)  || u.location.toLowerCase().includes(q)
-  );
-  renderUserCards(filtered);
-}
+  let perPage = 12;
+  let currentPage = 1;
 
-// ─── FILTER TABS ───
-function initUserFilters() {
-  const tabs = document.querySelectorAll('.filter-tab');
-  tabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-      tabs.forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-      const filter = tab.dataset.filter;
-      const filtered = filter === 'all'
-        ? usersData
-        : usersData.filter(u => u.status === filter || u.role === filter);
-      renderUserCards(filtered);
-    });
-  });
-}
+  // STATUS_BADGE
+  const STATUS_BADGE = {
+    Active: 'bg-emerald-100 text-emerald-800',
+    Approved: 'bg-emerald-100 text-emerald-800',
+    Pending: 'bg-orange-100 text-orange-800',
+    Inactive: 'bg-slate-100 text-slate-600',
+    Suspended: 'bg-red-100 text-red-800',
+    Rejected: 'bg-red-100 text-red-800',
+  };
 
-// ─── SEARCH USER ───
-function initUserSearch() {
-  const input = document.getElementById('user-search-input');
-  if (!input) return;
-  input.addEventListener('input', () => {
-    const q = input.value.toLowerCase();
-    const filtered = usersData.filter(u =>
-      u.name.toLowerCase().includes(q) ||
-      u.email.toLowerCase().includes(q) ||
-      u.role.toLowerCase().includes(q) ||
-      u.location.toLowerCase().includes(q)
-    );
-    renderUserCards(filtered);
-  });
-}
+  // STATUS_DOT
+  const STATUS_DOT = {
+    Active: 'bg-emerald-400',
+    Approved: 'bg-emerald-400',
+    Pending: 'bg-orange-400',
+    Inactive: 'bg-slate-300',
+    Suspended: 'bg-red-500',
+    Rejected: 'bg-red-500',
+  };
 
-// ─── ADD USER MODAL ───
-function openAddUserModal() {
-  document.getElementById('modal-add-user').classList.add('open');
-}
+  // ROLE_META
+  const ROLE_META = {
+    'Client': { cls: 'ri-briefcase-4-fill', bg: '#eef2ff', color: '#6366f1' },
+    'Freelancer': { cls: 'ri-vip-crown-fill', bg: '#fff7ed', color: '#f97316' },
+    'Skomda Student': { cls: 'ri-graduation-cap-fill', bg: '#f0fdfa', color: '#0f766e' },
+  };
 
-function closeAddUserModal() {
-  const modal = document.getElementById('modal-add-user');
-  modal.classList.remove('open');
-  document.getElementById('form-add-user').reset();
-  // reset custom role select
-  document.querySelectorAll('#add-role-select .role-option').forEach((opt, i) => {
-    opt.classList.toggle('selected', i === 0);
-  });
-  document.getElementById('new-user-role').value = 'Client';
-}
+  const $ = (id) => document.getElementById(id);
 
-function initAddUserModal() {
-  // Inject custom role select into add-role-select container
-  const roleContainer = document.getElementById('add-role-select');
-  if (roleContainer) {
-    roleContainer.innerHTML = buildRoleOptions('Client');
-    roleContainer.querySelectorAll('.role-option').forEach(opt => {
-      opt.addEventListener('click', () => {
-        roleContainer.querySelectorAll('.role-option').forEach(o => o.classList.remove('selected'));
-        opt.classList.add('selected');
-        document.getElementById('new-user-role').value = opt.dataset.value;
+  function avatar(u) {
+    return u.avatar ||
+      `https://ui-avatars.com/api/?name=${encodeURIComponent(u.name || 'U')}&background=f1f5f9&color=0f766e&size=128`;
+  }
+  function sBadge(s) { return STATUS_BADGE[s] || 'bg-slate-100 text-slate-600'; }
+  function sDot(s) { return STATUS_DOT[s] || 'bg-slate-300'; }
+
+  // CSRF_TOKEN
+  function getCsrfToken() {
+    const token = document.querySelector('meta[name="csrf-token"]')?.content;
+    if (!token) throw new Error('CSRF meta tag tidak ditemukan. Pastikan <meta name="csrf-token" ...> ada di layout.');
+    return token;
+  }
+
+  // API_REQUEST
+  async function apiRequest(url, { method = 'POST', body = null } = {}) {
+    const headers = {
+      'X-CSRF-TOKEN': getCsrfToken(),
+      'Accept': 'application/json',
+    };
+
+    let payload = body;
+    if (body && typeof body === 'object' && !(body instanceof FormData)) {
+      headers['Content-Type'] = 'application/json';
+      payload = JSON.stringify(body);
+    }
+
+    const res = await fetch(url, { method, headers, body: payload });
+
+    let data = null;
+    const ct = res.headers.get('content-type') || '';
+    if (ct.includes('application/json')) {
+      try { data = await res.json(); } catch (e) {}
+    }
+
+    if (!res.ok) throw new Error(data?.message || `Request gagal (${res.status}).`);
+    return data;
+  }
+
+  function deleteUrlFor(u) {
+    if (u.role === 'Client') return `/admin/clients/${u.id}`;
+    if (u.role === 'Freelancer') return `/admin/freelancers/${u.id}`;
+    if (u.role === 'Skomda Student') return `/admin/skomda-students/${u.id}`;
+    return `/admin/clients/${u.id}`;
+  }
+
+  // TOAST - Menggunakan notif-drawer.js yang sudah ada (jangan duplicate)
+  // showToast sudah disediakan oleh notif-drawer.js, cek apakah window.showToast ada
+  function ensureToastExists() {
+    if (!window.showToast) {
+      console.warn('showToast dari notif-drawer.js belum loaded, fallback ke alert');
+      window.showToast = (msg, type = 'success') => {
+        alert(msg);
+      };
+    }
+  }
+
+  // MODAL - Pastikan modal functions tersedia global
+  function openModal(id) {
+    const el = $(id);
+    if (!el) {
+      console.error(`Modal ${id} tidak ditemukan`);
+      return;
+    }
+    el.classList.add('open');
+    el.style.opacity = '1';
+    el.style.pointerEvents = 'all';
+  }
+
+  function closeModal(id) {
+    const el = $(id);
+    if (!el) {
+      console.error(`Modal ${id} tidak ditemukan`);
+      return;
+    }
+    el.classList.remove('open');
+    el.style.opacity = '0';
+    el.style.pointerEvents = 'none';
+  }
+
+  window.openModal = openModal;
+  window.closeModal = closeModal;
+
+  // Setup overlay click to close modal
+  function setupOverlayListeners() {
+    document.querySelectorAll('.overlay').forEach(ov => {
+      ov.addEventListener('click', e => { 
+        if (e.target === ov) closeModal(ov.id); 
       });
     });
   }
 
-  const btnAdd    = document.getElementById('btn-add-user');
-  const btnClose  = document.getElementById('btn-close-add-user');
-  const btnCancel = document.getElementById('btn-cancel-add-user');
-  const overlay   = document.getElementById('modal-add-user');
-  const form      = document.getElementById('form-add-user');
+  // PAGINATION
+  function setMeta(totalShown, totalAll) {
+    const meta = $('pagination-meta');
+    if (meta) {
+      if (totalAll === 0) meta.textContent = `Showing 0–0 of 0`;
+      else meta.textContent = `Showing 1–${totalShown} of ${totalAll}`;
+    }
+    const controls = $('pagination-controls');
+    if (controls) controls.innerHTML = '';
+  }
 
-  if (btnAdd)    btnAdd.addEventListener('click', openAddUserModal);
-  if (btnClose)  btnClose.addEventListener('click', closeAddUserModal);
-  if (btnCancel) btnCancel.addEventListener('click', closeAddUserModal);
+  function getFilteredData() {
+    const active = document.querySelector('.filter-tab.active');
+    const f = active ? active.dataset.filter : 'all';
+    const q = ($('user-search')?.value || '').toLowerCase();
 
-  if (overlay) {
-    overlay.addEventListener('click', (e) => {
-      if (e.target === overlay) closeAddUserModal();
+    let res = usersData;
+    if (f !== 'all') res = res.filter(u => u.role === f);
+
+    if (q) {
+      res = res.filter(u =>
+        (u.name && u.name.toLowerCase().includes(q)) ||
+        (u.email && u.email.toLowerCase().includes(q)) ||
+        (u.role && u.role.toLowerCase().includes(q)) ||
+        (u.location && u.location.toLowerCase().includes(q))
+      );
+    }
+    return res;
+  }
+
+  // RENDER_STATS
+  function renderStats() {
+    const total = (clientsData.total || 0) + (freelancersData.total || 0) + (skomdaData.total || 0);
+    const cl = clientsData.total || 0;
+    const fr = freelancersData.total || 0;
+    const sk = skomdaData.total || 0;
+
+    const el = $('stats-row');
+    if (!el) return;
+
+    el.innerHTML = [
+      { icon: 'ri-group-fill', bg: '#f0fdfa', color: '#0f766e', val: total, lbl: 'Total Users' },
+      { icon: 'ri-briefcase-4-fill', bg: '#eef2ff', color: '#6366f1', val: cl, lbl: 'Clients' },
+      { icon: 'ri-vip-crown-fill', bg: '#fff7ed', color: '#f97316', val: fr, lbl: 'Freelancers' },
+      { icon: 'ri-graduation-cap-fill', bg: '#f0fdfa', color: '#0d9488', val: sk, lbl: 'Skomda Students' },
+    ].map(s => `
+      <div class="bg-white border border-slate-200 rounded-2xl px-5 py-[18px] flex items-center gap-3.5 transition-all duration-200 hover:shadow-md hover:-translate-y-px">
+        <div class="w-11 h-11 rounded-xl flex items-center justify-center text-[20px] flex-shrink-0" style="background:${s.bg};color:${s.color}">
+          <i class="${s.icon}"></i>
+        </div>
+        <div>
+          <div class="font-display text-[1.5rem] font-extrabold text-slate-900 leading-none">${s.val}</div>
+          <div class="text-[12px] text-slate-500 font-semibold mt-0.5">${s.lbl}</div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // RENDER_CARDS
+  function renderCards(data) {
+    const grid = $('user-grid');
+    if (!grid) return;
+
+    if (!data || !data.length) {
+      grid.innerHTML = `
+        <div class="col-span-full py-16 px-5 text-center bg-white border-2 border-dashed border-slate-200 rounded-3xl">
+          <i class="ri-user-search-line text-[3rem] text-slate-300 block mb-3"></i>
+          <h3 class="font-display text-[1.1rem] font-bold text-slate-700 mb-1.5">No users found</h3>
+          <p class="text-[13px] text-slate-400">Try adjusting the filter or search keyword.</p>
+        </div>`;
+      setMeta(0, 0);
+      return;
+    }
+
+    const start = (currentPage - 1) * perPage;
+    const end = start + perPage;
+    const paginated = data.slice(start, end);
+
+    setMeta(paginated.length, data.length);
+
+    grid.innerHTML = paginated.map(u => {
+      const rm = ROLE_META[u.role] || {};
+      const skills = Array.isArray(u.skills) ? u.skills : [];
+
+      return `
+        <div class="user-cardx group relative bg-white border border-slate-200 rounded-[22px] p-[18px] flex flex-col transition-all duration-200 hover:-translate-y-0.5 hover:border-emerald-300 hover:shadow-[0_10px_28px_rgba(2,6,23,0.08)] overflow-hidden">
+          <div class="flex justify-between items-start mb-4 relative z-10">
+            <div class="flex items-center gap-3">
+              <div class="relative">
+                <img class="w-[54px] h-[54px] rounded-[16px] object-cover border-2 border-white shadow-sm" src="${avatar(u)}" alt="${u.name}"/>
+                <span class="absolute -bottom-0.5 -right-0.5 w-[13px] h-[13px] rounded-full border-2 border-white ${sDot(u.status)}"></span>
+              </div>
+              <div class="min-w-0">
+                <h3 class="font-display text-[1rem] font-extrabold text-slate-900 truncate leading-tight">${u.name}</h3>
+                <div class="flex items-center gap-1.5 mt-1">
+                  <span class="w-[22px] h-[22px] rounded-[7px] flex items-center justify-center text-[12px] flex-shrink-0"
+                    style="background:${rm.bg||'#f1f5f9'};color:${rm.color||'#64748b'}">
+                    <i class="${rm.cls||'ri-user-line'}"></i>
+                  </span>
+                  <span class="text-[12.5px] font-semibold text-slate-600">${u.role}</span>
+                </div>
+              </div>
+            </div>
+
+            <span class="text-[10.5px] font-bold px-2.5 py-1 rounded-lg uppercase tracking-[.05em] ${sBadge(u.status)}">${u.status}</span>
+          </div>
+
+          <div class="text-[11.5px] text-slate-400 flex items-center gap-1 mb-3 relative z-10">
+            <i class="ri-map-pin-line"></i>
+            <span class="truncate">${u.location || 'Unknown Location'}</span>
+          </div>
+
+          <div class="flex flex-wrap gap-1.5 mb-3 min-h-[26px] relative z-10">
+            ${skills.length
+              ? skills.slice(0,3).map(s=>`<span class="chip">${s}</span>`).join('')
+                + (skills.length>3 ? `<span class="chip chip-muted">+${skills.length-3}</span>` : '')
+              : '<span class="text-[11px] text-slate-300 italic">No skills listed</span>'
+            }
+          </div>
+
+          <div class="flex gap-2 mt-auto relative z-10">
+            <button type="button" onclick="window.openDetail('${u._uid}')" class="flex-1 btn-soft">
+              <i class="ri-eye-line"></i> View
+            </button>
+
+            <button type="button" onclick="window.openEdit('${u._uid}')" class="flex-1 btn-soft btn-soft-primary">
+              <i class="ri-pencil-line"></i> Edit
+            </button>
+
+            <button type="button" onclick="window.openDelete('${u._uid}')" class="btn-soft btn-soft-danger" title="Delete">
+              <i class="ri-delete-bin-line"></i>
+            </button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function refreshGrid() {
+    renderCards(getFilteredData());
+  }
+
+  // DETAIL
+  function openDetail(uid) {
+    const u = usersData.find(x => x._uid === uid);
+    if (!u) {
+      console.error(`User dengan uid ${uid} tidak ditemukan`);
+      return;
+    }
+
+    const detailContent = $('detail-content');
+    if (!detailContent) {
+      console.error('Element detail-content tidak ditemukan');
+      return;
+    }
+
+    const rm = ROLE_META[u.role] || {};
+    const skills = Array.isArray(u.skills) ? u.skills : [];
+
+    detailContent.innerHTML = `
+      <div class="h-[110px] bg-gradient-to-r from-[#0f766e] to-[#10b981] relative flex-shrink-0">
+        <button type="button" onclick="window.closeModal('modal-detail')"
+          class="absolute top-3.5 right-3.5 w-8 h-8 bg-white/20 border-none rounded-full flex items-center justify-center text-white text-[18px] cursor-pointer hover:bg-white/30 transition-all">
+          <i class="ri-close-line"></i>
+        </button>
+        <img class="absolute -bottom-[38px] left-[26px] w-[76px] h-[76px] rounded-[18px] object-cover border-[3px] border-white shadow-lg"
+          src="${avatar(u)}" alt="${u.name}"/>
+      </div>
+
+      <div class="px-[26px] pt-[50px] pb-[24px] overflow-y-auto flex-1">
+        <h2 class="font-display text-[1.35rem] font-extrabold text-slate-900 mb-2">${u.name}</h2>
+        <div class="flex items-center gap-2 mb-3 flex-wrap">
+          <span class="text-[10.5px] font-bold px-2.5 py-1 rounded-lg uppercase tracking-[.04em] ${sBadge(u.status)}">${u.status}</span>
+          <span class="flex items-center gap-1.5 text-[12.5px] font-bold text-slate-500">
+            <span class="w-5 h-5 rounded-[5px] flex items-center justify-center text-[11px]" style="background:${rm.bg||'#f1f5f9'};color:${rm.color||'#64748b'}">
+              <i class="${rm.cls||'ri-user-line'}"></i>
+            </span>
+            ${u.role}
+          </span>
+        </div>
+
+        <p class="text-[13px] text-slate-500 leading-[1.65] mb-5">${u.bio||'Tidak ada bio yang ditulis oleh pengguna ini.'}</p>
+
+        ${skills.length ? `
+          <div>
+            <div class="text-[10.5px] font-bold text-slate-400 uppercase tracking-[.1em] mb-2.5">Skills</div>
+            <div class="flex flex-wrap gap-1.5 mb-4">
+              ${skills.map(s=>`<span class="px-3 py-1.5 bg-[#f0fdfa] text-[#0f766e] rounded-[8px] text-[12px] font-bold">${s}</span>`).join('')}
+            </div>
+          </div>` : ''
+        }
+
+        <div class="flex gap-2.5 pt-4 border-t border-slate-100">
+          <button type="button" onclick="window.closeModal('modal-detail');window.openEdit('${u._uid}')"
+            class="flex-1 py-2.5 rounded-[11px] bg-[#0f766e] text-white font-bold text-[13px] flex items-center justify-center gap-1.5 cursor-pointer border-none shadow-teal-sm hover:bg-[#0a5e58] transition-all duration-150">
+            <i class="ri-pencil-line"></i> Edit
+          </button>
+
+          <button type="button" onclick="window.closeModal('modal-detail');window.openDelete('${u._uid}')"
+            class="flex-1 py-2.5 rounded-[11px] bg-red-500 text-white font-bold text-[13px] flex items-center justify-center gap-1.5 cursor-pointer border-none shadow-[0_3px_10px_rgba(239,68,68,.25)] hover:bg-red-600 transition-all duration-150">
+            <i class="ri-delete-bin-line"></i> Delete
+          </button>
+        </div>
+      </div>
+    `;
+
+    openModal('modal-detail');
+  }
+  window.openDetail = openDetail;
+
+  // EDIT
+  function openEdit(uid) {
+    const u = usersData.find(x => x._uid === uid);
+    if (!u) {
+      console.error(`User dengan uid ${uid} tidak ditemukan`);
+      return;
+    }
+
+    const editUidEl = $('edit-uid');
+    if (!editUidEl) {
+      console.error('Element edit-uid tidak ditemukan');
+      return;
+    }
+
+    editUidEl.value = uid;
+    const nameEl = $('edit-name');
+    const emailEl = $('edit-email');
+    const statusEl = $('edit-status');
+    const locationEl = $('edit-location');
+    const phoneEl = $('edit-phone');
+    const bioEl = $('edit-bio');
+
+    if (nameEl) nameEl.value = u.name || '';
+    if (emailEl) emailEl.value = u.email || '';
+    if (statusEl) statusEl.value = u.status || 'Active';
+    if (locationEl) locationEl.value = u.location || '';
+    if (phoneEl) phoneEl.value = u.phone || '';
+    if (bioEl) bioEl.value = u.bio || '';
+
+    const sg = $('edit-skills-group');
+    if (sg) sg.style.display = 'none';
+
+    openModal('modal-edit');
+  }
+  window.openEdit = openEdit;
+
+  async function submitEditUser() {
+    const editUidEl = $('edit-uid');
+    if (!editUidEl) {
+      console.error('Element edit-uid tidak ditemukan');
+      return;
+    }
+
+    const uid = editUidEl.value;
+    const u = usersData.find(x => x._uid === uid);
+    if (!u) {
+      console.error(`User dengan uid ${uid} tidak ditemukan`);
+      return;
+    }
+
+    if (u.role !== 'Client') {
+      ensureToastExists();
+      window.showToast('Edit hanya tersedia untuk Client (endpoint update role lain belum ada).', 'danger');
+      return;
+    }
+
+    const nameEl = $('edit-name');
+    const emailEl = $('edit-email');
+    const phoneEl = $('edit-phone');
+
+    const payload = {
+      name: (nameEl?.value || '').trim(),
+      email: (emailEl?.value || '').trim(),
+      phone: (phoneEl?.value || '').trim(),
+    };
+
+    try {
+      await apiRequest(`/admin/clients/${u.id}`, { method: 'PUT', body: payload });
+      closeModal('modal-edit');
+      ensureToastExists();
+      window.showToast('Client berhasil diupdate', 'success');
+      window.location.reload();
+    } catch (err) {
+      ensureToastExists();
+      window.showToast(err?.message || 'Gagal update client.', 'danger');
+    }
+  }
+  window.submitEditUser = submitEditUser;
+
+  // DELETE
+  let deleteTargetUid = null;
+
+  function openDelete(uid) {
+    const u = usersData.find(x => x._uid === uid);
+    if (!u) {
+      console.error(`User dengan uid ${uid} tidak ditemukan`);
+      return;
+    }
+
+    deleteTargetUid = uid;
+    const deleteTextEl = $('delete-text');
+    if (deleteTextEl) {
+      deleteTextEl.innerHTML =
+        `Tindakan ini tidak dapat dibatalkan. Akun <strong>${u.name}</strong> dan semua datanya akan dihapus permanen.`;
+    }
+
+    openModal('modal-delete');
+  }
+  window.openDelete = openDelete;
+
+  async function confirmDelete() {
+    if (!deleteTargetUid) return;
+
+    const u = usersData.find(x => x._uid === deleteTargetUid);
+    if (!u) {
+      console.error(`User dengan uid ${deleteTargetUid} tidak ditemukan`);
+      return;
+    }
+
+    try {
+      await apiRequest(deleteUrlFor(u), { method: 'DELETE' });
+      closeModal('modal-delete');
+      ensureToastExists();
+      window.showToast('User berhasil dihapus', 'success');
+      window.location.reload();
+    } catch (err) {
+      ensureToastExists();
+      window.showToast(err?.message || 'Gagal hapus user.', 'danger');
+    }
+  }
+  window.confirmDelete = confirmDelete;
+
+  // ADD_USER
+  function updateAddFormByRole() {
+    const roleSelect = $('add-role');
+    if (!roleSelect) return;
+
+    const role = roleSelect.value || 'Client';
+
+    const clientGroup = $('add-client-group');
+    const pwGroup = $('add-password-group');
+    const skGroup = $('add-skomda-group');
+    const frGroup = $('add-freelancer-group');
+
+    if (clientGroup) clientGroup.style.display = 'none';
+    if (pwGroup) pwGroup.style.display = 'none';
+    if (skGroup) skGroup.style.display = 'none';
+    if (frGroup) frGroup.style.display = 'none';
+
+    if (role === 'Client') {
+      if (clientGroup) clientGroup.style.display = '';
+      if (pwGroup) pwGroup.style.display = '';
+    } else if (role === 'Skomda Student') {
+      if (skGroup) skGroup.style.display = '';
+    } else if (role === 'Freelancer') {
+      if (frGroup) frGroup.style.display = '';
+      if (pwGroup) pwGroup.style.display = '';
+    }
+  }
+
+  async function submitAddUser() {
+    const roleSelect = $('add-role');
+    const role = roleSelect?.value || 'Client';
+
+    const nameEl = $('add-name');
+    const emailEl = $('add-email');
+    const phoneEl = $('add-phone');
+    const pwEl = $('add-password');
+    const pwcEl = $('add-password-confirmation');
+
+    const name = nameEl?.value.trim() || '';
+    const email = emailEl?.value.trim() || '';
+    const phone = phoneEl?.value.trim() || '';
+
+    const pw = pwEl?.value || '';
+    const pwc = pwcEl?.value || '';
+
+    ensureToastExists();
+
+    try {
+      if (role === 'Client') {
+        if (!name || !email || !phone) return window.showToast('Nama, email, dan phone wajib diisi.', 'danger');
+        if (!pw) return window.showToast('Password wajib diisi.', 'danger');
+        if (pw !== pwc) return window.showToast('Konfirmasi password tidak sama.', 'danger');
+
+        await apiRequest('/admin/clients', {
+          method: 'POST',
+          body: { name, email, phone, password: pw, password_confirmation: pwc }
+        });
+
+        closeModal('modal-add');
+        window.showToast('Client berhasil ditambahkan', 'success');
+        window.location.reload();
+        return;
+      }
+
+      if (role === 'Skomda Student') {
+        const nisEl = $('add-nis');
+        const clsEl = $('add-class');
+        const majorEl = $('add-major');
+
+        const nis = nisEl?.value.trim() || '';
+        const cls = clsEl?.value.trim() || '';
+        const major = majorEl?.value || 'SIJA';
+
+        if (!nis || !name || !email || !cls || !major) {
+          return window.showToast('NIS, Nama, Email, Class, Major wajib diisi.', 'danger');
+        }
+
+        await apiRequest('/admin/skomda-students', {
+          method: 'POST',
+          body: { nis, name, email, class: cls, major }
+        });
+
+        closeModal('modal-add');
+        window.showToast('Skomda Student berhasil ditambahkan', 'success');
+        window.location.reload();
+        return;
+      }
+
+      if (role === 'Freelancer') {
+        const studentIdEl = $('add-student-id');
+        const studentIdRaw = studentIdEl?.value || '';
+        const student_id = parseInt(studentIdRaw, 10);
+        const bioEl = $('add-bio');
+
+        if (!student_id) return window.showToast('Student ID wajib diisi untuk Freelancer.', 'danger');
+        if (!pw) return window.showToast('Password wajib diisi.', 'danger');
+        if (pw !== pwc) return window.showToast('Konfirmasi password tidak sama.', 'danger');
+
+        await apiRequest('/admin/freelancers', {
+          method: 'POST',
+          body: {
+            student_id,
+            bio: bioEl?.value.trim() || null,
+            password: pw,
+            password_confirmation: pwc,
+            status: 'Pending',
+          }
+        });
+
+        closeModal('modal-add');
+        window.showToast('Freelancer berhasil ditambahkan', 'success');
+        window.location.reload();
+        return;
+      }
+
+      window.showToast('Role tidak dikenali.', 'danger');
+    } catch (err) {
+      window.showToast(err?.message || 'Gagal menambah user.', 'danger');
+    }
+  }
+  window.submitAddUser = submitAddUser;
+
+  // ADD_ROLES_PICKER
+  function initAddRoles() {
+    const roles = [
+      { val: 'Client', label: 'Client', desc: 'Pemberi kerja / klien', icon: 'ri-briefcase-line' },
+      { val: 'Freelancer', label: 'Freelancer', desc: 'Penyedia jasa independen', icon: 'ri-vip-crown-line' },
+      { val: 'Skomda Student', label: 'Skomda Student', desc: 'Siswa magang / program Skomda', icon: 'ri-graduation-cap-line' },
+    ];
+
+    const container = $('add-roles');
+    if (!container) return;
+
+    container.innerHTML = roles.map((r, i) => `
+      <div class="role-opt flex items-center gap-3 p-3 border-[1.5px] ${i===0?'border-[#0f766e] bg-[#f0fdfa]':'border-slate-200 bg-white'} rounded-[12px] cursor-pointer transition-all duration-150 hover:border-[#0f766e] hover:bg-[#f0fdfa]" data-val="${r.val}">
+        <div class="w-[38px] h-[38px] rounded-[10px] bg-white shadow-sm flex items-center justify-center text-[17px] text-[#0f766e] flex-shrink-0">
+          <i class="${r.icon}"></i>
+        </div>
+        <div class="flex-1">
+          <div class="text-[13.5px] font-bold text-slate-800">${r.label}</div>
+          <div class="text-[11px] text-slate-400 mt-0.5">${r.desc}</div>
+        </div>
+        <div class="role-check w-5 h-5 rounded-full border-2 ${i===0?'bg-[#0f766e] border-[#0f766e]':'border-slate-300'} flex items-center justify-center text-[10px] ${i===0?'text-white':'text-transparent'} flex-shrink-0 transition-all duration-150">
+          <i class="ri-check-line"></i>
+        </div>
+      </div>
+    `).join('');
+
+    container.querySelectorAll('.role-opt').forEach((opt, idx) => {
+      opt.addEventListener('click', () => {
+        container.querySelectorAll('.role-opt').forEach(o => {
+          o.classList.remove('border-[#0f766e]', 'bg-[#f0fdfa]');
+          o.classList.add('border-slate-200', 'bg-white');
+          const chk = o.querySelector('.role-check');
+          chk.classList.remove('bg-[#0f766e]', 'border-[#0f766e]', 'text-white');
+          chk.classList.add('border-slate-300', 'text-transparent');
+        });
+
+        opt.classList.add('border-[#0f766e]', 'bg-[#f0fdfa]');
+        opt.classList.remove('border-slate-200', 'bg-white');
+
+        const chk = opt.querySelector('.role-check');
+        chk.classList.add('bg-[#0f766e]', 'border-[#0f766e]', 'text-white');
+        chk.classList.remove('border-slate-300', 'text-transparent');
+
+        const roleSelect = $('add-role');
+        if (roleSelect) {
+          roleSelect.value = opt.dataset.val;
+        }
+        updateAddFormByRole();
+      });
     });
   }
 
-  if (form) {
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const name     = document.getElementById('new-user-name').value.trim();
-      const email    = document.getElementById('new-user-email').value.trim();
-      const role     = document.getElementById('new-user-role').value;
-      const location = document.getElementById('new-user-location').value.trim();
+  // INIT
+  function init() {
+    // Setup overlay listeners untuk modal
+    setupOverlayListeners();
 
-      const newUser = {
-        id:           Date.now(),
-        name,
-        email,
-        avatar:       `https://picsum.photos/seed/${name.split(' ')[0].toLowerCase()}/200/200`,
-        role,
-        status:       'Active',
-        joinDate:     new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }),
-        location,
-        phone:        '-',
-        skills:       [],
-        totalOrders:  0,
-        totalEarning: '$0',
-        lastActive:   'Just now',
-        bio:          'No bio yet.',
-      };
-
-      usersData.push(newUser);
-      refreshAfterChange();
-      closeAddUserModal();
+    // Setup filter tabs
+    document.querySelectorAll('.filter-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.filter-tab').forEach(t => {
+          t.classList.remove('active', 'bg-[#0f766e]', 'text-white', 'border-[#0f766e]', 'shadow-teal-sm');
+          t.classList.add('border-slate-200', 'bg-white', 'text-slate-500');
+        });
+        tab.classList.add('active', 'bg-[#0f766e]', 'text-white', 'border-[#0f766e]', 'shadow-teal-sm');
+        tab.classList.remove('border-slate-200', 'bg-white', 'text-slate-500');
+        refreshGrid();
+      });
     });
+
+    // Setup search
+    const searchEl = $('user-search');
+    if (searchEl) {
+      searchEl.addEventListener('input', refreshGrid);
+    }
+
+    // Setup per page
+    const perPageSelect = $('per-page');
+    if (perPageSelect) {
+      perPageSelect.addEventListener('change', function () {
+        perPage = parseInt(this.value);
+        currentPage = 1;
+        refreshGrid();
+      });
+    }
+
+    // Setup add user button
+    const btnAddUser = $('btn-add-user');
+    if (btnAddUser) {
+      btnAddUser.addEventListener('click', () => {
+        updateAddFormByRole();
+        openModal('modal-add');
+      });
+    }
+
+    // Setup confirm delete button
+    const btnConfirmDelete = $('btn-confirm-delete');
+    if (btnConfirmDelete) {
+      btnConfirmDelete.addEventListener('click', confirmDelete);
+    }
+
+    // Initialize roles picker dan form
+    initAddRoles();
+    updateAddFormByRole();
+
+    // Render initial content
+    ensureToastExists();
+    renderStats();
+    refreshGrid();
   }
-}
 
-// ─── INIT USER PAGE ───
-function initUserPage() {
-  renderUserCards();
-  initUserFilters();
-  initUserSearch();
-  initAddUserModal();
-  initAdminDashboard();
-
-  // Tutup user detail modal saat klik overlay
-  const userOverlay = document.getElementById('user-modal-overlay');
-  if (userOverlay) {
-    userOverlay.addEventListener('click', (e) => {
-      if (e.target === userOverlay) closeUserModal();
-    });
+  // Jalankan init saat DOM siap
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
   }
-
-  // Notif
-  const notifBtn = document.getElementById('notif-btn');
-  if (notifBtn) {
-    notifBtn.classList.toggle('has-unread', hasUnreadMessages);
-    notifBtn.addEventListener('click', () => notifBtn.classList.remove('has-unread'));
-  }
-}
-
-// Jalankan ketika DOM siap
-document.addEventListener('DOMContentLoaded', initUserPage);
+})();

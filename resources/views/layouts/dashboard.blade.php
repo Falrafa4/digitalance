@@ -4,6 +4,9 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
     <title>@yield('title')</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -68,26 +71,28 @@
 
 <body class="bg-slate-50 text-slate-900 font-sans h-screen overflow-hidden">
     <div class="flex h-screen">
-
-        <!-- ── SIDEBAR ── -->
+        <!-- Sidebar -->
         <x-sidebar />
 
-        <!-- ── MAIN ── -->
+        <!-- Main -->
         <main class="flex-1 px-11 py-7 overflow-y-auto min-w-0">
             <!-- Header -->
             <x-header />
-            
+
             @yield('content')
         </main>
     </div>
 
-    @yield('modals');
+    @yield('modals')
 
-        <!-- Toast Container -->
+    <!-- Toast Container -->
     <div id="toast-container"></div>
 
-    {{-- Notification Drawer --}}
+    <!-- Notification Drawer -->
     <x-notification-drawer />
+
+    <script src="{{ asset('js/dashboard/search.js') }}"></script>
+    <script src="{{ asset('js/dashboard/notif-drawer.js') }}"></script>
 
     @yield('scripts')
 </body>

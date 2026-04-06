@@ -4,30 +4,23 @@ namespace App\Http\Controllers;
 
 use App\Models\Client;
 use App\Models\Freelancer;
-use App\Models\Order;
 use App\Models\SkomdaStudent;
+use App\Models\Order; 
 
 class DashboardController extends Controller
 {
     public function admin()
     {
         $totalUsers = Client::count() + Freelancer::count() + SkomdaStudent::count();
-        $activeProjects = Order::whereIn('status', ['Pending', 'In Progress'])->count();
-        $totalRevenue = Order::where('status', 'Completed')->sum('agreed_price');
-        $openDisputes = Order::where('status', 'Disputed')->count();
-
-        $pendingVerifications = Freelancer::with('user')
-            ->where('status', 'Pending') 
-            ->orderBy('created_at', 'desc')
-            ->limit(5)
-            ->get();
+        $totalClients = Client::count();
+        $totalFreelancers = Freelancer::count();
+        $totalSkomda = SkomdaStudent::count();
 
         return view('dashboard.admin.dashboard', compact(
             'totalUsers',
-            'activeProjects',
-            'totalRevenue',
-            'openDisputes',
-            'pendingVerifications'
+            'totalClients',
+            'totalFreelancers',
+            'totalSkomda'
         ));
     }
 
@@ -35,25 +28,37 @@ class DashboardController extends Controller
     {
         $user = auth()->guard('client')->user();
 
-        // 1. Ambil semua order milik client ini
+        if (!$user) {
+            abort(403, 'Unauthorized');
+        }
+
         $allOrders = Order::where('client_id', $user->id)->get();
 
-        // 2. Hitung statistik
-        $activeProjects = $allOrders->whereIn('status', ['Pending', 'In Progress'])->count();
+        $activeProjects = $allOrders
+            ->whereIn('status', ['Pending', 'In Progress'])
+            ->count();
 
-        // Hitung total pengeluaran (agreed_price) dari order yang statusnya bukan ditolak/cancel
-        $totalSpent = $allOrders->where('status', '!=', 'Cancelled')->sum('agreed_price');
+        $totalSpent = $allOrders
+            ->where('status', '!=', 'Cancelled')
+            ->sum('agreed_price');
 
-        $completedProjects = $allOrders->where('status', 'Completed')->count();
+        $completedProjects = $allOrders
+            ->where('status', 'Completed')
+            ->count();
 
-        // 3. Ambil 3 project terbaru buat list di bawah (sama kayak sebelumnya)
         $projects = Order::with('service')
             ->where('client_id', $user->id)
             ->latest()
             ->take(3)
             ->get();
 
-        return view('dashboard.client.dashboard', compact('user', 'projects', 'activeProjects', 'totalSpent', 'completedProjects'));
+        return view('dashboard.client.dashboard', compact(
+            'user',
+            'projects',
+            'activeProjects',
+            'totalSpent',
+            'completedProjects'
+        ));
     }
 
     public function freelancer()
@@ -64,7 +69,8 @@ class DashboardController extends Controller
     public function verifyFreelancer($id)
     {
         $freelancer = Freelancer::findOrFail($id);
-        $freelancer->update(['status' => 'Approved']); // Pastikan kolom status ada di tabel freelancers
+        $freelancer->update(['status' => 'Approved']);
+
         return response()->json(['message' => 'Success']);
     }
 
@@ -72,15 +78,25 @@ class DashboardController extends Controller
     {
         $freelancer = Freelancer::findOrFail($id);
         $freelancer->update(['status' => 'Rejected']);
+
         return response()->json(['message' => 'Success']);
     }
 
     public function user()
     {
         $clients = Client::latest()->get();
-        $freelancers = Freelancer::with('user')->latest()->get();
+        $freelancers = Freelancer::with('skomda_student')->latest()->get();
         $skomdaStudents = SkomdaStudent::latest()->get();
 
-        return view('admin.admin-user', compact('clients', 'freelancers', 'skomdaStudents'));
+        return view('admin.admin-user', compact(
+            'clients',
+            'freelancers',
+            'skomdaStudents'
+        ));
+    }
+
+    public function settings()
+    {
+        return view('dashboard.admin.settings');
     }
 }

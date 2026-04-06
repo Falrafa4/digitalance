@@ -7,8 +7,7 @@
                 <rect width="32" height="32" rx="10" fill="url(#logo-gradient)" />
                 <path d="M16 7L25 11.5V20.5L16 25L7 20.5V11.5L16 7Z" fill="white" />
                 <defs>
-                    <linearGradient id="logo-gradient" x1="0" y1="0" x2="32"
-                        y2="32">
+                    <linearGradient id="logo-gradient" x1="0" y1="0" x2="32" y2="32">
                         <stop stop-color="#0F766E" />
                         <stop offset="1" stop-color="#10B981" />
                     </linearGradient>
@@ -18,109 +17,101 @@
         </div>
     </div>
 
-    <!-- Nav main -->
+    <!-- Navigation -->
+
     <nav class="nav-scroll flex flex-col gap-0.5 flex-1 overflow-y-auto">
 
-        {{-- Dashboard --}}
         <a href="{{ route('admin.dashboard') }}"
             class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
-        {{ request()->routeIs('admin.dashboard') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
+            {{ request()->routeIs('admin.dashboard') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
             <i class="ri-dashboard-fill text-[17px]"></i> Dashboard
         </a>
 
-        {{-- User --}}
         <a href="{{ route('admin.clients.index') }}"
             class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
-        {{ request()->routeIs('admin.clients.*', 'admin.freelancers.*', 'admin.skomda-students.*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
+            {{ request()->routeIs('admin.clients.*', 'admin.freelancers.*', 'admin.skomda-students.*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
             <i class="ri-user-line text-[17px]"></i> Client
         </a>
 
-        {{-- Admin --}}
         <a href="{{ route('admin.admins.index') }}"
             class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
-        {{ request()->routeIs('admin.admins.index*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
+            {{ request()->routeIs('admin.admins.*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
             <i class="ri-user-star-line text-[17px]"></i> Admin
         </a>
 
-        {{-- Orders — belum ada route --}}
-        <a href="{{ \Illuminate\Support\Facades\Route::has('admin.orders.index') ? route('admin.orders.index') : '#' }}"
+        <a href="{{ route('admin.orders.index') }}"
             class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
-                {{ request()->routeIs('admin.orders.*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
+            {{ request()->routeIs('admin.orders.*') && request('status') !== 'in_progress' ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
             <i class="ri-file-list-3-line text-[17px]"></i> Orders
         </a>
 
-        {{-- Reviews — belum ada route --}}
-        <a href="{{ \Illuminate\Support\Facades\Route::has('admin.reviews.index') ? route('admin.reviews.index') : '#' }}"
+        <a href="{{ route('admin.reviews.index') }}"
             class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
-                {{ request()->routeIs('admin.reviews.*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
+            {{ request()->routeIs('admin.reviews.*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
             <i class="ri-star-line text-[17px]"></i> Reviews
         </a>
 
-        {{-- Services --}}
         <a href="{{ route('admin.services.index') }}"
             class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
-        {{ request()->routeIs('admin.services.index*', 'admin.service-categories.index.*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
+            {{ request()->routeIs('admin.services.*', 'admin.service-categories.*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
             <i class="ri-tools-line text-[17px]"></i> Services
         </a>
 
-        {{-- Transactions --}}
         <a href="{{ route('admin.transactions.index') }}"
             class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
-        {{ request()->routeIs('admin.transactions.index*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
+            {{ request()->routeIs('admin.transactions.*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
             <i class="ri-bank-card-line text-[17px]"></i> Transactions
         </a>
 
-        {{-- Portofolios — belum ada route --}}
-       <a href="{{ \Illuminate\Support\Facades\Route::has('admin.portofolios.index') ? route('admin.portofolios.index') : '#' }}"
+        <a href="{{ route('admin.portofolios.index') }}"
             class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
-                {{ request()->routeIs('admin.portofolios.*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
+            {{ request()->routeIs('admin.portofolios.*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
             <i class="ri-folder-user-line text-[17px]"></i> Portofolios
         </a>
 
-        {{-- Offers — belum ada route --}}
-        <a href="{{ \Illuminate\Support\Facades\Route::has('admin.offers.index') ? route('admin.offers.index') : '#' }}"
+        <a href="{{ route('admin.offers.index') }}"
             class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
-                {{ request()->routeIs('admin.offers.*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
+            {{ request()->routeIs('admin.offers.*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
             <i class="ri-price-tag-3-line text-[17px]"></i> Offers
         </a>
 
-        {{-- Working — belum ada route --}}
-        <a href="{{ \Illuminate\Support\Facades\Route::has('admin.working.index') ? route('admin.working.index') : '#' }}"
+        <a href="{{ route('admin.results.index') }}"
             class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
-                {{ request()->routeIs('admin.working.*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
-            <i class="ri-hammer-line text-[17px]"></i> Working
-        </a>
-
-        {{-- Negotiations — belum ada route --}}
-         <a href="{{ \Illuminate\Support\Facades\Route::has('admin.negotiations.index') ? route('admin.negotiations.index') : '#' }}"
-            class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
-                {{ request()->routeIs('admin.negotiations.*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
-            <i class="ri-discuss-line text-[17px]"></i> Negotiations
+            {{ request()->routeIs('admin.results.*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
+            <i class="ri-task-line text-[17px]"></i> Results
         </a>
 
     </nav>
 
-    <!-- Sidebar footer -->
+    <!-- Footer -->
     <div class="mt-auto">
         <div class="h-px bg-slate-200 my-3.5"></div>
         <nav class="flex flex-col gap-0.5">
-            <a href="{{ url('admin/profile') }}"
-                class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] text-slate-500 font-semibold text-[13.5px] transition-all duration-200 hover:bg-slate-100 hover:text-[#0f766e]">
+
+            <a href="{{ route('admin.settings') }}"
+                class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
+                {{ request()->routeIs('admin.settings') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
+                <i class="ri-settings-3-line text-[17px]"></i> Settings
+            </a>
+
+            <a href="{{ route('admin.profile') }}"
+                class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
+                {{ request()->routeIs('admin.profile*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
                 <i class="ri-user-line text-[17px]"></i> Account
             </a>
-            <span
-                class="flex items-center justify-between gap-[11px] px-[14px] py-[11px] rounded-[11px] text-slate-300 font-semibold text-[13.5px] cursor-not-allowed select-none">
-                <span class="flex items-center gap-[11px]"><i class="ri-settings-3-line text-[17px]"></i>
-                    Settings</span>
-                <span
-                    class="text-[9px] bg-slate-100 text-slate-400 px-1.5 py-0.5 rounded-full font-bold">Soon</span>
-            </span>
-            <form action="{{ route('logout') }}" method="POST" id="logout-form" class="hidden">@csrf</form>
-            <button onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
+
+            <form action="{{ route('logout') }}" method="POST" id="logout-form" class="hidden">
+                @csrf
+            </form>
+
+            <button
+                onclick="event.preventDefault(); if(confirm('Yakin ingin logout?')) document.getElementById('logout-form').submit();"
                 class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] text-red-500 font-semibold text-[13.5px] w-full text-left transition-all duration-200 hover:bg-red-50 hover:text-red-600 border-none bg-transparent cursor-pointer">
                 <i class="ri-logout-box-line text-[17px]"></i> Logout
             </button>
+
         </nav>
+
         <p class="text-[10.5px] text-slate-400 text-center mt-5 leading-relaxed">
             &copy; 2026 Digitalance.<br />All rights reserved.
         </p>

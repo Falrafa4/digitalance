@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\Route;
 
 // ── PUBLIC ──────────────────────────────────────────────
 Route::get('/', [PageController::class, 'home'])->name('home');
-Route::get('/login', [PageController::class, 'login'])->name('login');
+Route::get('/login', [PageController::class, 'login'])->name('login')->middleware(['guest', 'throttle:5,1']);
 Route::post('/login', [AuthController::class, 'login'])->name('login-process');
 Route::get('/register-client', [PageController::class, 'registerClient']);
 Route::get('/register-freelancer', [PageController::class, 'registerFreelancer']);
@@ -34,6 +34,8 @@ Route::middleware('auth:administrator')->prefix('admin')->name('admin.')->group(
     Route::get('/', [DashboardController::class, 'admin'])->name('dashboard');
     Route::get('/profile', [AdministratorController::class, 'profile'])->name('profile');
     Route::put('/profile', [AdministratorController::class, 'updateProfile'])->name('profile.update');
+    Route::put('/password', [AdministratorController::class, 'updatePassword'])->name('password.update');
+    Route::get('/settings', [DashboardController::class, 'settings'])->name('settings');
     Route::post('/verify-freelancer/{id}', [DashboardController::class, 'verifyFreelancer'])->name('verify');
     Route::post('/reject-freelancer/{id}', [DashboardController::class, 'rejectFreelancer'])->name('reject');
 
@@ -54,7 +56,7 @@ Route::middleware('auth:administrator')->prefix('admin')->name('admin.')->group(
     Route::put('/clients/{client}', [ClientController::class, 'update'])->name('clients.update');
     Route::delete('/clients/{client}', [ClientController::class, 'destroy'])->name('clients.destroy');
 
-    // Freelancers (CRUD)
+        // Freelancers (CRUD)
     Route::get('/freelancers', [FreelancerController::class, 'index'])->name('freelancers.index');
     Route::get('/freelancers/create', [FreelancerController::class, 'create'])->name('freelancers.create');
     Route::post('/freelancers', [FreelancerController::class, 'store'])->name('freelancers.store');
@@ -62,6 +64,11 @@ Route::middleware('auth:administrator')->prefix('admin')->name('admin.')->group(
     Route::get('/freelancers/{freelancer}/edit', [FreelancerController::class, 'edit'])->name('freelancers.edit');
     Route::put('/freelancers/{freelancer}', [FreelancerController::class, 'update'])->name('freelancers.update');
     Route::delete('/freelancers/{freelancer}', [FreelancerController::class, 'destroy'])->name('freelancers.destroy');
+
+    // Freelancers (Actions)
+    Route::post('/freelancers/{freelancer}/verify', [FreelancerController::class, 'verify'])->name('admin.freelancers.verify');
+Route::post('/freelancers/{freelancer}/suspend', [FreelancerController::class, 'suspend'])->name('admin.freelancers.suspend');
+Route::post('/freelancers/{freelancer}/unsuspend', [FreelancerController::class, 'unsuspend'])->name('admin.freelancers.unsuspend');
 
     // Skomda Students (CRUD)
     Route::get('/skomda-students', [SkomdaStudentController::class, 'index'])->name('skomda-students.index');
@@ -74,6 +81,7 @@ Route::middleware('auth:administrator')->prefix('admin')->name('admin.')->group(
 
     // Services (CRUD)
     Route::get('/services', [ServiceController::class, 'index'])->name('services.index');
+    Route::post('/admin/services/{id}/status', [App\Http\Controllers\ServiceController::class, 'updateStatus'])->name('admin.services.updateStatus');
 
     // Service Categories (CRUD)
     Route::get('/service-categories', [ServiceCategoryController::class, 'index'])->name('service-categories.index');
@@ -88,6 +96,8 @@ Route::middleware('auth:administrator')->prefix('admin')->name('admin.')->group(
     // Order (CRUD)
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::post('/orders/{id}/status', [OrderController::class, 'updateStatus'])->name('orders.updateStatus');
+    Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
+    Route::delete('/orders/{id}', [OrderController::class, 'destroy'])->name('orders.destroy');
 
     // Offer (CRUD)
     Route::get('/offers', [OfferController::class, 'index'])->name('offers.index');
@@ -106,15 +116,37 @@ Route::middleware('auth:administrator')->prefix('admin')->name('admin.')->group(
 });
 
 // ── CLIENT ───────────────────────────────────────────────
-Route::middleware('auth:client')->prefix('client')->group(function () {
-    Route::get('/', [DashboardController::class, 'client'])->name('client-dashboard');
-    Route::get('/profile', [ClientController::class, 'profile'])->name('client-profile');
+Route::middleware('auth:client')->prefix('client')->name('client.')->group(function () {
+    Route::get('/', [DashboardController::class, 'client'])->name('dashboard');
+    Route::get('/profile', [ClientController::class, 'profile'])->name('profile');
 });
 
 // ── FREELANCER ───────────────────────────────────────────
 Route::middleware('auth:freelancer')->prefix('freelancer')->name('freelancer.')->group(function () {
     Route::get('/', [DashboardController::class, 'freelancer'])->name('dashboard');
     Route::get('/profile', [FreelancerController::class, 'profile'])->name('profile');
+
+    // crud skomda students
+    Route::get('/skomda-students', [SkomdaStudentController::class, 'freelancerIndex'])->name('skomda-students.index');
+
+    // crud service categories
+    Route::get('/service-categories', [ServiceCategoryController::class, 'freelancerIndex'])->name('service-categories.index');
+
+    // crud client
+    Route::get('/clients', [ClientController::class, 'freelancerIndex'])->name('clients.index');
+
+    // crud order
+    Route::get('/orders', [OrderController::class, 'freelancerIndex'])->name('orders.index');
+    Route::patch('/orders/{id}/status', [OrderController::class, 'updateStatus'])->name('orders.updateStatus');
+    Route::patch('/orders/{id}/price', [OrderController::class, 'updateAgreedPrice'])->name('orders.updateAgreedPrice');
+
+    // crud review
+    Route::get('/reviews', [ReviewController::class, 'freelancerIndex'])->name('reviews.index');
+    Route::get('/reviews/order/{orderId}', [ReviewController::class, 'showReviewByOrderId'])->name('reviews.showByOrderId');
+
+    // crud transaction
+    Route::get('/transactions', [TransactionController::class, 'freelancerIndex'])->name('transactions.index');
+    Route::get('/transactions/order/{orderId}', [TransactionController::class, 'showTransactionByOrderId'])->name('transactions.showByOrderId');
 
     // crud services
     Route::get('/services', [ServiceController::class, 'freelancerIndex'])->name('services.index');

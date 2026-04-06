@@ -5,15 +5,17 @@ namespace App\Http\Controllers;
 use App\Models\Client;
 use App\Models\SkomdaStudent;
 use Illuminate\Http\Request;
+use App\Models\ServiceCategory;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
 
-    public function showLogin()
+    public function showRegister()
     {
-        return view('auth.login');
+        $categories = ServiceCategory::pluck('name')->toArray();
+        return view('auth.login', compact('categories'));
     }
 
     public function register_client(Request $request)

@@ -1,7 +1,7 @@
 @extends('layouts.dashboard')
 @section('title', 'Review Management | Digitalance')
 @section('styles')
-    <link rel="stylesheet" href="{{ asset('css/dashboard/admin/admin-reviews.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/dashboard/admin/reviews.css') }}">
 @endsection
 
 @section('content')
@@ -11,10 +11,7 @@
             <p>Kelola ulasan dan penilaian yang diberikan oleh pengguna platform.</p>
         </div>
         <div class="page-header-right">
-            <button class="btn-primary" id="btn-add-review">
-                <i class="ri-add-line"></i> Tambah Review
-            </button>
-        </div>
+            </div>
     </div>
 
     <div class="stats-row" id="stats-row"></div>
@@ -31,7 +28,7 @@
     <div id="review-empty" class="empty-state" style="display:none;">
         <div class="empty-icon"><i class="ri-star-line"></i></div>
         <h3>Tidak ada ulasan ditemukan</h3>
-        <p>Coba ubah filter atau kata kunci pencarian.</p>
+        <p>Coba ubah filter rating Anda.</p>
     </div>
 @endsection
 
@@ -42,5 +39,8 @@
 @endsection
 
 @section('scripts')
-    <script src="{{ asset('js/dashboard/admin/admin-reviews.js') }}"></script>
+        <script>
+            window.__REVIEWS_PAGE__ = { data: @json($reviews ?? []) };
+        </script>
+    <script src="{{ asset('js/dashboard/admin/reviews.js') }}"></script>
 @endsection

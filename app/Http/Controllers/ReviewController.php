@@ -7,44 +7,62 @@ use Illuminate\Http\Request;
 
 class ReviewController extends Controller
 {
-    // ADMIN ONLY
+    /**
+     * Display a listing of the resource (ADMIN ONLY)
+     */
     public function index()
     {
-        $reviews = Review::with('order.service.freelancer')->get();
+        // Pakai perbaikan audit kita agar nama asli muncul (eager loading skomda_student)
+        $reviews = Review::with([
+            'order.client', 
+            'order.service.freelancer.skomda_student' 
+        ])->latest()->get();
+
         return view('dashboard.admin.reviews', compact('reviews'));
     }
 
-    // CLIENT ONLY
-    // TODO: selesaikan fitur review untuk client (all), termasuk validasi dan return view yang sesuai
+    /**
+     * Store a newly created resource in storage 
+     */
     public function store(Request $request)
     {
-        //
+        // Logika simpan review
     }
 
     /**
-     * Display the specified resource.
-     */
-    public function show(Review $review)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Review $review)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
+     * Remove the specified resource from storage (FITUR ADMIN KITA)
      */
     public function destroy(Review $review)
     {
-        //
+        $review->delete();
+        return back()->with('success', 'Review berhasil dihapus');
     }
 
-    // FREELANCER ONLY
-    // TODO: selesaikan fitur review untuk freelancer (all), termasuk validasi dan return view yang sesuai
+    /**
+     * Tampilan Review untuk Freelancer
+     */
+    public function freelancerIndex(Request $request)
+    {
+        $freelancer = auth('freelancer')->user();
+
+        $reviews = Review::with('order.service')
+            ->whereHas('order.service', function ($query) use ($freelancer) {
+                $query->where('freelancer_id', $freelancer->id);
+            })
+            ->get();
+
+        return view('dashboard.freelancer.reviews', compact('reviews'));
+    }
+
+    /**
+     * Detail Review berdasarkan Order ID untuk Freelancer
+     */
+    public function showReviewByOrderId(string $orderId)
+    {
+        $review = Review::with('order.service.freelancer')
+            ->where('order_id', $orderId)
+            ->firstOrFail();
+
+        return view('dashboard.freelancer.review-detail', compact('review'));
+    }
 }

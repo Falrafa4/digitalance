@@ -1,3 +1,14 @@
+@php
+    use App\Models\Client;
+    use App\Models\Freelancer;
+    use App\Models\SkomdaStudent;
+
+    $totalUsers = Client::count() + Freelancer::count() + SkomdaStudent::count();
+    $totalClients = Client::count();
+    $totalFreelancers = Freelancer::count();
+    $totalSkomda = SkomdaStudent::count();
+@endphp
+
 @extends('layouts.dashboard')
 @section('title', 'Admin Dashboard | Digitalance')
 
@@ -15,76 +26,61 @@
         </div>
     </section>
 
-    {{-- Stats --}}
     <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 sm:gap-6 mb-10">
-        {{-- Total Users --}}
-        <div
-            class="bg-white px-6 sm:px-8 py-6 sm:py-7 rounded-3xl border border-slate-200 transition-all duration-300 hover:border-[#10B981] hover:shadow-[0_10px_30px_rgba(2,6,23,0.06)] animate-fadeUp-delay-1 min-h-[124px]">
-            <span class="block text-slate-500 text-[11px] font-bold uppercase tracking-[0.6px] mb-2">
-                Total Users
-            </span>
 
-            @isset($totalUsers)
-                <span class="font-display text-[1.85rem] sm:text-[2rem] font-extrabold text-slate-900 leading-none">
-                    {{ number_format($totalUsers, 0, ',', '.') }}
-                </span>
-            @else
-                <span class="font-display text-[1.2rem] font-bold text-slate-300">—</span>
-            @endisset
+    {{-- Total Users --}}
+    <div class="bg-white px-6 py-6 rounded-3xl border border-slate-200 flex items-center gap-4">
+        <div class="w-12 h-12 flex items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 text-xl">
+            <i class="ri-group-line"></i>
         </div>
-
-        {{-- Active Projects --}}
-        <div class="bg-white px-6 sm:px-8 py-6 sm:py-7 rounded-3xl border border-slate-200 transition-all duration-300 hover:border-[#10B981] hover:shadow-[0_10px_30px_rgba(2,6,23,0.06)] animate-fadeUp-delay-1 min-h-[124px]"
-            style="animation-delay:0.1s">
-            <span class="block text-slate-500 text-[11px] font-bold uppercase tracking-[0.6px] mb-2">
-                Active Projects
-            </span>
-
-            @isset($activeProjects)
-                <span class="font-display text-[1.85rem] sm:text-[2rem] font-extrabold text-slate-900 leading-none">
-                    {{ number_format($activeProjects, 0, ',', '.') }}
-                </span>
-            @else
-                <span class="font-display text-[1.2rem] font-bold text-slate-300">—</span>
-            @endisset
+        <div>
+            <span class="text-slate-500 text-[11px] font-bold uppercase">Total Users</span>
+            <div class="text-2xl font-extrabold text-slate-900">
+                {{ number_format($totalUsers ?? 0) }}
+            </div>
         </div>
+    </div>
 
-        {{-- Platform Revenue --}}
-        <div class="bg-white px-6 sm:px-8 py-6 sm:py-7 rounded-3xl border border-slate-200 transition-all duration-300 hover:border-[#10B981] hover:shadow-[0_10px_30px_rgba(2,6,23,0.06)] animate-fadeUp-delay-1 min-h-[124px]"
-            style="animation-delay:0.2s">
-            <span class="block text-slate-500 text-[11px] font-bold uppercase tracking-[0.6px] mb-2">
-                Platform Revenue
-            </span>
-
-            @isset($totalRevenue)
-                <div class="flex items-baseline gap-1 min-w-0">
-                    <span class="text-[1.05rem] font-bold text-[#0f766e] shrink-0">Rp</span>
-                    <span
-                        class="font-display text-[1.85rem] sm:text-[2rem] font-extrabold text-slate-900 leading-none break-words">
-                        {{ number_format($totalRevenue, 0, ',', '.') }}
-                    </span>
-                </div>
-            @else
-                <span class="font-display text-[1.2rem] font-bold text-slate-300">—</span>
-            @endisset
+    {{-- Clients --}}
+    <div class="bg-white px-6 py-6 rounded-3xl border border-slate-200 flex items-center gap-4">
+        <div class="w-12 h-12 flex items-center justify-center rounded-xl bg-blue-50 text-blue-600 text-xl">
+            <i class="ri-briefcase-4-line"></i>
         </div>
-
-        {{-- Open Disputes --}}
-        <div class="bg-white px-6 sm:px-8 py-6 sm:py-7 rounded-3xl border border-slate-200 transition-all duration-300 hover:border-[#10B981] hover:shadow-[0_10px_30px_rgba(2,6,23,0.06)] animate-fadeUp-delay-1 min-h-[124px]"
-            style="animation-delay:0.3s">
-            <span class="block text-slate-500 text-[11px] font-bold uppercase tracking-[0.6px] mb-2">
-                Open Disputes
-            </span>
-
-            @isset($openDisputes)
-                <span class="font-display text-[1.85rem] sm:text-[2rem] font-extrabold text-red-500 leading-none">
-                    {{ number_format($openDisputes, 0, ',', '.') }}
-                </span>
-            @else
-                <span class="font-display text-[1.2rem] font-bold text-slate-300">—</span>
-            @endisset
+        <div>
+            <span class="text-slate-500 text-[11px] font-bold uppercase">Clients</span>
+            <div class="text-2xl font-extrabold text-slate-900">
+                {{ number_format($totalClients ?? 0) }}
+            </div>
         </div>
-    </section>
+    </div>
+
+    {{-- Freelancers --}}
+    <div class="bg-white px-6 py-6 rounded-3xl border border-slate-200 flex items-center gap-4">
+        <div class="w-12 h-12 flex items-center justify-center rounded-xl bg-orange-50 text-orange-600 text-xl">
+            <i class="ri-vip-crown-line"></i>
+        </div>
+        <div>
+            <span class="text-slate-500 text-[11px] font-bold uppercase">Freelancers</span>
+            <div class="text-2xl font-extrabold text-slate-900">
+                {{ number_format($totalFreelancers ?? 0) }}
+            </div>
+        </div>
+    </div>
+
+    {{-- Skomda Students --}}
+    <div class="bg-white px-6 py-6 rounded-3xl border border-slate-200 flex items-center gap-4">
+        <div class="w-12 h-12 flex items-center justify-center rounded-xl bg-teal-50 text-teal-600 text-xl">
+            <i class="ri-graduation-cap-line"></i>
+        </div>
+        <div>
+            <span class="text-slate-500 text-[11px] font-bold uppercase">Skomda Students</span>
+            <div class="text-2xl font-extrabold text-slate-900">
+                {{ number_format($totalSkomda ?? 0) }}
+            </div>
+        </div>
+    </div>
+
+</section>
 
     {{-- Pending Verifications + System Alerts --}}
     <div class="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-10">
@@ -210,12 +206,12 @@
             const toast = document.createElement('div');
             toast.className = `toast toast-${type === 'success' ? 'success' : 'danger'}`;
             toast.innerHTML = `
-                    <i class="toast-icon ${icon}"></i>
-                    <span>${message}</span>
-                    <button class="toast-close" type="button" aria-label="Close toast">
-                        <i class="ri-close-line"></i>
-                    </button>
-                `;
+                        <i class="toast-icon ${icon}"></i>
+                        <span>${message}</span>
+                        <button class="toast-close" type="button" aria-label="Close toast">
+                            <i class="ri-close-line"></i>
+                        </button>
+                    `;
             toast.querySelector('.toast-close')?.addEventListener('click', () => dismissToast(toast));
 
             container.appendChild(toast);
@@ -343,7 +339,7 @@
 
             btn.addEventListener('click', open);
             closeBtn.addEventListener('click', close);
-            backdrop.addEventListener('click', close);
+            backdrop.aFddEventListener('click', close);
 
             document.addEventListener('keydown', (e) => {
                 if (drawer.classList.contains('hidden')) return;

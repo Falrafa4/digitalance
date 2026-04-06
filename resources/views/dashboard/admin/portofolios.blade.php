@@ -1,7 +1,7 @@
 @extends('layouts.dashboard')
 @section('title', 'Portfolios Management | Digitalance')
 @section('styles')
-    <link rel="stylesheet" href="{{ asset('css/dashboard/admin/admin-portofolios.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/dashboard/admin/portofolios.css') }}">
 @endsection
 
 @section('content')
@@ -42,5 +42,8 @@
 @endsection
 
 @section('scripts')
-    <script src="{{ asset('js/dashboard/admin/admin-portofolios.js') }}"></script>
+    <script>
+        window.__PORTOFOLIOS_PAGE__ = { data: @json($portofolios ?? []) };
+    </script>
+    <script src="{{ asset('js/dashboard/admin/portofolios.js') }}"></script>
 @endsection
