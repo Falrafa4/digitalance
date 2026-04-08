@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ServiceCategory;
+use App\Models\SkomdaStudent;
+
 class PageController
 {
     public function home()
@@ -11,7 +14,10 @@ class PageController
 
     public function login()
     {
-        return view('public.login');
+        $categories = ServiceCategory::pluck('name')->toArray();
+        $students = SkomdaStudent::select('nis', 'name', 'email')->orderBy('name')->get();
+
+        return view('public.login', compact('categories', 'students'));
     }
 
     public function registerClient()
@@ -24,4 +30,3 @@ class PageController
         return view('auth.register-freelancer');
     }
 }
-
