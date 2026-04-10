@@ -5,15 +5,17 @@ namespace App\Http\Controllers;
 use App\Models\Client;
 use App\Models\SkomdaStudent;
 use Illuminate\Http\Request;
+use App\Models\ServiceCategory;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
 
-    public function showLogin()
+    public function showRegister()
     {
-        return view('auth.login');
+        $categories = ServiceCategory::pluck('name')->toArray();
+        return view('auth.login', compact('categories'));
     }
 
     public function register_client(Request $request)
@@ -40,28 +42,34 @@ class AuthController extends Controller
      * Register Freelancer.
      */
     public function register_freelancer(Request $request)
-    {
-        $request->validate([
-            'nis' => 'required|exists:skomda_students,nis',
-            'password' => 'required|min:6',
-        ]);
+{
+    $request->validate([
+        'nis' => 'required|exists:skomda_students,nis',
+    ], [
+        'nis.required' => 'NIS wajib dipilih.',
+        'nis.exists' => 'NIS tidak ditemukan. Pilih dari dropdown siswa.',
+    ]);
 
-        $student = SkomdaStudent::where('nis', $request->nis)->first();
+    $student = SkomdaStudent::where('nis', $request->nis)->first();
 
-        if (!$student) {
-            return back()->withErrors('Siswa dengan NIS tersebut tidak ditemukan');
-        }
-
-        if ($student->freelancer) {
-            return back()->withErrors('Akun freelancer sudah terdaftar');
-        }
-
-        $student->freelancer()->create([
-            'password' => Hash::make($request->password),
-        ]);
-
-        return redirect('/login')->with('success', 'Registrasi berhasil');
+    if (!$student) {
+        return back()->withErrors(['nis' => 'Siswa dengan NIS tersebut tidak ditemukan'])->withInput();
     }
+
+    if ($student->freelancer) {
+        return back()->withErrors(['nis' => 'Akun freelancer untuk NIS ini sudah terdaftar. Silakan login.'])->withInput();
+    }
+    
+    // A) password = nis (paling simpel)
+    $defaultPassword = $student->nis;
+
+    $student->freelancer()->create([
+        'password' => Hash::make($defaultPassword),
+        'status' => 'Pending',
+    ]);
+
+    return redirect('/login')->with('success', 'Registrasi freelancer berhasil. Password awal adalah NIS Anda.');
+}
 
     /**
      * Login All Role.
@@ -109,6 +117,6 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        return redirect('/login');
     }
 }

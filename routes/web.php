@@ -96,6 +96,8 @@ Route::post('/freelancers/{freelancer}/unsuspend', [FreelancerController::class,
     // Order (CRUD)
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::post('/orders/{id}/status', [OrderController::class, 'updateStatus'])->name('orders.updateStatus');
+    Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
+    Route::delete('/orders/{id}', [OrderController::class, 'destroy'])->name('orders.destroy');
 
     // Offer (CRUD)
     Route::get('/offers', [OfferController::class, 'index'])->name('offers.index');
@@ -117,6 +119,24 @@ Route::post('/freelancers/{freelancer}/unsuspend', [FreelancerController::class,
 Route::middleware('auth:client')->prefix('client')->name('client.')->group(function () {
     Route::get('/', [DashboardController::class, 'client'])->name('dashboard');
     Route::get('/profile', [ClientController::class, 'profile'])->name('profile');
+
+    // Services (Client)
+    Route::get('/services', [ServiceController::class, 'clientIndex'])->name('services.index');
+    Route::get('/services/{service}', [ServiceController::class, 'clientShow'])->name('services.show');
+
+    // Orders (Client)
+    Route::get('/orders', [OrderController::class, 'clientIndex'])->name('orders.index');
+    Route::get('/orders/create/{service}', [OrderController::class, 'create'])->name('orders.create');
+    Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
+    Route::get('/orders/{id}', [OrderController::class, 'clientShow'])->name('orders.show');
+
+    // Reviews (Client)
+    Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
+    Route::get('/find-talent', fn() => view('dashboard.client.find-talent'))->name('find-talent');
+Route::get('/projects', fn() => view('dashboard.client.projects'))->name('projects');
+Route::get('/messages', fn() => view('dashboard.client.messages'))->name('messages');
+Route::get('/payment', fn() => view('dashboard.client.payment'))->name('payment');
+Route::get('/history', fn() => view('dashboard.client.history'))->name('history');
 });
 
 // ── FREELANCER ───────────────────────────────────────────

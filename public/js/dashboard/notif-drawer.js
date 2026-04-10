@@ -8,7 +8,11 @@
 
     if (!btn || !drawer || !panel || !backdrop || !closeBtn) return;
 
+    const getRole = () => btn.getAttribute('data-role') || 'unknown';
+
     const open = () => {
+      if (!drawer.classList.contains('hidden')) return;
+
       drawer.classList.remove('hidden');
       drawer.setAttribute('aria-hidden', 'false');
 
@@ -17,11 +21,17 @@
         panel.classList.remove('translate-x-full');
       });
 
-      btn.classList.remove('has-unread');
+      const dot = btn.querySelector('.has-unread');
+      if (dot) dot.remove();
+
       document.body.style.overflow = 'hidden';
+
+      console.log('Opened notif for role:', getRole());
     };
 
     const close = () => {
+      if (drawer.classList.contains('hidden')) return;
+
       backdrop.classList.add('opacity-0');
       panel.classList.add('translate-x-full');
 
