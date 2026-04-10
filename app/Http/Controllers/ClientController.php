@@ -73,7 +73,9 @@ class ClientController extends Controller
 
     public function store(StoreClientRequest $request)
     {
-        Client::create($request->validated());
+        $validated = $request->validated();
+        $validated['password'] = Hash::make($validated['password']);
+        Client::create($validated);
 
         if ($request->expectsJson()) {
             return response()->json(['message' => 'Akun client berhasil dibuat'], 201);
