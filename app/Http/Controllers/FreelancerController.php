@@ -11,8 +11,10 @@ use Illuminate\Http\Request;
 
 class FreelancerController extends Controller
 {
+    // FREELANCER ONLY
     public function profile()
-    {        $freelancer = auth('freelancer')->user();
+    {
+        $freelancer = auth('freelancer')->user();
 
         $freelancer->load('skomda_student');
 
@@ -33,10 +35,7 @@ class FreelancerController extends Controller
         return redirect()->route('freelancer.profile')->with('success', 'Profil berhasil diperbarui');
     }
 
-    /**
-     * Update Freelancer Password
-     */
-    public function update_password(UpdateFreelancerPasswordRequest $request)
+    public function updatePassword(UpdateFreelancerPasswordRequest $request)
     {
         $freelancer = auth('freelancer')->user();
 
@@ -109,44 +108,44 @@ class FreelancerController extends Controller
     }
 
     /**
- * Verify Freelancer
- */
-public function verify($id)
-{
-    $freelancer = Freelancer::findOrFail($id);
-    $freelancer->update([
-        'status' => 'Approved'
-    ]);
+     * Verify Freelancer
+     */
+    public function verify($id)
+    {
+        $freelancer = Freelancer::findOrFail($id);
+        $freelancer->update([
+            'status' => 'Approved'
+        ]);
 
-    return redirect()->route('admin.freelancers.index')
-        ->with('success', 'Freelancer berhasil diverifikasi');
-}
+        return redirect()->route('admin.freelancers.index')
+            ->with('success', 'Freelancer berhasil diverifikasi');
+    }
 
-/**
- * Suspend Freelancer
- */
-public function suspend($id)
-{
-    $freelancer = Freelancer::findOrFail($id);
-    $freelancer->update([
-        'status' => 'Suspended'
-    ]);
+    /**
+     * Suspend Freelancer
+     */
+    public function suspend($id)
+    {
+        $freelancer = Freelancer::findOrFail($id);
+        $freelancer->update([
+            'status' => 'Suspended'
+        ]);
 
-    return redirect()->route('admin.freelancers.index')
-        ->with('success', 'Freelancer berhasil disuspend');
-}
+        return redirect()->route('admin.freelancers.index')
+            ->with('success', 'Freelancer berhasil disuspend');
+    }
 
-/**
- * Unsuspend Freelancer
- */
-public function unsuspend($id)
-{
-    $freelancer = Freelancer::findOrFail($id);
-    $freelancer->update([
-        'status' => 'Active'
-    ]);
+    /**
+     * Unsuspend Freelancer
+     */
+    public function unsuspend($id)
+    {
+        $freelancer = Freelancer::findOrFail($id);
+        $freelancer->update([
+            'status' => 'Active'
+        ]);
 
-    return redirect()->route('admin.freelancers.index')
-        ->with('success', 'Freelancer berhasil diaktifkan kembali');
-}
+        return redirect()->route('admin.freelancers.index')
+            ->with('success', 'Freelancer berhasil diaktifkan kembali');
+    }
 }

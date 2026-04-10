@@ -56,7 +56,7 @@ Route::middleware('auth:administrator')->prefix('admin')->name('admin.')->group(
     Route::put('/clients/{client}', [ClientController::class, 'update'])->name('clients.update');
     Route::delete('/clients/{client}', [ClientController::class, 'destroy'])->name('clients.destroy');
 
-        // Freelancers (CRUD)
+    // Freelancers (CRUD)
     Route::get('/freelancers', [FreelancerController::class, 'index'])->name('freelancers.index');
     Route::get('/freelancers/create', [FreelancerController::class, 'create'])->name('freelancers.create');
     Route::post('/freelancers', [FreelancerController::class, 'store'])->name('freelancers.store');
@@ -67,8 +67,8 @@ Route::middleware('auth:administrator')->prefix('admin')->name('admin.')->group(
 
     // Freelancers (Actions)
     Route::post('/freelancers/{freelancer}/verify', [FreelancerController::class, 'verify'])->name('admin.freelancers.verify');
-Route::post('/freelancers/{freelancer}/suspend', [FreelancerController::class, 'suspend'])->name('admin.freelancers.suspend');
-Route::post('/freelancers/{freelancer}/unsuspend', [FreelancerController::class, 'unsuspend'])->name('admin.freelancers.unsuspend');
+    Route::post('/freelancers/{freelancer}/suspend', [FreelancerController::class, 'suspend'])->name('admin.freelancers.suspend');
+    Route::post('/freelancers/{freelancer}/unsuspend', [FreelancerController::class, 'unsuspend'])->name('admin.freelancers.unsuspend');
 
     // Skomda Students (CRUD)
     Route::get('/skomda-students', [SkomdaStudentController::class, 'index'])->name('skomda-students.index');
@@ -133,10 +133,10 @@ Route::middleware('auth:client')->prefix('client')->name('client.')->group(funct
     // Reviews (Client)
     Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
     Route::get('/find-talent', fn() => view('dashboard.client.find-talent'))->name('find-talent');
-Route::get('/projects', fn() => view('dashboard.client.projects'))->name('projects');
-Route::get('/messages', fn() => view('dashboard.client.messages'))->name('messages');
-Route::get('/payment', fn() => view('dashboard.client.payment'))->name('payment');
-Route::get('/history', fn() => view('dashboard.client.history'))->name('history');
+    Route::get('/projects', fn() => view('dashboard.client.projects'))->name('projects');
+    Route::get('/messages', fn() => view('dashboard.client.messages'))->name('messages');
+    Route::get('/payment', fn() => view('dashboard.client.payment'))->name('payment');
+    Route::get('/history', fn() => view('dashboard.client.history'))->name('history');
 });
 
 // ── FREELANCER ───────────────────────────────────────────
