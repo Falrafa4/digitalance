@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\SendMessageRequest;
 use App\Models\Negotiation;
+use App\Models\Order;
 use Illuminate\Http\Request;
 
 class NegotiationController extends Controller
@@ -28,15 +29,20 @@ class NegotiationController extends Controller
         return view('dashboard.freelancer.negotiations', compact('negotiations'));
     }
     
-    public function freelancerSendMessage(SendMessageRequest $request, $id)
+    public function freelancerSendMessage(SendMessageRequest $request)
     {
         $freelancer = auth('freelancer')->user();
+        $order = Order::with('service')->find($request->order_id);
+        
+        if ($freelancer->id !== $order->service->freelancer_id) {
+            return redirect()->back()->with('error', 'Anda tidak memiliki izin untuk mengirim pesan di negosiasi ini.');
+        }
+        
         $request->validated();
 
-        $negotiation = Negotiation::findOrFail($id);
-        $negotiation->messages()->create([
-            'sender_type' => 'freelancer',
-            'sender_id' => $freelancer->id,
+        Negotiation::create([
+            'order_id' => $request->order_id,
+            'sender' => 'freelancer',
             'message' => $request->message
         ]);
 
