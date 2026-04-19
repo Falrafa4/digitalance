@@ -183,4 +183,12 @@ Route::middleware('auth:freelancer')->prefix('freelancer')->name('freelancer.')-
     Route::get('/portofolios/{portofolio}', [PortofolioController::class, 'show'])->name('portofolios.show');
     Route::put('/portofolios/{portofolio}', [PortofolioController::class, 'update'])->name('portofolios.update');
     Route::delete('/portofolios/{portofolio}', [PortofolioController::class, 'destroy'])->name('portofolios.destroy');
+
+    // crud negotiations
+    Route::get('/negotiations', [NegotiationController::class, 'freelancerGetMessages'])->name('negotiations.index');
+    Route::post('/negotiations', [NegotiationController::class, 'freelancerSendMessage'])->name('negotiations.send-message');
+
+    // crud results
+    Route::get('/results', [ResultController::class, 'freelancerIndex'])->name('results.index');
+    Route::resource('results', ResultController::class)->except(['index']);
 });
