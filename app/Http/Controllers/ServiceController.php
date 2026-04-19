@@ -60,7 +60,7 @@ class ServiceController extends Controller
       return redirect()->route('freelancer.services.index')->with('error', 'Layanan tidak ditemukan');
     }
 
-    return view('freelancer.services.show', compact('service'));
+    return view('dashboard.freelancer.services.show', compact('service'));
   }
 
   /**
@@ -93,25 +93,16 @@ class ServiceController extends Controller
   public function updateStatus(Request $request, $id)
   {
     $request->validate([
-      'status' => 'required|in:Approved,Rejected',
+      'status' => 'required|in:Draft,Pending,Approved,Rejected',
       'reject_reason' => 'nullable|string'
     ]);
 
     $service = Service::findOrFail($id);
-    $service->status = $request->status;
-    
-    if ($request->status === 'Rejected') {
-      $service->reject_reason = $request->reject_reason;
-    } else {
-      $service->reject_reason = null;
-    }
-
-    $service->save();
-
-    return response()->json([
-      'success' => true,
-      'message' => 'Status layanan berhasil diperbarui!',
-      'data' => $service
+    $service->update([
+      'status' => $request->status,
+      'reject_reason' => $request->status === 'Rejected' ? $request->reject_reason : null
     ]);
+
+    return redirect()->route('admin.services.index')->with('success', 'Status layanan berhasil diperbarui');
   }
 }
