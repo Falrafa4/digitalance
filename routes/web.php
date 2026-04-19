@@ -143,6 +143,9 @@ Route::middleware('auth:client')->prefix('client')->name('client.')->group(funct
 Route::middleware('auth:freelancer')->prefix('freelancer')->name('freelancer.')->group(function () {
     Route::get('/', [DashboardController::class, 'freelancer'])->name('dashboard');
     Route::get('/profile', [FreelancerController::class, 'profile'])->name('profile');
+    Route::post('/profile', [FreelancerController::class, 'updateProfile'])->name('profile.update');
+    Route::post('/password', [FreelancerController::class, 'updatePassword'])->name('password.update');
+    Route::post('/delete', [FreelancerController::class, 'deleteAccount'])->name('delete');
 
     // crud skomda students
     Route::get('/skomda-students', [SkomdaStudentController::class, 'freelancerIndex'])->name('skomda-students.index');
