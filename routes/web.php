@@ -81,7 +81,7 @@ Route::middleware('auth:administrator')->prefix('admin')->name('admin.')->group(
 
     // Services (CRUD)
     Route::get('/services', [ServiceController::class, 'index'])->name('services.index');
-    Route::post('/admin/services/{id}/status', [App\Http\Controllers\ServiceController::class, 'updateStatus'])->name('admin.services.updateStatus');
+    Route::post('/services/{id}/status', [ServiceController::class, 'updateStatus'])->name('admin.services.updateStatus');
 
     // Service Categories (CRUD)
     Route::get('/service-categories', [ServiceCategoryController::class, 'index'])->name('service-categories.index');
@@ -171,7 +171,6 @@ Route::middleware('auth:freelancer')->prefix('freelancer')->name('freelancer.')-
 
     // crud services
     Route::get('/services', [ServiceController::class, 'freelancerIndex'])->name('services.index');
-    Route::get('/services/create', [ServiceController::class, 'create'])->name('services.create');
     Route::post('/services', [ServiceController::class, 'store'])->name('services.store');
     Route::get('/services/{service}', [ServiceController::class, 'show'])->name('services.show');
     Route::get('/services/{service}/edit', [ServiceController::class, 'edit'])->name('services.edit');
