@@ -48,6 +48,18 @@ class FreelancerController extends Controller
         return redirect()->route('freelancer.profile')->with('success', 'Password berhasil diperbarui');
     }
 
+    public function deleteAccount(Request $request)
+    {
+        $freelancer = auth('freelancer')->user();
+
+        if (!Hash::check($request->password, $freelancer->password)) {
+            return redirect()->route('freelancer.profile')->with('error', 'Password salah');
+        }
+
+        $freelancer->delete();
+        return redirect()->route('home')->with('success', 'Akun freelancer berhasil dihapus');
+    }
+
     /**
      * Get All Freelancers
      */
