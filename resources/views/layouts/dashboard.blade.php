@@ -1,13 +1,11 @@
 <!doctype html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>@yield('title')</title>
+    <title>@yield('title', 'Dashboard')</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link
@@ -15,9 +13,11 @@
         rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet" />
     <link rel="stylesheet" href="{{ asset('css/dashboard/dashboard.css') }}">
-    @yield('styles')
-    <script src="https://cdn.tailwindcss.com"></script>
 
+    @yield('styles')
+    @stack('styles')
+
+    <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -29,25 +29,14 @@
                     colors: {
                         primary: '#0F766E',
                         'primary-light': '#10B981',
-                        teal: {
-                            deep: '#0f766e'
-                        },
+                        teal: { deep: '#0f766e' },
                         orange: '#f97316',
                     },
-                    borderRadius: {
-                        '2xl': '16px',
-                        '3xl': '24px',
-                    },
+                    borderRadius: { '2xl': '16px', '3xl': '24px' },
                     keyframes: {
                         fadeUp: {
-                            from: {
-                                opacity: '0',
-                                transform: 'translateY(16px)'
-                            },
-                            to: {
-                                opacity: '1',
-                                transform: 'translateY(0)'
-                            },
+                            from: { opacity: '0', transform: 'translateY(16px)' },
+                            to: { opacity: '1', transform: 'translateY(0)' },
                         },
                     },
                     animation: {
@@ -71,12 +60,12 @@
 
 <body class="bg-slate-50 text-slate-900 font-sans h-screen overflow-hidden">
     <div class="flex h-screen">
-        <!-- Sidebar -->
+        <!-- Sidebar (role-aware) -->
         <x-sidebar />
 
         <!-- Main -->
         <main class="flex-1 px-11 py-7 overflow-y-auto min-w-0">
-            <!-- Header -->
+            <!-- Header (role-aware) -->
             <x-header />
 
             @yield('content')
@@ -95,6 +84,6 @@
     <script src="{{ asset('js/dashboard/notif-drawer.js') }}"></script>
 
     @yield('scripts')
+    @stack('scripts')
 </body>
-
 </html>

@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\LoginRequest;
+use App\Http\Requests\RegisterClientRequest;
+use App\Http\Requests\RegisterFreelancerRequest;
 use App\Models\Client;
 use App\Models\SkomdaStudent;
 use Illuminate\Http\Request;
@@ -18,87 +21,63 @@ class AuthController extends Controller
         return view('auth.login', compact('categories'));
     }
 
-    public function register_client(Request $request)
+    public function registerClient(RegisterClientRequest $request)
     {
-        // create client account
-        $request->validate([
-            'name' => 'required',
-            'email' => 'required|email',
-            'password' => 'required|min:6',
-            'phone' => 'required|unique:clients,phone',
-        ]);
+        $validated = $request->validated();
+        $validated['password'] = Hash::make($validated['password']);
 
-        Client::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'phone' => $request->phone,
-        ]);
+        Client::create($validated);
 
         return redirect('/login')->with('success', 'Registrasi berhasil');
     }
 
-    /**
-     * Register Freelancer.
-     */
-    public function register_freelancer(Request $request)
+    public function registerFreelancer(RegisterFreelancerRequest $request)
     {
-        $request->validate([
-            'nis' => 'required|exists:skomda_students,nis',
-            'password' => 'required|min:6',
-        ]);
+        $request->validated();
 
-        $student = SkomdaStudent::where('nis', $request->nis)->first();
+        $student = SkomdaStudent::where('student_id', $request->student_id)->first();
 
         if (!$student) {
-            return back()->withErrors('Siswa dengan NIS tersebut tidak ditemukan');
+            return back()->withErrors(['student_id' => 'Siswa dengan ID Student tersebut tidak ditemukan'])->withInput();
         }
 
         if ($student->freelancer) {
-            return back()->withErrors('Akun freelancer sudah terdaftar');
+            return back()->withErrors(['student_id' => 'Akun freelancer untuk ID Student ini sudah terdaftar. Silakan login.'])->withInput();
         }
 
+        $defaultPassword = $student->nis;
+
         $student->freelancer()->create([
-            'password' => Hash::make($request->password),
+            'student_id' => $request->student_id,
+            'password' => Hash::make($defaultPassword),
+            'status' => 'Pending',
         ]);
 
-        return redirect('/login')->with('success', 'Registrasi berhasil');
+        return redirect('/login')->with('success', 'Registrasi freelancer berhasil. Password awal adalah NIS Anda.');
     }
 
     /**
      * Login All Role.
      */
-    public function login(Request $request)
+    public function login(LoginRequest $request)
     {
-        $credentials = $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
-        ]);
+        $credentials = $request->validated();
 
-        // --- 1. CEK CLIENT (Akun Biasa Kayak Lo) ---
-        // Laravel bakal nyari di tabel 'clients'
         if (Auth::guard('client')->attempt($credentials)) {
             $request->session()->regenerate();
             return redirect()->intended('/client');
         }
 
-        // --- 2. CEK ADMIN ---
         if (Auth::guard('administrator')->attempt($credentials)) {
             $request->session()->regenerate();
             return redirect()->intended('/admin');
         }
 
-        // --- 3. CEK FREELANCER (Khusus Student Skomda) ---
-        $student = SkomdaStudent::where('email', $request->email)->first();
-        if ($student && $student->freelancer) {
-            if (Hash::check($request->password, $student->freelancer->password)) {
-                Auth::guard('freelancer')->login($student->freelancer);
-                $request->session()->regenerate();
-                return redirect()->intended('/freelancer');
-            }
+        if (Auth::guard('freelancer')->attempt($credentials)) {
+            $request->session()->regenerate();
+            return redirect()->intended('/freelancer');
         }
 
-        // Kalau sampai sini berarti emang gak ada datanya
         return back()->withErrors(['email' => 'Email atau Password salah, atau akun belum terdaftar!']);
     }
 
@@ -111,6 +90,6 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        return redirect('/login');
     }
 }

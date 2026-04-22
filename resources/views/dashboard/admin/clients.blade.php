@@ -114,7 +114,8 @@
                     </div>
 
                     <div class="flex flex-col gap-1.5">
-                        <label class="text-[11px] font-bold text-slate-500 uppercase tracking-[.1em]">Confirm Password</label>
+                        <label class="text-[11px] font-bold text-slate-500 uppercase tracking-[.1em]">Confirm
+                            Password</label>
                         <input id="add-password-confirmation" type="password" placeholder="Repeat password"
                             class="py-[10px] px-[13px] bg-slate-50 border-[1.5px] border-slate-200 rounded-[11px] text-[13.5px] font-sans outline-none transition-all duration-200 focus:border-[#0f766e] focus:bg-white focus:shadow-[0_0_0_3px_rgba(15,118,110,0.08)]" />
                     </div>
@@ -169,12 +170,12 @@
                         <label class="text-[11px] font-bold text-slate-500 uppercase tracking-[.1em]">
                             Student ID (skomda_students.id)
                         </label>
-                        
+
                         <div class="relative w-full">
                             <select name="skomda-student-id" id="add-student-id"
                                 class="w-full py-[10px] pl-[13px] pr-[36px] appearance-none bg-slate-50 border-[1.5px] border-slate-200 rounded-[11px] text-[13.5px] font-sans outline-none cursor-pointer transition-all duration-200 focus:border-[#0f766e] focus:bg-white focus:shadow-[0_0_0_3px_rgba(15,118,110,0.08)]">
                                 <option value="" selected disabled>Pilih Skomda Student...</option>
-                                
+
                                 @if(isset($skomdaData['data']) && is_array($skomdaData['data']))
                                     @foreach ($skomdaData['data'] as $student)
                                         <option value="{{ $student['id'] ?? '' }}">
@@ -183,10 +184,12 @@
                                     @endforeach
                                 @endif
                             </select>
-                            
-                            <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-slate-400">
+
+                            <div
+                                class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-slate-400">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 9l-7 7-7-7"></path>
                                 </svg>
                             </div>
                         </div>
@@ -206,7 +209,8 @@
                 <button onclick="window.closeModal('modal-add')"
                     class="flex-1 py-[11px] rounded-[11px] bg-slate-100 text-slate-500 font-bold text-[13px] cursor-pointer border-none hover:bg-slate-200 transition-all duration-150">Cancel</button>
                 <button onclick="window.submitAddUser()"
-                    class="flex-1 py-[11px] rounded-[11px] bg-[#0f766e] text-white font-bold text-[13px] cursor-pointer border-none shadow-teal-sm hover:bg-[#0a5e58] transition-all duration-150">Save User</button>
+                    class="flex-1 py-[11px] rounded-[11px] bg-[#0f766e] text-white font-bold text-[13px] cursor-pointer border-none shadow-teal-sm hover:bg-[#0a5e58] transition-all duration-150">Save
+                    User</button>
             </div>
         </div>
     </div>
@@ -283,7 +287,8 @@
                 <button onclick="window.closeModal('modal-edit')"
                     class="flex-1 py-[11px] rounded-[11px] bg-slate-100 text-slate-500 font-bold text-[13px] cursor-pointer border-none hover:bg-slate-200 transition-all duration-150">Cancel</button>
                 <button onclick="window.submitEditUser()"
-                    class="flex-1 py-[11px] rounded-[11px] bg-[#0f766e] text-white font-bold text-[13px] cursor-pointer border-none shadow-teal-sm hover:bg-[#0a5e58] transition-all duration-150">Save Changes</button>
+                    class="flex-1 py-[11px] rounded-[11px] bg-[#0f766e] text-white font-bold text-[13px] cursor-pointer border-none shadow-teal-sm hover:bg-[#0a5e58] transition-all duration-150">Save
+                    Changes</button>
             </div>
         </div>
     </div>
@@ -313,22 +318,21 @@
                 <button onclick="window.closeModal('modal-delete')"
                     class="flex-1 py-[11px] rounded-[11px] bg-slate-100 text-slate-500 font-bold text-[13px] cursor-pointer border-none hover:bg-slate-200 transition-all duration-150">Batal</button>
                 <button id="btn-confirm-delete"
-                    class="flex-1 py-[11px] rounded-[11px] bg-red-500 text-white font-bold text-[13px] cursor-pointer border-none shadow-[0_3px_10px_rgba(239,68,68,.25)] hover:bg-red-600 transition-all duration-150">Ya, Hapus</button>
+                    class="flex-1 py-[11px] rounded-[11px] bg-red-500 text-white font-bold text-[13px] cursor-pointer border-none shadow-[0_3px_10px_rgba(239,68,68,.25)] hover:bg-red-600 transition-all duration-150">Ya,
+                    Hapus</button>
             </div>
         </div>
     </div>
 @endsection
 
 @section('scripts')
-    <!-- ✅ IMPORTANT: notif-drawer.js HARUS di-load SEBELUM clients.js -->
     <script src="{{ asset('js/notif-drawer.js') }}"></script>
-    
-    <!-- Data untuk JavaScript -->
+
     <script>
         window.__CLIENTS_PAGE__ = {
-            clientsData: {{ json_encode($clientsData ?? ['total' => 0, 'data' => []]) }},
-            freelancersData: {{ json_encode($freelancersData ?? ['total' => 0, 'data' => []]) }},
-            skomdaData: {{ json_encode($skomdaData ?? ['total' => 0, 'data' => []]) }},
+            clientsData: {!! json_encode($clientsData ?? ['total' => 0, 'data' => []]) !!},
+            freelancersData: {!! json_encode($freelancersData ?? ['total' => 0, 'data' => []]) !!},
+            skomdaData: {!! json_encode($skomdaData ?? ['total' => 0, 'data' => []]) !!}
         };
     </script>
 

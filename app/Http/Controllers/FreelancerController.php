@@ -6,13 +6,18 @@ use App\Http\Requests\StoreFreelancerRequest;
 use App\Http\Requests\UpdateFreelancerPasswordRequest;
 use App\Http\Requests\UpdateFreelancerRequest;
 use App\Models\Freelancer;
+use App\Models\Service;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 
 class FreelancerController extends Controller
 {
+    // =========================
+    // FREELANCER ONLY
+    // =========================
     public function profile()
-    {        $freelancer = auth('freelancer')->user();
+    {
+        $freelancer = auth('freelancer')->user();
 
         $freelancer->load('skomda_student');
 
@@ -33,10 +38,7 @@ class FreelancerController extends Controller
         return redirect()->route('freelancer.profile')->with('success', 'Profil berhasil diperbarui');
     }
 
-    /**
-     * Update Freelancer Password
-     */
-    public function update_password(UpdateFreelancerPasswordRequest $request)
+    public function updatePassword(UpdateFreelancerPasswordRequest $request)
     {
         $freelancer = auth('freelancer')->user();
 
@@ -46,21 +48,31 @@ class FreelancerController extends Controller
 
         $freelancer->password = Hash::make($request->password);
         $freelancer->save();
+
         return redirect()->route('freelancer.profile')->with('success', 'Password berhasil diperbarui');
     }
 
-    /**
-     * Get All Freelancers
-     */
+    public function deleteAccount(Request $request)
+    {
+        $freelancer = auth('freelancer')->user();
+
+        if (!Hash::check($request->password, $freelancer->password)) {
+            return redirect()->route('freelancer.profile')->with('error', 'Password salah');
+        }
+
+        $freelancer->delete();
+        return redirect()->route('home')->with('success', 'Akun freelancer berhasil dihapus');
+    }
+
+    // =========================
+    // ADMIN ONLY
+    // =========================
     public function index()
     {
         $freelancers = Freelancer::with('skomda_student')->get();
         return view('dashboard.admin.freelancers', compact('freelancers'));
     }
 
-    /**
-     * Store New Freelancer
-     */
     public function store(StoreFreelancerRequest $request)
     {
         $data = $request->validated();
@@ -70,36 +82,24 @@ class FreelancerController extends Controller
         return redirect()->route('admin.freelancers.index')->with('success', 'Akun freelancer berhasil dibuat');
     }
 
-    /**
-     * Get Freelancer By ID
-     */
     public function show(Freelancer $freelancer)
     {
         $freelancer->load('skomda_student');
         return view('dashboard.admin.freelancers', compact('freelancer'));
     }
 
-    /**
-     * Get Freelancer Services By ID
-     */
     public function showServices(Freelancer $freelancer)
     {
         $freelancer->load(['services', 'skomda_student', 'services.category']);
         return view('dashboard.admin.freelancers.services', compact('freelancer'));
     }
 
-    /**
-     * Update Freelancer By ID
-     */
     public function update(UpdateFreelancerRequest $request, Freelancer $freelancer)
     {
         $freelancer->update($request->validated());
         return redirect()->route('admin.freelancers.index')->with('success', 'Akun freelancer berhasil diperbarui');
     }
 
-    /**
-     * Delete Freelancer By ID
-     */
     public function destroy(string $id)
     {
         $freelancer = Freelancer::findOrFail($id);
@@ -108,45 +108,66 @@ class FreelancerController extends Controller
         return redirect()->route('admin.freelancers.index')->with('success', 'Akun freelancer berhasil dihapus');
     }
 
+    public function verify($id)
+    {
+        $freelancer = Freelancer::findOrFail($id);
+        $freelancer->update([
+            'status' => 'Approved'
+        ]);
+
+        return redirect()->route('admin.freelancers.index')
+            ->with('success', 'Freelancer berhasil diverifikasi');
+    }
+
+    public function suspend($id)
+    {
+        $freelancer = Freelancer::findOrFail($id);
+        $freelancer->update([
+            'status' => 'Suspended'
+        ]);
+
+        return redirect()->route('admin.freelancers.index')
+            ->with('success', 'Freelancer berhasil disuspend');
+    }
+
+    public function unsuspend($id)
+    {
+        $freelancer = Freelancer::findOrFail($id);
+        $freelancer->update([
+            'status' => 'Active'
+        ]);
+
+        return redirect()->route('admin.freelancers.index')
+            ->with('success', 'Freelancer berhasil diaktifkan kembali');
+    }
+
+    // =========================
+    // CLIENT ONLY (Find Talent)
+    // =========================
+
+    public function clientFindTalent()
+{
+    $freelancers = Freelancer::with('skomda_student')->latest()->get();
+
+    foreach ($freelancers as $f) {
+        $f->services_count = Service::where('freelancer_id', $f->id)->count();
+    }
+
+    return view('dashboard.client.talents.find-talent', compact('freelancers'));
+}
+
     /**
- * Verify Freelancer
- */
-public function verify($id)
+     * CLIENT: Talent detail (profil + list services)
+     */
+    public function clientTalentShow(Freelancer $freelancer)
 {
-    $freelancer = Freelancer::findOrFail($id);
-    $freelancer->update([
-        'status' => 'Approved'
-    ]);
+    $freelancer->load('skomda_student');
 
-    return redirect()->route('admin.freelancers.index')
-        ->with('success', 'Freelancer berhasil diverifikasi');
-}
+    $services = Service::with('service_category:id,name')
+        ->where('freelancer_id', $freelancer->id)
+        ->latest()
+        ->get();
 
-/**
- * Suspend Freelancer
- */
-public function suspend($id)
-{
-    $freelancer = Freelancer::findOrFail($id);
-    $freelancer->update([
-        'status' => 'Suspended'
-    ]);
-
-    return redirect()->route('admin.freelancers.index')
-        ->with('success', 'Freelancer berhasil disuspend');
-}
-
-/**
- * Unsuspend Freelancer
- */
-public function unsuspend($id)
-{
-    $freelancer = Freelancer::findOrFail($id);
-    $freelancer->update([
-        'status' => 'Active'
-    ]);
-
-    return redirect()->route('admin.freelancers.index')
-        ->with('success', 'Freelancer berhasil diaktifkan kembali');
+    return view('dashboard.client.talents.talent-show', compact('freelancer', 'services'));
 }
 }

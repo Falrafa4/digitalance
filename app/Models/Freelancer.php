@@ -9,12 +9,17 @@ use Laravel\Sanctum\HasApiTokens;
 class Freelancer extends Authenticatable
 {
     use HasFactory, HasApiTokens;
-    protected $fillable = ['student_id', 'bio', 'email', 'password', 'status'];
+    protected $fillable = ['student_id', 'bio', 'password', 'status'];
     protected $hidden = ['password'];
 
     public function skomda_student()
     {
         return $this->belongsTo(SkomdaStudent::class, 'student_id');
+    }
+
+    public function getNameAttribute()
+    {
+        return optional($this->skomda_student)->name;
     }
 
     public function portofolios()

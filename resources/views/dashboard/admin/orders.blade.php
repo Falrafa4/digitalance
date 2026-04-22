@@ -60,7 +60,12 @@
 
 @section('scripts')
     <script>
-        window.__ORDERS_PAGE__ = { data: @json($orders ?? []) };
+        window.__ORDERS_PAGE__ = { 
+            data: @json($orders ?? []),
+            clients: @json($clients ?? []), 
+            freelancers: @json($freelancers ?? []),
+            services: @json($services ?? [])
+        };
     </script>
     <script src="{{ asset('js/dashboard/admin/orders.js') }}"></script>
 @endsection

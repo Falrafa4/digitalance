@@ -22,7 +22,7 @@
                             class="w-24 h-24 rounded-3xl object-cover border-4 border-white shadow-teal-md" />
                     </div>
                     <h3 class="font-display font-extrabold text-[1.15rem] text-slate-900">{{ Auth::user()->name }}</h3>
-                    <p class="text-[13px] text-slate-400 mt-0.5">@{{ Auth::user()->email }}</p>
+                    <p class="text-[13px] text-slate-400 mt-0.5">{{ Auth::user()->email }}</p>
                     <span
                         class="inline-flex items-center gap-1.5 mt-2 px-3 py-1 bg-[#f0fdf9] text-[#0f766e] text-[11px] font-bold rounded-full">
                         <i class="ri-shield-user-line"></i> Administrator

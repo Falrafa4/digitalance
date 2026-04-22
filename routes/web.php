@@ -24,8 +24,8 @@ Route::get('/login', [PageController::class, 'login'])->name('login')->middlewar
 Route::post('/login', [AuthController::class, 'login'])->name('login-process');
 Route::get('/register-client', [PageController::class, 'registerClient']);
 Route::get('/register-freelancer', [PageController::class, 'registerFreelancer']);
-Route::post('/register-client', [AuthController::class, 'register_client'])->name('register-process');
-Route::post('/register-freelancer', [AuthController::class, 'register_freelancer'])->name('register-freelancer-process');
+Route::post('/register-client', [AuthController::class, 'registerClient'])->name('register-process');
+Route::post('/register-freelancer', [AuthController::class, 'registerFreelancer'])->name('register-freelancer-process');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // ── ADMIN ────────────────────────────────────────────────
@@ -56,7 +56,7 @@ Route::middleware('auth:administrator')->prefix('admin')->name('admin.')->group(
     Route::put('/clients/{client}', [ClientController::class, 'update'])->name('clients.update');
     Route::delete('/clients/{client}', [ClientController::class, 'destroy'])->name('clients.destroy');
 
-        // Freelancers (CRUD)
+    // Freelancers (CRUD)
     Route::get('/freelancers', [FreelancerController::class, 'index'])->name('freelancers.index');
     Route::get('/freelancers/create', [FreelancerController::class, 'create'])->name('freelancers.create');
     Route::post('/freelancers', [FreelancerController::class, 'store'])->name('freelancers.store');
@@ -67,8 +67,8 @@ Route::middleware('auth:administrator')->prefix('admin')->name('admin.')->group(
 
     // Freelancers (Actions)
     Route::post('/freelancers/{freelancer}/verify', [FreelancerController::class, 'verify'])->name('admin.freelancers.verify');
-Route::post('/freelancers/{freelancer}/suspend', [FreelancerController::class, 'suspend'])->name('admin.freelancers.suspend');
-Route::post('/freelancers/{freelancer}/unsuspend', [FreelancerController::class, 'unsuspend'])->name('admin.freelancers.unsuspend');
+    Route::post('/freelancers/{freelancer}/suspend', [FreelancerController::class, 'suspend'])->name('admin.freelancers.suspend');
+    Route::post('/freelancers/{freelancer}/unsuspend', [FreelancerController::class, 'unsuspend'])->name('admin.freelancers.unsuspend');
 
     // Skomda Students (CRUD)
     Route::get('/skomda-students', [SkomdaStudentController::class, 'index'])->name('skomda-students.index');
@@ -81,7 +81,7 @@ Route::post('/freelancers/{freelancer}/unsuspend', [FreelancerController::class,
 
     // Services (CRUD)
     Route::get('/services', [ServiceController::class, 'index'])->name('services.index');
-    Route::post('/admin/services/{id}/status', [App\Http\Controllers\ServiceController::class, 'updateStatus'])->name('admin.services.updateStatus');
+    Route::post('/services/{id}/status', [ServiceController::class, 'updateStatus'])->name('admin.services.updateStatus');
 
     // Service Categories (CRUD)
     Route::get('/service-categories', [ServiceCategoryController::class, 'index'])->name('service-categories.index');
@@ -96,6 +96,8 @@ Route::post('/freelancers/{freelancer}/unsuspend', [FreelancerController::class,
     // Order (CRUD)
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::post('/orders/{id}/status', [OrderController::class, 'updateStatus'])->name('orders.updateStatus');
+    Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
+    Route::delete('/orders/{id}', [OrderController::class, 'destroy'])->name('orders.destroy');
 
     // Offer (CRUD)
     Route::get('/offers', [OfferController::class, 'index'])->name('offers.index');
@@ -117,12 +119,47 @@ Route::post('/freelancers/{freelancer}/unsuspend', [FreelancerController::class,
 Route::middleware('auth:client')->prefix('client')->name('client.')->group(function () {
     Route::get('/', [DashboardController::class, 'client'])->name('dashboard');
     Route::get('/profile', [ClientController::class, 'profile'])->name('profile');
+
+    // Services
+    Route::get('/services', [ServiceController::class, 'clientIndex'])->name('services.index');
+    Route::get('/services/{service}', [ServiceController::class, 'clientShow'])->name('services.show');
+
+    // Orders (PAGE)
+    Route::get('/orders', [OrderController::class, 'clientIndexPage'])->name('orders.index');
+    Route::get('/orders/create/{service}', [OrderController::class, 'create'])->name('orders.create');
+    Route::post('/orders', [OrderController::class, 'storePage'])->name('orders.store');
+    Route::get('/orders/{order}', [OrderController::class, 'clientShowPage'])->name('orders.show');
+    Route::post('/orders/{order}/attachments', [OrderController::class, 'uploadAttachment'])->name('orders.attachments.store');
+
+    // Reviews
+    Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
+
+    // Talents
+    Route::get('/talents', [FreelancerController::class, 'clientFindTalent'])->name('talents.index');
+    Route::get('/talents/{freelancer}', [FreelancerController::class, 'clientTalentShow'])->name('talents.show');
+
+    // Projects
+    Route::get('/projects', [OrderController::class, 'clientProjects'])->name('projects.index');
+
+    // Messages (negotiations)
+    Route::get('/messages', [NegotiationController::class, 'clientInbox'])->name('messages.index');
+    Route::post('/messages/send', [NegotiationController::class, 'clientSendMessage'])->name('messages.send');
+
+    // Payments
+    Route::get('/payments', [TransactionController::class, 'clientIndex'])->name('payments.index');
+    Route::get('/payments/order/{order}', [TransactionController::class, 'clientShowByOrderId'])->name('payments.show');
+
+    // History
+    Route::get('/history', [OrderController::class, 'clientHistory'])->name('history.index');
 });
 
 // ── FREELANCER ───────────────────────────────────────────
 Route::middleware('auth:freelancer')->prefix('freelancer')->name('freelancer.')->group(function () {
     Route::get('/', [DashboardController::class, 'freelancer'])->name('dashboard');
     Route::get('/profile', [FreelancerController::class, 'profile'])->name('profile');
+    Route::post('/profile', [FreelancerController::class, 'updateProfile'])->name('profile.update');
+    Route::post('/password', [FreelancerController::class, 'updatePassword'])->name('password.update');
+    Route::post('/delete', [FreelancerController::class, 'deleteAccount'])->name('delete');
 
     // crud skomda students
     Route::get('/skomda-students', [SkomdaStudentController::class, 'freelancerIndex'])->name('skomda-students.index');
@@ -148,7 +185,6 @@ Route::middleware('auth:freelancer')->prefix('freelancer')->name('freelancer.')-
 
     // crud services
     Route::get('/services', [ServiceController::class, 'freelancerIndex'])->name('services.index');
-    Route::get('/services/create', [ServiceController::class, 'create'])->name('services.create');
     Route::post('/services', [ServiceController::class, 'store'])->name('services.store');
     Route::get('/services/{service}', [ServiceController::class, 'show'])->name('services.show');
     Route::get('/services/{service}/edit', [ServiceController::class, 'edit'])->name('services.edit');
@@ -161,4 +197,12 @@ Route::middleware('auth:freelancer')->prefix('freelancer')->name('freelancer.')-
     Route::get('/portofolios/{portofolio}', [PortofolioController::class, 'show'])->name('portofolios.show');
     Route::put('/portofolios/{portofolio}', [PortofolioController::class, 'update'])->name('portofolios.update');
     Route::delete('/portofolios/{portofolio}', [PortofolioController::class, 'destroy'])->name('portofolios.destroy');
+
+    // crud negotiations
+    Route::get('/negotiations', [NegotiationController::class, 'freelancerGetMessages'])->name('negotiations.index');
+    Route::post('/negotiations', [NegotiationController::class, 'freelancerSendMessage'])->name('negotiations.send-message');
+
+    // crud results
+    Route::get('/results', [ResultController::class, 'freelancerIndex'])->name('results.index');
+    Route::resource('results', ResultController::class)->except(['index']);
 });
