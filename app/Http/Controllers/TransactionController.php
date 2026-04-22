@@ -6,15 +6,14 @@ use App\Models\Transaction;
 use Illuminate\Http\Request;
 
 class TransactionController extends Controller
-{    
+{
     /**
      * Tampilan untuk Admin (DASHBOARD ADMIN)
      */
     public function index()
     {
-        // Tetap pakai eager loading agar nama client muncul dan anti N+1
         $transactions = Transaction::with([
-            'order.client' 
+            'order.client'
         ])->latest()->get();
 
         return view('dashboard.admin.transactions', compact('transactions'));
@@ -66,4 +65,43 @@ class TransactionController extends Controller
 
         return view('dashboard.freelancer.transaction-detail', compact('transaction'));
     }
+
+    // =========================
+    // CLIENT ONLY (Payment sidebar)
+    // =========================
+
+    public function clientIndex()
+{
+    $client = auth('client')->user();
+
+    $transactions = Transaction::with([
+        'order.service.freelancer' => function ($q) {
+            $q->select('id', 'student_id')->with('skomda_student:id,name');
+        }
+    ])
+        ->whereHas('order', function ($q) use ($client) {
+            $q->where('client_id', $client->id);
+        })
+        ->latest()
+        ->get();
+
+    return view('dashboard.client.payments.index', compact('transactions'));
+}
+
+public function clientShowByOrderId(string $orderId)
+{
+    $client = auth('client')->user();
+
+    $transaction = Transaction::with([
+        'order.service.freelancer' => function ($q) {
+            $q->select('id', 'student_id')->with('skomda_student:id,name');
+        }
+    ])
+        ->whereHas('order', function ($q) use ($client, $orderId) {
+            $q->where('client_id', $client->id)->where('id', $orderId);
+        })
+        ->firstOrFail();
+
+    return view('dashboard.client.payments.show', compact('transaction'));
+}
 }
