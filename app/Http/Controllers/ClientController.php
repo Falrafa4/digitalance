@@ -28,7 +28,6 @@ class ClientController extends Controller
             'role' => 'Client',
             'status' => 'Active',
             'joinDate' => $c->created_at?->format('d M Y') ?? '-',
-            'avatar' => 'https://ui-avatars.com/api/?name=' . urlencode($c->name) . '&background=0f766e&color=fff',
         ]);
 
         $freelancersData = Freelancer::with('skomda_student')->get()
@@ -38,14 +37,10 @@ class ClientController extends Controller
                     'name' => $f->skomda_student->name ?? '-',
                     'email' => $f->skomda_student->email ?? '-',
                     'phone' => $f->skomda_student->phone ?? '-',
-                    'location' => $f->skomda_student->location ?? 'Unknown',
-                    'skills' => $f->skills ?? [],
+                    'bio' => $f->bio ?? '-',
                     'role' => 'Freelancer',
                     'status' => ucfirst($f->status ?? 'Pending'),
                     'joinDate' => $f->created_at?->format('d M Y') ?? '-',
-                    'avatar' => 'https://ui-avatars.com/api/?name='
-                        . urlencode($f->skomda_student->name ?? 'F')
-                        . '&background=0f766e&color=fff',
                 ];
             });
 
@@ -61,7 +56,6 @@ class ClientController extends Controller
                 'role' => 'Skomda Student',
                 'status' => 'Active',
                 'joinDate' => $s->created_at?->format('d M Y') ?? '-',
-                'avatar' => 'https://ui-avatars.com/api/?name=' . urlencode($s->name) . '&background=0f766e&color=fff',
             ]);
 
         return view('dashboard.admin.clients', [
