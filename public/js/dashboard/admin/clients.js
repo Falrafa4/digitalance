@@ -238,21 +238,35 @@
               </div>
             </div>
 
-            <span class="text-[10.5px] font-bold px-2.5 py-1 rounded-lg uppercase tracking-[.05em] ${sBadge(u.status)}">${u.status}</span>
+            <!--<span class="text-[10.5px] font-bold px-2.5 py-1 rounded-lg uppercase tracking-[.05em] ${sBadge(u.status)}">${u.status}</span>-->
           </div>
 
-          <div class="text-[11.5px] text-slate-400 flex items-center gap-1 mb-3 relative z-10">
-            <i class="ri-map-pin-line"></i>
-            <span class="truncate">${u.location || 'Unknown Location'}</span>
+          <div class="text-xs text-slate-500 flex items-center gap-1 mb-3 relative z-10">
+            <i class="ri-mail-fill"></i>
+            <span class="truncate">${u.email}</span>
           </div>
 
-          <div class="flex flex-wrap gap-1.5 mb-3 min-h-[26px] relative z-10">
+          ${u.bio ? `
+            <div class="text-xs text-slate-500 flex items-center gap-1 mb-3 relative z-10">
+              <i class="ri-profile-fill"></i>
+              <span class="truncate">${u.bio}</span>
+            </div>
+            ` : `
+            <div class="text-xs text-slate-500 flex items-center gap-1 mb-3 relative z-10">
+              <i class="ri-phone-fill"></i>
+              <span class="truncate">${u.phone}</span>
+            </div>
+            `}
+          
+
+          <!--<div class="flex flex-wrap gap-1.5 mb-3 min-h-[26px] relative z-10">
             ${skills.length
               ? skills.slice(0,3).map(s=>`<span class="chip">${s}</span>`).join('')
                 + (skills.length>3 ? `<span class="chip chip-muted">+${skills.length-3}</span>` : '')
               : '<span class="text-[11px] text-slate-300 italic">No skills listed</span>'
             }
           </div>
+          -->
 
           <div class="flex gap-2 mt-auto relative z-10">
             <button type="button" onclick="window.openDetail('${u._uid}')" class="flex-1 btn-soft">

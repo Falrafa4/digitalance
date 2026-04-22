@@ -175,8 +175,7 @@
                             <select name="skomda-student-id" id="add-student-id"
                                 class="w-full py-[10px] pl-[13px] pr-[36px] appearance-none bg-slate-50 border-[1.5px] border-slate-200 rounded-[11px] text-[13.5px] font-sans outline-none cursor-pointer transition-all duration-200 focus:border-[#0f766e] focus:bg-white focus:shadow-[0_0_0_3px_rgba(15,118,110,0.08)]">
                                 <option value="" selected disabled>Pilih Skomda Student...</option>
-
-                                @if(isset($skomdaData['data']) && is_array($skomdaData['data']))
+                                @if(isset($skomdaData['data']) && is_iterable($skomdaData['data']))
                                     @foreach ($skomdaData['data'] as $student)
                                         <option value="{{ $student['id'] ?? '' }}">
                                             {{ $student['name'] ?? 'Unknown' }} ({{ $student['nis'] ?? 'N/A' }})
