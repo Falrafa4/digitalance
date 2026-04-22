@@ -191,7 +191,7 @@
                         </p>
                         <button id="overlayToggle" type="button"
                             class="inline-flex items-center gap-2.5 text-white font-bold text-[0.82rem] bg-white/15 border border-white/25 backdrop-blur-sm px-6 py-3 rounded-xl uppercase tracking-wide w-fit cursor-pointer hover:bg-white/25 transition-all duration-300">
-                            <span id="toggleText">Bergabung dengan Jaringan</span>
+                            <span id="toggleText">Daftarkan Akun</span>
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                 stroke-width="2.5">
                                 <line x1="5" y1="12" x2="19" y2="12" />
@@ -219,8 +219,8 @@
                                         d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
                                 </svg>
                             </div>
-                            <h2 class="text-[1.7rem] font-extrabold text-slate-900 mb-1">Portal Akses</h2>
-                            <p class="text-slate-500 text-[0.82rem]">Autentikasi diperlukan untuk mengakses ekosistem.</p>
+                            <h2 class="text-[1.7rem] font-extrabold text-slate-900 mb-1">Masuk ke Akun Anda</h2>
+                            <p class="text-slate-500 text-[0.82rem]">Silakan masukkan email dan password Anda</p>
                         </div>
 
                         {{-- Error login --}}
@@ -255,7 +255,7 @@
                                             d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
                                         <polyline points="22,6 12,13 2,6" />
                                     </svg>
-                                    <input type="email" name="email" placeholder="nama@domain.com"
+                                    <input type="email" name="email" placeholder="nama@email.com"
                                         value="{{ old('email') }}" required
                                         class="inp w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-[0.88rem] text-slate-900 transition-all" />
                                 </div>
@@ -263,8 +263,7 @@
 
                             <div id="registerPasswordWrapper">
                                 <label
-                                    class="block text-[0.6rem] font-extrabold text-slate-400 uppercase tracking-wide mb-1.5 ml-1">Kode
-                                    Sandi</label>
+                                    class="block text-[0.6rem] font-extrabold text-slate-400 uppercase tracking-wide mb-1.5 ml-1">Password</label>
                                 <div class="relative">
                                     <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none"
                                         width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -279,7 +278,7 @@
 
                             <button type="submit"
                                 class="w-full py-3 bg-slate-900 text-white font-bold rounded-xl text-[0.88rem] mt-2 flex items-center justify-center gap-2 hover:bg-black hover:-translate-y-0.5 transition-all shadow-md cursor-pointer">
-                                Otorisasi Sesi
+                                Masuk
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                     stroke-width="2">
                                     <polyline points="9 18 15 12 9 6" />
@@ -308,7 +307,7 @@
                                 </svg>
                                 <span>Protokol Aman</span>
                             </div>
-                            <h2 class="text-[1.7rem] font-extrabold text-slate-900 mb-0.5">Buat Identitas</h2>
+                            <h2 class="text-[1.7rem] font-extrabold text-slate-900 mb-0.5">Daftar ke Digitalance</h2>
                             <p class="text-slate-500 text-[0.82rem]">Bergabunglah dengan jaringan elite digital.</p>
                         </div>
 
@@ -484,7 +483,7 @@
 
                             <button type="submit"
                                 class="w-full py-3 bg-slate-900 text-white font-bold rounded-xl text-[0.88rem] mt-1 flex items-center justify-center gap-2 hover:bg-black hover:-translate-y-0.5 transition-all shadow-md cursor-pointer">
-                                Inisialisasi Akun
+                                Daftar
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                     stroke-width="2">
                                     <polyline points="9 18 15 12 9 6" />
