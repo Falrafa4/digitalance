@@ -75,23 +75,14 @@ class OrderController extends Controller
     }
 
     // =========================
-    // CLIENT ONLY (PAGE)
+    // CLIENT PANEL (PAGE)
     // =========================
 
-    /**
-     * CLIENT: halaman Orders (tanpa filter)
-     * Ini untuk sidebar "Orders"
-     */
     public function clientIndexPage()
     {
         $client = auth('client')->user();
 
-        $orders = Order::with([
-            'service.service_category:id,name',
-            'service.freelancer' => function ($q) {
-                $q->select('id', 'student_id')->with('skomda_student:id,name');
-            }
-        ])
+        $orders = Order::with(['service', 'client'])
             ->where('client_id', $client->id)
             ->latest()
             ->get();
@@ -99,51 +90,32 @@ class OrderController extends Controller
         return view('dashboard.client.orders.index', compact('orders'));
     }
 
-    /**
-     * CLIENT: detail order (page)
-     * Ini untuk sidebar /orders/{id}
-     */
-    public function clientShowPage(string $id)
+    public function clientShowPage(Order $order)
     {
         $client = auth('client')->user();
 
-        $order = Order::with([
-            'service.service_category:id,name',
-            'service.freelancer' => function ($q) {
-                $q->select('id', 'student_id', 'bio')->with('skomda_student:id,name,email');
-            },
+        abort_unless($order->client_id === $client->id, 403);
+
+        $order->load([
+            'service.freelancer.skomda_student',
+            'service.service_category', // kalau masih kepakai di view lama
             'negotiations',
             'offers',
             'transactions',
             'results',
-            'review',
-        ])
-            ->where('client_id', $client->id)
-            ->findOrFail($id);
+            'review'
+        ]);
 
         return view('dashboard.client.orders.show', compact('order'));
     }
 
-    /**
-     * CLIENT: create order page dari sebuah service
-     * Route client sudah ada: /client/orders/create/{service}
-     */
     public function create(Service $service)
     {
-        $service->load([
-            'service_category:id,name',
-            'freelancer' => function ($q) {
-                $q->select('id', 'student_id', 'bio')->with('skomda_student:id,name,email');
-            }
-        ]);
+        $service->load(['freelancer.skomda_student', 'service_category']);
 
         return view('dashboard.client.orders.create', compact('service'));
     }
 
-    /**
-     * CLIENT: store order tapi versi page redirect (opsional kalau kamu butuh)
-     * Tidak menghapus store JSON yang sudah ada.
-     */
     public function storePage(Request $request)
     {
         $client = $request->user('client');
@@ -153,28 +125,27 @@ class OrderController extends Controller
             'brief' => 'required|string',
         ]);
 
+        $service = Service::findOrFail($validated['service_id']);
+
         $order = Order::create([
-            'service_id' => $validated['service_id'],
+            'service_id' => $service->id,
             'client_id' => $client->id,
+            'freelancer_id' => $service->freelancer_id, // sesuai ERD kolom sudah ada
             'brief' => $validated['brief'],
-            'status' => 'Pending',
+            'status' => 'Pending', // ikut status Illuminate existing
+            'agreed_price' => null,
         ]);
 
         return redirect()->route('client.orders.show', $order->id)->with('success', 'Order berhasil dibuat');
     }
 
-    /**
-     * CLIENT: upload attachment (fitur 9)
-     * MVP: simpan file ke storage public + append path ke brief.
-     */
-    public function uploadAttachment(Request $request, string $id)
+    public function uploadAttachment(Request $request, Order $order)
     {
         $client = auth('client')->user();
+        abort_unless($order->client_id === $client->id, 403);
 
-        $order = Order::where('client_id', $client->id)->findOrFail($id);
-
-        $validated = $request->validate([
-            'file' => 'required|file|max:5120', // 5MB
+        $request->validate([
+            'file' => 'required|file|max:5120',
         ]);
 
         $path = $request->file('file')->store('order-attachments', 'public');
@@ -185,40 +156,24 @@ class OrderController extends Controller
         return back()->with('success', 'Attachment berhasil diupload');
     }
 
-    /**
-     * CLIENT: My Projects (sidebar)
-     * Anggap project = order yang masih berjalan
-     */
     public function clientProjects()
-{
-    $client = auth('client')->user();
+    {
+        $client = auth('client')->user();
 
-    $projects = Order::with([
-        'service.freelancer' => function ($q) {
-            $q->select('id', 'student_id')->with('skomda_student:id,name');
-        }
-    ])
-        ->where('client_id', $client->id)
-        ->whereIn('status', ['Pending', 'Negotiated', 'Paid', 'In Progress', 'Revision'])
-        ->latest()
-        ->get();
+        $projects = Order::with(['service'])
+            ->where('client_id', $client->id)
+            ->whereIn('status', ['Pending', 'Negotiated', 'Paid', 'In Progress', 'Revision'])
+            ->latest()
+            ->get();
 
-    return view('dashboard.client.projects.index', compact('projects'));
-}
+        return view('dashboard.client.projects.index', compact('projects'));
+    }
 
-    /**
-     * CLIENT: History (sidebar)
-     */
     public function clientHistory()
     {
         $client = auth('client')->user();
 
-        $orders = Order::with([
-            'service.freelancer' => function ($q) {
-                $q->select('id', 'student_id')->with('skomda_student:id,name');
-            },
-            'review'
-        ])
+        $orders = Order::with(['service', 'review'])
             ->where('client_id', $client->id)
             ->whereIn('status', ['Completed', 'Cancelled'])
             ->latest()
@@ -235,7 +190,8 @@ class OrderController extends Controller
     public function clientShow(string $id)
     {
         // agar route lama tetap jalan dan tidak error
-        return $this->clientShowPage($id);
+        $order = Order::findOrFail($id);
+        return $this->clientShowPage($order);
     }
 
     // =========================

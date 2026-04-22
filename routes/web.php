@@ -120,36 +120,36 @@ Route::middleware('auth:client')->prefix('client')->name('client.')->group(funct
     Route::get('/', [DashboardController::class, 'client'])->name('dashboard');
     Route::get('/profile', [ClientController::class, 'profile'])->name('profile');
 
-    // SERVICES
+    // Services
     Route::get('/services', [ServiceController::class, 'clientIndex'])->name('services.index');
     Route::get('/services/{service}', [ServiceController::class, 'clientShow'])->name('services.show');
 
-    // ORDERS
+    // Orders (PAGE)
     Route::get('/orders', [OrderController::class, 'clientIndexPage'])->name('orders.index');
     Route::get('/orders/create/{service}', [OrderController::class, 'create'])->name('orders.create');
     Route::post('/orders', [OrderController::class, 'storePage'])->name('orders.store');
-    Route::get('/orders/{id}', [OrderController::class, 'clientShowPage'])->name('orders.show');
-    Route::post('/orders/{id}/attachments', [OrderController::class, 'uploadAttachment'])->name('orders.attachments.store');
+    Route::get('/orders/{order}', [OrderController::class, 'clientShowPage'])->name('orders.show');
+    Route::post('/orders/{order}/attachments', [OrderController::class, 'uploadAttachment'])->name('orders.attachments.store');
 
-    // REVIEWS
+    // Reviews
     Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
 
-    // TALENTS (Find Talent)
+    // Talents
     Route::get('/talents', [FreelancerController::class, 'clientFindTalent'])->name('talents.index');
     Route::get('/talents/{freelancer}', [FreelancerController::class, 'clientTalentShow'])->name('talents.show');
 
-    // PROJECTS
+    // Projects
     Route::get('/projects', [OrderController::class, 'clientProjects'])->name('projects.index');
 
-    // MESSAGES (Negotiation inbox)
+    // Messages (negotiations)
     Route::get('/messages', [NegotiationController::class, 'clientInbox'])->name('messages.index');
     Route::post('/messages/send', [NegotiationController::class, 'clientSendMessage'])->name('messages.send');
 
-    // PAYMENTS
+    // Payments
     Route::get('/payments', [TransactionController::class, 'clientIndex'])->name('payments.index');
-    Route::get('/payments/order/{orderId}', [TransactionController::class, 'clientShowByOrderId'])->name('payments.show');
+    Route::get('/payments/order/{order}', [TransactionController::class, 'clientShowByOrderId'])->name('payments.show');
 
-    // HISTORY
+    // History
     Route::get('/history', [OrderController::class, 'clientHistory'])->name('history.index');
 });
 

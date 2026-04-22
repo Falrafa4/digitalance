@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Transaction;
+use App\Models\Order;
 use Illuminate\Http\Request;
 
 class TransactionController extends Controller
@@ -71,37 +72,27 @@ class TransactionController extends Controller
     // =========================
 
     public function clientIndex()
-{
-    $client = auth('client')->user();
+    {
+        $client = auth('client')->user();
 
-    $transactions = Transaction::with([
-        'order.service.freelancer' => function ($q) {
-            $q->select('id', 'student_id')->with('skomda_student:id,name');
-        }
-    ])
-        ->whereHas('order', function ($q) use ($client) {
-            $q->where('client_id', $client->id);
-        })
-        ->latest()
-        ->get();
+        $transactions = Transaction::with('order.service')
+            ->whereHas('order', fn($q) => $q->where('client_id', $client->id))
+            ->latest()
+            ->get();
 
-    return view('dashboard.client.payments.index', compact('transactions'));
-}
+        return view('dashboard.client.payments.index', compact('transactions'));
+    }
 
-public function clientShowByOrderId(string $orderId)
-{
-    $client = auth('client')->user();
+    public function clientShowByOrderId(Order $order)
+    {
+        $client = auth('client')->user();
+        abort_unless($order->client_id === $client->id, 403);
 
-    $transaction = Transaction::with([
-        'order.service.freelancer' => function ($q) {
-            $q->select('id', 'student_id')->with('skomda_student:id,name');
-        }
-    ])
-        ->whereHas('order', function ($q) use ($client, $orderId) {
-            $q->where('client_id', $client->id)->where('id', $orderId);
-        })
-        ->firstOrFail();
+        $transaction = Transaction::with('order.service')
+            ->where('order_id', $order->id)
+            ->latest()
+            ->firstOrFail();
 
-    return view('dashboard.client.payments.show', compact('transaction'));
-}
+        return view('dashboard.client.payments.show', compact('transaction'));
+    }
 }

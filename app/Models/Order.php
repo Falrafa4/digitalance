@@ -8,7 +8,16 @@ use Illuminate\Database\Eloquent\Model;
 class Order extends Model
 {
     use HasFactory;
-    protected $fillable = ['service_id', 'client_id', 'brief', 'status', 'agreed_price'];
+
+    // ERD: orders punya freelancer_id
+    protected $fillable = [
+        'service_id',
+        'client_id',
+        'freelancer_id',
+        'brief',
+        'status',
+        'agreed_price',
+    ];
 
     public function service()
     {
@@ -20,6 +29,12 @@ class Order extends Model
         return $this->belongsTo(Client::class);
     }
 
+    // ERD: orders.freelancer_id -> freelancers.id
+    public function freelancer()
+    {
+        return $this->belongsTo(Freelancer::class);
+    }
+
     public function offers()
     {
         return $this->hasMany(Offer::class);
@@ -29,12 +44,12 @@ class Order extends Model
     {
         return $this->hasMany(Negotiation::class);
     }
-    
+
     public function transactions()
     {
         return $this->hasMany(Transaction::class);
     }
-    
+
     public function results()
     {
         return $this->hasMany(Result::class);

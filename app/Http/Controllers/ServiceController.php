@@ -31,41 +31,31 @@ class ServiceController extends Controller
      * - Ambil dari DB + eager load
      */
     public function clientIndex()
-    {
-        $services = Service::with([
-            'service_category:id,name',
-            'freelancer' => function ($query) {
-                $query->select('id', 'student_id', 'bio')
-                    ->with('skomda_student:id,name,email');
-            }
-        ])->latest()->get();
+{
+    $services = Service::with([
+        'category:id,name',
+        'freelancer.skomda_student:id,name'
+    ])->latest()->get();
 
-        return view('dashboard.client.services.index', compact('services'));
-    }
+    return view('dashboard.client.services.index', compact('services'));
+}
 
-    /**
-     * CLIENT: Detail Jasa + profil katalog (Page)
-     */
-    public function clientShow(Service $service)
-    {
-        $service->load([
-            'service_category:id,name',
-            'freelancer' => function ($query) {
-                $query->select('id', 'student_id', 'bio')
-                    ->with('skomda_student:id,name,email');
-            }
-        ]);
+public function clientShow(Service $service)
+{
+    $service->load([
+        'category:id,name',
+        'freelancer.skomda_student:id,name,email'
+    ]);
 
-        // (opsional) ambil layanan lain milik freelancer untuk "detail profil katalog"
-        $otherServices = Service::with('service_category:id,name')
-            ->where('freelancer_id', $service->freelancer_id)
-            ->where('id', '!=', $service->id)
-            ->latest()
-            ->take(6)
-            ->get();
+    $otherServices = Service::with('category:id,name')
+        ->where('freelancer_id', $service->freelancer_id)
+        ->where('id', '!=', $service->id)
+        ->latest()
+        ->take(6)
+        ->get();
 
-        return view('dashboard.client.services.show', compact('service', 'otherServices'));
-    }
+    return view('dashboard.client.services.show', compact('service', 'otherServices'));
+}
 
     /**
      * FREELANCER ONLY

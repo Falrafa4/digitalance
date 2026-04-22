@@ -1,7 +1,10 @@
 @php
-    $isAdmin = Auth::guard('administrator')->check();
-    $isClient = Auth::guard('client')->check();
-    $isFreelancer = Auth::guard('freelancer')->check();
+  $isAdmin = auth('administrator')->check();
+  $isFreelancer = auth('freelancer')->check();
+  $isClient = auth('client')->check();
+
+  $active = 'bg-[#0f766e] text-white shadow-teal-md';
+  $inactive = 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]';
 
     // Route mapping (tetap tidak mengubah variabel existing)
     $settingsRoute = null;
@@ -106,59 +109,54 @@
         @endif
 
        {{-- CLIENT --}}
-@if($isClient)
-    @php
-        $active = 'bg-[#0f766e] text-white shadow-teal-md';
-        $inactive = 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]';
-    @endphp
+       @if($isClient)
+  <a href="{{ route('client.dashboard') }}"
+     class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
+     {{ request()->routeIs('client.dashboard') ? $active : $inactive }}">
+    <i class="ri-dashboard-fill text-[17px]"></i> Dashboard
+  </a>
 
-    <a href="{{ route('client.dashboard') }}"
-       class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
-       {{ request()->routeIs('client.dashboard') ? $active : $inactive }}">
-        <i class="ri-dashboard-fill text-[17px]"></i> Dashboard
-    </a>
+  <a href="{{ route('client.services.index') }}"
+     class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
+     {{ request()->routeIs('client.services.*') ? $active : $inactive }}">
+    <i class="ri-tools-line text-[17px]"></i> Katalog Jasa
+  </a>
 
-    <a href="{{ route('client.services.index') }}"
-       class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
-       {{ request()->routeIs('client.services.*') ? $active : $inactive }}">
-        <i class="ri-tools-line text-[17px]"></i> Katalog Jasa
-    </a>
+  <a href="{{ route('client.orders.index') }}"
+     class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
+     {{ request()->routeIs('client.orders.*') ? $active : $inactive }}">
+    <i class="ri-file-list-3-line text-[17px]"></i> Orders
+  </a>
 
-    <a href="{{ route('client.orders.index') }}"
-       class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
-       {{ request()->routeIs('client.orders.*') ? $active : $inactive }}">
-        <i class="ri-file-list-3-line text-[17px]"></i> Orders
-    </a>
+  <a href="{{ route('client.talents.index') }}"
+     class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
+     {{ request()->routeIs('client.talents.*') ? $active : $inactive }}">
+    <i class="ri-user-search-line text-[17px]"></i> Find Talent
+  </a>
 
-    <a href="{{ route('client.talents.index') }}"
-       class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
-       {{ request()->routeIs('client.talents.*') ? $active : $inactive }}">
-        <i class="ri-user-search-line text-[17px]"></i> Find Talent
-    </a>
+  <a href="{{ route('client.projects.index') }}"
+     class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
+     {{ request()->routeIs('client.projects.*') ? $active : $inactive }}">
+    <i class="ri-briefcase-4-line text-[17px]"></i> My Projects
+  </a>
 
-    <a href="{{ route('client.projects.index') }}"
-       class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
-       {{ request()->routeIs('client.projects.*') ? $active : $inactive }}">
-        <i class="ri-briefcase-4-line text-[17px]"></i> My Projects
-    </a>
+  <a href="{{ route('client.messages.index') }}"
+     class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
+     {{ request()->routeIs('client.messages.*') ? $active : $inactive }}">
+    <i class="ri-message-3-line text-[17px]"></i> Messages
+  </a>
 
-    <a href="{{ route('client.messages.index') }}"
-       class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
-       {{ request()->routeIs('client.messages.*') ? $active : $inactive }}">
-        <i class="ri-message-3-line text-[17px]"></i> Messages
-    </a>
+  <a href="{{ route('client.payments.index') }}"
+     class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
+     {{ request()->routeIs('client.payments.*') ? $active : $inactive }}">
+    <i class="ri-bank-card-line text-[17px]"></i> Payment
+  </a>
 
-    <a href="{{ route('client.payments.index') }}"
-       class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
-       {{ request()->routeIs('client.payments.*') ? $active : $inactive }}">
-        <i class="ri-bank-card-line text-[17px]"></i> Payment
-    </a>
-
-    <a href="{{ route('client.history.index') }}"
-       class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
-       {{ request()->routeIs('client.history.*') ? $active : $inactive }}">
-        <i class="ri-history-line text-[17px]"></i> History
-    </a>
+  <a href="{{ route('client.history.index') }}"
+     class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
+     {{ request()->routeIs('client.history.*') ? $active : $inactive }}">
+    <i class="ri-history-line text-[17px]"></i> History
+  </a>
 @endif
 
         {{-- FREELANCER --}}
