@@ -24,8 +24,8 @@ Route::get('/login', [PageController::class, 'login'])->name('login')->middlewar
 Route::post('/login', [AuthController::class, 'login'])->name('login-process');
 Route::get('/register-client', [PageController::class, 'registerClient']);
 Route::get('/register-freelancer', [PageController::class, 'registerFreelancer']);
-Route::post('/register-client', [AuthController::class, 'register_client'])->name('register-process');
-Route::post('/register-freelancer', [AuthController::class, 'register_freelancer'])->name('register-freelancer-process');
+Route::post('/register-client', [AuthController::class, 'registerClient'])->name('register-process');
+Route::post('/register-freelancer', [AuthController::class, 'registerFreelancer'])->name('register-freelancer-process');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // ── ADMIN ────────────────────────────────────────────────
