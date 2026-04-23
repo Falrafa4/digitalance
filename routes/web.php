@@ -120,6 +120,9 @@ Route::middleware('auth:client')->prefix('client')->name('client.')->group(funct
     Route::get('/', [DashboardController::class, 'client'])->name('dashboard');
     Route::get('/profile', [ClientController::class, 'profile'])->name('profile');
 
+    // Service Categories
+    Route::get('/service-categories', [ServiceCategoryController::class, 'clientIndex'])->name('service-categories.index');
+
     // Services
     Route::get('/services', [ServiceController::class, 'clientIndex'])->name('services.index');
     Route::get('/services/{service}', [ServiceController::class, 'clientShow'])->name('services.show');
