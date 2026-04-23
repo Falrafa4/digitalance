@@ -168,7 +168,7 @@
                 <div id="add-freelancer-group" style="display:none;">
                     <div class="flex flex-col gap-1.5 mb-4">
                         <label class="text-[11px] font-bold text-slate-500 uppercase tracking-[.1em]">
-                            Student ID (skomda_students.id)
+                            Skomda Student
                         </label>
 
                         <div class="relative w-full">
