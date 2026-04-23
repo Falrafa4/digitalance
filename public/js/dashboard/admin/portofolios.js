@@ -57,12 +57,12 @@ function renderCards(data = portfoliosData) {
 
         const imageUrl = p.media_url 
                          ? `${window.location.origin}/storage/${p.media_url}` 
-                         : 'https://via.placeholder.com/800x600?text=No+Image';
+                         : 'https://placehold.co/800x600?text=No+Image';
 
         return `
             <div class="port-card" onclick="openPortModal('${p.id}')">
                 <div class="port-cover-wrap">
-                    <img class="port-cover" src="${imageUrl}" alt="Cover" onerror="this.src='https://via.placeholder.com/800x600?text=Image+Not+Found'">
+                    <img class="port-cover" src="${imageUrl}" alt="Cover" onerror="this.src='https://placehold.co/800x600?text=Image+Not+Found'" lazyload>
                     <div class="port-cover-overlay">
                         <span class="preview-hint"><i class="ri-eye-line"></i> Lihat Detail</span>
                     </div>
@@ -70,12 +70,12 @@ function renderCards(data = portfoliosData) {
                 <div class="port-body">
                     <div class="port-id-row">
                         <span class="port-id">#${p.id}</span>
-                        <span class="port-srv-id"><i class="ri-tools-line"></i> #${p.service_id}</span>
+                        <span class="port-srv-id"><i class="ri-tools-line"></i> #${p.service.title}</span>
                     </div>
                     <h3 class="port-title" title="${p.title}">${p.title}</h3>
                     <p class="port-desc">${p.description ? p.description.slice(0, 75) + '...' : '-'}</p>
                     <div class="port-meta-row">
-                        <span class="port-freelancer"><i class="ri-user-line"></i> ${fName}</span>
+                        <span class="port-freelancer"><i class="ri-user-line"></i> ${p.service.freelancer.skomda_student.name}</span>
                         <span class="port-date"><i class="ri-calendar-line"></i> ${date}</span>
                     </div>
                 </div>
