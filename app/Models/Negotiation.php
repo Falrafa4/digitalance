@@ -14,4 +14,12 @@ class Negotiation extends Model
     {
         return $this->belongsTo(Order::class);
     }
+
+    public function getTimeAttribute(): string
+    {
+        return date(
+            "d M Y, H:i:s",
+            strtotime($this->attributes['created_at'])
+        );
+    }
 }

@@ -30,7 +30,7 @@ class NegotiationController extends Controller
                 $query->where('freelancer_id', $freelancer->id);
             })->get();
 
-        return view('dashboard.freelancer.negotiations', compact('negotiations'));
+        return view('dashboard.freelancer.messages', compact('negotiations'));
     }
 
     public function freelancerSendMessage(SendMessageRequest $request)
