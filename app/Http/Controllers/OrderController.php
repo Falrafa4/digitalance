@@ -130,9 +130,8 @@ class OrderController extends Controller
         $order = Order::create([
             'service_id' => $service->id,
             'client_id' => $client->id,
-            'freelancer_id' => $service->freelancer_id, // sesuai ERD kolom sudah ada
             'brief' => $validated['brief'],
-            'status' => 'Pending', // ikut status Illuminate existing
+            'status' => 'Pending',
             'agreed_price' => null,
         ]);
 
