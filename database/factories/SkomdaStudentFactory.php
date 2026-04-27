@@ -9,22 +9,19 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class SkomdaStudentFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
     public function definition(): array
     {
-        $class = $this->faker->randomElement(['X', 'XI', 'XII', 'XIII']);
-        $major = $this->faker->randomElement(['TJAT', 'SIJA']);
-        if ($class == 'XIII') {
+        $class = fake()->randomElement(['X', 'XI', 'XII', 'XIII']);
+        $major = fake()->randomElement(['TJAT', 'SIJA']);
+
+        if ($class === 'XIII') {
             $major = 'SIJA';
         }
+
         return [
-            'nis' => $this->faker->unique()->numerify('#########'),
-            'name' => $this->faker->name(),
-            'email' => $this->faker->unique()->safeEmail(),
+            'nis' => fake()->unique()->numerify('#########'),
+            'name' => fake()->name(),
+            'email' => fake()->unique()->safeEmail(),
             'class' => $class,
             'major' => $major,
         ];
