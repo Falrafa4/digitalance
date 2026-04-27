@@ -18,7 +18,7 @@ class NegotiationFactory extends Factory
     {
         return [
             'order_id' => \App\Models\Order::inRandomOrder()->first()->id,
-            'sender' => $this->faker->randomElement(['Client', 'Freelancer']),
+            'sender' => $this->faker->randomElement(['client', 'freelancer']),
             'message' => $this->faker->sentence()
         ];
     }

@@ -22,53 +22,64 @@ class DatabaseSeeder extends Seeder
 {
     use WithoutModelEvents;
 
+    private const SERVICE_CATEGORIES = [
+        [
+            'name' => 'Web Development',
+            'description' => 'Layanan terkait pengembangan web dan pemrograman.',
+        ],
+        [
+            'name' => 'Desain Grafis',
+            'description' => 'Jasa desain grafis untuk kebutuhan promosi, branding, dan lainnya.',
+        ],
+        [
+            'name' => 'Jaringan Komputer',
+            'description' => 'Layanan terkait instalasi dan konfigurasi jaringan.',
+        ],
+        [
+            'name' => 'IT Support',
+            'description' => 'Layanan terkait dukungan teknis dan pemeliharaan sistem IT.',
+        ],
+        [
+            'name' => 'Internet of Things (IoT)',
+            'description' => 'Layanan terkait pengembangan dan implementasi solusi Internet of Things (IoT).',
+        ],
+        [
+            'name' => 'Multimedia',
+            'description' => 'Layanan terkait pengembangan dan implementasi solusi multimedia.',
+        ],
+    ];
+
     /**
      * Seed the application's database.
      */
     public function run(): void
     {
-        Administrator::create([
-            'name' => 'Admin 1',
+        Administrator::updateOrCreate([
             'email' => 'admin1@email.com',
+        ], [
+            'name' => 'Admin 1',
             'password' => bcrypt('admin123'), // Default password for admin
         ]);
-        Administrator::create([
-            'name' => 'Admin 2',
+        Administrator::updateOrCreate([
             'email' => 'admin2@email.com',
+        ], [
+            'name' => 'Admin 2',
             'password' => bcrypt('admin123'), // Default password for admin
         ]);
 
         Client::factory(10)->create();
         Freelancer::factory(10)->recycle(SkomdaStudent::factory(100)->create())->create();
 
-        ServiceCategory::create([
-            'name' => 'Web Development',
-            'description' => 'Layanan terkait pengembangan web dan pemrograman.',
-        ]);
-        ServiceCategory::create([
-            'name' => 'Desain Grafis',
-            'description' => 'Jasa desain grafis untuk kebutuhan promosi, branding, dan lainnya.',
-        ]);
-        ServiceCategory::create([
-            'name' => 'Jaringan Komputer',
-            'description' => 'Layanan terkait instalasi dan konfigurasi jaringan.',
-        ]);
-        ServiceCategory::create([
-            'name' => 'IT Support',
-            'description' => 'Layanan terkait dukungan teknis dan pemeliharaan sistem IT.',
-        ]);
-        ServiceCategory::create([
-            'name' => 'Internet of Things (IoT)',
-            'description' => 'Layanan terkait pengembangan dan implementasi solusi Internet of Things (IoT).',
-        ]);
-        ServiceCategory::create([
-            'name' => 'Multimedia',
-            'description' => 'Layanan terkait pengembangan dan implementasi solusi multimedia.',
-        ]);
+        foreach (self::SERVICE_CATEGORIES as $category) {
+            ServiceCategory::updateOrCreate(
+                ['name' => $category['name']],
+                ['description' => $category['description'], 'is_active' => true],
+            );
+        }
 
         Service::factory(20)->create();
         Portofolio::factory(20)->create();
-        
+
         Order::factory(30)->create();
         Offer::factory(30)->create();
         Negotiation::factory(10)->create();
