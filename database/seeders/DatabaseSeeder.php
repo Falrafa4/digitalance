@@ -2,6 +2,9 @@
 
 namespace Database\Seeders;
 
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Database\Seeder;
+
 use App\Models\Administrator;
 use App\Models\Client;
 use App\Models\Freelancer;
@@ -15,81 +18,140 @@ use App\Models\Service;
 use App\Models\ServiceCategory;
 use App\Models\SkomdaStudent;
 use App\Models\Transaction;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
     use WithoutModelEvents;
 
-    private const SERVICE_CATEGORIES = [
-        [
-            'name' => 'Web Development',
-            'description' => 'Layanan terkait pengembangan web dan pemrograman.',
-        ],
-        [
-            'name' => 'Desain Grafis',
-            'description' => 'Jasa desain grafis untuk kebutuhan promosi, branding, dan lainnya.',
-        ],
-        [
-            'name' => 'Jaringan Komputer',
-            'description' => 'Layanan terkait instalasi dan konfigurasi jaringan.',
-        ],
-        [
-            'name' => 'IT Support',
-            'description' => 'Layanan terkait dukungan teknis dan pemeliharaan sistem IT.',
-        ],
-        [
-            'name' => 'Internet of Things (IoT)',
-            'description' => 'Layanan terkait pengembangan dan implementasi solusi Internet of Things (IoT).',
-        ],
-        [
-            'name' => 'Multimedia',
-            'description' => 'Layanan terkait pengembangan dan implementasi solusi multimedia.',
-        ],
-    ];
-
     /**
-     * Seed the application's database.
+     * Production-grade Seeder
+     * Principles:
+     * - Ordered by dependency
+     * - Deterministic (data jelas, tidak chaos)
+     * - Safe for migrate:fresh --seed
+     * - Mudah debug jika ada error
      */
     public function run(): void
     {
-        Administrator::updateOrCreate([
-            'email' => 'admin1@email.com',
-        ], [
-            'name' => 'Admin 1',
-            'password' => bcrypt('admin123'), // Default password for admin
-        ]);
-        Administrator::updateOrCreate([
-            'email' => 'admin2@email.com',
-        ], [
-            'name' => 'Admin 2',
-            'password' => bcrypt('admin123'), // Default password for admin
-        ]);
+        /*
+        |------------------------------------------------------------------
+        | 1. MASTER ADMIN DATA
+        |------------------------------------------------------------------
+        */
+        Administrator::firstOrCreate(
+            ['email' => 'admin1@email.com'],
+            [
+                'name' => 'Admin 1',
+                'password' => bcrypt('admin123'),
+            ]
+        );
 
-        Client::factory(10)->create();
-        Freelancer::factory(10)->recycle(SkomdaStudent::factory(100)->create())->create();
+        Administrator::firstOrCreate(
+            ['email' => 'admin2@email.com'],
+            [
+                'name' => 'Admin 2',
+                'password' => bcrypt('admin123'),
+            ]
+        );
 
-        foreach (self::SERVICE_CATEGORIES as $category) {
-            ServiceCategory::updateOrCreate(
+
+        /*
+        |------------------------------------------------------------------
+        | 2. BASE USER DATA (independent)
+        |------------------------------------------------------------------
+        */
+        $students = SkomdaStudent::factory(50)->create();
+        $clients = Client::factory(10)->create();
+
+
+        /*
+        |------------------------------------------------------------------
+        | 3. FREELANCER DATA
+        | Hindari recycle() dulu jika relasi belum benar-benar stabil.
+        | Lebih aman explicit create().
+        |------------------------------------------------------------------
+        */
+        $freelancers = Freelancer::factory(10)->create();
+
+
+        /*
+        |------------------------------------------------------------------
+        | 4. MASTER CATEGORY DATA
+        |------------------------------------------------------------------
+        */
+        $categories = [
+            [
+                'name' => 'Web Development',
+                'description' => 'Layanan terkait pengembangan web dan pemrograman.',
+            ],
+            [
+                'name' => 'Desain Grafis',
+                'description' => 'Jasa desain grafis untuk kebutuhan promosi dan branding.',
+            ],
+            [
+                'name' => 'Jaringan Komputer',
+                'description' => 'Layanan instalasi dan konfigurasi jaringan.',
+            ],
+            [
+                'name' => 'IT Support',
+                'description' => 'Layanan dukungan teknis dan maintenance sistem IT.',
+            ],
+            [
+                'name' => 'Internet of Things (IoT)',
+                'description' => 'Layanan pengembangan solusi IoT.',
+            ],
+            [
+                'name' => 'Multimedia',
+                'description' => 'Layanan terkait pengembangan multimedia.',
+            ],
+        ];
+
+        foreach ($categories as $category) {
+            ServiceCategory::firstOrCreate(
                 ['name' => $category['name']],
-                ['description' => $category['description'], 'is_active' => true],
+                ['description' => $category['description']]
             );
         }
 
-        Service::factory(20)->create();
+
+        /*
+        |------------------------------------------------------------------
+        | 5. SERVICE + PORTOFOLIO
+        |------------------------------------------------------------------
+        */
+        $services = Service::factory(20)->create();
         Portofolio::factory(20)->create();
 
-        Order::factory(30)->create();
-        Offer::factory(30)->create();
+
+        /*
+        |------------------------------------------------------------------
+        | 6. TRANSACTION FLOW
+        | Order -> Offer -> Negotiation -> Transaction -> Result -> Review
+        |------------------------------------------------------------------
+        */
+        $orders = Order::factory(30)->create();
+
+        $offers = Offer::factory(30)->create();
+
         Negotiation::factory(10)->create();
+
         Transaction::factory(15)->create();
+
         Result::factory(15)->create();
-        Order::doesntHave('review')->get()->each(function ($order) {
-            Review::factory()->create([
-                'order_id' => $order->id,
-            ]);
-        });
-        // Review::factory(15)->create();
+
+
+        /*
+        |------------------------------------------------------------------
+        | 7. REVIEW
+        | Buat review hanya jika order belum punya review
+        |------------------------------------------------------------------
+        */
+        Order::doesntHave('review')
+            ->get()
+            ->each(function ($order) {
+                Review::factory()->create([
+                    'order_id' => $order->id,
+                ]);
+            });
     }
 }
