@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreReviewRequest;
 use App\Models\Review;
 use Illuminate\Http\Request;
 
 class ReviewController extends Controller
 {
-    /**
-     * Display a listing of the resource (ADMIN ONLY)
-     */
+    // ADMIN ONLY
     public function index()
     {
         // Pakai perbaikan audit kita agar nama asli muncul (eager loading skomda_student)
@@ -21,26 +20,49 @@ class ReviewController extends Controller
         return view('dashboard.admin.reviews', compact('reviews'));
     }
 
-    /**
-     * Store a newly created resource in storage 
-     */
-    public function store(Request $request)
+    // CLIENT ONLY
+    public function clientIndex(Request $request)
+    {
+        $client = auth('client')->user();
+
+        $reviews = Review::with('order.service.freelancer')
+            ->whereHas('order', fn($q) => $q->where('client_id', $client->id))
+            ->latest()
+            ->get();
+
+        return view('dashboard.client.reviews', compact('reviews'));
+    }
+
+    public function clientShowByOrderId(string $orderId)
+    {
+        $review = Review::with('order.service.freelancer')
+            ->where('order_id', $orderId)
+            ->firstOrFail();
+
+        return view('dashboard.client.review-detail', compact('review'));
+    }
+    
+    public function clientCreate(Request $request, string $orderId)
+    {
+        // Pastikan order tersebut milik client yang sedang login
+        $client = auth('client')->user();
+        $order = $client->orders()->where('id', $orderId)->firstOrFail();
+
+        // Tampilkan form review untuk client
+        return view('dashboard.client.reviews.create', compact('order'));
+    }
+    
+    public function clientStore(StoreReviewRequest $request)
     {
         // Logika simpan review
+        $request->validated();
+
+        Review::create($request->only(['order_id', 'rating', 'comment']));
+
+        return redirect()->back()->with('success', 'Review berhasil ditambahkan');
     }
 
-    /**
-     * Remove the specified resource from storage (FITUR ADMIN KITA)
-     */
-    public function destroy(Review $review)
-    {
-        $review->delete();
-        return back()->with('success', 'Review berhasil dihapus');
-    }
-
-    /**
-     * Tampilan Review untuk Freelancer
-     */
+    // FREELANCER ONLY
     public function freelancerIndex(Request $request)
     {
         $freelancer = auth('freelancer')->user();
@@ -54,9 +76,6 @@ class ReviewController extends Controller
         return view('dashboard.freelancer.reviews', compact('reviews'));
     }
 
-    /**
-     * Detail Review berdasarkan Order ID untuk Freelancer
-     */
     public function showReviewByOrderId(string $orderId)
     {
         $review = Review::with('order.service.freelancer')

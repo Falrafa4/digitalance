@@ -134,9 +134,6 @@ Route::middleware('auth:client')->prefix('client')->name('client.')->group(funct
     Route::get('/orders/{order}', [OrderController::class, 'clientShowPage'])->name('orders.show');
     Route::post('/orders/{order}/attachments', [OrderController::class, 'uploadAttachment'])->name('orders.attachments.store');
 
-    // Reviews
-    Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
-
     // Talents
     Route::get('/talents', [FreelancerController::class, 'clientFindTalent'])->name('talents.index');
     Route::get('/talents/{freelancer}', [FreelancerController::class, 'clientTalentShow'])->name('talents.show');
@@ -154,6 +151,12 @@ Route::middleware('auth:client')->prefix('client')->name('client.')->group(funct
 
     // History
     Route::get('/history', [OrderController::class, 'clientHistory'])->name('history.index');
+
+    // Reviews
+    Route::get('/reviews', [ReviewController::class, 'clientIndex'])->name('reviews.index');
+    Route::get('/reviews/order/{orderId}', [ReviewController::class, 'clientShowByOrderId'])->name('reviews.showByOrderId');
+    Route::get('/reviews/create/{orderId}', [ReviewController::class, 'clientCreate'])->name('reviews.create');
+    Route::post('/reviews', [ReviewController::class, 'clientStore'])->name('reviews.store');
 });
 
 // ── FREELANCER ───────────────────────────────────────────
