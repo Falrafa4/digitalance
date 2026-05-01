@@ -157,6 +157,12 @@ Route::middleware('auth:client')->prefix('client')->name('client.')->group(funct
     Route::get('/reviews/order/{orderId}', [ReviewController::class, 'clientShowByOrderId'])->name('reviews.showByOrderId');
     Route::get('/reviews/create/{orderId}', [ReviewController::class, 'clientCreate'])->name('reviews.create');
     Route::post('/reviews', [ReviewController::class, 'clientStore'])->name('reviews.store');
+
+    // Offers
+    Route::get('/offers', [OfferController::class, 'clientIndex'])->name('offers.index');
+    Route::get('/offers/{offer}', [OfferController::class, 'clientShow'])->name('offers.show');
+    Route::post('/offers/{offer}/accept', [OfferController::class, 'clientAccept'])->name('offers.accept');
+    Route::post('/offers/{offer}/reject', [OfferController::class, 'clientReject'])->name('offers.reject');
 });
 
 // ── FREELANCER ───────────────────────────────────────────
@@ -211,4 +217,9 @@ Route::middleware('auth:freelancer')->prefix('freelancer')->name('freelancer.')-
     // crud results
     Route::get('/results', [ResultController::class, 'freelancerIndex'])->name('results.index');
     Route::resource('results', ResultController::class)->except(['index']);
+
+    // crud offers
+    Route::get('/offers', [OfferController::class, 'freelancerIndex'])->name('offers.index');
+    Route::post('/offers', [OfferController::class, 'freelancerStore'])->name('offers.store');
+    Route::put('/offers/{offer}', [OfferController::class, 'freelancerUpdate'])->name('offers.update');
 });
