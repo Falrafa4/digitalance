@@ -36,21 +36,19 @@ class AuthController extends Controller
     {
         $request->validated();
 
-        $student = SkomdaStudent::where('student_id', $request->student_id)->first();
+        $student = SkomdaStudent::where('id', $request->student_id)->first();
 
         if (!$student) {
-            return back()->withErrors(['student_id' => 'Siswa dengan ID Student tersebut tidak ditemukan'])->withInput();
+            return back()->withErrors(['id' => 'Siswa dengan ID Student tersebut tidak ditemukan'])->withInput();
         }
 
         if ($student->freelancer) {
-            return back()->withErrors(['student_id' => 'Akun freelancer untuk ID Student ini sudah terdaftar. Silakan login.'])->withInput();
+            return back()->withErrors(['id' => 'Akun freelancer untuk ID Student ini sudah terdaftar. Silakan login.'])->withInput();
         }
-
-        $defaultPassword = $student->nis;
 
         $student->freelancer()->create([
             'student_id' => $request->student_id,
-            'password' => Hash::make($defaultPassword),
+            'password' => Hash::make($request->password),
             'status' => 'Pending',
         ]);
 
@@ -79,6 +77,8 @@ class AuthController extends Controller
         $freelancer = Freelancer::whereHas('skomda_student', function ($query) use ($credentials) {
             $query->where('email', $credentials['email']);
         })->first();
+
+        // dd($freelancer);
 
         if ($freelancer && Hash::check($credentials['password'], $freelancer->password)) {
             Auth::guard('freelancer')->login($freelancer);

@@ -397,18 +397,21 @@
                                             <path d="M8 12h8" />
                                             <path d="M8 16h6" />
                                         </svg>
-                                        <input id="studentSelect" list="studentList"
+                                        <input id="studentSelect" name="student_display" list="studentList"
                                             class="inp w-full pl-10 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-[0.86rem] transition-all"
                                             placeholder="Ketik nama / NIS..." autocomplete="off" />
 
                                         <datalist id="studentList">
                                             @foreach(($students ?? []) as $s)
-                                                <option value="{{ $s->nis }}">{{ $s->name }} ({{ $s->nis }})</option>
+                                                <option value="{{ $s->name }} ({{ $s->nis }})" data-id="{{ $s->id }}"
+                                                    data-nis="{{ $s->nis }}" data-email="{{ $s->email }}"></option>
                                             @endforeach
                                         </datalist>
                                     </div>
+                                    <input type="hidden" id="studentIdInput" name="student_id"
+                                        value="{{ old('student_id') }}" />
                                     <input type="hidden" id="nisInput" name="nis" value="{{ old('nis') }}" />
-                                    @error('nis')
+                                    @error('student_id')
                                         <p class="text-[0.72rem] text-red-600 font-bold mt-1 flex items-center gap-2">
                                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                                 stroke-width="2">
@@ -434,9 +437,8 @@
                                                 d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
                                             <polyline points="22,6 12,13 2,6" />
                                         </svg>
-                                        <input type="text" id="studentEmail" value="" readonly tabindex="-1"
-                                            oncopy="return false" oncut="return false" onpaste="return false"
-                                            class="inp w-full pl-10 pr-3 py-2.5 bg-slate-100 border border-slate-200 rounded-xl text-[0.86rem] transition-all cursor-not-allowed text-slate-600 select-none pointer-events-none" />
+                                        <input type="text" id="studentEmail" value="" placeholder="Email siswa" readonly tabindex="-1"
+                                            class="inp w-full pl-10 pr-3 py-2.5 bg-slate-100 border border-slate-200 rounded-xl text-[0.86rem] transition-all text-slate-600" />
                                     </div>
                                     <p class="text-[0.62rem] text-slate-400 mt-1 ml-1">
                                         Gunakan email ini untuk login setelah registrasi.
