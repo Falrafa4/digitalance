@@ -2,15 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreTransactionRequest;
 use App\Models\Transaction;
 use App\Models\Order;
 use Illuminate\Http\Request;
 
 class TransactionController extends Controller
 {
-    /**
-     * Tampilan untuk Admin (DASHBOARD ADMIN)
-     */
+    // ADMIN ONLY
     public function index()
     {
         $transactions = Transaction::with([
@@ -20,26 +19,7 @@ class TransactionController extends Controller
         return view('dashboard.admin.transactions', compact('transactions'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        // Logika simpan transaksi baru
-    }
-
-    /**
-     * Remove the specified resource from storage (FITUR ADMIN KITA)
-     */
-    public function destroy(Transaction $transaction)
-    {
-        $transaction->delete();
-        return back()->with('success', 'Data transaksi berhasil dihapus');
-    }
-
-    /**
-     * Tampilan Transaksi untuk Freelancer
-     */
+    // FREELANCER ONLY
     public function freelancerIndex(Request $request)
     {
         $freelancer = auth('freelancer')->user();
@@ -53,9 +33,6 @@ class TransactionController extends Controller
         return view('dashboard.freelancer.transactions', compact('transactions'));
     }
 
-    /**
-     * Detail Transaksi berdasarkan Order ID untuk Freelancer
-     */
     public function showTransactionByOrderId(string $orderId)
     {
         $transaction = Transaction::with('order.service.freelancer')
@@ -67,10 +44,7 @@ class TransactionController extends Controller
         return view('dashboard.freelancer.transaction-detail', compact('transaction'));
     }
 
-    // =========================
-    // CLIENT ONLY (Payment sidebar)
-    // =========================
-
+    // CLIENT ONLY
     public function clientIndex()
     {
         $client = auth('client')->user();
@@ -94,5 +68,19 @@ class TransactionController extends Controller
             ->firstOrFail();
 
         return view('dashboard.client.payments.show', compact('transaction'));
+    }
+
+    public function store(StoreTransactionRequest $request)
+    {
+        $request->validated();
+
+        $transaction = Transaction::create([
+            'order_id' => $request->order_id,
+            'amount' => $request->amount,
+            'type' => $request->type,
+            'status' => $request->status ?? 'Pending',
+        ]);
+
+        return redirect()->back()->with('success', 'Transaksi berhasil dibuat');
     }
 }
