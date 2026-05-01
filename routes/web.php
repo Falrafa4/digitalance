@@ -175,7 +175,7 @@ Route::middleware('auth:freelancer')->prefix('freelancer')->name('freelancer.')-
 
     // crud order
     Route::get('/orders', [OrderController::class, 'freelancerIndex'])->name('orders.index');
-    Route::patch('/orders/{id}/status', [OrderController::class, 'updateStatus'])->name('orders.updateStatus');
+    Route::patch('/orders/{id}/status', [OrderController::class, 'updateStatusFreelancer'])->name('orders.updateStatus');
     Route::patch('/orders/{id}/price', [OrderController::class, 'updateAgreedPrice'])->name('orders.updateAgreedPrice');
 
     // crud review

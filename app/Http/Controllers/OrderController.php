@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 
 class OrderController extends Controller
 {
+    private const STATUS_RULE = 'required|in:Pending,Negotiated,Paid,In Progress,Revision,Completed,Cancelled';
+
     // =========================
     // ADMIN ONLY
     // =========================
@@ -19,9 +21,7 @@ class OrderController extends Controller
 
     public function updateStatus(Request $request, string $id)
     {
-        $validated = $request->validate([
-            'status' => 'required|in:Pending,Negotiated,Paid,In Progress,Revision,Completed,Cancelled'
-        ]);
+        $validated = $request->validate($this->statusValidationRules());
 
         $order = Order::findOrFail($id);
         $order->update($validated);
@@ -29,49 +29,25 @@ class OrderController extends Controller
         return redirect()->route('admin.orders.index')->with('success', 'Status order berhasil diperbarui');
     }
 
-    /**
-     * Store (dipakai admin route & client route di repo kamu)
-     * NOTE: method ini saat ini mengembalikan JSON (sesuai kode awalmu).
-     * Kalau kamu butuh redirect ke halaman orders setelah store, bikin method lain (aku sediakan storePage di bawah).
-     */
     public function store(Request $request)
     {
-        $client = $request->user('client');
-
         $validated = $request->validate([
+            'client_id' => 'required|integer|exists:clients,id',
             'service_id' => 'required|integer|exists:services,id',
             'brief' => 'required|string',
             'status' => 'nullable|in:Pending,Negotiated,Paid,In Progress,Revision,Completed,Cancelled',
             'agreed_price' => 'nullable|decimal:2'
         ]);
 
+        $service = Service::findOrFail($validated['service_id']);
+
         Order::create([
             ...$validated,
-            'client_id' => $client->id,
+            'freelancer_id' => $service->freelancer_id,
             'status' => $validated['status'] ?? 'Pending',
         ]);
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Sukses melakukan order jasa'
-        ]);
-    }
-
-    /**
-     * CLIENT ONLY (JSON) - sesuai kode awalmu
-     */
-    public function clientIndex(Request $request)
-    {
-        $client = auth('client')->user();
-
-        $orders = Order::with('service')
-            ->where('client_id', $client->id)
-            ->get();
-
-        return response()->json([
-            'status' => true,
-            'data' => $orders
-        ]);
+        return redirect()->route('admin.orders.index')->with('success', 'Order berhasil dibuat');
     }
 
     // =========================
@@ -181,18 +157,6 @@ class OrderController extends Controller
         return view('dashboard.client.history', compact('orders'));
     }
 
-    /**
-     * CLIENT: detail order versi route lama repo kamu (clientShow)
-     * Di routes/web.php kamu ada: Route::get('/orders/{id}', [OrderController::class, 'clientShow'])
-     * Aku buat kompatibel: return view bukan JSON.
-     */
-    public function clientShow(string $id)
-    {
-        // agar route lama tetap jalan dan tidak error
-        $order = Order::findOrFail($id);
-        return $this->clientShowPage($order);
-    }
-
     // =========================
     // FREELANCER ONLY
     // =========================
@@ -211,9 +175,7 @@ class OrderController extends Controller
 
     public function updateStatusFreelancer(Request $request, string $id)
     {
-        $validated = $request->validate([
-            'status' => 'required|in:Pending,Negotiated,Paid,In Progress,Revision,Completed,Cancelled'
-        ]);
+        $validated = $request->validate($this->statusValidationRules());
 
         $order = Order::findOrFail($id);
         $order->update($validated);
@@ -231,5 +193,20 @@ class OrderController extends Controller
         $order->update($validated);
 
         return redirect()->route('freelancer.orders.index')->with('success', 'Harga yang disepakati berhasil diperbarui');
+    }
+
+    public function destroy(string $id)
+    {
+        $order = Order::findOrFail($id);
+        $order->delete();
+
+        return redirect()->route('admin.orders.index')->with('success', 'Order berhasil dihapus');
+    }
+
+    private function statusValidationRules(): array
+    {
+        return [
+            'status' => self::STATUS_RULE,
+        ];
     }
 }
