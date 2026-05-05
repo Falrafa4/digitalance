@@ -18,6 +18,7 @@ use App\Models\Service;
 use App\Models\ServiceCategory;
 use App\Models\SkomdaStudent;
 use App\Models\Transaction;
+use App\Models\User;
 
 class DatabaseSeeder extends Seeder
 {
@@ -62,6 +63,7 @@ class DatabaseSeeder extends Seeder
         */
         $students = SkomdaStudent::factory(50)->create();
         $clients = Client::factory(10)->create();
+        User::factory(5)->create();
 
 
         /*
@@ -82,27 +84,27 @@ class DatabaseSeeder extends Seeder
         $categories = [
             [
                 'name' => 'Web Development',
-                'description' => 'Layanan terkait pengembangan web dan pemrograman.',
+                'description' => 'Pembuatan website, landing page, dashboard, dan integrasi fitur backend.',
             ],
             [
                 'name' => 'Desain Grafis',
-                'description' => 'Jasa desain grafis untuk kebutuhan promosi dan branding.',
+                'description' => 'Desain konten visual untuk promosi, branding, dan kebutuhan media sosial.',
             ],
             [
                 'name' => 'Jaringan Komputer',
-                'description' => 'Layanan instalasi dan konfigurasi jaringan.',
+                'description' => 'Instalasi, konfigurasi, dan troubleshooting jaringan untuk sekolah maupun UMKM.',
             ],
             [
                 'name' => 'IT Support',
-                'description' => 'Layanan dukungan teknis dan maintenance sistem IT.',
+                'description' => 'Dukungan teknis perangkat dan software, termasuk maintenance berkala.',
             ],
             [
                 'name' => 'Internet of Things (IoT)',
-                'description' => 'Layanan pengembangan solusi IoT.',
+                'description' => 'Perancangan solusi IoT sederhana untuk monitoring dan otomasi perangkat.',
             ],
             [
                 'name' => 'Multimedia',
-                'description' => 'Layanan terkait pengembangan multimedia.',
+                'description' => 'Produksi konten multimedia dasar untuk kebutuhan dokumentasi dan promosi.',
             ],
         ];
 

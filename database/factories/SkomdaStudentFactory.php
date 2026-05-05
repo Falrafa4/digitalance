@@ -3,8 +3,6 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Faker\Factory as Faker;
-
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\SkomdaStudent>
  */
@@ -12,19 +10,21 @@ class SkomdaStudentFactory extends Factory
 {
     public function definition(): array
     {
-        $faker = Faker::create();
-
-        $class = $faker->randomElement(['X', 'XI', 'XII', 'XIII']);
-        $major = $faker->randomElement(['TJAT', 'SIJA']);
+        $firstNames = ['Arga', 'Rafa', 'Dimas', 'Yusuf', 'Tegar', 'Nisa', 'Lala', 'Syifa', 'Adit', 'Farhan'];
+        $lastNames = ['Saputra', 'Prasetyo', 'Maulana', 'Permana', 'Fadilah', 'Putri', 'Anjani', 'Salsabila'];
+        $class = fake()->randomElement(['X', 'XI', 'XII', 'XIII']);
+        $major = fake()->randomElement(['TJAT', 'SIJA']);
 
         if ($class === 'XIII') {
             $major = 'SIJA';
         }
 
+        $name = fake()->randomElement($firstNames) . ' ' . fake()->randomElement($lastNames);
+
         return [
-            'nis' => $faker->unique()->numerify('#########'),
-            'name' => $faker->name(),
-            'email' => $faker->unique()->safeEmail(),
+            'nis' => fake()->unique()->numerify('#########'),
+            'name' => $name,
+            'email' => fake()->unique()->userName() . '@student.skomda.sch.id',
             'class' => $class,
             'major' => $major,
         ];

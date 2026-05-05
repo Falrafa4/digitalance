@@ -16,12 +16,19 @@ class FreelancerFactory extends Factory
      */
     public function definition(): array
     {
+        $bios = [
+            'Freelancer web developer dengan fokus Laravel dan sistem dashboard UMKM.',
+            'UI/UX designer yang terbiasa membuat landing page konversi tinggi untuk jasa lokal.',
+            'Teknisi jaringan berpengalaman untuk instalasi router, access point, dan CCTV IP.',
+            'Fullstack developer untuk pembuatan website company profile dan portal pemesanan.',
+            'Spesialis maintenance website, optimasi performa, dan perbaikan bug produksi.',
+        ];
+
         return [
             'student_id' => \App\Models\SkomdaStudent::inRandomOrder()->first()->id,
-            'bio' => $this->faker->text(),
+            'bio' => fake()->randomElement($bios),
             'password' => bcrypt('password'), // Default password
-            // 'status' => $this->faker->randomElement(['Pending', 'Approved', 'Suspended']),
-            'status' => 'Approved', // Set default status to 'Approved' for seeding
+            'status' => fake()->randomElement(['Pending', 'Approved', 'Approved', 'Suspended']),
         ];
     }
 }
