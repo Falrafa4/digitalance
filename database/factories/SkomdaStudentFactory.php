@@ -24,7 +24,7 @@ class SkomdaStudentFactory extends Factory
         return [
             'nis' => fake()->unique()->numerify('#########'),
             'name' => $name,
-            'email' => fake()->unique()->userName() . '@student.skomda.sch.id',
+            'email' => fake()->unique()->userName() . '@student.smktelkom-sda.sch.id',
             'class' => $class,
             'major' => $major,
         ];
