@@ -15,7 +15,11 @@ class PageController
     public function login()
     {
         $categories = ServiceCategory::pluck('name')->toArray();
-        $students = SkomdaStudent::select('nis', 'name', 'email')->orderBy('name')->get();
+        // select skomdastudent yang akunnya belum terikat ke freelancers
+        $students = SkomdaStudent::whereDoesntHave('freelancer')
+            ->select('id', 'nis', 'name', 'email')
+            ->orderBy('name')
+            ->get();
 
         return view('public.login', compact('categories', 'students'));
     }

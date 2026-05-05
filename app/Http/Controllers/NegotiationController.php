@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\NegotiationSent;
 use App\Http\Requests\SendMessageRequest;
 use App\Models\Negotiation;
 use App\Models\Order;
@@ -30,7 +31,7 @@ class NegotiationController extends Controller
                 $query->where('freelancer_id', $freelancer->id);
             })->get();
 
-        return view('dashboard.freelancer.negotiations', compact('negotiations'));
+        return view('dashboard.freelancer.messages', compact('negotiations'));
     }
 
     public function freelancerSendMessage(SendMessageRequest $request)
@@ -48,11 +49,13 @@ class NegotiationController extends Controller
 
         $request->validated();
 
-        Negotiation::create([
+        $negotiation = Negotiation::create([
             'order_id' => $request->order_id,
             'sender' => 'freelancer',
             'message' => $request->message
         ]);
+
+        broadcast(new NegotiationSent($negotiation))->toOthers();
 
         return redirect()->back()->with('success', 'Pesan berhasil dikirim');
     }
@@ -88,11 +91,13 @@ public function clientSendMessage(Request $request)
 
     $order = Order::where('client_id', $client->id)->findOrFail($validated['order_id']);
 
-    Negotiation::create([
+    $negotiation = Negotiation::create([
         'order_id' => $order->id,
         'sender' => 'client',
         'message' => $validated['message'],
     ]);
+
+    broadcast(new NegotiationSent($negotiation))->toOthers();
 
     if ($order->status === 'pending') {
         $order->status = 'negotiated';

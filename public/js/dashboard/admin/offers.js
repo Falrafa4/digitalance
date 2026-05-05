@@ -3,7 +3,7 @@ let negoData = [];
 
 document.addEventListener('DOMContentLoaded', function() {
     // 1. Ambil data dari Bridge yang ada di Blade
-    const pageData = window.OFFERS_PAGE || {};
+    const pageData = window.__OFFERS_PAGE__ || {};
     offersData = Array.isArray(pageData.offers) ? pageData.offers : [];
     negoData = Array.isArray(pageData.negotiations) ? pageData.negotiations : [];
     

@@ -238,21 +238,35 @@
               </div>
             </div>
 
-            <span class="text-[10.5px] font-bold px-2.5 py-1 rounded-lg uppercase tracking-[.05em] ${sBadge(u.status)}">${u.status}</span>
+            <!--<span class="text-[10.5px] font-bold px-2.5 py-1 rounded-lg uppercase tracking-[.05em] ${sBadge(u.status)}">${u.status}</span>-->
           </div>
 
-          <div class="text-[11.5px] text-slate-400 flex items-center gap-1 mb-3 relative z-10">
-            <i class="ri-map-pin-line"></i>
-            <span class="truncate">${u.location || 'Unknown Location'}</span>
+          <div class="text-xs text-slate-500 flex items-center gap-1 mb-3 relative z-10">
+            <i class="ri-mail-fill"></i>
+            <span class="truncate">${u.email}</span>
           </div>
 
-          <div class="flex flex-wrap gap-1.5 mb-3 min-h-[26px] relative z-10">
+          ${u.bio ? `
+            <div class="text-xs text-slate-500 flex items-center gap-1 mb-3 relative z-10">
+              <i class="ri-profile-fill"></i>
+              <span class="truncate">${u.bio}</span>
+            </div>
+            ` : `
+            <div class="text-xs text-slate-500 flex items-center gap-1 mb-3 relative z-10">
+              <i class="ri-phone-fill"></i>
+              <span class="truncate">${u.phone}</span>
+            </div>
+            `}
+          
+
+          <!--<div class="flex flex-wrap gap-1.5 mb-3 min-h-[26px] relative z-10">
             ${skills.length
               ? skills.slice(0,3).map(s=>`<span class="chip">${s}</span>`).join('')
                 + (skills.length>3 ? `<span class="chip chip-muted">+${skills.length-3}</span>` : '')
               : '<span class="text-[11px] text-slate-300 italic">No skills listed</span>'
             }
           </div>
+          -->
 
           <div class="flex gap-2 mt-auto relative z-10">
             <button type="button" onclick="window.openDetail('${u._uid}')" class="flex-1 btn-soft">
@@ -270,7 +284,41 @@
         </div>
       `;
     }).join('');
+
+    renderPaginationControls(Math.ceil(data.length / perPage));
   }
+
+  function renderPaginationControls(totalPages) {
+    let wrap = $('pagination-wrap');
+    if (!wrap) {
+        wrap = document.createElement('div');
+        wrap.id = 'pagination-wrap';
+        wrap.className = 'flex justify-center gap-2 mt-8 px-6';
+        $('user-grid').parentNode.appendChild(wrap);
+    }
+    
+    if (totalPages <= 1) {
+        wrap.innerHTML = '';
+        return;
+    }
+
+    let html = '';
+    html += `<button class="px-3 py-1 rounded-lg border border-slate-200 bg-white text-sm hover:bg-slate-50 disabled:opacity-50" ${currentPage === 1 ? 'disabled' : ''} onclick="window.changeUserPage(${currentPage - 1})">Prev</button>`;
+    for (let i = 1; i <= totalPages; i++) {
+        if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
+            html += `<button class="px-3 py-1 rounded-lg border ${i === currentPage ? 'bg-[#0f766e] text-white border-[#0f766e]' : 'border-slate-200 bg-white hover:bg-slate-50'} text-sm font-semibold" onclick="window.changeUserPage(${i})">${i}</button>`;
+        } else if (i === currentPage - 2 || i === currentPage + 2) {
+            html += `<span class="px-2 py-1 text-slate-400">...</span>`;
+        }
+    }
+    html += `<button class="px-3 py-1 rounded-lg border border-slate-200 bg-white text-sm hover:bg-slate-50 disabled:opacity-50" ${currentPage === totalPages ? 'disabled' : ''} onclick="window.changeUserPage(${currentPage + 1})">Next</button>`;
+    wrap.innerHTML = html;
+  }
+
+  window.changeUserPage = function(page) {
+      currentPage = page;
+      refreshGrid();
+  };
 
   function refreshGrid() {
     renderCards(getFilteredData());
@@ -654,6 +702,7 @@
         });
         tab.classList.add('active', 'bg-[#0f766e]', 'text-white', 'border-[#0f766e]', 'shadow-teal-sm');
         tab.classList.remove('border-slate-200', 'bg-white', 'text-slate-500');
+        currentPage = 1;
         refreshGrid();
       });
     });
@@ -661,7 +710,7 @@
     // Setup search
     const searchEl = $('user-search');
     if (searchEl) {
-      searchEl.addEventListener('input', refreshGrid);
+      searchEl.addEventListener('input', () => { currentPage = 1; refreshGrid(); });
     }
 
     // Setup per page

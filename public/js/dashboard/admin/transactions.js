@@ -2,6 +2,9 @@
     const page = window.__TRANSACTIONS_PAGE__ || {};
     let trxData = Array.isArray(page.data) ? page.data : (page.data?.data || []);
     
+    let currentPage = 1;
+    let itemsPerPage = 10;
+    
     let reportTargetId = null;
 
     const $ = (id) => document.getElementById(id);
@@ -106,9 +109,13 @@
         tableEl.style.display = 'table';
         emptyEl.style.display = 'none';
 
-        tbody.innerHTML = data.map(t => {
+        const totalPages = Math.ceil(data.length / itemsPerPage);
+        if (currentPage > totalPages && totalPages > 0) currentPage = totalPages;
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const paginatedData = data.slice(startIndex, startIndex + itemsPerPage);
+
+        tbody.innerHTML = paginatedData.map(t => {
             const rawStatus = String(t.status || 'pending').toLowerCase();
-            const rawType = String(t.type || 'full').toLowerCase();
             const date = t.created_at ? new Date(t.created_at).toLocaleDateString('id-ID') : '-';
 
             return `
@@ -123,11 +130,50 @@
                         <button class="btn-action" title="Detail" onclick="window.openTrxModal('${t.id}')">
                             <i class="ri-eye-line"></i>
                         </button>
+                        <button class="btn-action" style="color: #ef4444;" title="Laporkan" onclick="window.openReportModal('${t.id}')">
+                            <i class="ri-alarm-warning-line"></i>
+                        </button>
                     </td>
                 </tr>
             `;
         }).join('');
+
+        renderPaginationControls(totalPages);
     }
+
+    function renderPaginationControls(totalPages) {
+        let wrap = $('pagination-wrap');
+        if (!wrap) {
+            wrap = document.createElement('div');
+            wrap.id = 'pagination-wrap';
+            wrap.className = 'flex justify-end gap-2 mt-4 px-6';
+            $('trx-table').parentNode.appendChild(wrap);
+        }
+        
+        if (totalPages <= 1) {
+            wrap.innerHTML = '';
+            return;
+        }
+
+        let html = '';
+        html += `<button class="px-3 py-1 rounded border border-slate-200 bg-white text-sm hover:bg-slate-50 disabled:opacity-50" ${currentPage === 1 ? 'disabled' : ''} onclick="window.changeTrxPage(${currentPage - 1})">Prev</button>`;
+        
+        for (let i = 1; i <= totalPages; i++) {
+            if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
+                html += `<button class="px-3 py-1 rounded border ${i === currentPage ? 'bg-[#0f766e] text-white border-[#0f766e]' : 'border-slate-200 bg-white hover:bg-slate-50'} text-sm" onclick="window.changeTrxPage(${i})">${i}</button>`;
+            } else if (i === currentPage - 2 || i === currentPage + 2) {
+                html += `<span class="px-2 py-1 text-slate-400">...</span>`;
+            }
+        }
+
+        html += `<button class="px-3 py-1 rounded border border-slate-200 bg-white text-sm hover:bg-slate-50 disabled:opacity-50" ${currentPage === totalPages ? 'disabled' : ''} onclick="window.changeTrxPage(${currentPage + 1})">Next</button>`;
+        wrap.innerHTML = html;
+    }
+
+    window.changeTrxPage = function(page) {
+        currentPage = page;
+        refreshGrid();
+    };
 
     // OPEN DETAIL MODAL
     window.openTrxModal = function(id) {
@@ -238,6 +284,7 @@
                 });
                 tab.classList.add('active', 'bg-[#0f766e]', 'text-white', 'border-[#0f766e]', 'shadow-teal-sm');
                 tab.classList.remove('border-slate-200', 'bg-white', 'text-slate-500');
+                currentPage = 1;
                 refreshGrid();
             });
         });
@@ -249,7 +296,7 @@
         refreshGrid();
         initFilters();
         
-        $('trx-search-input')?.addEventListener('input', refreshGrid);
+        $('trx-search-input')?.addEventListener('input', () => { currentPage = 1; refreshGrid(); });
     }
 
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);

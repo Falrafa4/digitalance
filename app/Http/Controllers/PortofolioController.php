@@ -13,7 +13,7 @@ class PortofolioController extends Controller
      */
     public function index()
     {
-        $portofolios = Portofolio::with('service.freelancer')->get();
+        $portofolios = Portofolio::with('service.freelancer.skomda_student')->get();
 
         return view('dashboard.admin.portofolios', compact('portofolios'));
     }

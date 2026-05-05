@@ -16,11 +16,15 @@ class TransactionFactory extends Factory
      */
     public function definition(): array
     {
+        $type = fake()->randomElement(['DP', 'Full', 'Refund']);
+
         return [
             'order_id' => \App\Models\Order::inRandomOrder()->first()->id,
-            'amount' => $this->faker->randomFloat(2, 100000, 1000000),
-            'type' => $this->faker->randomElement(['DP', 'Full', 'Refund']),
-            'status' => $this->faker->randomElement(['Pending', 'Paid', 'Failed']),
+            'amount' => $type === 'Refund'
+                ? fake()->numberBetween(150000, 1800000)
+                : fake()->numberBetween(500000, 4500000),
+            'type' => $type,
+            'status' => fake()->randomElement(['Pending', 'Paid', 'Failed']),
         ];
     }
 }

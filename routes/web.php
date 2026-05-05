@@ -22,8 +22,8 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [PageController::class, 'home'])->name('home');
 Route::get('/login', [PageController::class, 'login'])->name('login')->middleware(['guest', 'throttle:5,1']);
 Route::post('/login', [AuthController::class, 'login'])->name('login-process');
-Route::get('/register-client', [PageController::class, 'registerClient']);
-Route::get('/register-freelancer', [PageController::class, 'registerFreelancer']);
+Route::get('/register-client', [PageController::class, 'registerClient'])->name('register-client');
+Route::get('/register-freelancer', [PageController::class, 'registerFreelancer'])->name('register-freelancer');
 Route::post('/register-client', [AuthController::class, 'registerClient'])->name('register-process');
 Route::post('/register-freelancer', [AuthController::class, 'registerFreelancer'])->name('register-freelancer-process');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
@@ -120,6 +120,9 @@ Route::middleware('auth:client')->prefix('client')->name('client.')->group(funct
     Route::get('/', [DashboardController::class, 'client'])->name('dashboard');
     Route::get('/profile', [ClientController::class, 'profile'])->name('profile');
 
+    // Service Categories
+    Route::get('/service-categories', [ServiceCategoryController::class, 'clientIndex'])->name('service-categories.index');
+
     // Services
     Route::get('/services', [ServiceController::class, 'clientIndex'])->name('services.index');
     Route::get('/services/{service}', [ServiceController::class, 'clientShow'])->name('services.show');
@@ -130,9 +133,6 @@ Route::middleware('auth:client')->prefix('client')->name('client.')->group(funct
     Route::post('/orders', [OrderController::class, 'storePage'])->name('orders.store');
     Route::get('/orders/{order}', [OrderController::class, 'clientShowPage'])->name('orders.show');
     Route::post('/orders/{order}/attachments', [OrderController::class, 'uploadAttachment'])->name('orders.attachments.store');
-
-    // Reviews
-    Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
 
     // Talents
     Route::get('/talents', [FreelancerController::class, 'clientFindTalent'])->name('talents.index');
@@ -151,11 +151,25 @@ Route::middleware('auth:client')->prefix('client')->name('client.')->group(funct
 
     // History
     Route::get('/history', [OrderController::class, 'clientHistory'])->name('history.index');
+
+    // Reviews
+    Route::get('/reviews', [ReviewController::class, 'clientIndex'])->name('reviews.index');
+    Route::get('/reviews/order/{orderId}', [ReviewController::class, 'clientShowByOrderId'])->name('reviews.showByOrderId');
+    Route::get('/reviews/create/{orderId}', [ReviewController::class, 'clientCreate'])->name('reviews.create');
+    Route::post('/reviews', [ReviewController::class, 'clientStore'])->name('reviews.store');
+
+    // Offers
+    Route::get('/offers', [OfferController::class, 'clientIndex'])->name('offers.index');
+    Route::get('/offers/{offer}', [OfferController::class, 'clientShow'])->name('offers.show');
+    Route::post('/offers/{offer}/accept', [OfferController::class, 'clientAccept'])->name('offers.accept');
+    Route::post('/offers/{offer}/reject', [OfferController::class, 'clientReject'])->name('offers.reject');
 });
 
 // ── FREELANCER ───────────────────────────────────────────
 Route::middleware('auth:freelancer')->prefix('freelancer')->name('freelancer.')->group(function () {
     Route::get('/', [DashboardController::class, 'freelancer'])->name('dashboard');
+    // Alias URL (optional): /freelancer/dashboard -> same dashboard page
+    Route::get('/dashboard', [DashboardController::class, 'freelancer']);
     Route::get('/profile', [FreelancerController::class, 'profile'])->name('profile');
     Route::post('/profile', [FreelancerController::class, 'updateProfile'])->name('profile.update');
     Route::post('/password', [FreelancerController::class, 'updatePassword'])->name('password.update');
@@ -172,7 +186,7 @@ Route::middleware('auth:freelancer')->prefix('freelancer')->name('freelancer.')-
 
     // crud order
     Route::get('/orders', [OrderController::class, 'freelancerIndex'])->name('orders.index');
-    Route::patch('/orders/{id}/status', [OrderController::class, 'updateStatus'])->name('orders.updateStatus');
+    Route::patch('/orders/{id}/status', [OrderController::class, 'updateStatusFreelancer'])->name('orders.updateStatus');
     Route::patch('/orders/{id}/price', [OrderController::class, 'updateAgreedPrice'])->name('orders.updateAgreedPrice');
 
     // crud review
@@ -204,5 +218,10 @@ Route::middleware('auth:freelancer')->prefix('freelancer')->name('freelancer.')-
 
     // crud results
     Route::get('/results', [ResultController::class, 'freelancerIndex'])->name('results.index');
-    Route::resource('results', ResultController::class)->except(['index']);
+    Route::resource('results', ResultController::class)->except(['index', 'create', 'edit']);
+
+    // crud offers
+    Route::get('/offers', [OfferController::class, 'freelancerIndex'])->name('offers.index');
+    Route::post('/offers', [OfferController::class, 'freelancerStore'])->name('offers.store');
+    Route::put('/offers/{offer}', [OfferController::class, 'freelancerUpdate'])->name('offers.update');
 });

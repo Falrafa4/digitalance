@@ -127,9 +127,9 @@
 @section('scripts')
     <script>
         // Menyiapkan data dari database ke format JSON untuk diolah JavaScript
-        var offersData = {!! json_encode($offers) !!};
-        var negotiationsData = {!! json_encode($negotiations) !!};
-        window.OFFERS_PAGE = {
+        var offersData = @json($offers ?? []);
+        var negotiationsData = @json($negotiations ?? []);
+        window.__OFFERS_PAGE__ = {
             offers: offersData,
             negotiations: negotiationsData
         };

@@ -6,6 +6,7 @@ use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterClientRequest;
 use App\Http\Requests\RegisterFreelancerRequest;
 use App\Models\Client;
+use App\Models\Freelancer;
 use App\Models\SkomdaStudent;
 use Illuminate\Http\Request;
 use App\Models\ServiceCategory;
@@ -35,21 +36,19 @@ class AuthController extends Controller
     {
         $request->validated();
 
-        $student = SkomdaStudent::where('student_id', $request->student_id)->first();
+        $student = SkomdaStudent::where('id', $request->student_id)->first();
 
         if (!$student) {
-            return back()->withErrors(['student_id' => 'Siswa dengan ID Student tersebut tidak ditemukan'])->withInput();
+            return back()->withErrors(['id' => 'Siswa dengan ID Student tersebut tidak ditemukan'])->withInput();
         }
 
         if ($student->freelancer) {
-            return back()->withErrors(['student_id' => 'Akun freelancer untuk ID Student ini sudah terdaftar. Silakan login.'])->withInput();
+            return back()->withErrors(['id' => 'Akun freelancer untuk ID Student ini sudah terdaftar. Silakan login.'])->withInput();
         }
-
-        $defaultPassword = $student->nis;
 
         $student->freelancer()->create([
             'student_id' => $request->student_id,
-            'password' => Hash::make($defaultPassword),
+            'password' => Hash::make($request->password),
             'status' => 'Pending',
         ]);
 
@@ -65,20 +64,33 @@ class AuthController extends Controller
 
         if (Auth::guard('client')->attempt($credentials)) {
             $request->session()->regenerate();
-            return redirect()->intended('/client');
+            return redirect()->intended('/client')
+                ->with('success', 'Login sebagai client berhasil');
         }
 
         if (Auth::guard('administrator')->attempt($credentials)) {
             $request->session()->regenerate();
-            return redirect()->intended('/admin');
+            return redirect()->intended('/admin')
+                ->with('success', 'Login sebagai administrator berhasil');
         }
 
-        if (Auth::guard('freelancer')->attempt($credentials)) {
+        $freelancer = Freelancer::whereHas('skomda_student', function ($query) use ($credentials) {
+            $query->where('email', $credentials['email']);
+        })->first();
+
+        // dd($freelancer);
+
+        if ($freelancer && Hash::check($credentials['password'], $freelancer->password)) {
+            Auth::guard('freelancer')->login($freelancer);
             $request->session()->regenerate();
-            return redirect()->intended('/freelancer');
+            return redirect()->intended('/freelancer')
+                ->with('success', 'Login sebagai freelancer berhasil');
         }
 
-        return back()->withErrors(['email' => 'Email atau Password salah, atau akun belum terdaftar!']);
+        return back()
+            ->withErrors(['email' => 'Email atau Password salah, atau akun belum terdaftar!'])
+            ->withInput()
+            ->with('error', 'Login gagal');
     }
 
     public function logout(Request $request)
@@ -90,6 +102,7 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/login');
+        return redirect('/login')
+            ->with('success', 'Berhasil logout');
     }
 }

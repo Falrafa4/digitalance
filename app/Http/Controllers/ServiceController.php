@@ -31,31 +31,31 @@ class ServiceController extends Controller
      * - Ambil dari DB + eager load
      */
     public function clientIndex()
-{
-    $services = Service::with([
-        'category:id,name',
-        'freelancer.skomda_student:id,name'
-    ])->latest()->get();
+    {
+        $services = Service::with([
+            'category:id,name',
+            'freelancer.skomda_student:id,name'
+        ])->latest()->get();
 
-    return view('dashboard.client.services.index', compact('services'));
-}
+        return view('dashboard.client.services.index', compact('services'));
+    }
 
-public function clientShow(Service $service)
-{
-    $service->load([
-        'category:id,name',
-        'freelancer.skomda_student:id,name,email'
-    ]);
+    public function clientShow(Service $service)
+    {
+        $service->load([
+            'category:id,name',
+            'freelancer.skomda_student:id,name,email'
+        ]);
 
-    $otherServices = Service::with('category:id,name')
-        ->where('freelancer_id', $service->freelancer_id)
-        ->where('id', '!=', $service->id)
-        ->latest()
-        ->take(6)
-        ->get();
+        $otherServices = Service::with('category:id,name')
+            ->where('freelancer_id', $service->freelancer_id)
+            ->where('id', '!=', $service->id)
+            ->latest()
+            ->take(6)
+            ->get();
 
-    return view('dashboard.client.services.show', compact('service', 'otherServices'));
-}
+        return view('dashboard.client.services.show', compact('service', 'otherServices'));
+    }
 
     /**
      * FREELANCER ONLY
@@ -95,7 +95,25 @@ public function clientShow(Service $service)
             return redirect()->route('freelancer.services.index')->with('error', 'Layanan tidak ditemukan');
         }
 
+        $freelancer = auth('freelancer')->user();
+        if ((int) $service->freelancer_id !== (int) $freelancer->id) {
+            return redirect()->route('freelancer.services.index')->with('error', 'Anda tidak memiliki akses ke layanan ini');
+        }
+
         return view('dashboard.freelancer.services.show', compact('service'));
+    }
+
+    /**
+     * Edit Service By ID (FREELANCER ONLY)
+     */
+    public function edit(string $id)
+    {
+        $freelancer = auth('freelancer')->user();
+        $service = Service::with('service_category:id,name')
+            ->where('freelancer_id', $freelancer->id)
+            ->findOrFail($id);
+
+        return view('dashboard.freelancer.services.edit', compact('service'));
     }
 
     /**

@@ -13,19 +13,19 @@
 
     <!-- Statistics (ID harus sesuai dengan JS) -->
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-[14px] mb-6">
-        <div class="bg-white px-6 py-5 rounded-3xl border border-slate-200 hover:border-[#10B981] transition-all duration-300">
+        <div class="bg-white px-6 py-5 rounded-[18px] border border-slate-200 hover:border-[#10B981] transition-all duration-300">
             <span class="block text-slate-500 text-[11px] font-bold uppercase tracking-[0.6px] mb-2">Paid</span>
             <span class="font-display text-[2rem] font-extrabold text-emerald-600" id="stat-paid">0</span>
         </div>
-        <div class="bg-white px-6 py-5 rounded-3xl border border-slate-200 hover:border-amber-500 transition-all duration-300">
+        <div class="bg-white px-6 py-5 rounded-[18px] border border-slate-200 hover:border-amber-500 transition-all duration-300">
             <span class="block text-slate-500 text-[11px] font-bold uppercase tracking-[0.6px] mb-2">Pending</span>
             <span class="font-display text-[2rem] font-extrabold text-amber-500" id="stat-pending">0</span>
         </div>
-        <div class="bg-white px-6 py-5 rounded-3xl border border-slate-200 hover:border-blue-500 transition-all duration-300">
+        <div class="bg-white px-6 py-5 rounded-[18px] border border-slate-200 hover:border-blue-500 transition-all duration-300">
             <span class="block text-slate-500 text-[11px] font-bold uppercase tracking-[0.6px] mb-2">In Progress</span>
             <span class="font-display text-[2rem] font-extrabold text-blue-500" id="stat-in_progress">0</span>
         </div>
-        <div class="bg-white px-6 py-5 rounded-3xl border border-slate-200 hover:border-red-500 transition-all duration-300">
+        <div class="bg-white px-6 py-5 rounded-[18px] border border-slate-200 hover:border-red-500 transition-all duration-300">
             <span class="block text-slate-500 text-[11px] font-bold uppercase tracking-[0.6px] mb-2">Cancelled</span>
             <span class="font-display text-[2rem] font-extrabold text-red-500" id="stat-cancelled">0</span>
         </div>
@@ -48,7 +48,7 @@
     </div>
 
     <!-- Table -->
-    <div class="bg-white rounded-3xl border border-slate-200 overflow-hidden">
+    <div class="bg-white rounded-[18px] border border-slate-200 overflow-hidden">
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
                 <thead>

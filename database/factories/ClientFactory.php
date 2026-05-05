@@ -16,11 +16,18 @@ class ClientFactory extends Factory
      */
     public function definition(): array
     {
+        $firstNames = ['Raka', 'Nadya', 'Fajar', 'Dinda', 'Rizky', 'Aulia', 'Bagas', 'Naila', 'Galih', 'Citra'];
+        $lastNames = ['Pratama', 'Saputra', 'Maharani', 'Wibowo', 'Putri', 'Ramadhan', 'Permata', 'Handayani'];
+        $domains = ['gmail.com', 'yahoo.com', 'outlook.com'];
+
+        $name = fake()->randomElement($firstNames) . ' ' . fake()->randomElement($lastNames);
+        $emailHandle = strtolower(str_replace(' ', '.', $name)) . fake()->numberBetween(10, 99);
+
         return [
-            'name' => $this->faker->name(),
-            'email' => $this->faker->unique()->safeEmail(),
+            'name' => $name,
+            'email' => fake()->unique()->lexify($emailHandle . '@' . fake()->randomElement($domains)),
             'password' => bcrypt('password'), // Default password for clients
-            'phone' => $this->faker->phoneNumber(),
+            'phone' => '+628' . fake()->numerify('##########'),
         ];
     }
 }

@@ -1,10 +1,10 @@
 @php
-  $isAdmin = auth('administrator')->check();
-  $isFreelancer = auth('freelancer')->check();
-  $isClient = auth('client')->check();
+    $isAdmin = auth('administrator')->check();
+    $isFreelancer = auth('freelancer')->check();
+    $isClient = auth('client')->check();
 
-  $active = 'bg-[#0f766e] text-white shadow-teal-md';
-  $inactive = 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]';
+    $active = 'bg-[#0f766e] text-white shadow-teal-md';
+    $inactive = 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]';
 
     // Route mapping (tetap tidak mengubah variabel existing)
     $settingsRoute = null;
@@ -49,146 +49,167 @@
         @if($isAdmin)
             <a href="{{ route('admin.dashboard') }}"
                 class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
-                    {{ request()->routeIs('admin.dashboard') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
+                        {{ request()->routeIs('admin.dashboard') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
                 <i class="ri-dashboard-fill text-[17px]"></i> Dashboard
             </a>
 
             <a href="{{ route('admin.clients.index') }}"
                 class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
-                    {{ request()->routeIs('admin.clients.*', 'admin.freelancers.*', 'admin.skomda-students.*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
+                        {{ request()->routeIs('admin.clients.*', 'admin.freelancers.*', 'admin.skomda-students.*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
                 <i class="ri-user-line text-[17px]"></i> Client
             </a>
 
             <a href="{{ route('admin.admins.index') }}"
                 class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
-                    {{ request()->routeIs('admin.admins.*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
+                        {{ request()->routeIs('admin.admins.*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
                 <i class="ri-user-star-line text-[17px]"></i> Admin
             </a>
 
             <a href="{{ route('admin.orders.index') }}"
                 class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
-                    {{ request()->routeIs('admin.orders.*') && request('status') !== 'in_progress' ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
+                        {{ request()->routeIs('admin.orders.*') && request('status') !== 'in_progress' ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
                 <i class="ri-file-list-3-line text-[17px]"></i> Orders
             </a>
 
             <a href="{{ route('admin.reviews.index') }}"
                 class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
-                    {{ request()->routeIs('admin.reviews.*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
+                        {{ request()->routeIs('admin.reviews.*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
                 <i class="ri-star-line text-[17px]"></i> Reviews
             </a>
 
             <a href="{{ route('admin.services.index') }}"
                 class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
-                    {{ request()->routeIs('admin.services.*', 'admin.service-categories.*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
+                        {{ request()->routeIs('admin.services.*', 'admin.service-categories.*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
                 <i class="ri-tools-line text-[17px]"></i> Services
             </a>
 
             <a href="{{ route('admin.transactions.index') }}"
                 class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
-                    {{ request()->routeIs('admin.transactions.*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
+                        {{ request()->routeIs('admin.transactions.*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
                 <i class="ri-bank-card-line text-[17px]"></i> Transactions
             </a>
 
             <a href="{{ route('admin.portofolios.index') }}"
                 class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
-                    {{ request()->routeIs('admin.portofolios.*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
+                        {{ request()->routeIs('admin.portofolios.*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
                 <i class="ri-folder-user-line text-[17px]"></i> Portofolios
             </a>
 
             <a href="{{ route('admin.offers.index') }}"
                 class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
-                    {{ request()->routeIs('admin.offers.*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
+                        {{ request()->routeIs('admin.offers.*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
                 <i class="ri-price-tag-3-line text-[17px]"></i> Offers
             </a>
 
             <a href="{{ route('admin.results.index') }}"
                 class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
-                    {{ request()->routeIs('admin.results.*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
+                        {{ request()->routeIs('admin.results.*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
                 <i class="ri-task-line text-[17px]"></i> Results
             </a>
         @endif
 
-       {{-- CLIENT --}}
-       @if($isClient)
-  <a href="{{ route('client.dashboard') }}"
-     class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
-     {{ request()->routeIs('client.dashboard') ? $active : $inactive }}">
-    <i class="ri-dashboard-fill text-[17px]"></i> Dashboard
-  </a>
+        {{-- CLIENT --}}
+        @if($isClient)
+                <a href="{{ route('client.dashboard') }}" class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
+             {{ request()->routeIs('client.dashboard') ? $active : $inactive }}">
+                    <i class="ri-dashboard-fill text-[17px]"></i> Dashboard
+                </a>
 
-  <a href="{{ route('client.services.index') }}"
-     class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
-     {{ request()->routeIs('client.services.*') ? $active : $inactive }}">
-    <i class="ri-tools-line text-[17px]"></i> Katalog Jasa
-  </a>
+                <a href="{{ route('client.services.index') }}" class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
+             {{ request()->routeIs('client.services.*') ? $active : $inactive }}">
+                    <i class="ri-tools-line text-[17px]"></i> Katalog Jasa
+                </a>
 
-  <a href="{{ route('client.orders.index') }}"
-     class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
-     {{ request()->routeIs('client.orders.*') ? $active : $inactive }}">
-    <i class="ri-file-list-3-line text-[17px]"></i> Orders
-  </a>
+                <a href="{{ route('client.orders.index') }}" class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
+             {{ request()->routeIs('client.orders.*') ? $active : $inactive }}">
+                    <i class="ri-file-list-3-line text-[17px]"></i> Orders
+                </a>
 
-  <a href="{{ route('client.talents.index') }}"
-     class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
-     {{ request()->routeIs('client.talents.*') ? $active : $inactive }}">
-    <i class="ri-user-search-line text-[17px]"></i> Find Talent
-  </a>
+                <a href="{{ route('client.talents.index') }}" class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
+             {{ request()->routeIs('client.talents.*') ? $active : $inactive }}">
+                    <i class="ri-user-search-line text-[17px]"></i> Find Talent
+                </a>
 
-  <a href="{{ route('client.projects.index') }}"
-     class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
-     {{ request()->routeIs('client.projects.*') ? $active : $inactive }}">
-    <i class="ri-briefcase-4-line text-[17px]"></i> My Projects
-  </a>
+                <a href="{{ route('client.projects.index') }}" class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
+             {{ request()->routeIs('client.projects.*') ? $active : $inactive }}">
+                    <i class="ri-briefcase-4-line text-[17px]"></i> My Projects
+                </a>
 
-  <a href="{{ route('client.messages.index') }}"
-     class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
-     {{ request()->routeIs('client.messages.*') ? $active : $inactive }}">
-    <i class="ri-message-3-line text-[17px]"></i> Messages
-  </a>
+                <a href="{{ route('client.messages.index') }}" class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
+             {{ request()->routeIs('client.messages.*') ? $active : $inactive }}">
+                    <i class="ri-message-3-line text-[17px]"></i> Messages
+                </a>
 
-  <a href="{{ route('client.payments.index') }}"
-     class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
-     {{ request()->routeIs('client.payments.*') ? $active : $inactive }}">
-    <i class="ri-bank-card-line text-[17px]"></i> Payment
-  </a>
+                <a href="{{ route('client.offers.index') }}" class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
+                 {{ request()->routeIs('client.offers.*') ? $active : $inactive }}">
+                    <i class="ri-price-tag-3-line text-[17px]"></i> Offers
+                </a>
 
-  <a href="{{ route('client.history.index') }}"
-     class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
-     {{ request()->routeIs('client.history.*') ? $active : $inactive }}">
-    <i class="ri-history-line text-[17px]"></i> History
-  </a>
-@endif
+                <a href="{{ route('client.payments.index') }}" class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
+             {{ request()->routeIs('client.payments.*') ? $active : $inactive }}">
+                    <i class="ri-bank-card-line text-[17px]"></i> Payment
+                </a>
+
+                <a href="{{ route('client.history.index') }}" class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
+             {{ request()->routeIs('client.history.*') ? $active : $inactive }}">
+                    <i class="ri-history-line text-[17px]"></i> History
+                </a>
+        @endif
 
         {{-- FREELANCER --}}
         @if($isFreelancer)
             <a href="{{ route('freelancer.dashboard') }}"
                 class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
-                    {{ request()->routeIs('freelancer.dashboard') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
+                        {{ request()->routeIs('freelancer.dashboard') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
                 <i class="ri-dashboard-fill text-[17px]"></i> Dashboard
             </a>
 
             <a href="{{ route('freelancer.services.index') }}"
                 class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
-                    {{ request()->routeIs('freelancer.services.*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
+                        {{ request()->routeIs('freelancer.services.*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
                 <i class="ri-tools-line text-[17px]"></i> Services
             </a>
 
             <a href="{{ route('freelancer.orders.index') }}"
                 class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
-                    {{ request()->routeIs('freelancer.orders.*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
+                        {{ request()->routeIs('freelancer.orders.*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
                 <i class="ri-file-list-3-line text-[17px]"></i> Orders
+            </a>
+
+            <a href="{{ route('freelancer.negotiations.index') }}"
+                class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
+                        {{ request()->routeIs('freelancer.negotiations.*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
+                <i class="ri-message-3-line text-[17px]"></i> Messages
+            </a>
+
+            <a href="{{ route('freelancer.offers.index') }}"
+                class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
+                        {{ request()->routeIs('freelancer.offers.*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
+                <i class="ri-price-tag-3-line text-[17px]"></i> Offers
             </a>
 
             <a href="{{ route('freelancer.reviews.index') }}"
                 class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
-                    {{ request()->routeIs('freelancer.reviews.*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
+                        {{ request()->routeIs('freelancer.reviews.*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
                 <i class="ri-star-line text-[17px]"></i> Reviews
+            </a>
+
+            <a href="{{ route('freelancer.results.index') }}"
+                class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
+                        {{ request()->routeIs('freelancer.results.*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
+                <i class="ri-task-line text-[17px]"></i> Results
             </a>
 
             <a href="{{ route('freelancer.transactions.index') }}"
                 class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
-                    {{ request()->routeIs('freelancer.transactions.*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
+                        {{ request()->routeIs('freelancer.transactions.*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
                 <i class="ri-bank-card-line text-[17px]"></i> Transactions
+            </a>
+
+            <a href="{{ route('freelancer.portofolios.index') }}"
+                class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
+                        {{ request()->routeIs('freelancer.portofolios.*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
+                <i class="ri-folder-user-line text-[17px]"></i> Portofolios
             </a>
         @endif
 
@@ -203,7 +224,7 @@
             @if($settingsRoute && Route::has($settingsRoute))
                 <a href="{{ route($settingsRoute) }}"
                     class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
-                        {{ request()->routeIs($settingsRoute) ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
+                            {{ request()->routeIs($settingsRoute) ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
                     <i class="ri-settings-3-line text-[17px]"></i> Settings
                 </a>
             @else
@@ -216,7 +237,7 @@
             @if($accountRoute && Route::has($accountRoute))
                 <a href="{{ route($accountRoute) }}"
                     class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
-                        {{ request()->routeIs($accountRoute, $accountRoute . '*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
+                            {{ request()->routeIs($accountRoute, $accountRoute . '*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}">
                     <i class="ri-user-line text-[17px]"></i> Account
                 </a>
             @else
@@ -232,7 +253,7 @@
             </form>
 
             <button type="button"
-                onclick="event.preventDefault(); if(confirm('Yakin ingin logout?')) document.getElementById('logout-form').submit();"
+                onclick="event.preventDefault(); customConfirm('Yakin ingin logout?').then(res => { if(res) document.getElementById('logout-form').submit(); })"
                 class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] text-red-500 font-semibold text-[13.5px] w-full text-left transition-all duration-200 hover:bg-red-50 hover:text-red-600 border-none bg-transparent cursor-pointer">
                 <i class="ri-logout-box-line text-[17px]"></i> Logout
             </button>

@@ -15,11 +15,11 @@
             {{-- Sidebar Profile --}}
             <div class="lg:col-span-1">
                 <div
-                    class="bg-white rounded-3xl border border-slate-200 p-6 flex flex-col items-center text-center animate-fadeUp">
+                    class="bg-white rounded-[18px] border border-slate-200 p-6 flex flex-col items-center text-center animate-fadeUp">
                     <div class="relative mb-4">
                         <img id="avatar-preview"
                             src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=0f766e&color=fff&size=128"
-                            class="w-24 h-24 rounded-3xl object-cover border-4 border-white shadow-teal-md" />
+                            class="w-24 h-24 rounded-[18px] object-cover border-4 border-white shadow-teal-md" />
                     </div>
                     <h3 class="font-display font-extrabold text-[1.15rem] text-slate-900">{{ Auth::user()->name }}</h3>
                     <p class="text-[13px] text-slate-400 mt-0.5">{{ Auth::user()->email }}</p>
@@ -34,7 +34,7 @@
             <div class="lg:col-span-2 flex flex-col gap-5">
 
                 {{-- Informasi Umum --}}
-                <div class="bg-white rounded-3xl border border-slate-200 animate-fadeUp-1">
+                <div class="bg-white rounded-[18px] border border-slate-200 animate-fadeUp-1">
                     <div class="px-7 py-5 border-b border-slate-100">
                         <h2 class="font-display font-bold text-[1.05rem] text-slate-900">Informasi Umum</h2>
                         <p class="text-[12px] text-slate-400 mt-0.5">Perbarui data diri dasar administrator.</p>
@@ -81,7 +81,7 @@
                 </div>
 
                 {{-- Ubah Password --}}
-                <div class="bg-white rounded-3xl border border-slate-200 animate-fadeUp-2">
+                <div class="bg-white rounded-[18px] border border-slate-200 animate-fadeUp-2">
                     <div class="px-7 py-5 border-b border-slate-100">
                         <h2 class="font-display font-bold text-[1.05rem] text-slate-900">Ubah Password</h2>
                         <p class="text-[12px] text-slate-400 mt-0.5">Pastikan akun kamu menggunakan password yang kuat.</p>
@@ -150,7 +150,7 @@
                 </div>
 
                 {{-- Danger Zone --}}
-                <div class="bg-white rounded-3xl border border-red-100 animate-fadeUp-3">
+                <div class="bg-white rounded-[18px] border border-red-100 animate-fadeUp-3">
                     <div class="px-7 py-5 border-b border-red-100">
                         <h2 class="font-display font-bold text-[1.05rem] text-red-600">Danger Zone</h2>
                         <p class="text-[12px] text-slate-400 mt-0.5">Aksi berbahaya yang tidak bisa dibatalkan.</p>
@@ -161,7 +161,7 @@
                             <p class="text-[12px] text-slate-400 mt-0.5">Akhiri semua sesi aktif di perangkat lain.</p>
                         </div>
                         <form action="{{ route('logout') }}" method="POST"
-                            onsubmit="return confirm('Yakin ingin logout?');">
+                            onsubmit="event.preventDefault(); customConfirm('Yakin ingin logout?').then(res => { if(res) this.submit(); });">
                             @csrf
                             <button type="submit"
                                 class="inline-flex items-center gap-2 px-[18px] py-[10px] bg-red-50 text-red-600 font-bold text-[13px] rounded-[12px] border border-red-200 hover:bg-red-100 transition-all duration-150 cursor-pointer">
