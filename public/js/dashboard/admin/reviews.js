@@ -75,6 +75,8 @@
     wrap.innerHTML = data.map(r => {
       const date = r.created_at ? new Date(r.created_at).toLocaleDateString('id-ID') : '-';
       
+      const clientName = r.order?.client?.user?.name ?? r.order?.client?.name ?? r.client_name ?? 'Client ' + (r.order?.client_id ?? '-');
+      const serviceName = r.order?.service?.title ?? r.service_name ?? 'Service ' + (r.order?.service_id ?? '-');
       return `
       <div class="review-card animate-fadeUp">
         <div class="card-header">
@@ -86,7 +88,11 @@
         </div>
         <div class="card-body">
           ${generateStars(r.rating)}
-          <div class="card-comment" title="${r.comment || '-'}">${r.comment || 'Tidak ada komentar'}</div>
+          <div class="text-[12px] text-slate-500 mt-2 mb-1">
+            <strong>Client:</strong> ${clientName} <br>
+            <strong>Service:</strong> ${serviceName}
+          </div>
+          <div class="card-comment mt-2" title="${r.comment || '-'}">${r.comment || 'Tidak ada komentar'}</div>
         </div>
         <div class="card-footer">
           <div class="action-btns">
@@ -124,6 +130,14 @@
             <div><span style="display:block;font-weight:700;color:var(--slate-800)">Order ID</span>#${r.order_id ?? '-'}</div>
           </div>
           <div class="modal-info-row">
+            <i class="ri-user-line"></i>
+            <div><span style="display:block;font-weight:700;color:var(--slate-800)">Client</span>${r.order?.client?.user?.name ?? r.order?.client?.name ?? r.client_name ?? '-'}</div>
+          </div>
+          <div class="modal-info-row">
+            <i class="ri-tools-line"></i>
+            <div><span style="display:block;font-weight:700;color:var(--slate-800)">Service Used</span>${r.order?.service?.title ?? r.service_name ?? '-'}</div>
+          </div>
+          <div class="modal-info-row">
             <i class="ri-star-line"></i>
             <div><span style="display:block;font-weight:700;color:var(--slate-800)">Rating</span>${generateStars(r.rating)}</div>
           </div>
@@ -152,8 +166,8 @@
   }
 
   // DELETE REVIEW
-  window.deleteReview = function(id) {
-    if (confirm(`Apakah Anda yakin ingin menghapus ulasan #${id}?`)) {
+  window.deleteReview = async function(id) {
+    if (await customConfirm(`Apakah Anda yakin ingin menghapus ulasan #${id}?`)) {
       reviewsData = reviewsData.filter(r => String(r.id) !== String(id));
       refreshUI();
     }

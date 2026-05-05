@@ -83,7 +83,7 @@
     <div class="overlay fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-200"
         id="modal-add">
         <div
-            class="modal-box bg-white rounded-3xl w-full max-w-[520px] max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
+            class="modal-box bg-white rounded-[18px] w-full max-w-[520px] max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
             <div class="flex items-center justify-between px-[26px] py-[22px] border-b border-slate-100 flex-shrink-0">
                 <span class="font-display text-[1.1rem] font-extrabold text-slate-900">Add New User</span>
                 <button onclick="window.closeModal('modal-add')"
@@ -218,7 +218,7 @@
     <div class="overlay fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-200"
         id="modal-edit">
         <div
-            class="modal-box bg-white rounded-3xl w-full max-w-[520px] max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
+            class="modal-box bg-white rounded-[18px] w-full max-w-[520px] max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
             <div class="flex items-center justify-between px-[26px] py-[22px] border-b border-slate-100 flex-shrink-0">
                 <span class="font-display text-[1.1rem] font-extrabold text-slate-900">Edit User</span>
                 <button onclick="window.closeModal('modal-edit')"
@@ -296,7 +296,7 @@
     <div class="overlay fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-200"
         id="modal-detail">
         <div
-            class="modal-box bg-white rounded-3xl w-full max-w-[580px] max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
+            class="modal-box bg-white rounded-[18px] w-full max-w-[580px] max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
             <div id="detail-content" class="flex flex-col flex-1 overflow-y-auto"></div>
         </div>
     </div>
@@ -304,7 +304,7 @@
     <!-- Confirm Delete Modal -->
     <div class="overlay fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-200"
         id="modal-delete">
-        <div class="modal-box bg-white rounded-3xl w-full max-w-[400px] shadow-2xl overflow-hidden">
+        <div class="modal-box bg-white rounded-[18px] w-full max-w-[400px] shadow-2xl overflow-hidden">
             <div class="px-[26px] pt-[30px] pb-[24px] text-center">
                 <div
                     class="w-[72px] h-[72px] mx-auto mb-5 bg-red-50 rounded-full flex items-center justify-center text-[2rem] text-red-500">

@@ -70,12 +70,12 @@ function renderCards(data = portfoliosData) {
                 <div class="port-body">
                     <div class="port-id-row">
                         <span class="port-id">#${p.id}</span>
-                        <span class="port-srv-id"><i class="ri-tools-line"></i> #${p.service.title}</span>
+                        <span class="port-srv-id"><i class="ri-tools-line"></i> #${p.service?.title ?? p.service_id ?? '-'}</span>
                     </div>
                     <h3 class="port-title" title="${p.title}">${p.title}</h3>
                     <p class="port-desc">${p.description ? p.description.slice(0, 75) + '...' : '-'}</p>
                     <div class="port-meta-row">
-                        <span class="port-freelancer"><i class="ri-user-line"></i> ${p.service.freelancer.skomda_student.name}</span>
+                        <span class="port-freelancer"><i class="ri-user-line"></i> ${fName}</span>
                         <span class="port-date"><i class="ri-calendar-line"></i> ${date}</span>
                     </div>
                 </div>

@@ -124,7 +124,7 @@ class ClientController extends Controller
         $client = auth('client')->user();
         $client->update($request->validated());
 
-        return redirect()->route('dashboard.client.profile')->with('success', 'Profil berhasil diperbarui');
+        return redirect()->route('client.profile')->with('success', 'Profil berhasil diperbarui');
     }
 
     public function updatePassword(UpdateClientPasswordRequest $request)
@@ -133,14 +133,14 @@ class ClientController extends Controller
         $client = auth('client')->user();
 
         if (!Hash::check($request->current_password, $client->password)) {
-            return redirect()->route('dashboard.client.profile')->withErrors('Password saat ini salah');
+            return redirect()->route('client.profile')->withErrors('Password saat ini salah');
         }
 
         $client->update([
             'password' => Hash::make($request->password),
         ]);
 
-        return redirect()->route('dashboard.client.profile')->with('success', 'Password berhasil diperbarui');
+        return redirect()->route('client.profile')->with('success', 'Password berhasil diperbarui');
     }
 
     // ==========================================

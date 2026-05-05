@@ -18,8 +18,8 @@
       client_id: o.client_id ?? o.client?.id ?? '',
       
       // Deteksi Nama Freelancer: Cek relasi Laravel atau properti langsung
-      freelancer_name: o.freelancer_name ?? o.service?.freelancer?.user?.name ?? o.service?.freelancer?.name ?? '-',
-      freelancer_id: o.freelancer_id ?? o.service?.freelancer?.id ?? '',
+      freelancer_name: o.freelancer?.user?.name ?? o.freelancer?.name ?? o.freelancer_name ?? o.service?.freelancer?.user?.name ?? o.service?.freelancer?.name ?? '-',
+      freelancer_id: o.freelancer_id ?? o.freelancer?.id ?? o.service?.freelancer?.id ?? '',
       
       // Deteksi Nama Service
       service_name: o.service_name ?? o.service?.title ?? o.service_id ?? '-',
@@ -44,6 +44,9 @@
 
   // Inisialisasi data dengan normalisasi
   let ordersData = (Array.isArray(rawOrders) ? rawOrders : []).map(normalizeOrder);
+
+  let currentPage = 1;
+  let itemsPerPage = 10;
 
   const STATUS_OPTIONS = ['pending', 'negotiated', 'paid', 'in_progress', 'revision', 'completed', 'cancelled'];
 
@@ -119,7 +122,12 @@
     tableEl.style.display = 'table';
     emptyEl.style.display = 'none';
 
-    tbody.innerHTML = data.map(o => `
+    const totalPages = Math.ceil(data.length / itemsPerPage);
+    if (currentPage > totalPages && totalPages > 0) currentPage = totalPages;
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const paginatedData = data.slice(startIndex, startIndex + itemsPerPage);
+
+    tbody.innerHTML = paginatedData.map(o => `
       <tr>
         <td><span class="order-id-badge">#${o.id}</span></td>
         <td>
@@ -143,7 +151,41 @@
         </td>
       </tr>
     `).join('');
+
+    renderPaginationControls(totalPages);
   }
+
+  function renderPaginationControls(totalPages) {
+    let wrap = document.getElementById('pagination-wrap');
+    if (!wrap) {
+        wrap = document.createElement('div');
+        wrap.id = 'pagination-wrap';
+        wrap.className = 'flex justify-end gap-2 mt-4 px-6';
+        document.getElementById('order-table').parentNode.appendChild(wrap);
+    }
+    
+    if (totalPages <= 1) {
+        wrap.innerHTML = '';
+        return;
+    }
+
+    let html = '';
+    html += `<button class="px-3 py-1 rounded border border-slate-200 bg-white text-sm hover:bg-slate-50 disabled:opacity-50" ${currentPage === 1 ? 'disabled' : ''} onclick="window.changeOrderPage(${currentPage - 1})">Prev</button>`;
+    for (let i = 1; i <= totalPages; i++) {
+        if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
+            html += `<button class="px-3 py-1 rounded border ${i === currentPage ? 'bg-[#0f766e] text-white border-[#0f766e]' : 'border-slate-200 bg-white hover:bg-slate-50'} text-sm" onclick="window.changeOrderPage(${i})">${i}</button>`;
+        } else if (i === currentPage - 2 || i === currentPage + 2) {
+            html += `<span class="px-2 py-1 text-slate-400">...</span>`;
+        }
+    }
+    html += `<button class="px-3 py-1 rounded border border-slate-200 bg-white text-sm hover:bg-slate-50 disabled:opacity-50" ${currentPage === totalPages ? 'disabled' : ''} onclick="window.changeOrderPage(${currentPage + 1})">Next</button>`;
+    wrap.innerHTML = html;
+  }
+
+  window.changeOrderPage = function(page) {
+      currentPage = page;
+      applyFilterAndSearch();
+  };
 
   /**
    * 4. DETAIL MODAL
@@ -314,8 +356,8 @@
   /**
    * 6. DELETE & FILTERING
    */
-  window.deleteOrder = function(id) {
-    if (confirm(`Apakah Anda yakin ingin menghapus order #${id}?`)) {
+  window.deleteOrder = async function(id) {
+    if (await customConfirm(`Apakah Anda yakin ingin menghapus order #${id}?`)) {
       ordersData = ordersData.filter(o => String(o.id) !== String(id));
       refreshUI();
     }
@@ -362,6 +404,7 @@
       tab.addEventListener('click', () => {
         document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
         tab.classList.add('active');
+        currentPage = 1;
         applyFilterAndSearch();
       });
     });
@@ -369,7 +412,7 @@
     // Event Listener Search Input
     const searchInput = document.getElementById('order-search-input');
     if (searchInput) {
-      searchInput.addEventListener('input', applyFilterAndSearch);
+      searchInput.addEventListener('input', () => { currentPage = 1; applyFilterAndSearch(); });
     }
 
     // Event Listener Add Button

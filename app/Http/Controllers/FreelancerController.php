@@ -24,7 +24,7 @@ class FreelancerController extends Controller
         $freelancer->name = $freelancer->skomda_student->name ?? 'Siswa Skomda';
         $freelancer->email = $freelancer->skomda_student->email ?? '-';
 
-        return view('freelancer.profile', [
+        return view('dashboard.freelancer.profile', [
             'user' => $freelancer,
             'role' => 'Freelancer'
         ]);

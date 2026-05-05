@@ -284,7 +284,41 @@
         </div>
       `;
     }).join('');
+
+    renderPaginationControls(Math.ceil(data.length / perPage));
   }
+
+  function renderPaginationControls(totalPages) {
+    let wrap = $('pagination-wrap');
+    if (!wrap) {
+        wrap = document.createElement('div');
+        wrap.id = 'pagination-wrap';
+        wrap.className = 'flex justify-center gap-2 mt-8 px-6';
+        $('user-grid').parentNode.appendChild(wrap);
+    }
+    
+    if (totalPages <= 1) {
+        wrap.innerHTML = '';
+        return;
+    }
+
+    let html = '';
+    html += `<button class="px-3 py-1 rounded-lg border border-slate-200 bg-white text-sm hover:bg-slate-50 disabled:opacity-50" ${currentPage === 1 ? 'disabled' : ''} onclick="window.changeUserPage(${currentPage - 1})">Prev</button>`;
+    for (let i = 1; i <= totalPages; i++) {
+        if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
+            html += `<button class="px-3 py-1 rounded-lg border ${i === currentPage ? 'bg-[#0f766e] text-white border-[#0f766e]' : 'border-slate-200 bg-white hover:bg-slate-50'} text-sm font-semibold" onclick="window.changeUserPage(${i})">${i}</button>`;
+        } else if (i === currentPage - 2 || i === currentPage + 2) {
+            html += `<span class="px-2 py-1 text-slate-400">...</span>`;
+        }
+    }
+    html += `<button class="px-3 py-1 rounded-lg border border-slate-200 bg-white text-sm hover:bg-slate-50 disabled:opacity-50" ${currentPage === totalPages ? 'disabled' : ''} onclick="window.changeUserPage(${currentPage + 1})">Next</button>`;
+    wrap.innerHTML = html;
+  }
+
+  window.changeUserPage = function(page) {
+      currentPage = page;
+      refreshGrid();
+  };
 
   function refreshGrid() {
     renderCards(getFilteredData());
@@ -668,6 +702,7 @@
         });
         tab.classList.add('active', 'bg-[#0f766e]', 'text-white', 'border-[#0f766e]', 'shadow-teal-sm');
         tab.classList.remove('border-slate-200', 'bg-white', 'text-slate-500');
+        currentPage = 1;
         refreshGrid();
       });
     });
@@ -675,7 +710,7 @@
     // Setup search
     const searchEl = $('user-search');
     if (searchEl) {
-      searchEl.addEventListener('input', refreshGrid);
+      searchEl.addEventListener('input', () => { currentPage = 1; refreshGrid(); });
     }
 
     // Setup per page

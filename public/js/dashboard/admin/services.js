@@ -307,7 +307,7 @@
     };
 
     window.approveService = async function(id) {
-        if (!confirm('Yakin ingin menyetujui layanan ini?')) return;
+        if (!(await customConfirm('Yakin ingin menyetujui layanan ini?'))) return;
 
         try {
             await apiRequest(`/admin/services/${id}/status`, { 

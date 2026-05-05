@@ -3,6 +3,9 @@
     const pageData = window.__RESULTS_PAGE__ || {};
     let allResults = Array.isArray(pageData.data) ? pageData.data : [];
 
+    let currentPage = 1;
+    let itemsPerPage = 10;
+    
     // State Filter
     let activeFilter = 'all';
 
@@ -14,14 +17,15 @@
         'paid': { label: 'Paid', color: 'text-emerald-700', bg: 'bg-emerald-100' },
         'pending': { label: 'Pending', color: 'text-amber-700', bg: 'bg-amber-100' },
         'in_progress': { label: 'In Progress', color: 'text-blue-700', bg: 'bg-blue-100' },
-        'cancelled': { label: 'Cancelled', color: 'text-red-700', bg: 'bg-red-100' }
+        'cancelled': { label: 'Cancelled', color: 'text-red-700', bg: 'bg-red-100' },
+        'accepted': { label: 'Accepted', color: 'text-emerald-700', bg: 'bg-emerald-100' },
+        'revision': { label: 'Revision', color: 'text-purple-700', bg: 'bg-purple-100' },
+        'completed': { label: 'Completed', color: 'text-emerald-700', bg: 'bg-emerald-100' }
     };
 
     // Helper untuk mendapat status string (fallback jika kosong)
     function getStatusKey(item) {
-        // Cek di result.status, jika tidak ada cek di order.status
-        const s = (item.status || item.order?.status || 'pending').toLowerCase();
-        return s;
+        return (item.status || item.order?.status || 'in_progress').toLowerCase();
     }
 
     // 3. FUNGSI RENDER STATS
@@ -58,9 +62,14 @@
         if (table) table.style.display = 'table';
         if (emptyEl) emptyEl.classList.add('hidden');
 
-        tbody.innerHTML = data.map(item => {
+        const totalPages = Math.ceil(data.length / itemsPerPage);
+        if (currentPage > totalPages && totalPages > 0) currentPage = totalPages;
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const paginatedData = data.slice(startIndex, startIndex + itemsPerPage);
+
+        tbody.innerHTML = paginatedData.map(item => {
             const key = getStatusKey(item);
-            const style = STATUS_CONFIG[key] || { label: item.status, color: 'text-slate-700', bg: 'bg-slate-100' };
+            const style = STATUS_CONFIG[key] || { label: item.status || 'In Progress', color: 'text-slate-700', bg: 'bg-slate-100' };
             
             const date = item.created_at ? new Date(item.created_at).toLocaleDateString('id-ID') : '-';
             const orderId = item.order_id || item.order?.id || '-';
@@ -90,7 +99,41 @@
                 </tr>
             `;
         }).join('');
+
+        renderPaginationControls(totalPages);
     }
+
+    function renderPaginationControls(totalPages) {
+        let wrap = $('pagination-wrap');
+        if (!wrap) {
+            wrap = document.createElement('div');
+            wrap.id = 'pagination-wrap';
+            wrap.className = 'flex justify-end gap-2 mt-4 px-6';
+            document.querySelector('table').parentNode.appendChild(wrap);
+        }
+        
+        if (totalPages <= 1) {
+            wrap.innerHTML = '';
+            return;
+        }
+
+        let html = '';
+        html += `<button class="px-3 py-1 rounded border border-slate-200 bg-white text-sm hover:bg-slate-50 disabled:opacity-50" ${currentPage === 1 ? 'disabled' : ''} onclick="window.changeResultPage(${currentPage - 1})">Prev</button>`;
+        for (let i = 1; i <= totalPages; i++) {
+            if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
+                html += `<button class="px-3 py-1 rounded border ${i === currentPage ? 'bg-[#0f766e] text-white border-[#0f766e]' : 'border-slate-200 bg-white hover:bg-slate-50'} text-sm" onclick="window.changeResultPage(${i})">${i}</button>`;
+            } else if (i === currentPage - 2 || i === currentPage + 2) {
+                html += `<span class="px-2 py-1 text-slate-400">...</span>`;
+            }
+        }
+        html += `<button class="px-3 py-1 rounded border border-slate-200 bg-white text-sm hover:bg-slate-50 disabled:opacity-50" ${currentPage === totalPages ? 'disabled' : ''} onclick="window.changeResultPage(${currentPage + 1})">Next</button>`;
+        wrap.innerHTML = html;
+    }
+
+    window.changeResultPage = function(page) {
+        currentPage = page;
+        applyFilter();
+    };
 
     // 5. FUNGSI FILTER & SEARCH
     function applyFilter() {
@@ -137,6 +180,7 @@
 
                 // Set state filter
                 activeFilter = btn.dataset.filter;
+                currentPage = 1;
                 
                 // Render ulang table
                 applyFilter();
@@ -146,7 +190,7 @@
         // Setup Search Input
         const searchInput = $('result-search');
         if (searchInput) {
-            searchInput.addEventListener('input', applyFilter);
+            searchInput.addEventListener('input', () => { currentPage = 1; applyFilter(); });
         }
     }
 

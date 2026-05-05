@@ -1,13 +1,3 @@
-@php
-    use App\Models\Client;
-    use App\Models\Freelancer;
-    use App\Models\SkomdaStudent;
-
-    $totalUsers = Client::count() + Freelancer::count() + SkomdaStudent::count();
-    $totalClients = Client::count();
-    $totalFreelancers = Freelancer::count();
-    $totalSkomda = SkomdaStudent::count();
-@endphp
 
 @extends('layouts.dashboard')
 @section('title', 'Admin Dashboard | Digitalance')
@@ -29,7 +19,7 @@
     <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 sm:gap-6 mb-10">
 
     {{-- Total Users --}}
-    <div class="bg-white px-6 py-6 rounded-3xl border border-slate-200 flex items-center gap-4">
+    <div class="bg-white px-6 py-6 rounded-[18px] border border-slate-200 flex items-center gap-4">
         <div class="w-12 h-12 flex items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 text-xl">
             <i class="ri-group-line"></i>
         </div>
@@ -42,7 +32,7 @@
     </div>
 
     {{-- Clients --}}
-    <div class="bg-white px-6 py-6 rounded-3xl border border-slate-200 flex items-center gap-4">
+    <div class="bg-white px-6 py-6 rounded-[18px] border border-slate-200 flex items-center gap-4">
         <div class="w-12 h-12 flex items-center justify-center rounded-xl bg-blue-50 text-blue-600 text-xl">
             <i class="ri-briefcase-4-line"></i>
         </div>
@@ -55,7 +45,7 @@
     </div>
 
     {{-- Freelancers --}}
-    <div class="bg-white px-6 py-6 rounded-3xl border border-slate-200 flex items-center gap-4">
+    <div class="bg-white px-6 py-6 rounded-[18px] border border-slate-200 flex items-center gap-4">
         <div class="w-12 h-12 flex items-center justify-center rounded-xl bg-orange-50 text-orange-600 text-xl">
             <i class="ri-vip-crown-line"></i>
         </div>
@@ -68,7 +58,7 @@
     </div>
 
     {{-- Skomda Students --}}
-    <div class="bg-white px-6 py-6 rounded-3xl border border-slate-200 flex items-center gap-4">
+    <div class="bg-white px-6 py-6 rounded-[18px] border border-slate-200 flex items-center gap-4">
         <div class="w-12 h-12 flex items-center justify-center rounded-xl bg-teal-50 text-teal-600 text-xl">
             <i class="ri-graduation-cap-line"></i>
         </div>
@@ -128,7 +118,7 @@
                     </div>
                 @empty
                     <div
-                        class="text-center py-12 px-5 bg-white border-2 border-dashed border-slate-200 rounded-3xl animate-fadeUp">
+                        class="text-center py-12 px-5 bg-white border-2 border-dashed border-slate-200 rounded-[18px] animate-fadeUp">
                         <div class="flex items-center justify-center text-[44px] text-slate-300 mb-3">
                             <i class="ri-inbox-archive-line"></i>
                         </div>
@@ -145,7 +135,7 @@
                 <h2 class="font-display text-[1.3rem] font-bold">System Alerts</h2>
             </div>
 
-            <div class="bg-white p-6 rounded-3xl border border-slate-200 flex flex-col gap-4">
+            <div class="bg-white p-6 rounded-[18px] border border-slate-200 flex flex-col gap-4">
                 @php $hasAnyAlert = false; @endphp
 
                 @if (($openDisputes ?? 0) > 0)
@@ -279,7 +269,7 @@
             const container = document.getElementById('verification-container');
             if (!card || !container) return;
 
-            if (!confirm('Yakin ingin menolak verifikasi ini?')) return;
+            if (!(await customConfirm('Yakin ingin menolak verifikasi ini?'))) return;
 
             const rejectUrl = (container.dataset.rejectUrl || '').replace('__ID__', id);
             if (!rejectUrl) return;
@@ -339,7 +329,7 @@
 
             btn.addEventListener('click', open);
             closeBtn.addEventListener('click', close);
-            backdrop.aFddEventListener('click', close);
+            backdrop.addEventListener('click', close);
 
             document.addEventListener('keydown', (e) => {
                 if (drawer.classList.contains('hidden')) return;

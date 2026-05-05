@@ -80,8 +80,34 @@
     <!-- Notification Drawer -->
     <x-notification-drawer />
 
+    <script src="{{ asset('js/dashboard/confirm-modal.js') }}"></script>
     <script src="{{ asset('js/dashboard/search.js') }}"></script>
     <script src="{{ asset('js/dashboard/notif-drawer.js') }}"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!sessionStorage.getItem('welcomeShown')) {
+                const welcome = document.createElement('div');
+                welcome.className = 'fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[9999] bg-slate-900/95 text-white px-8 py-5 rounded-[24px] shadow-[0_20px_50px_rgba(0,0,0,0.3)] flex items-center gap-5 animate-fadeUp backdrop-blur-xl border border-white/10 transition-all duration-500';
+                welcome.innerHTML = `
+                    <div class="w-14 h-14 bg-gradient-to-br from-emerald-400 to-teal-600 rounded-full flex items-center justify-center text-white text-[28px] shadow-lg">
+                        <i class="ri-hand-heart-fill"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-display font-extrabold text-[1.3rem] leading-tight mb-0.5">Selamat Datang!</h3>
+                        <p class="text-slate-300 text-[13px]">Semoga harimu menyenangkan dan produktif.</p>
+                    </div>
+                `;
+                document.body.appendChild(welcome);
+                sessionStorage.setItem('welcomeShown', 'true');
+                setTimeout(() => {
+                    welcome.style.opacity = '0';
+                    welcome.style.transform = 'translate(-50%, -60%)';
+                    setTimeout(() => welcome.remove(), 500);
+                }, 3500);
+            }
+        });
+    </script>
 
     @yield('scripts')
     @stack('scripts')
