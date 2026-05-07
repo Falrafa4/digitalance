@@ -68,42 +68,45 @@ class NegotiationController extends Controller
      * CLIENT: Messages inbox (sidebar Messages)
      * Menampilkan list negotiation berdasarkan order milik client
      */
-    public function clientInbox()
-{
-    $client = auth('client')->user();
+    public function clientIndex()
+    {
+        $client = auth('client')->user();
 
-    $threads = Negotiation::with('order.service.freelancer.skomda_student')
-        ->whereHas('order', fn($q) => $q->where('client_id', $client->id))
-        ->latest()
-        ->get();
+        $threads = Negotiation::with('order.service.freelancer.skomda_student')
+            ->whereHas('order', fn($q) => $q->where('client_id', $client->id))
+            ->latest()
+            ->get()
+            ->groupBy('order_id')
+            ->map(fn($messages) => $messages->first())
+            ->values();
 
-    return view('dashboard.client.messages', compact('threads'));
-}
-
-public function clientSendMessage(Request $request)
-{
-    $client = auth('client')->user();
-
-    $validated = $request->validate([
-        'order_id' => 'required|integer|exists:orders,id',
-        'message' => 'required|string|max:2000',
-    ]);
-
-    $order = Order::where('client_id', $client->id)->findOrFail($validated['order_id']);
-
-    $negotiation = Negotiation::create([
-        'order_id' => $order->id,
-        'sender' => 'client',
-        'message' => $validated['message'],
-    ]);
-
-    broadcast(new NegotiationSent($negotiation))->toOthers();
-
-    if ($order->status === 'pending') {
-        $order->status = 'negotiated';
-        $order->save();
+        return view('dashboard.client.messages', compact('threads'));
     }
 
-    return back()->with('success', 'Pesan terkirim');
-}
+    public function clientSendMessage(Request $request)
+    {
+        $client = auth('client')->user();
+
+        $validated = $request->validate([
+            'order_id' => 'required|integer|exists:orders,id',
+            'message' => 'required|string|max:2000',
+        ]);
+
+        $order = Order::where('client_id', $client->id)->findOrFail($validated['order_id']);
+
+        $negotiation = Negotiation::create([
+            'order_id' => $order->id,
+            'sender' => 'client',
+            'message' => $validated['message'],
+        ]);
+
+        broadcast(new NegotiationSent($negotiation))->toOthers();
+
+        if ($order->status === 'Pending') {
+            $order->status = 'Negotiated';
+            $order->save();
+        }
+
+        return back()->with('success', 'Pesan terkirim');
+    }
 }
