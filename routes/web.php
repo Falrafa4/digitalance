@@ -137,7 +137,7 @@ Route::middleware('auth:client')->prefix('client')->name('client.')->group(funct
     Route::get('/orders/{order}', [OrderController::class, 'clientShowPage'])->name('orders.show');
     Route::post('/orders/{order}/attachments', [OrderController::class, 'uploadAttachment'])->name('orders.attachments.store');
 
-    // Talents
+    // Talents (Freelancers)
     Route::get('/talents', [FreelancerController::class, 'clientFindTalent'])->name('talents.index');
     Route::get('/talents/{freelancer}', [FreelancerController::class, 'clientTalentShow'])->name('talents.show');
 

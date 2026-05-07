@@ -145,29 +145,40 @@ class FreelancerController extends Controller
     // CLIENT ONLY (Find Talent)
     // =========================
 
-    public function clientFindTalent()
-{
-    $freelancers = Freelancer::with('skomda_student')->latest()->get();
+    public function browseTalents()
+    {
+        $freelancers = Freelancer::with('skomda_student')->latest()->get();
 
-    foreach ($freelancers as $f) {
-        $f->services_count = Service::where('freelancer_id', $f->id)->count();
+        foreach ($freelancers as $f) {
+            $f->services_count = Service::where('freelancer_id', $f->id)->count();
+        }
+
+        return view('dashboard.client.talents.browse-talents', compact('freelancers'));
     }
+    
+    public function clientFindTalent()
+    {
+        $freelancers = Freelancer::with('skomda_student')->latest()->get();
 
-    return view('dashboard.client.talents.find-talent', compact('freelancers'));
-}
+        foreach ($freelancers as $f) {
+            $f->services_count = Service::where('freelancer_id', $f->id)->count();
+        }
+
+        return view('dashboard.client.talents.find-talent', compact('freelancers'));
+    }
 
     /**
      * CLIENT: Talent detail (profil + list services)
      */
     public function clientTalentShow(Freelancer $freelancer)
-{
-    $freelancer->load('skomda_student');
+    {
+        $freelancer->load('skomda_student');
 
-    $services = Service::with('service_category:id,name')
-        ->where('freelancer_id', $freelancer->id)
-        ->latest()
-        ->get();
+        $services = Service::with('service_category:id,name')
+            ->where('freelancer_id', $freelancer->id)
+            ->latest()
+            ->get();
 
-    return view('dashboard.client.talents.talent-show', compact('freelancer', 'services'));
-}
+        return view('dashboard.client.talents.talent-show', compact('freelancer', 'services'));
+    }
 }
