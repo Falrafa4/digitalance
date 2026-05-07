@@ -144,17 +144,6 @@ class FreelancerController extends Controller
     // =========================
     // CLIENT ONLY (Find Talent)
     // =========================
-
-    public function browseTalents()
-    {
-        $freelancers = Freelancer::with('skomda_student')->latest()->get();
-
-        foreach ($freelancers as $f) {
-            $f->services_count = Service::where('freelancer_id', $f->id)->count();
-        }
-
-        return view('dashboard.client.talents.browse-talents', compact('freelancers'));
-    }
     
     public function clientFindTalent()
     {
