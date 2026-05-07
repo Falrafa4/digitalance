@@ -75,6 +75,20 @@
                 </table>
             </div>
 
+            <div id="offers-pagination"
+                class="flex items-center justify-between px-6 py-4 bg-gray-50 border-t border-gray-100">
+                <div class="text-sm text-gray-600">
+                    Menampilkan <span id="offers-showing-start">0</span> sampai <span id="offers-showing-end">0</span> dari
+                    <span id="offers-total">0</span> hasil
+                </div>
+                <div class="flex gap-2">
+                    <button id="offers-prev-btn"
+                        class="px-3 py-1 text-sm bg-white border border-gray-200 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">Sebelumnya</button>
+                    <button id="offers-next-btn"
+                        class="px-3 py-1 text-sm bg-white border border-gray-200 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">Selanjutnya</button>
+                </div>
+            </div>
+
             <div id="offers-empty" class="py-20 text-center hidden">
                 <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
                     <i class="ri-price-tag-3-line text-3xl text-gray-300"></i>
@@ -102,6 +116,20 @@
                     <tbody id="nego-tbody" class="divide-y divide-gray-50">
                     </tbody>
                 </table>
+            </div>
+
+            <div id="nego-pagination"
+                class="flex items-center justify-between px-6 py-4 bg-gray-50 border-t border-gray-100">
+                <div class="text-sm text-gray-600">
+                    Menampilkan <span id="nego-showing-start">0</span> sampai <span id="nego-showing-end">0</span> dari
+                    <span id="nego-total">0</span> hasil
+                </div>
+                <div class="flex gap-2">
+                    <button id="nego-prev-btn"
+                        class="px-3 py-1 text-sm bg-white border border-gray-200 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">Sebelumnya</button>
+                    <button id="nego-next-btn"
+                        class="px-3 py-1 text-sm bg-white border border-gray-200 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">Selanjutnya</button>
+                </div>
             </div>
 
             <div id="nego-empty" class="py-20 text-center hidden">
@@ -156,5 +184,5 @@
             });
         });
     </script>
-    <script src="{{ asset('js/offers.js') }}"></script>
+    <script src="{{ asset('js/dashboard/admin/offers.js') }}"></script>
 @endsection

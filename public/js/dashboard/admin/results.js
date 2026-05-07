@@ -100,17 +100,21 @@
             `;
         }).join('');
 
+        const meta = $('results-meta');
+        if (meta) {
+            if (data.length === 0) {
+                meta.textContent = 'Showing 0-0 of 0';
+            } else {
+                meta.textContent = `Showing ${startIndex + 1}-${Math.min(startIndex + itemsPerPage, data.length)} of ${data.length}`;
+            }
+        }
+
         renderPaginationControls(totalPages);
     }
 
     function renderPaginationControls(totalPages) {
-        let wrap = $('pagination-wrap');
-        if (!wrap) {
-            wrap = document.createElement('div');
-            wrap.id = 'pagination-wrap';
-            wrap.className = 'flex justify-end gap-2 mt-4 px-6';
-            document.querySelector('table').parentNode.appendChild(wrap);
-        }
+        const wrap = $('pagination-wrap');
+        if (!wrap) return;
         
         if (totalPages <= 1) {
             wrap.innerHTML = '';
@@ -118,15 +122,17 @@
         }
 
         let html = '';
-        html += `<button class="px-3 py-1 rounded border border-slate-200 bg-white text-sm hover:bg-slate-50 disabled:opacity-50" ${currentPage === 1 ? 'disabled' : ''} onclick="window.changeResultPage(${currentPage - 1})">Prev</button>`;
+        html += `<button class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-[13px] font-bold text-slate-500 hover:bg-slate-50 disabled:opacity-50 transition-all" ${currentPage === 1 ? 'disabled' : ''} onclick="window.changeResultPage(${currentPage - 1})">Prev</button>`;
+        
         for (let i = 1; i <= totalPages; i++) {
             if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
-                html += `<button class="px-3 py-1 rounded border ${i === currentPage ? 'bg-[#0f766e] text-white border-[#0f766e]' : 'border-slate-200 bg-white hover:bg-slate-50'} text-sm" onclick="window.changeResultPage(${i})">${i}</button>`;
+                html += `<button class="w-8 h-8 rounded-lg border ${i === currentPage ? 'bg-[#0f766e] text-white border-[#0f766e]' : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'} text-[13px] font-bold transition-all flex items-center justify-center" onclick="window.changeResultPage(${i})">${i}</button>`;
             } else if (i === currentPage - 2 || i === currentPage + 2) {
-                html += `<span class="px-2 py-1 text-slate-400">...</span>`;
+                html += `<span class="w-8 h-8 flex items-center justify-center text-slate-400 text-[13px]">...</span>`;
             }
         }
-        html += `<button class="px-3 py-1 rounded border border-slate-200 bg-white text-sm hover:bg-slate-50 disabled:opacity-50" ${currentPage === totalPages ? 'disabled' : ''} onclick="window.changeResultPage(${currentPage + 1})">Next</button>`;
+        
+        html += `<button class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-[13px] font-bold text-slate-500 hover:bg-slate-50 disabled:opacity-50 transition-all" ${currentPage === totalPages ? 'disabled' : ''} onclick="window.changeResultPage(${currentPage + 1})">Next</button>`;
         wrap.innerHTML = html;
     }
 

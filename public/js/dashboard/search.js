@@ -42,6 +42,16 @@ document.addEventListener('DOMContentLoaded', () => {
     dropdown.classList.remove('hidden');
   });
 
+  input.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        const q = this.value.trim();
+        if (q) {
+            window.location.href = `/admin/search?q=${encodeURIComponent(q)}`;
+        }
+    }
+  });
+
   // klik luar → tutup dropdown
   document.addEventListener('click', (e) => {
     if (!input.contains(e.target) && !dropdown.contains(e.target)) {

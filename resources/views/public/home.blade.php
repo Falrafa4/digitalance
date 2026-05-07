@@ -44,10 +44,10 @@
                             Freelancer
                         </button>
                     </div>
-                    <div class="relative mb-4">
-                        <input type="text" id="heroSearch" placeholder="Cari jasa: Web Design, Video Editing…"
+                    <form action="{{ route('services.index') }}" method="GET" class="relative mb-4">
+                        <input type="text" name="q" id="heroSearch" placeholder="Cari jasa: Web Design, Video Editing…"
                             class="w-full px-6 py-4 pr-36 border-2 border-slate-200 rounded-2xl text-base text-slate-900 bg-white transition-all focus:outline-none focus:border-primary" />
-                        <button
+                        <button type="submit"
                             class="absolute right-2 top-2 bottom-2 bg-primary text-white border-none px-5 rounded-xl font-bold cursor-pointer flex items-center gap-2 hover:bg-teal-800 transition-all text-sm">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                 stroke-width="2.5">
@@ -56,20 +56,20 @@
                             </svg>
                             Search
                         </button>
-                    </div>
+                    </form>
                     <div class="flex flex-wrap gap-2 items-center">
                         <span class="text-xs font-semibold text-slate-400">Rekomendasi:</span>
-                        <span
-                            class="search-tag text-xs font-bold px-3 py-1 bg-orange-500/10 text-orange-500 rounded-lg cursor-pointer hover:bg-orange-500/20 transition-all">#Web
-                            Dev</span>
-                        <span
-                            class="search-tag text-xs font-bold px-3 py-1 bg-orange-500/10 text-orange-500 rounded-lg cursor-pointer hover:bg-orange-500/20 transition-all">#Logo
-                            Design</span>
-                        <span
-                            class="search-tag text-xs font-bold px-3 py-1 bg-orange-500/10 text-orange-500 rounded-lg cursor-pointer hover:bg-orange-500/20 transition-all">#Video
-                            Editor</span>
-                        <span
-                            class="search-tag text-xs font-bold px-3 py-1 bg-orange-500/10 text-orange-500 rounded-lg cursor-pointer hover:bg-orange-500/20 transition-all">#UI/UX</span>
+                        <a href="{{ route('services.index', ['q' => 'Web Dev']) }}"
+                            class="search-tag text-xs font-bold px-3 py-1 bg-orange-500/10 text-orange-500 rounded-lg cursor-pointer hover:bg-orange-500/20 transition-all no-underline">#Web
+                            Dev</a>
+                        <a href="{{ route('services.index', ['q' => 'Logo Design']) }}"
+                            class="search-tag text-xs font-bold px-3 py-1 bg-orange-500/10 text-orange-500 rounded-lg cursor-pointer hover:bg-orange-500/20 transition-all no-underline">#Logo
+                            Design</a>
+                        <a href="{{ route('services.index', ['q' => 'Video Editor']) }}"
+                            class="search-tag text-xs font-bold px-3 py-1 bg-orange-500/10 text-orange-500 rounded-lg cursor-pointer hover:bg-orange-500/20 transition-all no-underline">#Video
+                            Editor</a>
+                        <a href="{{ route('services.index', ['q' => 'UI/UX']) }}"
+                            class="search-tag text-xs font-bold px-3 py-1 bg-orange-500/10 text-orange-500 rounded-lg cursor-pointer hover:bg-orange-500/20 transition-all no-underline">#UI/UX</a>
                     </div>
                 </div>
             </div>
@@ -438,15 +438,15 @@
                     </div>
                 </div>
                 <div class="flex justify-center">
-                    <button
-                        class="inline-flex items-center gap-3 bg-emerald-500 text-white border-none px-8 py-4 rounded-2xl font-black text-base cursor-pointer transition-all shadow-[0_12px_32px_rgba(16,185,129,.25)] hover:bg-emerald-600 hover:-translate-y-0.5">
+                    <a href="{{ route('login', ['mode' => 'register', 'role' => 'client']) }}"
+                        class="inline-flex items-center gap-3 bg-emerald-500 text-white border-none px-8 py-4 rounded-2xl font-black text-base cursor-pointer transition-all shadow-[0_12px_32px_rgba(16,185,129,.25)] hover:bg-emerald-600 hover:-translate-y-0.5 no-underline">
                         Post a Project
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2">
                             <line x1="5" y1="12" x2="19" y2="12" />
                             <polyline points="12 5 19 12 12 19" />
                         </svg>
-                    </button>
+                    </a>
                 </div>
             </div>
 
@@ -516,15 +516,15 @@
                     </div>
                 </div>
                 <div class="flex justify-center">
-                    <button
-                        class="inline-flex items-center gap-3 bg-emerald-500 text-white border-none px-8 py-4 rounded-2xl font-black text-base cursor-pointer transition-all shadow-[0_12px_32px_rgba(16,185,129,.25)] hover:bg-emerald-600 hover:-translate-y-0.5">
+                    <a href="{{ route('login', ['mode' => 'register', 'role' => 'freelancer']) }}"
+                        class="inline-flex items-center gap-3 bg-emerald-500 text-white border-none px-8 py-4 rounded-2xl font-black text-base cursor-pointer transition-all shadow-[0_12px_32px_rgba(16,185,129,.25)] hover:bg-emerald-600 hover:-translate-y-0.5 no-underline">
                         Start Freelancing
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2">
                             <line x1="5" y1="12" x2="19" y2="12" />
                             <polyline points="12 5 19 12 12 19" />
                         </svg>
-                    </button>
+                    </a>
                 </div>
             </div>
         </div>

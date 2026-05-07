@@ -70,7 +70,7 @@
 
 @section('modals')
 <!-- MODAL: Detail Transaction -->
-<div class="overlay fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-200" id="modal-detail-trx">
+<div class="overlay fixed inset-0 z-[9999] bg-slate-900/40 backdrop-blur-sm flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-200" id="modal-detail-trx">
     <div class="modal-box bg-white rounded-[18px] w-full max-w-[520px] max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
         <div id="detail-trx-box" class="flex flex-col flex-1 overflow-hidden">
             <!-- Content injected by JS -->
@@ -79,7 +79,7 @@
 </div>
 
 <!-- MODAL: Report Fake Transaction -->
-<div class="overlay fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-200" id="modal-report-trx">
+<div class="overlay fixed inset-0 z-[9999] bg-slate-900/40 backdrop-blur-sm flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-200" id="modal-report-trx">
     <div class="modal-box bg-white rounded-[18px] w-full max-w-[450px] shadow-2xl overflow-hidden">
         <div class="px-[26px] pt-[30px] pb-[24px] text-center">
             <div class="w-[72px] h-[72px] mx-auto mb-5 bg-red-50 rounded-full flex items-center justify-center text-[2rem] text-red-500">

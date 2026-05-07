@@ -13,19 +13,7 @@
         ?? Auth::guard('freelancer')->user();
 @endphp
 
-{{-- Notification Button --}}
-<button
-    id="notif-btn"
-    data-role="{{ $role }}"
-    class="relative"
-    type="button"
->
-    <i class="ri-notification-3-line text-[20px]"></i>
 
-    @if (isset($notifications) && count($notifications) > 0)
-        <span class="has-unread absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full"></span>
-    @endif
-</button>
 
 {{-- Slide-in Notification Drawer --}}
 <div id="notif-drawer" class="fixed inset-0 z-[9998] hidden" aria-hidden="true">

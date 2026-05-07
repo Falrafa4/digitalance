@@ -173,11 +173,28 @@ class OrderController extends Controller
         return view('dashboard.freelancer.orders', compact('orders'));
     }
 
+    public function freelancerShow(Order $order)
+    {
+        $freelancer = auth('freelancer')->user();
+        
+        // Cek akses: Pesanan harus milik service yang dikelola freelancer ini
+        abort_unless($order->service->freelancer_id === $freelancer->id, 403);
+
+        $order->load(['service.service_category', 'client', 'negotiations', 'offers', 'transactions', 'results', 'review']);
+
+        return view('freelancer.orders.show', compact('order'));
+    }
+
     public function updateStatusFreelancer(Request $request, string $id)
     {
         $validated = $request->validate($this->statusValidationRules());
 
         $order = Order::findOrFail($id);
+        
+        // Cek akses
+        $freelancer = auth('freelancer')->user();
+        abort_unless($order->service->freelancer_id === $freelancer->id, 403);
+
         $order->update($validated);
 
         return redirect()->route('freelancer.orders.index')->with('success', 'Status order berhasil diperbarui');
@@ -186,13 +203,67 @@ class OrderController extends Controller
     public function updateAgreedPrice(Request $request, string $id)
     {
         $validated = $request->validate([
-            'agreed_price' => 'required|decimal:2'
+            'agreed_price' => 'required|numeric|min:0',
+            'note' => 'nullable|string'
         ]);
 
         $order = Order::findOrFail($id);
-        $order->update($validated);
+        
+        // Cek akses
+        $freelancer = auth('freelancer')->user();
+        abort_unless($order->service->freelancer_id === $freelancer->id, 403);
 
-        return redirect()->route('freelancer.orders.index')->with('success', 'Harga yang disepakati berhasil diperbarui');
+        $order->update([
+            'agreed_price' => $validated['agreed_price'],
+            'status' => 'Negotiated'
+        ]);
+
+        return redirect()->route('freelancer.orders.show', $order->id)->with('success', 'Penawaran harga berhasil dikirim');
+    }
+
+    public function freelancerAccept(Request $request, Order $order)
+    {
+        $freelancer = auth('freelancer')->user();
+        abort_unless($order->service->freelancer_id === $freelancer->id, 403);
+
+        $validated = $request->validate([
+            'agreed_price' => 'required|numeric|min:0',
+            'note' => 'nullable|string'
+        ]);
+
+        $order->update([
+            'agreed_price' => $validated['agreed_price'],
+            'status' => 'Negotiated'
+        ]);
+
+        // Opsional: Jika ada sistem pesan, simpan catatan sebagai pesan negosiasi
+        if ($request->filled('note')) {
+            $order->negotiations()->create([
+                'sender' => 'freelancer',
+                'message' => $validated['note']
+            ]);
+        }
+
+        return redirect()->route('freelancer.orders.show', $order->id)->with('success', 'Pesanan diterima dengan penawaran baru');
+    }
+
+    public function freelancerReject(Request $request, Order $order)
+    {
+        $freelancer = auth('freelancer')->user();
+        
+        // Cek akses: Pesanan harus milik service yang dikelola freelancer ini
+        abort_unless($order->service->freelancer_id === $freelancer->id, 403);
+
+        $request->validate([
+            'reason' => 'required|string'
+        ]);
+
+        $order->update([
+            'status' => 'Cancelled',
+            'brief' => $order->brief . "\n\nRejection Reason: " . $request->reason
+        ]);
+
+        return redirect()->route('freelancer.orders.index')->with('success', 'Pesanan telah ditolak');
     }
 
     public function destroy(string $id)

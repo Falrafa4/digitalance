@@ -21,11 +21,17 @@
         <div id="stats-row" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 animate-fadeUp-2">
             </div>
 
-        <div class="flex items-center justify-start gap-2 mb-6 flex-wrap animate-fadeUp-2" id="filter-tabs">
-            <button class="filter-tab px-[20px] py-2 rounded-full border-[1.5px] border-[#0f766e] bg-[#0f766e] text-white font-bold text-[12.5px] shadow-teal-sm cursor-pointer transition-all active" data-filter="all">Semua Layanan</button>
-            <button class="filter-tab px-[20px] py-2 rounded-full border-[1.5px] border-slate-200 bg-white text-slate-500 font-bold text-[12.5px] cursor-pointer transition-all hover:border-[#0f766e] hover:text-[#0f766e]" data-filter="pending">Pending</button>
-            <button class="filter-tab px-[20px] py-2 rounded-full border-[1.5px] border-slate-200 bg-white text-slate-500 font-bold text-[12.5px] cursor-pointer transition-all hover:border-[#0f766e] hover:text-[#0f766e]" data-filter="approved">Approved</button>
-            <button class="filter-tab px-[20px] py-2 rounded-full border-[1.5px] border-slate-200 bg-white text-slate-500 font-bold text-[12.5px] cursor-pointer transition-all hover:border-[#0f766e] hover:text-[#0f766e]" data-filter="rejected">Rejected</button>
+        <div class="flex items-center justify-between gap-4 mb-6 flex-wrap animate-fadeUp-2">
+            <div class="flex items-center justify-start gap-2 flex-wrap" id="filter-tabs">
+                <button class="filter-tab px-[20px] py-2 rounded-full border-[1.5px] border-[#0f766e] bg-[#0f766e] text-white font-bold text-[12.5px] shadow-teal-sm cursor-pointer transition-all active" data-filter="all">Semua Layanan</button>
+                <button class="filter-tab px-[20px] py-2 rounded-full border-[1.5px] border-slate-200 bg-white text-slate-500 font-bold text-[12.5px] cursor-pointer transition-all hover:border-[#0f766e] hover:text-[#0f766e]" data-filter="pending">Pending</button>
+                <button class="filter-tab px-[20px] py-2 rounded-full border-[1.5px] border-slate-200 bg-white text-slate-500 font-bold text-[12.5px] cursor-pointer transition-all hover:border-[#0f766e] hover:text-[#0f766e]" data-filter="approved">Approved</button>
+                <button class="filter-tab px-[20px] py-2 rounded-full border-[1.5px] border-slate-200 bg-white text-slate-500 font-bold text-[12.5px] cursor-pointer transition-all hover:border-[#0f766e] hover:text-[#0f766e]" data-filter="rejected">Rejected</button>
+            </div>
+            <div class="relative">
+                <i class="ri-search-line absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[15px] pointer-events-none"></i>
+                <input type="text" id="service-search-input" placeholder="Cari layanan, freelancer..." class="pl-9 pr-4 py-[9px] w-[260px] border-[1.5px] border-slate-200 rounded-[11px] text-[13px] font-semibold text-slate-700 bg-white outline-none transition-all duration-200 placeholder:font-normal placeholder:text-slate-400 focus:border-[#0f766e] focus:shadow-[0_0_0_3px_rgba(15,118,110,0.08)]" />
+            </div>
         </div>
 
         <div class="cards-wrap grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fadeUp-3" id="service-cards-wrap">
@@ -37,6 +43,11 @@
             </div>
             <h3 class="text-slate-900 font-bold">Layanan Tidak Ditemukan</h3>
             <p class="text-slate-400 text-sm">Tidak ada layanan dengan status ini.</p>
+        </div>
+
+        <div class="flex items-center justify-between mt-8 mb-4">
+            <div class="text-[13px] text-slate-500 font-medium" id="pagination-meta"></div>
+            <div id="pagination-wrap" class="flex justify-end gap-2"></div>
         </div>
     </div>
 @endsection

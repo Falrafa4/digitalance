@@ -151,8 +151,7 @@
         </div>
         <div class="flex flex-wrap justify-between items-center py-8 gap-4">
             <p class="text-slate-400 font-semibold text-sm">
-                © 2026 Digitalance. All rights reserved. Made with ❤️
-                for SKOMDA
+                © 2026 Digitalance. All rights reserved.
             </p>
             <div class="flex gap-6 text-xs font-bold uppercase tracking-widest text-slate-400">
                 <span class="cursor-pointer hover:text-primary transition-colors">Verified Platform</span>

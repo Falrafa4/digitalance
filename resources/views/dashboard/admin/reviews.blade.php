@@ -16,14 +16,22 @@
 
     <div class="stats-row" id="stats-row"></div>
 
-    <div class="filter-tabs">
-        <button class="filter-tab active" data-filter="all">Semua</button>
-        <button class="filter-tab" data-filter="5">5 Bintang</button>
-        <button class="filter-tab" data-filter="4">4 Bintang</button>
-        <button class="filter-tab" data-filter="low">3 Bintang ke Bawah</button>
+    <div class="flex items-center justify-between mb-6 flex-wrap gap-4">
+        <div class="filter-tabs" style="margin-bottom: 0;">
+            <button class="filter-tab active" data-filter="all">Semua</button>
+            <button class="filter-tab" data-filter="5">5 Bintang</button>
+            <button class="filter-tab" data-filter="4">4 Bintang</button>
+            <button class="filter-tab" data-filter="low">3 Bintang ke Bawah</button>
+        </div>
+        <div class="relative">
+            <i class="ri-search-line absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[15px] pointer-events-none"></i>
+            <input type="text" id="review-search" placeholder="Cari client atau service..." class="pl-9 pr-4 py-[9px] w-[260px] border-[1.5px] border-slate-200 rounded-[11px] text-[13px] font-semibold text-slate-700 bg-white outline-none transition-all duration-200 placeholder:font-normal placeholder:text-slate-400 focus:border-[#0f766e] focus:shadow-[0_0_0_3px_rgba(15,118,110,0.08)]" />
+        </div>
     </div>
 
     <div class="cards-wrap" id="review-cards-wrap"></div>
+    
+    <div id="pagination-wrap" class="flex justify-end gap-2 mt-6"></div>
 
     <div id="review-empty" class="empty-state" style="display:none;">
         <div class="empty-icon"><i class="ri-star-line"></i></div>
