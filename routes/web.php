@@ -166,6 +166,10 @@ Route::middleware('auth:client')->prefix('client')->name('client.')->group(funct
     Route::get('/offers/{offer}', [OfferController::class, 'clientShow'])->name('offers.show');
     Route::post('/offers/{offer}/accept', [OfferController::class, 'clientAccept'])->name('offers.accept');
     Route::post('/offers/{offer}/reject', [OfferController::class, 'clientReject'])->name('offers.reject');
+
+    // Portofolios
+    Route::get('/freelancers/{freelancer_id}/portofolios', [PortofolioController::class, 'showAllFreelancerPortofolios'])->name('freelancers.portofolios');
+    Route::get('/portofolios/{id}', [PortofolioController::class, 'showFreelancerPortofolio'])->name('portofolios.show');
 });
 
 // ── FREELANCER ───────────────────────────────────────────

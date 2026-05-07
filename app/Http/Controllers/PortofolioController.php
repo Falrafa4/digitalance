@@ -8,9 +8,7 @@ use App\Models\Portofolio;
 
 class PortofolioController extends Controller
 {
-    /**
-     * Display a listing of the resource. (ADMIN ONLY)
-     */
+    // ADMIN ONLY
     public function index()
     {
         $portofolios = Portofolio::with('service.freelancer.skomda_student')->get();
@@ -18,9 +16,7 @@ class PortofolioController extends Controller
         return view('dashboard.admin.portofolios', compact('portofolios'));
     }
 
-    /**
-     * Display a listing of the resource. (FREELANCER ONLY)
-     */
+    // FREELANCER ONLY
     public function freelancerIndex()
     {
         $freelancer = auth('freelancer')->user();
@@ -30,9 +26,6 @@ class PortofolioController extends Controller
         return view('dashboard.freelancer.portofolios', compact('portofolios', 'services'));
     }
 
-    /**
-     * Store a newly created resource in storage. (FREELANCER ONLY)
-     */
     public function store(StorePortofolioRequest $request)
     {
         Portofolio::create($request->validated());
@@ -40,9 +33,6 @@ class PortofolioController extends Controller
         return redirect()->route('freelancer.portofolios.index')->with('success', 'Portofolio berhasil ditambahkan');
     }
 
-    /**
-     * Display the specified resource. (FREELANCER ONLY)
-     */
     public function show(string $id)
     {
         $portofolio = Portofolio::with('service')->findOrFail($id);
@@ -50,9 +40,6 @@ class PortofolioController extends Controller
         return view('dashboard.freelancer.portofolios', compact('portofolio'));
     }
 
-    /**
-     * Update the specified resource in storage. (FREELANCER ONLY)
-     */
     public function update(UpdatePortofolioRequest $request, string $id)
     {
         $freelancer = auth('freelancer')->user();
@@ -67,9 +54,6 @@ class PortofolioController extends Controller
         return redirect()->route('freelancer.portofolios.index')->with('success', 'Portofolio berhasil diperbarui');
     }
 
-    /**
-     * Remove the specified resource from storage. (FREELANCER ONLY)
-     */
     public function destroy(string $id)
     {
         $freelancer = auth('freelancer')->user();
@@ -82,5 +66,20 @@ class PortofolioController extends Controller
         $portofolio->delete();
 
         return redirect()->route('freelancer.portofolios.index')->with('success', 'Portofolio berhasil dihapus');
+    }
+
+    // CLIENT ONLY
+    public function showAllFreelancerPortofolios(string $freelancer_id)
+    {
+        $portofolio = Portofolio::with('service.freelancer.skomda_student')->whereHas('service.freelancer', function ($query) use ($freelancer_id) {
+            $query->where('id', $freelancer_id);
+        })->get();
+        return view('dashboard.client.portofolio', compact('portofolio'));
+    }
+
+    public function showFreelancerPortofolio(string $id)
+    {
+        $portofolio = Portofolio::with('service.freelancer.skomda_student')->findOrFail($id);
+        return view('dashboard.client.portofolio', compact('portofolio'));
     }
 }
