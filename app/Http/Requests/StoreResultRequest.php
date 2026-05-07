@@ -22,10 +22,10 @@ class StoreResultRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'order_id' => 'required|exists:orders,id',
             'file' => 'required|file|mimes:pdf,doc,docx,zip',
-            'note' => 'nullable|string|max:255',
-            'message' => 'nullable|string|max:1000',
+            'note' => 'required|string|max:255',
+            'version' => 'nullable|string|max:100',
+            'message' => 'nullable|string|max:100',
         ];
     }
 }

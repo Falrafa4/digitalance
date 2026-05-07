@@ -229,7 +229,11 @@ Route::middleware('auth:freelancer')->prefix('freelancer')->name('freelancer.')-
 
     // crud results
     Route::get('/results', [ResultController::class, 'freelancerIndex'])->name('results.index');
-    Route::resource('results', ResultController::class)->except(['index', 'create', 'edit']);
+    Route::post('/results/{order_id}', [ResultController::class, 'store'])->name('results.store');
+    Route::get('/results/{result}', [ResultController::class, 'show'])->name('results.show');
+    Route::put('/results/{result}', [ResultController::class, 'update'])->name('results.update');
+    Route::delete('/results/{result}', [ResultController::class, 'destroy'])->name('results.destroy');
+    // Route::resource('results', ResultController::class)->except(['index', 'create', 'edit']);
 
     // crud offers
     Route::get('/offers', [OfferController::class, 'freelancerIndex'])->name('offers.index');
