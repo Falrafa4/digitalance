@@ -21,8 +21,6 @@ Route::get('/test', function () {
     ]);
 });
 
-// test message
-
 // Route::prefix('auth')->group(function () {
 //     Route::post('/register-client', [AuthController::class, 'register_client']);
 //     Route::post('/register-freelancer', [AuthController::class, 'register_freelancer']);
