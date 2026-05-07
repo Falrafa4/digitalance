@@ -19,52 +19,52 @@
     <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 sm:gap-6 mb-10">
 
     {{-- Total Users --}}
-    <div class="bg-white px-6 py-6 rounded-[18px] border border-slate-200 flex items-center gap-4">
+    <div class="bg-white p-5 rounded-[18px] border border-slate-200 flex items-center gap-4 transition-all hover:shadow-md">
         <div class="w-12 h-12 flex items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 text-xl">
             <i class="ri-group-line"></i>
         </div>
         <div>
-            <span class="text-slate-500 text-[11px] font-bold uppercase">Total Users</span>
-            <div class="text-2xl font-extrabold text-slate-900">
+            <span class="text-slate-400 text-[10px] font-extrabold uppercase tracking-widest">Total Users</span>
+            <div class="text-[1.85rem] font-extrabold text-slate-900 leading-none mt-1">
                 {{ number_format($totalUsers ?? 0) }}
             </div>
         </div>
     </div>
 
     {{-- Clients --}}
-    <div class="bg-white px-6 py-6 rounded-[18px] border border-slate-200 flex items-center gap-4">
+    <div class="bg-white p-5 rounded-[18px] border border-slate-200 flex items-center gap-4 transition-all hover:shadow-md">
         <div class="w-12 h-12 flex items-center justify-center rounded-xl bg-blue-50 text-blue-600 text-xl">
             <i class="ri-briefcase-4-line"></i>
         </div>
         <div>
-            <span class="text-slate-500 text-[11px] font-bold uppercase">Clients</span>
-            <div class="text-2xl font-extrabold text-slate-900">
+            <span class="text-slate-400 text-[10px] font-extrabold uppercase tracking-widest">Clients</span>
+            <div class="text-[1.85rem] font-extrabold text-slate-900 leading-none mt-1">
                 {{ number_format($totalClients ?? 0) }}
             </div>
         </div>
     </div>
 
     {{-- Freelancers --}}
-    <div class="bg-white px-6 py-6 rounded-[18px] border border-slate-200 flex items-center gap-4">
+    <div class="bg-white p-5 rounded-[18px] border border-slate-200 flex items-center gap-4 transition-all hover:shadow-md">
         <div class="w-12 h-12 flex items-center justify-center rounded-xl bg-orange-50 text-orange-600 text-xl">
             <i class="ri-vip-crown-line"></i>
         </div>
         <div>
-            <span class="text-slate-500 text-[11px] font-bold uppercase">Freelancers</span>
-            <div class="text-2xl font-extrabold text-slate-900">
+            <span class="text-slate-400 text-[10px] font-extrabold uppercase tracking-widest">Freelancers</span>
+            <div class="text-[1.85rem] font-extrabold text-slate-900 leading-none mt-1">
                 {{ number_format($totalFreelancers ?? 0) }}
             </div>
         </div>
     </div>
 
     {{-- Skomda Students --}}
-    <div class="bg-white px-6 py-6 rounded-[18px] border border-slate-200 flex items-center gap-4">
+    <div class="bg-white p-5 rounded-[18px] border border-slate-200 flex items-center gap-4 transition-all hover:shadow-md">
         <div class="w-12 h-12 flex items-center justify-center rounded-xl bg-teal-50 text-teal-600 text-xl">
             <i class="ri-graduation-cap-line"></i>
         </div>
         <div>
-            <span class="text-slate-500 text-[11px] font-bold uppercase">Skomda Students</span>
-            <div class="text-2xl font-extrabold text-slate-900">
+            <span class="text-slate-400 text-[10px] font-extrabold uppercase tracking-widest">Skomda Students</span>
+            <div class="text-[1.85rem] font-extrabold text-slate-900 leading-none mt-1">
                 {{ number_format($totalSkomda ?? 0) }}
             </div>
         </div>
@@ -135,16 +135,21 @@
                 <h2 class="font-display text-[1.3rem] font-bold">System Alerts</h2>
             </div>
 
-            <div class="bg-white p-6 rounded-[18px] border border-slate-200 flex flex-col gap-4">
+            <div class="space-y-4">
                 @php $hasAnyAlert = false; @endphp
 
                 @if (($openDisputes ?? 0) > 0)
                     @php $hasAnyAlert = true; @endphp
-                    <div class="flex gap-3 items-start pb-4 border-b border-slate-200">
-                        <i class="ri-error-warning-line text-orange-500 text-[20px] flex-shrink-0 mt-0.5"></i>
+                    <div class="bg-amber-50 border border-amber-100 p-4 rounded-2xl flex gap-3 items-start transition-all hover:shadow-sm">
+                        <div class="w-9 h-9 rounded-xl bg-amber-100 flex items-center justify-center text-amber-600 flex-shrink-0">
+                            <i class="ri-error-warning-line text-lg"></i>
+                        </div>
                         <div>
-                            <h4 class="text-[14px] text-slate-900 mb-1 font-semibold">Open Disputes</h4>
-                            <p class="text-[12px] text-slate-500 leading-relaxed">
+                            <div class="flex items-center gap-2 mb-1">
+                                <h4 class="text-[13.5px] text-amber-900 font-extrabold uppercase tracking-tight">Open Disputes</h4>
+                                <span class="px-2 py-0.5 rounded-full bg-amber-500 text-white text-[9px] font-extrabold uppercase">Warning</span>
+                            </div>
+                            <p class="text-[12.5px] text-amber-800/80 font-medium leading-relaxed">
                                 Ada <strong>{{ $openDisputes }}</strong> dispute yang belum diselesaikan.
                             </p>
                         </div>
@@ -153,11 +158,16 @@
 
                 @if (isset($pendingVerifications) && count($pendingVerifications) >= 5)
                     @php $hasAnyAlert = true; @endphp
-                    <div class="flex gap-3 items-start pb-4 border-b border-slate-200">
-                        <i class="ri-user-received-line text-orange-400 text-[20px] flex-shrink-0 mt-0.5"></i>
+                    <div class="bg-blue-50 border border-blue-100 p-4 rounded-2xl flex gap-3 items-start transition-all hover:shadow-sm">
+                        <div class="w-9 h-9 rounded-xl bg-blue-100 flex items-center justify-center text-blue-600 flex-shrink-0">
+                            <i class="ri-user-received-line text-lg"></i>
+                        </div>
                         <div>
-                            <h4 class="text-[14px] text-slate-900 mb-1 font-semibold">Antrian Verifikasi Penuh</h4>
-                            <p class="text-[12px] text-slate-500 leading-relaxed">
+                            <div class="flex items-center gap-2 mb-1">
+                                <h4 class="text-[13.5px] text-blue-900 font-extrabold uppercase tracking-tight">Antrian Verifikasi</h4>
+                                <span class="px-2 py-0.5 rounded-full bg-blue-500 text-white text-[9px] font-extrabold uppercase">Info</span>
+                            </div>
+                            <p class="text-[12.5px] text-blue-800/80 font-medium leading-relaxed">
                                 Ada <strong>{{ count($pendingVerifications) }}</strong> pengajuan menunggu persetujuan.
                             </p>
                         </div>
@@ -165,12 +175,12 @@
                 @endif
 
                 @if (!$hasAnyAlert)
-                    <div class="flex gap-3 items-start">
-                        <i class="ri-shield-check-line text-[#10B981] text-[20px] flex-shrink-0 mt-0.5"></i>
-                        <div>
-                            <h4 class="text-[14px] text-slate-900 mb-1 font-semibold">Semua Sistem Normal</h4>
-                            <p class="text-[12px] text-slate-500 leading-relaxed">Tidak ada masalah terdeteksi.</p>
+                    <div class="bg-slate-50 border border-slate-200 p-6 rounded-2xl flex flex-col items-center justify-center text-center">
+                        <div class="w-12 h-12 rounded-full bg-white border border-slate-200 flex items-center justify-center text-emerald-500 mb-3 shadow-sm">
+                            <i class="ri-shield-check-line text-2xl"></i>
                         </div>
+                        <h4 class="text-[14px] text-slate-900 font-bold">Semua Sistem Normal</h4>
+                        <p class="text-[12px] text-slate-500 mt-1">Tidak ada masalah terdeteksi saat ini.</p>
                     </div>
                 @endif
             </div>

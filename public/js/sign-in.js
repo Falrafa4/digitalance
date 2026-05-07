@@ -1,6 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-    console.log("🚀 sign-in.js berhasil di-load");
-
     // STATE
     let currentMode = "login";
     let currentRole = "client";
@@ -44,27 +42,17 @@ document.addEventListener("DOMContentLoaded", () => {
     const hiddenSkills = document.getElementById("hiddenSkillsInput");
     const registerForm = document.getElementById("registerForm");
 
-    // Ambil tombol submit untuk validasi
-    const registerSubmitBtn = registerForm?.querySelector(
-        'button[type="submit"]',
-    );
+    const registerSubmitBtn = registerForm?.querySelector('button[type="submit"]');
 
     const studentSelect = document.getElementById("studentSelect");
     const studentList = document.getElementById("studentList");
     const studentIdInput = document.getElementById("studentIdInput");
     const nisInput = document.getElementById("nisInput");
-
-    // field email siswa (read-only)
     const studentEmailInput = document.getElementById("studentEmail");
-
     const mobileToggles = document.querySelectorAll(".mobile-toggle");
 
-    // ✅ GUARD: kalau bukan halaman auth (element inti gak ada), stop supaya gak ganggu halaman lain
-    if (!authOverlay || !loginPanel || !registerPanel || !registerForm) {
-        return;
-    }
+    if (!authOverlay || !loginPanel || !registerPanel || !registerForm) return;
 
-    // CONTENT
     const content = {
         login: {
             title: "Jaringan Presisi untuk Solusi Expert",
@@ -84,124 +72,101 @@ document.addEventListener("DOMContentLoaded", () => {
         el.classList.remove("panel-hidden");
         el.classList.add("panel-visible");
     }
-
     function hidePanel(el) {
         el.classList.remove("panel-visible");
         el.classList.add("panel-hidden");
     }
-
     function setDisabled(selector, disabled) {
         document.querySelectorAll(selector).forEach((el) => {
             el.disabled = disabled;
         });
     }
-
     function getStudents() {
-        return Array.isArray(window.skomdaStudents)
-            ? window.skomdaStudents
-            : [];
+        return Array.isArray(window.skomdaStudents) ? window.skomdaStudents : [];
     }
-
     function formatStudentLabel(student) {
         if (!student) return "";
         return `${student.name} (${student.nis})`;
     }
-
     function getStudentById(id) {
         return getStudents().find((s) => String(s.id) === String(id));
     }
-
     function getStudentFromInput() {
         if (!studentSelect) return null;
-
         const rawValue = (studentSelect.value || "").trim();
         if (!rawValue) return null;
-
         if (studentList) {
             const options = Array.from(studentList.options || []);
             const match = options.find((opt) => opt.value === rawValue);
-
             if (match && match.dataset && match.dataset.id) {
                 return getStudentById(match.dataset.id) || null;
             }
         }
-
         const nisMatch = rawValue.match(/\(([^)]+)\)\s*$/);
         if (nisMatch && nisMatch[1]) {
             const byNis = getStudents().find(
-                (s) => String(s.nis) === String(nisMatch[1]),
+                (s) => String(s.nis) === String(nisMatch[1])
             );
             if (byNis) return byNis;
         }
-
         const byNis = getStudents().find(
-            (s) => String(s.nis) === String(rawValue),
+            (s) => String(s.nis) === String(rawValue)
         );
         if (byNis) return byNis;
-
         const byId = getStudents().find(
-            (s) => String(s.id) === String(rawValue),
+            (s) => String(s.id) === String(rawValue)
         );
         if (byId) return byId;
-
         const byName = getStudents().find(
-            (s) => (s.name || "").toLowerCase() === rawValue.toLowerCase(),
+            (s) => (s.name || "").toLowerCase() === rawValue.toLowerCase()
         );
         return byName || null;
     }
-
-    // isi email siswa berdasarkan NIS terpilih
     function updateStudentUI() {
         if (!studentSelect) return;
-
         const selectedStudent = getStudentFromInput();
-
-        if (studentIdInput) {
-            studentIdInput.value = selectedStudent ? selectedStudent.id : "";
-        }
-
-        if (nisInput) {
-            nisInput.value = selectedStudent ? selectedStudent.nis : "";
-        }
-
-        if (studentEmailInput) {
-            studentEmailInput.value = selectedStudent
-                ? selectedStudent.email || ""
-                : "";
-        }
+        if (studentIdInput) studentIdInput.value = selectedStudent ? selectedStudent.id : "";
+        if (nisInput) nisInput.value = selectedStudent ? selectedStudent.nis : "";
+        if (studentEmailInput) studentEmailInput.value = selectedStudent ? selectedStudent.email || "" : "";
     }
-
-    // VALIDASI TOMBOL SUBMIT (Mencegah submit jika NIS kosong / invalid di mode Freelancer)
     function checkFormValidity() {
         if (!registerSubmitBtn) return;
-
         if (currentRole === "freelancer") {
-            const ok = !!(
-                studentIdInput && String(studentIdInput.value || "").trim()
-            );
-
+            const ok = !!(studentIdInput && String(studentIdInput.value || "").trim());
             registerSubmitBtn.disabled = !ok;
             registerSubmitBtn.classList.toggle("opacity-50", !ok);
             registerSubmitBtn.classList.toggle("cursor-not-allowed", !ok);
         } else {
             registerSubmitBtn.disabled = false;
-            registerSubmitBtn.classList.remove(
-                "opacity-50",
-                "cursor-not-allowed",
-            );
+            registerSubmitBtn.classList.remove("opacity-50", "cursor-not-allowed");
+        }
+    }
+
+    // PENTING: PANEL ERROR HANDLER
+    function showCorrectPanelFromError() {
+        if (window.panelShowMode === 'register') {
+            currentMode = "register";
+            authOverlay.classList.add("register-mode");
+            hidePanel(loginPanel);
+            showPanel(registerPanel);
+            updateRole(window.oldRole || "client");
+        } else if (window.panelShowMode === 'login') {
+            currentMode = "login";
+            authOverlay.classList.remove("register-mode");
+            hidePanel(registerPanel);
+            showPanel(loginPanel);
         }
     }
 
     function toggleMode() {
         currentMode = currentMode === "login" ? "register" : "login";
         const isRegister = currentMode === "register";
-
         authOverlay.classList.toggle("register-mode", isRegister);
 
         if (isRegister) {
             hidePanel(loginPanel);
             showPanel(registerPanel);
-            updateRole("client"); // Default ke client saat masuk menu register
+            updateRole("client");
         } else {
             hidePanel(registerPanel);
             showPanel(loginPanel);
@@ -219,7 +184,6 @@ document.addEventListener("DOMContentLoaded", () => {
             toggleText.textContent = data.btnText;
             heroImage.src = data.img;
             heroImage.classList.remove("fade-out");
-
             overlayTitle.style.opacity = "1";
             overlayDesc.style.opacity = "1";
             toggleText.style.opacity = "1";
@@ -229,13 +193,9 @@ document.addEventListener("DOMContentLoaded", () => {
     function updateRole(role) {
         currentRole = role;
         const isFreelancer = role === "freelancer";
-
         if (roleSlider) {
-            roleSlider.style.transform = isFreelancer
-                ? "translateX(100%)"
-                : "translateX(0%)";
+            roleSlider.style.transform = isFreelancer ? "translateX(100%)" : "translateX(0%)";
         }
-
         if (btnClient) {
             btnClient.style.color = isFreelancer ? "#94A3B8" : "#0F766E";
             btnClient.style.fontWeight = isFreelancer ? "600" : "800";
@@ -244,39 +204,25 @@ document.addEventListener("DOMContentLoaded", () => {
             btnFreelancer.style.color = isFreelancer ? "#0F766E" : "#94A3B8";
             btnFreelancer.style.fontWeight = isFreelancer ? "800" : "600";
         }
-
         if (clientFields) clientFields.classList.toggle("hidden", isFreelancer);
         if (freelancerFields)
             freelancerFields.classList.toggle("hidden", !isFreelancer);
 
-        // Dropdown siswa hanya wajib jika di mode freelancer
-        if (studentSelect) {
-            studentSelect.required = isFreelancer;
-        }
-
-        // Toggle required untuk input Client agar tidak bentrok validasi browser
+        if (studentSelect) studentSelect.required = isFreelancer;
         document.querySelectorAll("#clientFields input").forEach((input) => {
             input.required = !isFreelancer;
         });
-
-        // Disable field client agar datanya tidak terkirim saat submit Freelancer
         setDisabled("#clientFields input", isFreelancer);
-
-        // Set action form berdasarkan role
-        if (registerForm) {
+        if (registerForm)
             registerForm.action = isFreelancer
                 ? registerForm.dataset.actionFreelancer
                 : registerForm.dataset.actionClient;
-        }
-
-        // update email display on role change
         if (isFreelancer) updateStudentUI();
         if (!isFreelancer && studentEmailInput) studentEmailInput.value = "";
 
         checkFormValidity();
     }
 
-    // EVENTS
     overlayToggle?.addEventListener("click", (e) => {
         e.preventDefault();
         toggleMode();
@@ -292,14 +238,11 @@ document.addEventListener("DOMContentLoaded", () => {
     btnClient?.addEventListener("click", () => updateRole("client"));
     btnFreelancer?.addEventListener("click", () => updateRole("freelancer"));
 
-    // SYNC dropdown/input siswa -> hidden input NIS
     if (studentSelect && studentIdInput) {
         studentSelect.addEventListener("input", () => {
             updateStudentUI();
             checkFormValidity();
         });
-
-        // init old value (berguna jika ada error validation dari Laravel)
         if (studentIdInput.value && !studentSelect.value) {
             const existingStudent = getStudentById(studentIdInput.value);
             if (existingStudent) {
@@ -311,7 +254,6 @@ document.addEventListener("DOMContentLoaded", () => {
         checkFormValidity();
     }
 
-    // SKILLS TAG & AUTOCOMPLETE
     if (
         tagsContainer &&
         skillInput &&
@@ -325,33 +267,23 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         function renderTags() {
-            tagsContainer
-                .querySelectorAll(".tag-item")
-                .forEach((t) => t.remove());
-
+            tagsContainer.querySelectorAll(".tag-item").forEach((t) => t.remove());
             skills.forEach((skill) => {
                 const tag = document.createElement("span");
-                tag.className =
-                    "tag-item inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 px-2 py-1 rounded border border-emerald-100 text-xs font-semibold";
-
+                tag.className = "tag-item inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 px-2 py-1 rounded border border-emerald-100 text-xs font-semibold";
                 tag.innerHTML = `${skill}<span class="tag-close cursor-pointer ml-1 text-emerald-500 hover:text-emerald-900 flex items-center" data-val="${skill}">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
             <line x1="18" y1="6" x2="6" y2="18"></line>
             <line x1="6" y1="6" x2="18" y2="18"></line>
           </svg>
         </span>`;
-
                 tagsContainer.insertBefore(tag, skillInput);
             });
-
             tagLimitMsg.textContent = `${skills.length}/${MAX_SKILLS} Keahlian`;
-            tagLimitMsg.style.color =
-                skills.length >= MAX_SKILLS ? "#ef4444" : "#94A3B8";
-            skillInput.placeholder =
-                skills.length >= MAX_SKILLS ? "Penuh" : "Ketik lalu Enter...";
+            tagLimitMsg.style.color = skills.length >= MAX_SKILLS ? "#ef4444" : "#94A3B8";
+            skillInput.placeholder = skills.length >= MAX_SKILLS ? "Penuh" : "Ketik lalu Enter...";
             skillInput.disabled = skills.length >= MAX_SKILLS;
             hiddenSkills.value = JSON.stringify(skills);
-
             hideSuggestions();
         }
 
@@ -381,7 +313,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const matches = availableCategories.filter(
                 (cat) =>
                     cat.toLowerCase().includes(val.toLowerCase()) &&
-                    !skills.includes(cat),
+                    !skills.includes(cat)
             );
 
             if (matches.length === 0) {
@@ -392,7 +324,7 @@ document.addEventListener("DOMContentLoaded", () => {
             skillSuggestions.innerHTML = matches
                 .map(
                     (match) =>
-                        `<li class="px-4 py-2 hover:bg-emerald-50 cursor-pointer transition-colors" data-val="${match}">${match}</li>`,
+                        `<li class="px-4 py-2 hover:bg-emerald-50 cursor-pointer transition-colors" data-val="${match}">${match}</li>`
                 )
                 .join("");
 
@@ -445,9 +377,37 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // INIT
-    updateRole("client");
-    showPanel(loginPanel);
-    hidePanel(registerPanel);
-    authOverlay.classList.remove("register-mode");
+    // INIT panel logic
+    let initMode = "login";
+    let initRole = "client";
+    const urlParams = new URLSearchParams(window.location.search);
+
+    if (urlParams.get('mode') === 'register') initMode = "register";
+    if (urlParams.get('role')) initRole = urlParams.get('role');
+    if (window.hasRegistrationErrors) {
+        initMode = "register";
+        if (window.oldRole) initRole = window.oldRole;
+    }
+    updateRole(initRole);
+
+    if(window.panelShowMode){
+        showCorrectPanelFromError();
+    } else {
+        if (initMode === "register") {
+            currentMode = "register";
+            authOverlay.classList.add("register-mode");
+            hidePanel(loginPanel);
+            showPanel(registerPanel);
+            const data = content["register"];
+            overlayTitle.textContent = data.title;
+            overlayDesc.textContent = data.desc;
+            toggleText.textContent = data.btnText;
+            heroImage.src = data.img;
+        } else {
+            currentMode = "login";
+            authOverlay.classList.remove("register-mode");
+            hidePanel(registerPanel);
+            showPanel(loginPanel);
+        }
+    }
 });

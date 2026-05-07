@@ -85,27 +85,70 @@
     <script src="{{ asset('js/dashboard/notif-drawer.js') }}"></script>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            if (!sessionStorage.getItem('welcomeShown')) {
-                const welcome = document.createElement('div');
-                welcome.className = 'fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[9999] bg-slate-900/95 text-white px-8 py-5 rounded-[24px] shadow-[0_20px_50px_rgba(0,0,0,0.3)] flex items-center gap-5 animate-fadeUp backdrop-blur-xl border border-white/10 transition-all duration-500';
-                welcome.innerHTML = `
-                    <div class="w-14 h-14 bg-gradient-to-br from-emerald-400 to-teal-600 rounded-full flex items-center justify-center text-white text-[28px] shadow-lg">
-                        <i class="ri-hand-heart-fill"></i>
-                    </div>
-                    <div>
-                        <h3 class="font-display font-extrabold text-[1.3rem] leading-tight mb-0.5">Selamat Datang!</h3>
-                        <p class="text-slate-300 text-[13px]">Semoga harimu menyenangkan dan produktif.</p>
-                    </div>
-                `;
-                document.body.appendChild(welcome);
-                sessionStorage.setItem('welcomeShown', 'true');
-                setTimeout(() => {
-                    welcome.style.opacity = '0';
-                    welcome.style.transform = 'translate(-50%, -60%)';
-                    setTimeout(() => welcome.remove(), 500);
-                }, 3500);
+        // Global Toast / Slide-in Notification System
+        window.showToast = function(arg1, arg2, arg3) {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+            
+            let message = '';
+            let type = 'success';
+
+            // Handle both (message, type) and (title, message, type) signatures
+            if (arg3 !== undefined) {
+                // (title, message, type)
+                message = arg1 ? `<strong>${arg1}</strong>: ${arg2}` : arg2;
+                type = arg3;
+            } else if (arg2 !== undefined) {
+                // (message, type)
+                message = arg1;
+                type = arg2;
+            } else {
+                // (message)
+                message = arg1;
             }
+
+            if (type === 'error') type = 'danger';
+            if (type === 'welcome') type = 'success';
+            
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            
+            let icon = 'ri-checkbox-circle-fill';
+            if (type === 'danger') icon = 'ri-close-circle-fill';
+            else if (type === 'info') icon = 'ri-information-fill';
+
+            toast.innerHTML = `
+                <div class="toast-icon"><i class="${icon}"></i></div>
+                <div style="flex-1; line-height: 1.4;">${message}</div>
+                <button class="toast-close" onclick="this.parentElement.remove()">
+                    <i class="ri-close-line"></i>
+                </button>
+            `;
+            
+            container.appendChild(toast);
+            
+            // Auto remove after 5s
+            setTimeout(() => {
+                if(!document.body.contains(toast)) return;
+                toast.classList.add('toast-hide');
+                setTimeout(() => { if(document.body.contains(toast)) toast.remove() }, 300);
+            }, 5000);
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Welcome Notification
+            if (!sessionStorage.getItem('welcomeShown')) {
+                window.showToast('Selamat Datang!', 'Semoga harimu menyenangkan dan produktif.', 'welcome');
+                sessionStorage.setItem('welcomeShown', 'true');
+            }
+            
+            // Laravel Flash Messages
+            @if(session('success'))
+                window.showToast('{!! session('success') !!}', 'success');
+            @endif
+            @if(session('error'))
+                window.showToast('{!! session('error') !!}', 'danger');
+            @endif
         });
     </script>
 

@@ -187,6 +187,16 @@
       applyFilterAndSearch();
   };
 
+  function getCsrfToken() {
+      return document.querySelector('meta[name="csrf-token"]')?.content || 
+             document.querySelector('input[name="_token"]')?.value || '';
+  }
+
+  function showToast(msg, type = 'success') {
+      if (window.showToast) return window.showToast(msg, type);
+      alert(msg);
+  }
+
   /**
    * 4. DETAIL MODAL
    */
@@ -229,12 +239,51 @@
         <p class="modal-section-title">Brief</p>
         <div class="brief-box">${o.brief || '-'}</div>
 
+        <p class="modal-section-title mt-4">Ubah Status</p>
+        <div style="display: flex; gap: 8px; margin-bottom: 20px;">
+          <select id="modal-update-status" class="flex-1 border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none">
+            ${STATUS_OPTIONS.map(s => {
+                const label = s.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
+                return `<option value="${label}" ${o.status === s ? 'selected' : ''}>${label}</option>`;
+            }).join('')}
+          </select>
+          <button onclick="updateOrderStatus('${o.id}')" class="bg-teal-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-teal-700 transition-all">Update</button>
+        </div>
+
         <div class="modal-action-group">
           <button class="modal-btn-delete" style="width:100%" onclick="deleteOrder('${o.id}'); closeOrderModal();"><i class="ri-delete-bin-line"></i> Hapus Order</button>
         </div>
       </div>
     `;
     overlay.classList.add('open');
+  };
+
+  window.updateOrderStatus = async function(id) {
+      const newStatus = document.getElementById('modal-update-status').value;
+      try {
+          const res = await fetch(`/admin/orders/${id}/status`, {
+              method: 'POST', // Use POST with _method=PATCH for Laravel forms, or just POST if the route accepts it
+              headers: {
+                  'X-CSRF-TOKEN': getCsrfToken(),
+                  'Content-Type': 'application/json',
+                  'Accept': 'application/json'
+              },
+              body: JSON.stringify({ status: newStatus })
+          });
+          
+          if (!res.ok && res.status !== 200 && res.status !== 302) {
+              throw new Error('Gagal mengupdate status');
+          }
+
+          const o = ordersData.find(x => String(x.id) === String(id));
+          if (o) o.status = newStatus.toLowerCase().replace(/\s+/g, '_');
+          
+          showToast('Status berhasil diupdate', 'success');
+          closeOrderModal();
+          refreshUI();
+      } catch (e) {
+          showToast(e.message, 'danger');
+      }
   };
 
   window.closeOrderModal = function() {
@@ -254,62 +303,57 @@
     
     // Generate Pilihan Dropdown
     const clientOptions = clientsList.length > 0 
-      ? clientsList.map(c => `<option value="${c.id}" data-name="${c.name}">${c.name}</option>`).join('')
+      ? clientsList.map(c => `<option value="${c.id}" data-name="${c.name || c.user?.name}">${c.name || c.user?.name}</option>`).join('')
       : '<option value="" disabled>Data client tidak tersedia</option>';
-
-    const freelancerOptions = freelancersList.length > 0 
-      ? freelancersList.map(f => `<option value="${f.id}" data-name="${f.name}">${f.name}</option>`).join('')
-      : '<option value="" disabled>Data freelancer tidak tersedia</option>';
 
     const serviceOptions = servicesList.length > 0 
       ? servicesList.map(s => `<option value="${s.id}" data-name="${s.title}">${s.title}</option>`).join('')
       : '<option value="" disabled>Data service tidak tersedia</option>';
 
-    const statusOptions = STATUS_OPTIONS.map(s => `<option value="${s}">${s.replace('_', ' ')}</option>`).join('');
+    const statusOptions = STATUS_OPTIONS.map(s => {
+        // format options ke format title case
+        const label = s.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
+        // status di controller expect enum: Pending,Negotiated,Paid,In Progress,Revision,Completed,Cancelled
+        return `<option value="${label}">${label}</option>`;
+    }).join('');
 
     el.innerHTML = `
       <div class="modal-content">
         <div class="modal-header">
           <h2>Tambah Order Baru</h2>
-          <button class="close-modal" id="btn-close-add"><i class="ri-close-line"></i></button>
+          <button class="close-modal" type="button" id="btn-close-add"><i class="ri-close-line"></i></button>
         </div>
-        <form id="form-add-order">
+        <form id="form-add-order" action="/admin/orders" method="POST">
+          <input type="hidden" name="_token" value="${getCsrfToken()}">
           <div class="form-row">
             <div class="form-group">
               <label>Client</label>
-              <select id="add-client-id" required>
+              <select name="client_id" required>
                 <option value="" disabled selected>Pilih Client...</option>
                 ${clientOptions}
               </select>
             </div>
             <div class="form-group">
-              <label>Freelancer</label>
-              <select id="add-free-id" required>
-                <option value="" disabled selected>Pilih Freelancer...</option>
-                ${freelancerOptions}
+              <label>Service</label>
+              <select name="service_id" required>
+                <option value="" disabled selected>Pilih Layanan...</option>
+                ${serviceOptions}
               </select>
             </div>
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label>Service</label>
-              <select id="add-srv-id" required>
-                <option value="" disabled selected>Pilih Layanan...</option>
-                ${serviceOptions}
-              </select>
+              <label>Agreed Price</label>
+              <input type="number" name="agreed_price" placeholder="Contoh: 500000" />
             </div>
             <div class="form-group">
-              <label>Agreed Price</label>
-              <input type="number" id="add-price" placeholder="Contoh: 500000" required />
+              <label>Status Awal</label>
+              <select name="status">${statusOptions}</select>
             </div>
-          </div>
-          <div class="form-group">
-            <label>Status Awal</label>
-            <select id="add-status">${statusOptions}</select>
           </div>
           <div class="form-group">
             <label>Brief Pekerjaan</label>
-            <textarea id="add-brief" rows="3" placeholder="Jelaskan detail pesanan..." required></textarea>
+            <textarea name="brief" rows="3" placeholder="Jelaskan detail pesanan..." required></textarea>
           </div>
           <div class="modal-actions">
             <button type="button" class="btn-secondary" id="btn-cancel-add">Batal</button>
@@ -325,32 +369,6 @@
     const closeFn = () => { el.classList.remove('open'); setTimeout(() => el.remove(), 280); };
     el.querySelector('#btn-close-add').addEventListener('click', closeFn);
     el.querySelector('#btn-cancel-add').addEventListener('click', closeFn);
-    
-    el.querySelector('#form-add-order').addEventListener('submit', (e) => {
-      e.preventDefault();
-      
-      const clientEl = el.querySelector('#add-client-id');
-      const freeEl = el.querySelector('#add-free-id');
-      const srvEl = el.querySelector('#add-srv-id');
-
-      const newOrder = normalizeOrder({
-        id: 'ORD-' + Math.floor(Math.random() * 10000),
-        client_id: clientEl.value,
-        client_name: clientEl.options[clientEl.selectedIndex].getAttribute('data-name'),
-        freelancer_id: freeEl.value,
-        freelancer_name: freeEl.options[freeEl.selectedIndex].getAttribute('data-name'),
-        service_id: srvEl.value,
-        service_name: srvEl.options[srvEl.selectedIndex].getAttribute('data-name'),
-        brief: el.querySelector('#add-brief').value,
-        status: el.querySelector('#add-status').value,
-        agreed_price: parseInt(el.querySelector('#add-price').value),
-        created_at: new Date().toISOString()
-      });
-
-      ordersData.unshift(newOrder);
-      closeFn();
-      refreshUI();
-    });
   }
 
   /**
@@ -358,8 +376,27 @@
    */
   window.deleteOrder = async function(id) {
     if (await customConfirm(`Apakah Anda yakin ingin menghapus order #${id}?`)) {
-      ordersData = ordersData.filter(o => String(o.id) !== String(id));
-      refreshUI();
+      try {
+          const res = await fetch(`/admin/orders/${id}`, {
+              method: 'DELETE',
+              headers: {
+                  'X-CSRF-TOKEN': getCsrfToken(),
+                  'Accept': 'application/json'
+              }
+          });
+          
+          if (!res.ok) {
+              // Jika controller melempar redirect (seperti default Laravel), fetch akan mengikuti dan res.ok = true biasanya
+              // tapi kalo failed akan nembak throw
+              if(res.status !== 200 && res.status !== 302) throw new Error('Gagal menghapus order');
+          }
+
+          ordersData = ordersData.filter(o => String(o.id) !== String(id));
+          showToast('Order berhasil dihapus', 'success');
+          refreshUI();
+      } catch (e) {
+          showToast(e.message, 'danger');
+      }
     }
   };
 

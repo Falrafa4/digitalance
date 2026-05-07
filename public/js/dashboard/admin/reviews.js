@@ -173,13 +173,49 @@
     }
   }
 
-  // APPLY FILTER ONLY
+  let currentPage = 1;
+  const itemsPerPage = 8;
+  
+  // RENDER PAGINATION
+  function renderPagination(totalItems) {
+    const wrap = document.getElementById('pagination-wrap');
+    if (!wrap) return;
+    
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+    if (totalPages <= 1) {
+      wrap.innerHTML = '';
+      return;
+    }
+
+    let html = '';
+    html += `<button class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-[13px] font-bold text-slate-500 hover:bg-slate-50 disabled:opacity-50 transition-all" ${currentPage === 1 ? 'disabled' : ''} onclick="window.changeReviewPage(${currentPage - 1})">Prev</button>`;
+    
+    for (let i = 1; i <= totalPages; i++) {
+        if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
+            html += `<button class="w-8 h-8 rounded-lg border ${i === currentPage ? 'bg-[#0f766e] text-white border-[#0f766e]' : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'} text-[13px] font-bold transition-all flex items-center justify-center" onclick="window.changeReviewPage(${i})">${i}</button>`;
+        } else if (i === currentPage - 2 || i === currentPage + 2) {
+            html += `<span class="w-8 h-8 flex items-center justify-center text-slate-400 text-[13px]">...</span>`;
+        }
+    }
+    
+    html += `<button class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-[13px] font-bold text-slate-500 hover:bg-slate-50 disabled:opacity-50 transition-all" ${currentPage === totalPages ? 'disabled' : ''} onclick="window.changeReviewPage(${currentPage + 1})">Next</button>`;
+    wrap.innerHTML = html;
+  }
+
+  window.changeReviewPage = function(page) {
+    currentPage = page;
+    applyFilter();
+  };
+
+  // APPLY FILTER & SEARCH
   function applyFilter() {
     const activeTab = document.querySelector('.filter-tab.active');
     const filter = activeTab ? activeTab.dataset.filter : 'all';
+    const searchVal = document.getElementById('review-search')?.value.toLowerCase() || '';
 
     let filtered = [...reviewsData];
     
+    // Rating Filter
     if (filter === '5') {
       filtered = filtered.filter(r => Number(r.rating) === 5);
     } else if (filter === '4') {
@@ -188,7 +224,26 @@
       filtered = filtered.filter(r => Number(r.rating) <= 3);
     }
     
-    renderCards(filtered);
+    // Search Filter
+    if (searchVal) {
+      filtered = filtered.filter(r => {
+          const clientName = String(r.order?.client?.user?.name ?? r.order?.client?.name ?? r.client_name ?? '').toLowerCase();
+          const serviceName = String(r.order?.service?.title ?? r.service_name ?? '').toLowerCase();
+          const comment = String(r.comment || '').toLowerCase();
+          return clientName.includes(searchVal) || serviceName.includes(searchVal) || comment.includes(searchVal);
+      });
+    }
+    
+    // Pagination slicing
+    const totalItems = filtered.length;
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+    if (currentPage > totalPages && totalPages > 0) currentPage = totalPages;
+    
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const paginatedData = filtered.slice(startIndex, startIndex + itemsPerPage);
+    
+    renderCards(paginatedData);
+    renderPagination(totalItems);
   }
 
   // REFRESH UI
@@ -200,7 +255,7 @@
   // INITIALIZE PAGE
   function initPage() {
     renderStats();
-    renderCards();
+    applyFilter();
     
     // Filter Tabs Events
     const tabs = document.querySelectorAll('.filter-tab');
@@ -208,9 +263,19 @@
       tab.addEventListener('click', () => {
         tabs.forEach(t => t.classList.remove('active'));
         tab.classList.add('active');
+        currentPage = 1;
         applyFilter();
       });
     });
+    
+    // Search Event
+    const searchInput = document.getElementById('review-search');
+    if (searchInput) {
+        searchInput.addEventListener('input', () => {
+            currentPage = 1;
+            applyFilter();
+        });
+    }
 
     // Close Modal on Overlay Click
     const overlay = document.getElementById('detail-modal-overlay');

@@ -66,6 +66,13 @@
                 </tbody>
             </table>
         </div>
+        
+        <!-- Pagination Wrap -->
+        <div class="px-6 py-4 border-t border-slate-100 bg-slate-50 flex items-center justify-between">
+            <div class="text-[12.5px] text-slate-500 font-medium" id="results-meta"></div>
+            <div id="pagination-wrap" class="flex justify-end gap-1.5"></div>
+        </div>
+
         <div id="result-empty" class="hidden text-center py-16 px-5">
             <i class="ri-folder-check-line text-[44px] text-slate-300 mb-3 block"></i>
             <h3 class="font-display text-[1.15rem] text-slate-900 mb-1.5 font-bold">Tidak ada hasil ditemukan</h3>

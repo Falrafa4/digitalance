@@ -24,8 +24,8 @@ class PortofolioController extends Controller
     public function freelancerIndex()
     {
         $freelancer = auth('freelancer')->user();
-        $portofolios = Portofolio::with('service')->where('freelancer_id', $freelancer->id)->get();
-        $services = $freelancer->service()->get();
+        $portofolios = $freelancer->portofolios()->with('service')->get();
+        $services = $freelancer->services()->get();
 
         return view('dashboard.freelancer.portofolios', compact('portofolios', 'services'));
     }
@@ -78,7 +78,7 @@ class PortofolioController extends Controller
         if ($freelancer->id !== $portofolio->service->freelancer_id) {
             return redirect()->route('freelancer.portofolios.index')->with('error', 'Anda tidak memiliki akses untuk menghapus portofolio ini');
         }
-        
+
         $portofolio->delete();
 
         return redirect()->route('freelancer.portofolios.index')->with('success', 'Portofolio berhasil dihapus');

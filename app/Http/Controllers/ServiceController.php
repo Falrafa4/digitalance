@@ -4,11 +4,78 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreServiceRequest;
 use App\Http\Requests\UpdateServiceRequest;
+use App\Models\ServiceCategory;
 use App\Models\Service;
 use Illuminate\Http\Request;
 
 class ServiceController extends Controller
 {
+    /**
+     * PUBLIC: Katalog layanan untuk landing page.
+     */
+    public function publicIndex(Request $request)
+    {
+        $search = trim((string) $request->query('q', ''));
+        $categoryId = $request->query('category');
+
+        $categories = ServiceCategory::query()
+            ->where('is_active', true)
+            ->withCount([
+                'services as approved_services_count' => function ($query) {
+                    $query->where('status', 'Approved');
+                }
+            ])
+            ->orderBy('name')
+            ->get();
+
+        $servicesQuery = Service::query()
+            ->with([
+                'category:id,name',
+                'freelancer.skomda_student:id,name'
+            ])
+            ->where('status', 'Approved');
+
+        if ($categoryId) {
+            $servicesQuery->where('category_id', $categoryId);
+        }
+
+        if ($search !== '') {
+            $servicesQuery->where(function ($query) use ($search) {
+                $query->where('title', 'like', '%' . $search . '%')
+                    ->orWhere('description', 'like', '%' . $search . '%')
+                    ->orWhereHas('category', function ($categoryQuery) use ($search) {
+                        $categoryQuery->where('name', 'like', '%' . $search . '%');
+                    })
+                    ->orWhereHas('freelancer.skomda_student', function ($freelancerQuery) use ($search) {
+                        $freelancerQuery->where('name', 'like', '%' . $search . '%');
+                    });
+            });
+        }
+
+        $services = $servicesQuery
+            ->latest()
+            ->paginate(12)
+            ->withQueryString();
+
+        $featuredServices = Service::query()
+            ->with([
+                'category:id,name',
+                'freelancer.skomda_student:id,name'
+            ])
+            ->where('status', 'Approved')
+            ->latest()
+            ->take(3)
+            ->get();
+
+        return view('public.services.index', compact(
+            'categories',
+            'services',
+            'featuredServices',
+            'search',
+            'categoryId'
+        ));
+    }
+
     /**
      * Get All Services (ADMIN ONLY)
      */

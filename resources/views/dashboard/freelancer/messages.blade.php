@@ -10,6 +10,17 @@
         </div>
     </div>
 
+    <div class="flex items-center gap-6 mb-8 border-b border-slate-100 pb-4">
+        <button class="msg-tab active group relative pb-2 transition-all" data-filter="chat">
+            <span class="text-[15px] font-extrabold text-[#0f766e]">Chat Percakapan</span>
+            <div class="absolute bottom-[-17px] left-0 w-full h-[3px] bg-[#0f766e] rounded-full"></div>
+        </button>
+        <button class="msg-tab group relative pb-2 transition-all" data-filter="log">
+            <span class="text-[15px] font-bold text-slate-400 group-hover:text-slate-600">Log Transaksi</span>
+            <div class="absolute bottom-[-17px] left-0 w-0 h-[3px] bg-slate-300 rounded-full group-hover:w-full transition-all"></div>
+        </button>
+    </div>
+
     @if($negotiations->isEmpty())
         <div class="text-center py-16 px-5 bg-white border-2 border-dashed border-slate-200 rounded-[20px]">
             <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center text-slate-300 text-3xl mx-auto mb-4">
@@ -25,22 +36,36 @@
                     $latestMsg = $thread->sortByDesc('created_at')->first();
                     $order = $latestMsg->order;
                     $clientName = $order->client->user->name ?? $order->client->name ?? 'Klien';
+                    $isLog = str_contains(strtolower($latestMsg->message), 'status changed') || str_contains(strtolower($latestMsg->message), 'payment');
                 @endphp
-                <div class="bg-white border border-slate-200 rounded-[20px] p-5 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer" onclick="openChatModal({{ $orderId }}, '{{ addslashes($clientName) }}')">
+                <div class="msg-card bg-white border border-slate-200 rounded-[20px] p-5 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer" 
+                     data-type="{{ $isLog ? 'log' : 'chat' }}"
+                     onclick="openChatModal({{ $orderId }}, '{{ addslashes($clientName) }}')">
                     <div class="flex items-center gap-4 mb-4 pb-4 border-b border-slate-100">
                         <div class="relative">
                             <div class="w-[50px] h-[50px] rounded-2xl bg-gradient-to-br from-[#0f766e] to-teal-500 text-white flex items-center justify-center text-xl shadow-md">
                                 <i class="ri-user-smile-line"></i>
                             </div>
+                            <div class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-emerald-500 border-2 border-white"></div>
                         </div>
                         <div class="min-w-0 flex-1">
-                            <h3 class="font-bold text-slate-900 truncate">{{ $clientName }}</h3>
+                            <div class="flex items-center justify-between gap-2">
+                                <h3 class="font-bold text-slate-900 truncate">{{ $clientName }}</h3>
+                                <span class="px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase {{ $isLog ? 'bg-blue-50 text-blue-600' : 'bg-teal-50 text-teal-700' }}">
+                                    {{ $isLog ? 'Log' : 'Chat' }}
+                                </span>
+                            </div>
                             <p class="text-[12px] font-bold text-slate-400 uppercase tracking-wider truncate">Order #{{ $orderId }}</p>
                         </div>
                     </div>
 
                     <div>
-                        <p class="text-[11px] font-bold text-slate-400 mb-1.5">{{ $latestMsg->created_at->diffForHumans() }}</p>
+                        <div class="flex items-center justify-between mb-1.5">
+                            <p class="text-[11px] font-bold text-slate-400">{{ $latestMsg->created_at->diffForHumans() }}</p>
+                            @if(!$isLog && $latestMsg->sender === 'client')
+                                <span class="w-2 h-2 rounded-full bg-[#0f766e] animate-pulse"></span>
+                            @endif
+                        </div>
                         <p class="text-[13px] text-slate-600 line-clamp-2">
                             @if($latestMsg->sender === 'freelancer')
                                 <span class="font-bold text-[#0f766e]">Kamu:</span> 
@@ -114,7 +139,7 @@
         body.innerHTML = ''; // bersihkan pesan sebelumnya
 
         if(threadData[orderId]) {
-            const msgs = threadData[orderId].sort((a,b) => new Date(a.created_at) - new Date(b.created_at));
+            const msgs = [...threadData[orderId]].sort((a,b) => new Date(a.created_at) - new Date(b.created_at));
             msgs.forEach(m => {
                 const isMe = m.sender === 'freelancer';
                 const time = new Date(m.created_at).toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'});
@@ -150,5 +175,49 @@
             modal.classList.add('hidden');
         }, 200);
     }
+
+    function initMessageTabs() {
+        const tabs = document.querySelectorAll('.msg-tab');
+        const cards = document.querySelectorAll('.msg-card');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const filter = tab.dataset.filter;
+
+                // Update tab UI
+                tabs.forEach(t => {
+                    t.classList.remove('active');
+                    t.querySelector('span').classList.replace('text-[#0f766e]', 'text-slate-400');
+                    t.querySelector('span').classList.remove('font-extrabold');
+                    t.querySelector('span').classList.add('font-bold');
+                    t.querySelector('div').classList.replace('w-full', 'w-0');
+                    t.querySelector('div').classList.replace('bg-[#0f766e]', 'bg-slate-300');
+                });
+
+                tab.classList.add('active');
+                tab.querySelector('span').classList.replace('text-slate-400', 'text-[#0f766e]');
+                tab.querySelector('span').classList.replace('font-bold', 'font-extrabold');
+                tab.querySelector('div').classList.replace('w-0', 'w-full');
+                tab.querySelector('div').classList.replace('bg-slate-300', 'bg-[#0f766e]');
+
+                // Filter cards
+                cards.forEach(card => {
+                    if (filter === 'chat') {
+                        card.style.display = card.dataset.type === 'chat' ? 'block' : 'none';
+                    } else {
+                        card.style.display = card.dataset.type === 'log' ? 'block' : 'none';
+                    }
+                });
+            });
+        });
+
+        // Trigger first tab
+        const firstTab = document.querySelector('.msg-tab[data-filter="chat"]');
+        if(firstTab) firstTab.click();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        initMessageTabs();
+    });
 </script>
 @endsection

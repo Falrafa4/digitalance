@@ -40,6 +40,8 @@
 <body class="bg-slate-100 text-slate-900 overflow-x-hidden">
     @yield('additional-header')
 
+    <x-flash />
+
     <x-navbar />
 
     @yield('content')

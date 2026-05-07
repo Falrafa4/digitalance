@@ -166,4 +166,159 @@ class DashboardController extends Controller
     {
         return view('dashboard.admin.settings');
     }
+
+    public function search(\Illuminate\Http\Request $request)
+    {
+        $q = $request->query('q');
+        
+        $results = collect();
+        
+        if ($q) {
+            // Search Menus
+            $menus = collect([
+                ['name' => 'Dashboard', 'url' => route('admin.dashboard'), 'desc' => 'Ringkasan statistik dan aktivitas terbaru'],
+                ['name' => 'Users & Clients', 'url' => route('admin.user'), 'desc' => 'Kelola data pengguna, klien, dan siswa'],
+                ['name' => 'Freelancers', 'url' => route('admin.freelancers.index'), 'desc' => 'Daftar talent dan verifikasi data'],
+                ['name' => 'Orders Management', 'url' => route('admin.orders.index'), 'desc' => 'Kelola pesanan dan status proyek'],
+                ['name' => 'Services Catalog', 'url' => route('admin.services.index'), 'desc' => 'Manajemen layanan dan kategori'],
+                ['name' => 'Offers', 'url' => route('admin.offers.index'), 'desc' => 'Penawaran masuk dan request custom'],
+                ['name' => 'Transactions', 'url' => route('admin.transactions.index'), 'desc' => 'Riwayat pembayaran dan keuangan'],
+                ['name' => 'Reviews', 'url' => route('admin.reviews.index'), 'desc' => 'Ulasan klien terhadap freelancer'],
+                ['name' => 'Settings', 'url' => route('admin.settings'), 'desc' => 'Pengaturan dashboard dan panduan'],
+                ['name' => 'Profile', 'url' => route('admin.profile'), 'desc' => 'Pengaturan akun administrator'],
+            ])->filter(function($menu) use ($q) {
+                return stripos($menu['name'], $q) !== false || stripos($menu['desc'], $q) !== false;
+            })->map(function($item) {
+                return (object) [
+                    'title' => $item['name'],
+                    'email' => $item['desc'], // hack to use the email field for description
+                    'search_type' => 'Menu',
+                    'search_url' => $item['url'],
+                    'created_at' => now(), // dummy
+                ];
+            });
+
+            // Search Clients
+            $clients = Client::where('name', 'like', "%{$q}%")
+                ->orWhere('email', 'like', "%{$q}%")
+                ->get()->map(function($item) {
+                    $item->search_type = 'Client';
+                    $item->search_url = route('admin.clients.index') . '?q=' . urlencode($item->name);
+                    return $item;
+                });
+                
+            // Search Freelancers
+            $freelancers = Freelancer::whereHas('skomda_student', function($query) use ($q) {
+                    $query->where('name', 'like', "%{$q}%")
+                          ->orWhere('email', 'like', "%{$q}%");
+                })
+                ->get()->map(function($item) {
+                    $item->search_type = 'Freelancer';
+                    $item->search_url = route('admin.freelancers.index') . '?q=' . urlencode($item->name);
+                    return $item;
+                });
+                
+            // Search Services
+            $services = Service::where('title', 'like', "%{$q}%")
+                ->get()->map(function($item) {
+                    $item->search_type = 'Service';
+                    $item->search_url = route('admin.services.index') . '?q=' . urlencode($item->title);
+                    return $item;
+                });
+                
+            // Search Orders
+            $orders = Order::whereHas('client', function($query) use ($q) {
+                    $query->where('name', 'like', "%{$q}%");
+                })
+                ->orWhereHas('service', function($query) use ($q) {
+                    $query->where('title', 'like', "%{$q}%");
+                })
+                ->get()->map(function($item) {
+                    $item->search_type = 'Order';
+                    $item->search_url = route('admin.orders.index');
+                    return $item;
+                });
+                
+            $results = $results->concat($menus)->concat($clients)->concat($freelancers)->concat($services)->concat($orders);
+        }
+        
+        return view('dashboard.admin.search', compact('results', 'q'));
+    }
+
+    public function clientSearch(\Illuminate\Http\Request $request)
+    {
+        $q = $request->query('q');
+        $user = auth()->guard('client')->user();
+        $results = collect();
+        
+        if ($q && $user) {
+            // Search Talents (Freelancers)
+            $freelancers = Freelancer::whereHas('skomda_student', function($query) use ($q) {
+                    $query->where('name', 'like', "%{$q}%");
+                })
+                ->get()->map(function($item) {
+                    $item->search_type = 'Talent';
+                    $item->search_url = route('client.talents.show', $item->id);
+                    return $item;
+                });
+                
+            // Search Services
+            $services = Service::where('title', 'like', "%{$q}%")
+                ->get()->map(function($item) {
+                    $item->search_type = 'Service';
+                    $item->search_url = route('client.services.show', $item->id);
+                    return $item;
+                });
+                
+            // Search Orders (Own)
+            $orders = Order::where('client_id', $user->id)
+                ->whereHas('service', function($query) use ($q) {
+                    $query->where('title', 'like', "%{$q}%");
+                })
+                ->get()->map(function($item) {
+                    $item->search_type = 'Order';
+                    $item->search_url = route('client.orders.show', $item->id);
+                    return $item;
+                });
+                
+            $results = $results->concat($freelancers)->concat($services)->concat($orders);
+        }
+        
+        return view('dashboard.admin.search', compact('results', 'q')); // Reuse the same search view for now
+    }
+
+    public function freelancerSearch(\Illuminate\Http\Request $request)
+    {
+        $q = $request->query('q');
+        $user = auth()->guard('freelancer')->user();
+        $results = collect();
+        
+        if ($q && $user) {
+            // Search Own Services
+            $services = Service::where('freelancer_id', $user->id)
+                ->where('title', 'like', "%{$q}%")
+                ->get()->map(function($item) {
+                    $item->search_type = 'Service';
+                    $item->search_url = route('freelancer.services.show', $item->id);
+                    return $item;
+                });
+                
+            // Search Orders (Received)
+            $orders = Order::whereHas('service', function($query) use ($user) {
+                    $query->where('freelancer_id', $user->id);
+                })
+                ->whereHas('client', function($query) use ($q) {
+                    $query->where('name', 'like', "%{$q}%");
+                })
+                ->get()->map(function($item) {
+                    $item->search_type = 'Order';
+                    $item->search_url = route('freelancer.orders.index');
+                    return $item;
+                });
+                
+            $results = $results->concat($services)->concat($orders);
+        }
+        
+        return view('dashboard.admin.search', compact('results', 'q')); // Reuse the same search view
+    }
 }

@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Route;
 
 // ── PUBLIC ──────────────────────────────────────────────
 Route::get('/', [PageController::class, 'home'])->name('home');
+Route::get('/services', [ServiceController::class, 'publicIndex'])->name('services.index');
 Route::get('/login', [PageController::class, 'login'])->name('login')->middleware(['guest', 'throttle:5,1']);
 Route::post('/login', [AuthController::class, 'login'])->name('login-process');
 Route::get('/register-client', [PageController::class, 'registerClient'])->name('register-client');
@@ -36,6 +37,7 @@ Route::middleware('auth:administrator')->prefix('admin')->name('admin.')->group(
     Route::put('/profile', [AdministratorController::class, 'updateProfile'])->name('profile.update');
     Route::put('/password', [AdministratorController::class, 'updatePassword'])->name('password.update');
     Route::get('/settings', [DashboardController::class, 'settings'])->name('settings');
+    Route::get('/search', [DashboardController::class, 'search'])->name('search');
     Route::post('/verify-freelancer/{id}', [DashboardController::class, 'verifyFreelancer'])->name('verify');
     Route::post('/reject-freelancer/{id}', [DashboardController::class, 'rejectFreelancer'])->name('reject');
 
@@ -119,6 +121,7 @@ Route::middleware('auth:administrator')->prefix('admin')->name('admin.')->group(
 Route::middleware('auth:client')->prefix('client')->name('client.')->group(function () {
     Route::get('/', [DashboardController::class, 'client'])->name('dashboard');
     Route::get('/profile', [ClientController::class, 'profile'])->name('profile');
+    Route::get('/search', [DashboardController::class, 'clientSearch'])->name('search');
 
     // Service Categories
     Route::get('/service-categories', [ServiceCategoryController::class, 'clientIndex'])->name('service-categories.index');
@@ -171,6 +174,7 @@ Route::middleware('auth:freelancer')->prefix('freelancer')->name('freelancer.')-
     // Alias URL (optional): /freelancer/dashboard -> same dashboard page
     Route::get('/dashboard', [DashboardController::class, 'freelancer']);
     Route::get('/profile', [FreelancerController::class, 'profile'])->name('profile');
+    Route::get('/search', [DashboardController::class, 'freelancerSearch'])->name('search');
     Route::post('/profile', [FreelancerController::class, 'updateProfile'])->name('profile.update');
     Route::post('/password', [FreelancerController::class, 'updatePassword'])->name('password.update');
     Route::post('/delete', [FreelancerController::class, 'deleteAccount'])->name('delete');
@@ -186,8 +190,11 @@ Route::middleware('auth:freelancer')->prefix('freelancer')->name('freelancer.')-
 
     // crud order
     Route::get('/orders', [OrderController::class, 'freelancerIndex'])->name('orders.index');
+    Route::get('/orders/{order}', [OrderController::class, 'freelancerShow'])->name('orders.show');
     Route::patch('/orders/{id}/status', [OrderController::class, 'updateStatusFreelancer'])->name('orders.updateStatus');
     Route::patch('/orders/{id}/price', [OrderController::class, 'updateAgreedPrice'])->name('orders.updateAgreedPrice');
+    Route::post('/orders/{order}/accept', [OrderController::class, 'freelancerAccept'])->name('orders.accept');
+    Route::post('/orders/{order}/reject', [OrderController::class, 'freelancerReject'])->name('orders.reject');
 
     // crud review
     Route::get('/reviews', [ReviewController::class, 'freelancerIndex'])->name('reviews.index');
