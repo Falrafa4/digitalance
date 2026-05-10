@@ -109,8 +109,8 @@
     const r = reviewsData.find(x => String(x.id) === String(id));
     if (!r) return;
 
-    const overlay = document.getElementById('detail-modal-overlay');
-    const box = document.getElementById('detail-modal-box');
+    const overlay = document.getElementById('modal-reviews-overlay');
+    const box = document.getElementById('modal-reviews-box');
     const date = r.created_at ? new Date(r.created_at).toLocaleString('id-ID') : '-';
 
     box.innerHTML = `
@@ -162,7 +162,7 @@
 
   // CLOSE REVIEW MODAL
   window.closeReviewModal = function() {
-    document.getElementById('detail-modal-overlay').classList.remove('open');
+    document.getElementById('modal-reviews-overlay').classList.remove('open');
   }
 
   // DELETE REVIEW
@@ -278,7 +278,7 @@
     }
 
     // Close Modal on Overlay Click
-    const overlay = document.getElementById('detail-modal-overlay');
+    const overlay = document.getElementById('modal-reviews-overlay');
     if (overlay) {
       overlay.addEventListener('click', (e) => { 
         if (e.target === overlay) closeReviewModal(); 

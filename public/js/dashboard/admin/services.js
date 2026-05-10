@@ -269,8 +269,8 @@
         const s = servicesData.find(x => String(x.id) === String(id));
         if (!s) return;
 
-        const overlay = $('detail-modal-overlay');
-        const box = $('detail-modal-box');
+        const overlay = $('modal-services-overlay');
+        const box = $('modal-services-box');
 
         if (!box) return;
 
@@ -330,11 +330,11 @@
             </div>
         `;
         
-        if (overlay) openModal('detail-modal-overlay');
+        if (overlay) openModal('modal-services-overlay');
     };
 
     window.closeServiceModal = function() {
-        closeModal('detail-modal-overlay');
+        closeModal('modal-services-overlay');
     };
 
     window.approveService = async function(id) {
@@ -352,7 +352,7 @@
                 s.reject_reason = null;
             }
 
-            closeModal('detail-modal-overlay');
+            closeModal('modal-services-overlay');
             showToast('Layanan berhasil disetujui!', 'success');
             renderStats();
             refreshGrid();
@@ -429,7 +429,7 @@
                 }
 
                 closeFn();
-                closeModal('detail-modal-overlay');
+                closeModal('modal-services-overlay');
                 showToast('Layanan berhasil ditolak.', 'success');
                 renderStats();
                 refreshGrid();
@@ -521,7 +521,7 @@
         initSearch();
         initPagination();
 
-        const overlay = $('detail-modal-overlay');
+        const overlay = $('modal-services-overlay');
         if (overlay) {
             overlay.addEventListener('click', (e) => { 
                 if (e.target === overlay) window.closeServiceModal(); 

@@ -9,26 +9,54 @@ use Illuminate\Http\Request;
 class ReviewController extends Controller
 {
     // ADMIN ONLY
-    public function index()
+    public function index(Request $request)
     {
-        // Pakai perbaikan audit kita agar nama asli muncul (eager loading skomda_student)
-        $reviews = Review::with([
-            'order.client', 
-            'order.service.freelancer.skomda_student' 
-        ])->latest()->get();
+        $rating = $request->query('rating');
+        $search = $request->query('q');
+
+        $query = Review::with([
+            'order.client',
+            'order.service.freelancer.skomda_student'
+        ]);
+
+        if ($rating) {
+            if ($rating === 'low') {
+                $query->where('rating', '<=', 3);
+            } else {
+                $query->where('rating', $rating);
+            }
+        }
+
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('comment', 'like', "%{$search}%")
+                  ->orWhereHas('order.client', function($cq) use ($search) {
+                      $cq->where('name', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        $reviews = $query->latest()->paginate(12)->withQueryString();
 
         return view('dashboard.admin.reviews', compact('reviews'));
     }
 
-    // CLIENT ONLY
-    public function clientIndex(Request $request)
+    public function destroy(Review $review)
+    {
+        $review->delete();
+        return redirect()->back()->with('success', 'Review berhasil dihapus.');
+    }
+
+    public function clientIndex()
     {
         $client = auth('client')->user();
 
-        $reviews = Review::with('order.service.freelancer')
-            ->whereHas('order', fn($q) => $q->where('client_id', $client->id))
+        $reviews = Review::with(['order.service'])
+            ->whereHas('order', function ($q) use ($client) {
+                $q->where('client_id', $client->id);
+            })
             ->latest()
-            ->get();
+            ->paginate(12);
 
         return view('dashboard.client.reviews', compact('reviews'));
     }
@@ -83,5 +111,19 @@ class ReviewController extends Controller
             ->firstOrFail();
 
         return view('dashboard.freelancer.review-detail', compact('review'));
+    }
+
+    public function clientDestroy(string $orderId)
+    {
+        $client = auth('client')->user();
+        $review = Review::where('order_id', $orderId)->firstOrFail();
+
+        if ($review->order->client_id !== $client->id) {
+            abort(403, 'Akses ditolak.');
+        }
+
+        $review->delete();
+
+        return redirect()->back()->with('success', 'Review berhasil dihapus.');
     }
 }

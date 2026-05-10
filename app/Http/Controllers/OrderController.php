@@ -13,10 +13,37 @@ class OrderController extends Controller
     // =========================
     // ADMIN ONLY
     // =========================
-    public function index()
+    public function index(Request $request)
     {
-        $orders = Order::with('service', 'client')->get();
-        return view('dashboard.admin.orders', compact('orders'));
+        $status = $request->query('status');
+        $search = $request->query('q');
+
+        $query = Order::with(['service.freelancer.skomda_student', 'client']);
+
+        if ($status) {
+            $query->where('status', $status);
+        }
+
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('id', 'like', "%{$search}%")
+                  ->orWhereHas('client', function($cq) use ($search) {
+                      $cq->where('name', 'like', "%{$search}%");
+                  })
+                  ->orWhereHas('service', function($sq) use ($search) {
+                      $sq->where('title', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        $orders = $query->latest()->paginate(12)->withQueryString();
+        
+        // Data for dropdowns in Add Order modal (if still needed)
+        $clients = \App\Models\Client::orderBy('name')->get();
+        $freelancers = \App\Models\Freelancer::with('skomda_student')->get();
+        $services = \App\Models\Service::where('status', 'Approved')->orderBy('title')->get();
+
+        return view('dashboard.admin.orders', compact('orders', 'clients', 'freelancers', 'services'));
     }
 
     public function updateStatus(Request $request, string $id)
@@ -43,7 +70,6 @@ class OrderController extends Controller
 
         Order::create([
             ...$validated,
-            'freelancer_id' => $service->freelancer_id,
             'status' => $validated['status'] ?? 'Pending',
         ]);
 
@@ -58,7 +84,7 @@ class OrderController extends Controller
     {
         $client = auth('client')->user();
 
-        $orders = Order::with(['service', 'client'])
+        $orders = Order::with(['service.freelancer.skomda_student', 'client', 'offers'])
             ->where('client_id', $client->id)
             ->latest()
             ->get();
@@ -164,10 +190,11 @@ class OrderController extends Controller
     {
         $freelancer = $request->user('freelancer');
 
-        $orders = Order::with('service', 'client')
+        $orders = Order::with(['service.freelancer.skomda_student', 'client', 'offers'])
             ->whereHas('service', function ($query) use ($freelancer) {
                 $query->where('freelancer_id', $freelancer->id);
             })
+            ->latest()
             ->get();
 
         return view('dashboard.freelancer.orders', compact('orders'));
@@ -182,7 +209,7 @@ class OrderController extends Controller
 
         $order->load(['service.service_category', 'client', 'negotiations', 'offers', 'transactions', 'results', 'review']);
 
-        return view('freelancer.orders.show', compact('order'));
+        return view('dashboard.freelancer.orders.show', compact('order'));
     }
 
     public function updateStatusFreelancer(Request $request, string $id)
@@ -279,5 +306,217 @@ class OrderController extends Controller
         return [
             'status' => self::STATUS_RULE,
         ];
+    }
+
+    // =========================
+    // CLIENT: Accept Order (after freelancer sends price)
+    // =========================
+    public function clientAcceptOrder(Request $request, Order $order)
+    {
+        $client = auth('client')->user();
+        abort_unless($order->client_id === $client->id, 403);
+
+        if ($order->status !== 'Negotiated') {
+            return redirect()->back()->with('error', 'Order tidak dalam status negosiasi.');
+        }
+
+        if (!$order->agreed_price) {
+            return redirect()->back()->with('error', 'Belum ada harga yang disepakati.');
+        }
+
+        return redirect()->route('client.orders.checkout', $order->id);
+    }
+
+    public function checkout(Order $order)
+    {
+        $client = auth('client')->user();
+        abort_unless($order->client_id === $client->id, 403);
+
+        if ($order->status !== 'Negotiated') {
+            return redirect()->route('client.orders.show', $order->id)->with('error', 'Order tidak dalam status negosiasi.');
+        }
+
+        $order->load(['service.freelancer.skomda_student', 'service.service_category']);
+
+        return view('dashboard.client.orders.checkout', compact('order'));
+    }
+
+    public function processPayment(Request $request, Order $order)
+    {
+        $client = auth('client')->user();
+        abort_unless($order->client_id === $client->id, 403);
+
+        if ($order->status !== 'Negotiated') {
+            return redirect()->route('client.orders.show', $order->id)->with('error', 'Pembayaran tidak dapat diproses.');
+        }
+
+        // Validasi payment method
+        $request->validate([
+            'payment_method' => 'required|in:qris,va_bca,va_mandiri,va_bri',
+        ]);
+
+        // Hitung total dengan biaya platform 10%
+        $price = (float)$order->agreed_price;
+        $platformFee = $price * 0.1;
+        $total = $price + $platformFee;
+
+        // Simulasikan Payment Berhasil
+        $order->update(['status' => 'Paid']);
+
+        $paymentMethodLabels = [
+            'qris' => 'QRIS',
+            'va_bca' => 'BCA Virtual Account',
+            'va_mandiri' => 'Mandiri Virtual Account',
+            'va_bri' => 'BRI Virtual Account',
+        ];
+
+        $order->transactions()->create([
+            'order_id' => $order->id,
+            'amount' => $total,
+            'type' => 'Full',
+            'status' => 'Paid',
+        ]);
+
+        $methodLabel = $paymentMethodLabels[$request->payment_method] ?? 'QRIS';
+
+        return redirect()->route('client.orders.show', $order->id)->with('success', 'Pembayaran sebesar Rp ' . number_format($total, 0, ',', '.') . ' via ' . $methodLabel . ' berhasil!');
+    }
+
+    // =========================
+    // CLIENT: Reject Order
+    // =========================
+    public function clientRejectOrder(Request $request, Order $order)
+    {
+        $client = auth('client')->user();
+        abort_unless($order->client_id === $client->id, 403);
+
+        $request->validate(['reason' => 'required|string|max:500']);
+
+        $order->update([
+            'status' => 'Cancelled',
+        ]);
+
+        $order->negotiations()->create([
+            'sender' => 'client',
+            'message' => 'Order ditolak. Alasan: ' . $request->reason,
+        ]);
+
+        return redirect()->route('client.orders.index')->with('success', 'Order telah ditolak.');
+    }
+
+    // =========================
+    // CLIENT: Negotiate Order
+    // =========================
+    public function clientNegoOrder(Request $request, Order $order)
+    {
+        $client = auth('client')->user();
+        abort_unless($order->client_id === $client->id, 403);
+
+        $validated = $request->validate([
+            'reason' => 'required|string|max:1000',
+            'new_price' => 'required|integer|min:1000',
+            'description' => 'nullable|string|max:2000',
+        ]);
+
+        $order->negotiations()->create([
+            'sender' => 'client',
+            'message' => 'Negosiasi harga: ' . $validated['reason'] . "\n\nHarga tawaran: Rp " . number_format($validated['new_price'], 0, ',', '.') . "\n\nDetail: " . ($validated['description'] ?? '-'),
+        ]);
+
+        return redirect()->back()->with('success', 'Negosiasi berhasil dikirim ke freelancer.');
+    }
+
+    // =========================
+    // CLIENT: Request Revision
+    // =========================
+    public function clientRequestRevision(Request $request, Order $order)
+    {
+        $client = auth('client')->user();
+        abort_unless($order->client_id === $client->id, 403);
+
+        if (!in_array($order->status, ['In Progress', 'Completed'])) {
+            return redirect()->back()->with('error', 'Revision hanya bisa diminta pada pekerjaan yang sedang berlangsung atau sudah selesai.');
+        }
+
+        $validated = $request->validate([
+            'reason' => 'required|string|max:1000',
+            'description' => 'nullable|string|max:2000',
+        ]);
+
+        $order->negotiations()->create([
+            'sender' => 'client',
+            'message' => 'Permintaan Revisi: ' . $validated['reason'] . "\n\nDetail: " . ($validated['description'] ?? '-'),
+        ]);
+
+        $order->update(['status' => 'Revision']);
+
+        return redirect()->back()->with('success', 'Permintaan revisi berhasil dikirim.');
+    }
+
+    // =========================
+    // CLIENT: Complete Order (Terima Hasil)
+    // =========================
+    public function clientCompleteOrder(Request $request, Order $order)
+    {
+        $client = auth('client')->user();
+        abort_unless($order->client_id === $client->id, 403);
+
+        if ($order->status !== 'In Progress') {
+            return redirect()->back()->with('error', 'Order tidak dalam tahap pengerjaan.');
+        }
+
+        if ($order->results->count() === 0) {
+            return redirect()->back()->with('error', 'Belum ada hasil kerja dari freelancer.');
+        }
+
+        $order->update(['status' => 'Completed']);
+
+        return redirect()->back()->with('success', 'Hasil pekerjaan berhasil diterima. Terima kasih!');
+    }
+
+    // =========================
+    // FREELANCER: Approve Revision
+    // =========================
+    public function freelancerApproveRevision(Order $order)
+    {
+        $freelancer = auth('freelancer')->user();
+        abort_unless($order->service->freelancer_id === $freelancer->id, 403);
+
+        if ($order->status !== 'Revision') {
+            return redirect()->back()->with('error', 'Order bukan dalam status revisi.');
+        }
+
+        $order->update(['status' => 'In Progress']);
+
+        $order->negotiations()->create([
+            'sender' => 'freelancer',
+            'message' => '[REVISION APPROVED] Revisi telah disetujui dan akan segera dikerjakan.',
+        ]);
+
+        return redirect()->back()->with('success', 'Revisi disetujui. Pengerjaan revisi dimulai.');
+    }
+
+    // =========================
+    // FREELANCER: Reject Revision
+    // =========================
+    public function freelancerRejectRevision(Request $request, Order $order)
+    {
+        $freelancer = auth('freelancer')->user();
+        abort_unless($order->service->freelancer_id === $freelancer->id, 403);
+
+        $request->validate(['reason' => 'required|string|max:500']);
+
+        if ($order->status !== 'Revision') {
+            return redirect()->back()->with('error', 'Order bukan dalam status revisi.');
+        }
+
+        $order->update(['status' => 'Completed']);
+
+        $order->negotiations()->create([
+            'sender' => 'freelancer',
+            'message' => '[REVISION REJECTED] Revisi ditolak. Alasan: ' . $request->reason,
+        ]);
+
+        return redirect()->back()->with('error', 'Revisi ditolak.');
     }
 }

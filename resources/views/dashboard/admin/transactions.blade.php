@@ -17,11 +17,6 @@
         <h1 class="font-display text-[2.1rem] font-extrabold text-slate-900">Transactions Management</h1>
         <p class="text-slate-500 text-[0.95rem] mt-1">Kelola dan pantau seluruh transaksi pembayaran, DP, serta pengembalian dana.</p>
     </div>
-    <div class="header-actions">
-        <button id="btn-add-transaction" class="inline-flex items-center gap-2 px-[22px] py-[11px] bg-[#0f766e] text-white font-display font-bold text-[13px] rounded-[12px] shadow-teal-md hover:bg-[#0a5e58] hover:shadow-teal-lg transition-all duration-200 hover:-translate-y-0.5 cursor-pointer border-none whitespace-nowrap">
-            <i class="ri-add-circle-line"></i> Tambah Transaksi
-        </button>
-    </div>
 </div>
 
 <!-- Stats Row -->
@@ -57,7 +52,23 @@
             </tr>
         </thead>
         <tbody id="trx-tbody" class="divide-y divide-slate-100 text-[13px] text-slate-700">
-            <!-- Rows rendered by JS -->
+            @forelse($transactions as $trx)
+            <tr class="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
+                <td class="px-6 py-4 font-medium">#{{ $trx->id }}</td>
+                <td class="px-6 py-4">#{{ $trx->order_id }}</td>
+                <td class="px-6 py-4 font-bold text-emerald-700">Rp {{ number_format($trx->amount, 0, ',', '.') }}</td>
+                <td class="px-6 py-4"><span class="type-pill">{{ $trx->type ?? '-' }}</span></td>
+                <td class="px-6 py-4"><span class="status-pill @if(($trx->status ?? '') == 'Paid') status-paid @elseif(($trx->status ?? '') == 'Pending') status-pending @elseif(($trx->status ?? '') == 'Failed') status-failed @else status-refund @endif">{{ $trx->status ?? '-' }}</span></td>
+                <td class="px-6 py-4 text-slate-500">{{ $trx->created_at->format('d/m/Y') }}</td>
+                <td class="px-6 py-4 text-center">
+                    <button onclick="showTransactionDetail({{ $trx->id }})" class="px-3 py-1.5 rounded-lg bg-[#0f766e]/10 text-[#0f766e] text-xs font-bold hover:bg-[#0f766e]/20 transition-colors">Detail</button>
+                </td>
+            </tr>
+            @empty
+            <tr>
+                <td colspan="7" class="px-6 py-12 text-center text-slate-400 text-sm">Belum ada transaksi.</td>
+            </tr>
+            @endforelse
         </tbody>
     </table>
     <div id="trx-empty" class="hidden py-16 px-5 text-center">
@@ -65,6 +76,12 @@
         <h3 class="font-display text-[1.1rem] font-bold text-slate-700 mb-1.5">Tidak ada transaksi ditemukan</h3>
         <p class="text-[13px] text-slate-400">Coba ubah filter atau kata kunci pencarian.</p>
     </div>
+
+    @if($transactions instanceof \Illuminate\Pagination\LengthAwarePaginator && $transactions->hasPages())
+    <div class="px-6 py-4 border-t border-slate-100 bg-slate-50">
+        {{ $transactions->links() }}
+    </div>
+    @endif
 </div>
 @endsection
 

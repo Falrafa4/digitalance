@@ -144,12 +144,18 @@
 @endsection
 
 @section('modals')
-    <div id="detail-modal-overlay"
+    <div id="modal-offers-overlay"
         class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[99] hidden flex items-center justify-center transition-all duration-300">
-        <div id="detail-modal-box"
+        <div id="modal-offers-box"
             class="bg-white rounded-2xl shadow-2xl max-w-lg w-full mx-4 overflow-hidden transform transition-all">
         </div>
     </div>
+
+    @if($offers instanceof \Illuminate\Pagination\LengthAwarePaginator && $offers->hasPages())
+    <div class="px-6 py-4 border-t border-slate-100 bg-slate-50">
+        {{ $offers->links() }}
+    </div>
+    @endif
 @endsection
 
 @section('scripts')

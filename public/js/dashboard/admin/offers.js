@@ -35,7 +35,7 @@ function initPage() {
     initFilterEvents();
     initPaginationEvents();
     
-    const overlay = document.getElementById('detail-modal-overlay');
+    const overlay = document.getElementById('modal-offers-overlay');
     if (overlay) {
         overlay.addEventListener('click', (e) => {
             if (e.target === overlay) closeModal();
@@ -307,7 +307,7 @@ function openOfferModal(id) {
     const o = offersState.data.find(x => x.id == id);
     if (!o) return;
 
-    const box = document.getElementById('detail-modal-box');
+    const box = document.getElementById('modal-offers-box');
     box.innerHTML = `
         <div class="p-6">
             <div class="flex justify-between items-center mb-6">
@@ -339,14 +339,14 @@ function openOfferModal(id) {
             <button onclick="closeModal()" class="mt-8 w-full py-3 bg-gray-900 text-white font-bold rounded-xl hover:bg-black transition">Tutup Detail</button>
         </div>
     `;
-    document.getElementById('detail-modal-overlay').classList.remove('hidden');
+    document.getElementById('modal-offers-overlay').classList.remove('hidden');
 }
 
 function openNegoModal(id) {
     const n = negoState.data.find(x => x.id == id);
     if (!n) return;
 
-    const box = document.getElementById('detail-modal-box');
+    const box = document.getElementById('modal-offers-box');
     box.innerHTML = `
         <div class="p-6">
             <div class="flex justify-between items-center mb-6">
@@ -378,11 +378,11 @@ function openNegoModal(id) {
             <button onclick="closeModal()" class="mt-8 w-full py-3 bg-gray-900 text-white font-bold rounded-xl hover:bg-black transition">Tutup Detail</button>
         </div>
     `;
-    document.getElementById('detail-modal-overlay').classList.remove('hidden');
+    document.getElementById('modal-offers-overlay').classList.remove('hidden');
 }
 
 function closeModal() {
-    document.getElementById('detail-modal-overlay').classList.add('hidden');
+    document.getElementById('modal-offers-overlay').classList.add('hidden');
 }
 
 function getStatusColor(status) {

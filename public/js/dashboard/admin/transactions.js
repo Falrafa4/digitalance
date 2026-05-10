@@ -130,9 +130,6 @@
                         <button class="btn-action" title="Detail" onclick="window.openTrxModal('${t.id}')">
                             <i class="ri-eye-line"></i>
                         </button>
-                        <button class="btn-action" style="color: #ef4444;" title="Laporkan" onclick="window.openReportModal('${t.id}')">
-                            <i class="ri-alarm-warning-line"></i>
-                        </button>
                     </td>
                 </tr>
             `;
@@ -218,9 +215,7 @@
                 </div>
             </div>
             <div class="flex gap-2.5 px-[26px] py-[16px] border-t border-slate-100 bg-slate-50 flex-shrink-0">
-                <button onclick="window.openReportModal('${t.id}')" class="flex-1 py-[11px] rounded-[11px] bg-red-50 text-red-600 font-bold text-[13px] flex items-center justify-center gap-1.5 cursor-pointer border-none hover:bg-red-100 transition-all">
-                    <i class="ri-alarm-warning-line"></i> Laporkan Fake
-                </button>
+                <button onclick="window.closeModal('modal-detail-trx')" class="flex-1 py-[11px] rounded-[11px] bg-slate-100 text-slate-500 font-bold text-[13px] cursor-pointer border-none hover:bg-slate-200 transition-all">Close</button>
             </div>
         `;
         openModal('modal-detail-trx');

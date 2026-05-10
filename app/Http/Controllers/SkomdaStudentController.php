@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreSkomdaStudentRequest;
 use App\Http\Requests\UpdateSkomdaStudentRequest;
 use App\Models\SkomdaStudent;
+use Illuminate\Http\Request;
 
 class SkomdaStudentController extends Controller
 {
@@ -17,14 +18,11 @@ class SkomdaStudentController extends Controller
 
     public function store(StoreSkomdaStudentRequest $request)
     {
-        $request->validated();
+        $skomdaStudent = SkomdaStudent::create($request->validated());
 
-        SkomdaStudent::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'password' => bcrypt($request->password),
-        ]);
+        if ($request->expectsJson()) {
+            return response()->json(['message' => 'Akun siswa SMK Telkom Sidoarjo berhasil ditambahkan'], 201);
+        }
 
         return redirect()->route('admin.skomda-students.index')->with('success', 'Akun siswa SMK Telkom Sidoarjo berhasil ditambahkan');
     }
@@ -40,13 +38,21 @@ class SkomdaStudentController extends Controller
         $skomdaStudent = SkomdaStudent::findOrFail($id);
         $skomdaStudent->update($request->validated());
 
+        if ($request->expectsJson()) {
+            return response()->json(['message' => 'Akun siswa SMK Telkom Sidoarjo berhasil diperbarui'], 200);
+        }
+
         return redirect()->route('admin.skomda-students.index')->with('success', 'Akun siswa SMK Telkom Sidoarjo berhasil diperbarui');
     }
 
-    public function destroy(string $id)
+    public function destroy(Request $request, string $id)
     {
         $skomdaStudent = SkomdaStudent::findOrFail($id);
         $skomdaStudent->delete();
+
+        if ($request->expectsJson()) {
+            return response()->json(['message' => 'Akun siswa SMK Telkom Sidoarjo berhasil dihapus'], 200);
+        }
 
         return redirect()->route('admin.skomda-students.index')->with('success', 'Akun siswa SMK Telkom Sidoarjo berhasil dihapus');
     }

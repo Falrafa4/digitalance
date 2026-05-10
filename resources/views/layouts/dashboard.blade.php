@@ -125,6 +125,8 @@
                 </button>
             `;
             
+            toast.setAttribute('role', 'alert');
+            toast.setAttribute('aria-live', 'polite');
             container.appendChild(toast);
             
             // Auto remove after 5s

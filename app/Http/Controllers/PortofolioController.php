@@ -9,9 +9,20 @@ use App\Models\Portofolio;
 class PortofolioController extends Controller
 {
     // ADMIN ONLY
-    public function index()
+    public function index(\Illuminate\Http\Request $request)
     {
-        $portofolios = Portofolio::with('service.freelancer.skomda_student')->get();
+        $search = $request->query('q');
+        
+        $query = Portofolio::with('service.freelancer.skomda_student');
+
+        if ($search) {
+            $query->where('title', 'like', "%{$search}%")
+                  ->orWhereHas('service.freelancer.skomda_student', function($sq) use ($search) {
+                      $sq->where('name', 'like', "%{$search}%");
+                  });
+        }
+
+        $portofolios = $query->latest()->paginate(12)->withQueryString();
 
         return view('dashboard.admin.portofolios', compact('portofolios'));
     }
@@ -66,6 +77,22 @@ class PortofolioController extends Controller
         $portofolio->delete();
 
         return redirect()->route('freelancer.portofolios.index')->with('success', 'Portofolio berhasil dihapus');
+    }
+
+    public function adminUpdate(UpdatePortofolioRequest $request, string $id)
+    {
+        $portofolio = Portofolio::findOrFail($id);
+        $portofolio->update($request->validated());
+
+        return redirect()->route('admin.portofolios.index')->with('success', 'Portofolio berhasil diperbarui oleh Admin');
+    }
+
+    public function adminDestroy(string $id)
+    {
+        $portofolio = Portofolio::findOrFail($id);
+        $portofolio->delete();
+
+        return redirect()->route('admin.portofolios.index')->with('success', 'Portofolio berhasil dihapus oleh Admin');
     }
 
     // CLIENT ONLY
