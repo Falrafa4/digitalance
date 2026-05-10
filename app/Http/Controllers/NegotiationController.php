@@ -68,7 +68,7 @@ class NegotiationController extends Controller
      * CLIENT: Messages inbox (sidebar Messages)
      * Menampilkan list negotiation berdasarkan order milik client
      */
-    public function clientIndex()
+    public function clientInbox()
     {
         $client = auth('client')->user();
 
