@@ -2,53 +2,107 @@
 @section('title', 'Review Management | Digitalance')
 @section('styles')
     <link rel="stylesheet" href="{{ asset('css/dashboard/admin/reviews.css') }}">
+    <style>
+        .filter-tab-link { px-[18px] py-2 rounded-full border-[1.5px] border-slate-200 bg-white text-slate-500 font-bold text-[12.5px] transition-all; }
+        .filter-tab-link.active { border-color: #0f766e; bg: #0f766e; color: white; shadow: 0 4px 12px rgba(15,118,110,0.2); }
+    </style>
 @endsection
 
 @section('content')
-    <div class="page-header">
-        <div class="page-header-left">
-            <h1>Review Management</h1>
-            <p>Kelola ulasan dan penilaian yang diberikan oleh pengguna platform.</p>
+    <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8 animate-fadeUp">
+        <div>
+            <h1 class="font-display text-[2.1rem] font-extrabold text-slate-900">Review Management</h1>
+            <p class="text-slate-500 text-[0.95rem] mt-1">Kelola ulasan dan penilaian yang diberikan oleh pengguna platform.</p>
         </div>
-        <div class="page-header-right">
+        <div class="flex items-center gap-3">
+             <div class="bg-white px-5 py-3 rounded-2xl border border-slate-100 flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-500 flex items-center justify-center text-lg shadow-sm">
+                    <i class="ri-star-fill"></i>
+                </div>
+                <div>
+                    <div class="text-[1.2rem] font-black text-slate-900 leading-none">{{ $reviews->total() }}</div>
+                    <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Total Ulasan</div>
+                </div>
             </div>
-    </div>
-
-    <div class="stats-row" id="stats-row"></div>
-
-    <div class="flex items-center justify-between mb-6 flex-wrap gap-4">
-        <div class="filter-tabs" style="margin-bottom: 0;">
-            <button class="filter-tab active" data-filter="all">Semua</button>
-            <button class="filter-tab" data-filter="5">5 Bintang</button>
-            <button class="filter-tab" data-filter="4">4 Bintang</button>
-            <button class="filter-tab" data-filter="low">3 Bintang ke Bawah</button>
-        </div>
-        <div class="relative">
-            <i class="ri-search-line absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[15px] pointer-events-none"></i>
-            <input type="text" id="review-search" placeholder="Cari client atau service..." class="pl-9 pr-4 py-[9px] w-[260px] border-[1.5px] border-slate-200 rounded-[11px] text-[13px] font-semibold text-slate-700 bg-white outline-none transition-all duration-200 placeholder:font-normal placeholder:text-slate-400 focus:border-[#0f766e] focus:shadow-[0_0_0_3px_rgba(15,118,110,0.08)]" />
         </div>
     </div>
 
-    <div class="cards-wrap" id="review-cards-wrap"></div>
-    
-    <div id="pagination-wrap" class="flex justify-end gap-2 mt-6"></div>
+    <div class="flex items-center justify-between gap-4 mb-8 flex-wrap animate-fadeUp-2">
+        <div class="flex gap-2 flex-wrap">
+            <a href="{{ route('admin.reviews.index', array_merge(request()->query(), ['rating' => ''])) }}" 
+               class="px-[18px] py-2 rounded-full border-[1.5px] font-bold text-[12.5px] transition-all {{ !request('rating') ? 'border-[#0f766e] bg-[#0f766e] text-white shadow-teal-sm' : 'border-slate-200 bg-white text-slate-500' }}">
+                Semua
+            </a>
+            <a href="{{ route('admin.reviews.index', array_merge(request()->query(), ['rating' => '5'])) }}" 
+               class="px-[18px] py-2 rounded-full border-[1.5px] font-bold text-[12.5px] transition-all {{ request('rating') == '5' ? 'border-[#0f766e] bg-[#0f766e] text-white shadow-teal-sm' : 'border-slate-200 bg-white text-slate-500' }}">
+                5 Bintang
+            </a>
+            <a href="{{ route('admin.reviews.index', array_merge(request()->query(), ['rating' => '4'])) }}" 
+               class="px-[18px] py-2 rounded-full border-[1.5px] font-bold text-[12.5px] transition-all {{ request('rating') == '4' ? 'border-[#0f766e] bg-[#0f766e] text-white shadow-teal-sm' : 'border-slate-200 bg-white text-slate-500' }}">
+                4 Bintang
+            </a>
+            <a href="{{ route('admin.reviews.index', array_merge(request()->query(), ['rating' => 'low'])) }}" 
+               class="px-[18px] py-2 rounded-full border-[1.5px] font-bold text-[12.5px] transition-all {{ request('rating') == 'low' ? 'border-[#0f766e] bg-[#0f766e] text-white shadow-teal-sm' : 'border-slate-200 bg-white text-slate-500' }}">
+                3 Bintang ke Bawah
+            </a>
+        </div>
 
-    <div id="review-empty" class="empty-state" style="display:none;">
-        <div class="empty-icon"><i class="ri-star-line"></i></div>
-        <h3>Tidak ada ulasan ditemukan</h3>
-        <p>Coba ubah filter rating Anda.</p>
+        <form action="{{ route('admin.reviews.index') }}" method="GET" class="relative">
+            <i class="ri-search-line absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-[15px]"></i>
+            <input type="text" name="q" value="{{ request('q') }}" placeholder="Cari client atau service..." 
+                   class="pl-10 pr-4 py-[9px] w-[260px] border-[1.5px] border-slate-200 rounded-[11px] text-[13px] font-semibold text-slate-700 bg-white outline-none focus:border-[#0f766e] transition-all" />
+        </form>
     </div>
-@endsection
 
-@section('modals')
-    <div class="modal-overlay" id="detail-modal-overlay">
-        <div class="modal-box" id="detail-modal-box"></div>
-    </div>
-@endsection
+    @if($reviews->count() > 0)
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fadeUp-3">
+            @foreach($reviews as $review)
+                <div class="bg-white border border-slate-200 rounded-[24px] p-6 hover:shadow-lg transition-all duration-300">
+                    <div class="flex items-start justify-between mb-5">
+                        <div class="flex items-center gap-3.5">
+                            <img src="https://ui-avatars.com/api/?name=${{ urlencode($review->order->client->name ?? 'C') }}&background=0f766e&color=fff" class="w-11 h-11 rounded-xl shadow-sm" />
+                            <div>
+                                <h3 class="font-bold text-slate-900 text-[14.5px]">{{ $review->order->client->name ?? 'Client' }}</h3>
+                                <p class="text-slate-400 text-[11px] font-bold uppercase tracking-wider mt-0.5">Order #{{ $review->order_id }}</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-0.5 bg-amber-50 px-2 py-1 rounded-lg">
+                             <i class="ri-star-fill text-amber-400 text-[13px]"></i>
+                             <span class="text-amber-700 font-black text-[12px] ml-0.5">{{ $review->rating }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-5">
+                        <p class="text-slate-500 text-[11px] font-bold uppercase tracking-widest mb-1.5">Service</p>
+                        <p class="text-slate-800 font-bold text-[13.5px] truncate">{{ $review->order->service->title ?? 'N/A' }}</p>
+                    </div>
 
-@section('scripts')
-        <script>
-            window.__REVIEWS_PAGE__ = { data: @json($reviews ?? []) };
-        </script>
-    <script src="{{ asset('js/dashboard/admin/reviews.js') }}"></script>
+                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 mb-5">
+                        <p class="text-slate-600 text-[13px] leading-relaxed italic">"{{ $review->comment ?? 'Tidak ada komentar.' }}"</p>
+                    </div>
+
+                    <div class="flex items-center justify-between pt-2 border-t border-slate-50">
+                        <span class="text-slate-400 text-[11px] font-medium">{{ $review->created_at->format('d M Y') }}</span>
+                        <form action="{{ route('admin.reviews.destroy', $review->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus ulasan ini?')">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="text-[11px] font-bold text-red-500 hover:text-red-700 uppercase tracking-wider">Delete Review</button>
+                        </form>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+
+        <div class="mt-12 flex justify-center pagination-container">
+            {{ $reviews->links() }}
+        </div>
+    @else
+        <div class="py-24 text-center animate-fadeUp-3">
+            <div class="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-5 text-[2.5rem] text-slate-300">
+                <i class="ri-star-line"></i>
+            </div>
+            <h3 class="text-[1.2rem] font-extrabold text-slate-900">Belum Ada Ulasan</h3>
+            <p class="text-slate-500 max-w-[320px] mx-auto mt-2">Tidak ditemukan ulasan sesuai filter yang dipilih.</p>
+        </div>
+    @endif
 @endsection

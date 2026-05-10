@@ -109,4 +109,92 @@ class NegotiationController extends Controller
 
         return back()->with('success', 'Pesan terkirim');
     }
+
+    // =========================
+    // CLIENT: Store Negotiation (New Price Proposal)
+    // =========================
+    public function clientStoreNegotiation(Request $request, Offer $offer)
+    {
+        $client = auth('client')->user();
+
+        if ($offer->order->client_id !== $client->id) {
+            abort(403, 'Akses ditolak.');
+        }
+
+        if ($offer->status !== 'Sent') {
+            return redirect()->back()->with('error', 'Penawaran yang sudah diproses tidak bisa dinegosiasikan.');
+        }
+
+        $validated = $request->validate([
+            'reason' => 'required|string|max:1000',
+            'new_price' => 'required|integer|min:1000',
+            'description' => 'nullable|string|max:2000',
+        ]);
+
+        $message = "Negosiasi harga: " . $validated['reason'] . 
+                   "\nHarga tawaran: Rp " . number_format($validated['new_price'], 0, ',', '.') . 
+                   "\nDeskripsi: " . ($validated['description'] ?? '-');
+
+        $negotiation = Negotiation::create([
+            'order_id' => $offer->order_id,
+            'sender' => 'client',
+            'message' => $message,
+        ]);
+
+        $offer->order->update(['status' => 'Negotiated']);
+
+        return redirect()->route('client.offers.show', $offer->id)->with('success', 'Negosiasi berhasil dikirim');
+    }
+
+    // =========================
+    // FREELANCER: Accept Negotiation
+    // =========================
+    public function freelancerAcceptNegotiation(Negotiation $negotiation)
+    {
+        $freelancer = auth('freelancer')->user();
+
+        if ($negotiation->order->service->freelancer_id !== $freelancer->id) {
+            abort(403, 'Akses ditolak.');
+        }
+
+        $negotiation->update([
+            'message' => $negotiation->message . "\n\n[SISTEM: Negosiasi harga diterima oleh Freelancer]",
+        ]);
+
+        return redirect()->back()->with('success', 'Negosiasi diterima.');
+    }
+
+    // =========================
+    // FREELANCER: Reject Negotiation
+    // =========================
+    public function freelancerRejectNegotiation(Negotiation $negotiation)
+    {
+        $freelancer = auth('freelancer')->user();
+
+        if ($negotiation->order->service->freelancer_id !== $freelancer->id) {
+            abort(403, 'Akses ditolak.');
+        }
+
+        $negotiation->update([
+            'message' => $negotiation->message . "\n\n[SISTEM: Negosiasi harga ditolak oleh Freelancer]",
+        ]);
+
+        return redirect()->back()->with('success', 'Negosiasi ditolak.');
+    }
+
+    // =========================
+    // FREELANCER: Show Negotiation Detail
+    // =========================
+    public function freelancerShowNegotiation(Negotiation $negotiation)
+    {
+        $freelancer = auth('freelancer')->user();
+
+        if ($negotiation->order->service->freelancer_id !== $freelancer->id) {
+            abort(403, 'Akses ditolak.');
+        }
+
+        $negotiation->load(['order.service', 'order.client', 'order.offers']);
+
+        return view('dashboard.freelancer.negotiation-view', compact('negotiation'));
+    }
 }

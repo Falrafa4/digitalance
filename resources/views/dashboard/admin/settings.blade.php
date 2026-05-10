@@ -88,6 +88,28 @@
                     </div>
                 </a>
 
+                <a href="{{ route('admin.negotiations.index') }}" class="group bg-white border border-slate-200 rounded-[18px] p-5 hover:border-teal-400 hover:shadow-teal-sm transition-all duration-200 flex items-start gap-4 relative overflow-hidden">
+                    <div class="absolute right-0 top-0 w-24 h-24 bg-gradient-to-bl from-slate-50 to-transparent -z-10 rounded-bl-[100px] opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <div class="w-11 h-11 rounded-xl bg-orange-50 text-orange-500 flex items-center justify-center text-[22px] shrink-0 group-hover:scale-110 transition-transform">
+                        <i class="ri-chat-voice-line"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-display font-bold text-[14.5px] text-slate-900 mb-1 group-hover:text-teal-700 transition-colors">Negotiations</h3>
+                        <p class="text-[12.5px] text-slate-500 leading-relaxed">Pantau dan kelola negosiasi harga antara client dan freelancer.</p>
+                    </div>
+                </a>
+
+                <a href="{{ route('admin.admins.index') }}" class="group bg-white border border-slate-200 rounded-[18px] p-5 hover:border-teal-400 hover:shadow-teal-sm transition-all duration-200 flex items-start gap-4 relative overflow-hidden">
+                    <div class="absolute right-0 top-0 w-24 h-24 bg-gradient-to-bl from-slate-50 to-transparent -z-10 rounded-bl-[100px] opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <div class="w-11 h-11 rounded-xl bg-rose-50 text-rose-500 flex items-center justify-center text-[22px] shrink-0 group-hover:scale-110 transition-transform">
+                        <i class="ri-shield-user-line"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-display font-bold text-[14.5px] text-slate-900 mb-1 group-hover:text-teal-700 transition-colors">Admin Management</h3>
+                        <p class="text-[12.5px] text-slate-500 leading-relaxed">Kelola akun admin dan hak akses platform.</p>
+                    </div>
+                </a>
+
                 <a href="{{ route('admin.profile') }}" class="group bg-slate-900 border border-slate-800 rounded-[18px] p-5 hover:bg-black transition-all duration-200 flex items-center justify-between sm:col-span-2 shadow-md hover:shadow-xl hover:-translate-y-0.5">
                     <div class="flex items-center gap-4">
                         <div class="w-11 h-11 rounded-xl bg-white/10 text-white flex items-center justify-center text-[22px] shrink-0">

@@ -92,7 +92,7 @@
                     </td>
                     <td class="px-6 py-4 text-[12px] text-slate-400">${date}</td>
                     <td class="px-6 py-4 text-center">
-                        <button onclick="alert('Detail fitur belum aktif')" class="w-8 h-8 rounded-[9px] bg-slate-100 text-slate-500 flex items-center justify-center text-[14px] hover:bg-[#f0fdf9] hover:text-[#0f766e] transition-all duration-150 border-none cursor-pointer">
+                        <button onclick="window.openResultModal('${item.id}')" class="w-8 h-8 rounded-[9px] bg-slate-100 text-slate-500 flex items-center justify-center text-[14px] hover:bg-[#f0fdf9] hover:text-[#0f766e] transition-all duration-150 border-none cursor-pointer mx-auto">
                             <i class="ri-eye-line"></i>
                         </button>
                     </td>
@@ -110,6 +110,92 @@
         }
 
         renderPaginationControls(totalPages);
+    }
+
+    function openModal(id) {
+        const el = $(id);
+        if (el) { 
+            el.classList.remove('opacity-0', 'pointer-events-none'); 
+            el.style.opacity = '1'; 
+            el.style.pointerEvents = 'all'; 
+        }
+    }
+
+    function closeModal(id) {
+        const el = $(id);
+        if (el) { 
+            el.classList.add('opacity-0', 'pointer-events-none'); 
+            el.style.opacity = '0'; 
+            el.style.pointerEvents = 'none'; 
+        }
+    }
+
+    window.openResultModal = function(id) {
+        const r = allResults.find(x => String(x.id) === String(id));
+        if (!r) return;
+
+        const box = $('modal-results-box');
+        if (!box) return;
+
+        const date = r.created_at ? new Date(r.created_at).toLocaleString('id-ID') : '-';
+        const orderStatus = (r.order?.status || 'Unknown').replace(/\b\w/g, l => l.toUpperCase());
+
+        box.innerHTML = `
+            <div class="modal-hero relative h-20 bg-gradient-to-r from-[#0f766e] to-[#10B981]">
+                <button class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center bg-white/20 text-white rounded-full hover:bg-white/30 transition" onclick="window.closeResultModal()"><i class="ri-close-line"></i></button>
+            </div>
+            <div class="p-6">
+                <div class="flex items-center gap-2 mb-4">
+                    <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Result ID</span>
+                    <span class="font-mono text-[13px] font-bold text-slate-900">#${r.id}</span>
+                </div>
+                
+                <h2 class="text-xl font-extrabold text-slate-900 mb-6">Detail Hasil Pekerjaan</h2>
+
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                        <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Order ID</span>
+                        <span class="font-bold text-slate-900">#${r.order_id}</span>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                        <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Status Order</span>
+                        <span class="px-2 py-0.5 rounded-lg bg-emerald-100 text-emerald-700 text-[10px] font-bold uppercase">${orderStatus}</span>
+                    </div>
+                </div>
+
+                <div class="space-y-4 mb-8">
+                    <div>
+                        <span class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Versi / Nama File</span>
+                        <p class="text-[14px] text-slate-700 font-medium">${r.version || r.message || '-'}</p>
+                    </div>
+                    <div>
+                        <span class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Catatan Freelancer</span>
+                        <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl text-[13.5px] text-slate-600 leading-relaxed italic">
+                            "${r.note || 'Tidak ada catatan.'}"
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between p-4 bg-[#f0fdfa] border border-[#ccfbf1] rounded-xl">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-lg bg-white shadow-sm flex items-center justify-center text-[#0f766e]">
+                                <i class="ri-file-zip-line text-xl"></i>
+                            </div>
+                            <div>
+                                <div class="text-[13px] font-bold text-slate-900">Project Files</div>
+                                <div class="text-[11px] text-slate-500">${date}</div>
+                            </div>
+                        </div>
+                        <a href="/storage/${r.file_url}" target="_blank" class="px-4 py-2 bg-[#0f766e] text-white rounded-lg text-[12px] font-bold hover:bg-[#0a5e58] transition-all">Download</a>
+                    </div>
+                </div>
+
+                <button onclick="window.closeResultModal()" class="w-full py-3 bg-slate-900 text-white font-bold rounded-xl hover:bg-black transition-all shadow-lg">Tutup</button>
+            </div>
+        `;
+        openModal('modal-results-overlay');
+    }
+
+    window.closeResultModal = function() {
+        closeModal('modal-results-overlay');
     }
 
     function renderPaginationControls(totalPages) {

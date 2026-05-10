@@ -204,8 +204,8 @@
     const o = ordersData.find(x => String(x.id) === String(id));
     if (!o) return;
     
-    const overlay = document.getElementById('detail-modal-overlay');
-    const box = document.getElementById('detail-modal-box');
+    const overlay = document.getElementById('modal-orders-overlay');
+    const box = document.getElementById('modal-orders-box');
 
     box.innerHTML = `
       <div class="modal-hero">
@@ -287,7 +287,7 @@
   };
 
   window.closeOrderModal = function() {
-    document.getElementById('detail-modal-overlay').classList.remove('open');
+    document.getElementById('modal-orders-overlay').classList.remove('open');
   };
 
   /**
@@ -459,7 +459,7 @@
     }
 
     // Close Modal on Overlay Click
-    const overlay = document.getElementById('detail-modal-overlay');
+    const overlay = document.getElementById('modal-orders-overlay');
     if (overlay) {
       overlay.addEventListener('click', (e) => { 
         if (e.target === overlay) closeOrderModal(); 

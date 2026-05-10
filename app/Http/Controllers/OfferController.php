@@ -15,7 +15,7 @@ class OfferController extends Controller
     public function index()
     {
         // Mengambil data dengan Eager Loading agar tidak berat
-        $offers = Offer::with(['order.service.freelancer', 'order.client'])->latest()->get();
+        $offers = Offer::with(['order.service.freelancer', 'order.client'])->latest()->paginate(12);
         $negotiations = Negotiation::with(['order.client', 'order.service.freelancer'])->latest()->get();
 
         return view('dashboard.admin.offers', [
@@ -28,7 +28,7 @@ class OfferController extends Controller
     public function clientIndex()
     {
         $client = auth('client')->user();
-        $offers = Offer::with('order.service.freelancer')
+        $offers = Offer::with(['order.service.freelancer.skomda_student', 'order.client'])
             ->whereHas('order.client', function ($query) use ($client) {
                 $query->where('id', $client->id);
             })->get();
@@ -37,6 +37,8 @@ class OfferController extends Controller
 
     public function clientShow(Offer $offer)
     {
+        $offer->load(['order.service.freelancer.skomda_student', 'order.client']);
+
         if ($offer->order->client_id !== auth('client')->id()) {
             abort(403, 'Akses ditolak.');
         }
@@ -76,7 +78,7 @@ class OfferController extends Controller
     public function freelancerIndex(Request $request)
     {
         $freelancer = auth('freelancer')->user();
-        $offers = Offer::with('order.service.freelancer')
+        $offers = Offer::with(['order.service.freelancer.skomda_student', 'order.client'])
             ->whereHas('order.service.freelancer', function ($query) use ($freelancer) {
                 $query->where('id', $freelancer->id);
             })->get();

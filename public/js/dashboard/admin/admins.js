@@ -20,9 +20,7 @@ function openAdminModal(id) {
 
     const name = card.dataset.name;
     const email = card.dataset.email;
-    const phone = card.dataset.phone || '-';
     const status = card.dataset.status || 'Active';
-    const bio = card.dataset.bio || 'Tidak ada deskripsi bio.';
     const avatar = card.querySelector('img').src;
 
     const box = document.getElementById('admin-modal-box');
@@ -51,17 +49,10 @@ function openAdminModal(id) {
 
             <div class="space-y-5">
                 <div class="flex flex-col gap-1.5">
-                    <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Kontak</span>
+                    <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Email</span>
                     <div class="flex items-center gap-2.5 text-[13.5px] text-slate-700 font-medium">
                         <i class="ri-mail-line text-slate-400 text-[16px]"></i> ${email}
                     </div>
-                    <div class="flex items-center gap-2.5 text-[13.5px] text-slate-700 font-medium">
-                        <i class="ri-phone-line text-slate-400 text-[16px]"></i> ${phone}
-                    </div>
-                </div>
-                <div class="flex flex-col gap-1.5 border-t border-slate-100 pt-5">
-                    <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Bio</span>
-                    <p class="text-[13.5px] text-slate-600 leading-relaxed">${bio}</p>
                 </div>
             </div>
         </div>
@@ -116,7 +107,7 @@ function openEditAdmin(id) {
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div class="grid grid-cols-1 gap-4 mb-4">
                         <div class="flex flex-col gap-1.5">
                             <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Status</label>
                             <select name="status" class="py-2.5 px-3.5 bg-slate-50 border-[1.5px] border-slate-200 rounded-xl text-[13.5px] outline-none focus:border-[#0f766e] focus:bg-white transition-all">
@@ -125,15 +116,6 @@ function openEditAdmin(id) {
                                 <option value="Suspended" ${card.dataset.status === 'Suspended' ? 'selected' : ''}>Suspended</option>
                             </select>
                         </div>
-                        <div class="flex flex-col gap-1.5">
-                            <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">No. Telepon</label>
-                            <input type="text" name="phone" value="${card.dataset.phone}" class="py-2.5 px-3.5 bg-slate-50 border-[1.5px] border-slate-200 rounded-xl text-[13.5px] outline-none focus:border-[#0f766e] focus:bg-white transition-all" />
-                        </div>
-                    </div>
-
-                    <div class="flex flex-col gap-1.5">
-                        <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Bio</label>
-                        <textarea name="bio" rows="3" class="py-2.5 px-3.5 bg-slate-50 border-[1.5px] border-slate-200 rounded-xl text-[13.5px] outline-none focus:border-[#0f766e] focus:bg-white transition-all resize-none">${card.dataset.bio}</textarea>
                     </div>
                 </div>
 

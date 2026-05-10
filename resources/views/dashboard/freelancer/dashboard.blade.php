@@ -124,7 +124,7 @@
 
         {{-- CONTENT GRID --}}
         <section class="grid grid-cols-1 xl:grid-cols-3 gap-6 animate-fadeUp-delay-3">
-            {{-- LEFT: Latest Orders --}}
+            {{-- LEFT: Latest Orders + Status Change Alert --}}
             <div class="xl:col-span-2 min-w-0">
                 <div class="flex items-end justify-between mb-4 gap-3 flex-wrap">
                     <div>
@@ -138,6 +138,36 @@
                         View All
                     </a>
                 </div>
+
+                @if(!empty($dashboardData['ordersWithStatusChange']) && count($dashboardData['ordersWithStatusChange']) > 0)
+                <div class="mb-4 space-y-3">
+                    @foreach($dashboardData['ordersWithStatusChange'] as $changedOrder)
+                        <a href="{{ route('freelancer.orders.show', $changedOrder['id']) }}"
+                           class="block p-4 rounded-xl border {{ $changedOrder['status'] == 'Revision' ? 'bg-amber-50 border-amber-200' : 'bg-emerald-50 border-emerald-200' }} hover:shadow-md transition-all">
+                            <div class="flex items-center justify-between gap-3">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-9 h-9 rounded-lg {{ $changedOrder['status'] == 'Revision' ? 'bg-amber-100 text-amber-600' : 'bg-emerald-100 text-emerald-600' }} flex items-center justify-center">
+                                        <i class="{{ $changedOrder['status'] == 'Revision' ? 'ri-refresh-line' : 'ri-checkbox-circle-line' }}"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-bold text-slate-900 text-sm">{{ $changedOrder['title'] }}</p>
+                                        <p class="text-xs text-slate-500">
+                                            @if($changedOrder['status'] == 'Revision')
+                                                <span class="text-amber-700 font-semibold">Client meminta revisi</span>
+                                            @else
+                                                <span class="text-emerald-700 font-semibold">Client menerima hasil</span>
+                                            @endif
+                                        </p>
+                                    </div>
+                                </div>
+                                <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase {{ $changedOrder['status'] == 'Revision' ? 'bg-amber-200 text-amber-800' : 'bg-emerald-200 text-emerald-800' }}">
+                                    {{ $changedOrder['status'] }}
+                                </span>
+                            </div>
+                        </a>
+                    @endforeach
+                </div>
+                @endif
 
                 <div class="bg-white border border-slate-200 rounded-[18px] overflow-hidden">
                     <div class="divide-y divide-slate-100" id="latest-order-list"></div>

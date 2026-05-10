@@ -14,7 +14,7 @@ class ResultController extends Controller
     // ADMIN ONLY
     public function index()
     {
-        $results = Result::with('order.service.freelancer')->get();
+        $results = Result::with('order.service.freelancer')->latest()->paginate(12);
         return view('dashboard.admin.results', compact('results'));
     }
 
@@ -74,7 +74,12 @@ class ResultController extends Controller
 
     public function show(Result $result)
     {
-        $result = $result->load('order.service.freelancer');
+        $result = $result->load(['order.service.freelancer.skomda_student', 'order.client']);
+        
+        if (auth('administrator')->check()) {
+            return view('dashboard.admin.results-detail', compact('result'));
+        }
+        
         return view('dashboard.freelancer.result-detail', compact('result'));
     }
 
@@ -88,7 +93,7 @@ class ResultController extends Controller
     public function destroy(Result $result)
     {
         $result->delete();
-        return redirect()->back()->with('success', 'Hasil kerja berhasil dihapus');
+        return redirect()->route('admin.results.index')->with('success', 'Hasil kerja berhasil dihapus');
     }
 
     // CLIENT ONLY

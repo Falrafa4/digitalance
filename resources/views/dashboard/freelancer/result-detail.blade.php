@@ -15,15 +15,52 @@
                 <h1 class="font-display text-[1.6rem] font-extrabold text-slate-900 mb-1">Detail Hasil Pekerjaan</h1>
                 <p class="text-slate-500 text-[13px]">Order #{{ $result->order_id }} - {{ $result->order->service->title ?? '-' }}</p>
             </div>
-            <div class="flex gap-2">
-                <form action="{{ route('freelancer.results.destroy', $result->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus result ini?')">
-                    @csrf @method('DELETE')
-                    <button type="submit" class="px-4 py-2 bg-red-50 text-red-600 rounded-xl font-bold text-sm hover:bg-red-100 transition-colors">
-                        <i class="ri-delete-bin-line mr-1"></i> Hapus
-                    </button>
-                </form>
+            <div class="flex gap-2 items-center flex-wrap">
+                <span class="px-3 py-1 rounded-lg text-[11px] font-bold uppercase 
+                    @if($result->order->status == 'Completed') bg-emerald-100 text-emerald-700
+                    @elseif($result->order->status == 'Revision') bg-amber-100 text-amber-700
+                    @else bg-blue-100 text-blue-700 @endif">
+                    Status: {{ $result->order->status }}
+                </span>
             </div>
         </div>
+
+        @php
+            $hasNewerResult = $result->order->results->where('id', '!=', $result->id)->count() > 0;
+            $isLatestResult = $result->order->results->sortByDesc('created_at')->first()->id === $result->id;
+        @endphp
+
+        @if($isLatestResult && in_array($result->order->status, ['In Progress', 'Revision']))
+        <div class="mb-6 p-4 rounded-xl bg-blue-50 border border-blue-100 flex items-start gap-3">
+            <div class="w-8 h-8 rounded-lg bg-blue-500 text-white flex items-center justify-center flex-shrink-0 text-sm">
+                <i class="ri-information-line"></i>
+            </div>
+            <div>
+                <p class="font-bold text-blue-800 text-sm">Menunggu Respon Klien</p>
+                <p class="text-blue-700 text-xs mt-0.5">Hasil ini masih menunggu klien untuk menerima atau meminta revisi.</p>
+            </div>
+        </div>
+        @elseif($result->order->status == 'Completed')
+        <div class="mb-6 p-4 rounded-xl bg-emerald-50 border border-emerald-100 flex items-start gap-3">
+            <div class="w-8 h-8 rounded-lg bg-emerald-500 text-white flex items-center justify-center flex-shrink-0 text-sm">
+                <i class="ri-checkbox-circle-line"></i>
+            </div>
+            <div>
+                <p class="font-bold text-emerald-800 text-sm">Hasil Diterima</p>
+                <p class="text-emerald-700 text-xs mt-0.5">Klien telah menerima hasil pekerjaan ini.</p>
+            </div>
+        </div>
+        @elseif($result->order->status == 'Revision')
+        <div class="mb-6 p-4 rounded-xl bg-amber-50 border border-amber-200 flex items-start gap-3">
+            <div class="w-8 h-8 rounded-lg bg-amber-500 text-white flex items-center justify-center flex-shrink-0 text-sm">
+                <i class="ri-refresh-line"></i>
+            </div>
+            <div>
+                <p class="font-bold text-amber-800 text-sm">Revisi Diminta</p>
+                <p class="text-amber-700 text-xs mt-0.5">Klien telah meminta revisi pada hasil ini.</p>
+            </div>
+        </div>
+        @endif
 
         <div class="mb-8">
             <h3 class="font-bold text-slate-900 mb-3 text-[15px]">Pesan / Pesan Klien</h3>

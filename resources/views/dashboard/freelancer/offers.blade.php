@@ -17,7 +17,10 @@
                 <i class="ri-price-tag-3-line"></i>
             </div>
             <h3 class="font-display text-[1.15rem] font-bold text-slate-700 mb-1">Belum Ada Penawaran</h3>
-            <p class="text-[13px] text-slate-400">Kamu belum mengajukan penawaran harga untuk order apapun.</p>
+            <p class="text-[13px] text-slate-400 mb-4">Kamu belum mengajukan penawaran harga untuk order apapun.</p>
+            <a href="{{ route('freelancer.orders.index') }}" class="inline-flex items-center gap-2 px-5 py-2.5 bg-[#0f766e] text-white rounded-xl font-bold text-[13px] hover:bg-[#0d6b63] transition-all shadow-teal-sm">
+                <i class="ri-eye-line"></i> Lihat Orders
+            </a>
         </div>
     @else
         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">

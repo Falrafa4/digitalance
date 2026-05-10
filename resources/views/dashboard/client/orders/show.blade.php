@@ -1,7 +1,12 @@
 @extends('layouts.dashboard')
 @section('title', 'Detail Order')
 
+@section('styles')
+<style>[x-cloak]{display:none!important}</style>
+@endsection
+
 @section('content')
+<script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 @if(session('success'))
   <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -93,6 +98,115 @@
         </div>
       </div>
 
+      {{-- ACTION BUTTONS: Accept/Tolak/Negosiasi --}}
+      @if($order->status === 'Negotiated' && $order->agreed_price)
+      <div x-data="{ showNego: false, showReject: false }" class="bg-white border border-slate-200 rounded-[18px] p-6">
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div>
+            <h3 class="font-display font-extrabold text-slate-900 text-[1.1rem]">Harga Disepakati</h3>
+            <p class="text-2xl font-black text-[#0f766e] mt-1">Rp {{ number_format($order->agreed_price, 0, ',', '.') }}</p>
+          </div>
+          <div class="flex flex-col sm:flex-row gap-3">
+            <button @click="showNego = true" class="px-5 py-3 rounded-[12px] bg-amber-50 border border-amber-200 text-amber-700 font-bold text-[13px] hover:bg-amber-100 transition-all">
+              <i class="ri-chat-history-line mr-1"></i> Negosiasi
+            </button>
+            <form action="{{ route('client.orders.reject', $order->id) }}" method="POST" @submit="if(!showReject){ showReject = true; return false; } return true;">
+              @csrf
+              <input type="hidden" name="reason" id="rejectReason" value="">
+              <button type="submit" class="px-5 py-3 rounded-[12px] bg-white border border-red-200 text-red-600 font-bold text-[13px] hover:bg-red-50 transition-all">
+                <i class="ri-close-line mr-1"></i> Tolak
+              </button>
+            </form>
+            <form action="{{ route('client.orders.accept', $order->id) }}" method="POST">
+              @csrf
+              <button type="submit" onclick="return confirm('Terima pesanan dan lanjut ke pembayaran?')" class="px-5 py-3 rounded-[12px] bg-[#0f766e] text-white font-bold text-[13px] hover:bg-[#0a5e58] transition-all">
+                <i class="ri-check-line mr-1"></i> Lanjut ke Pembayaran
+              </button>
+            </form>
+          </div>
+        </div>
+
+        {{-- Banner Menunggu Pembayaran --}}
+        <div class="mt-5 p-4 rounded-xl bg-blue-50 border border-blue-100 flex items-start gap-3">
+          <div class="w-9 h-9 rounded-lg bg-blue-500 text-white flex items-center justify-center flex-shrink-0">
+            <i class="ri-bank-card-line text-lg"></i>
+          </div>
+          <div>
+            <p class="font-bold text-blue-800 text-sm mb-0.5">Menunggu Pembayaran</p>
+            <p class="text-blue-700 text-xs leading-relaxed">Selesaikan pembayaran untuk melanjutkan pesanan.</p>
+            <a href="{{ route('client.orders.checkout', $order->id) }}" class="inline-flex items-center gap-1 mt-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-xs font-bold hover:bg-blue-700 transition-all">
+              <i class="ri-arrow-right-line"></i> Bayar Sekarang
+            </a>
+          </div>
+        </div>
+
+        {{-- Modal Negosiasi --}}
+        <div x-show="showNego" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div @click="showNego = false" class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm"></div>
+          <div class="relative w-full max-w-lg bg-white rounded-[24px] shadow-xl p-6 sm:p-8">
+            <button @click="showNego = false" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500">
+              <i class="ri-close-line"></i>
+            </button>
+            <h2 class="font-display text-xl font-bold text-slate-900 mb-1">Ajukan Negosiasi</h2>
+            <p class="text-sm text-slate-500 mb-5">Kirimkan harga baru ke freelancer</p>
+            
+            <form action="{{ route('client.orders.nego', $order->id) }}" method="POST" class="space-y-4">
+              @csrf
+              <div>
+                <label class="block text-sm font-bold text-slate-700 mb-2">Alasan <span class="text-red-500">*</span></label>
+                <textarea name="reason" rows="2" required class="w-full px-4 py-3 rounded-[12px] border border-slate-200 focus:border-amber-400 focus:ring-2 focus:ring-amber-100 outline-none text-sm
+                     @error('reason') input-error @enderror" placeholder="Alasan nego..."></textarea>
+                @error('reason')
+                  <p class="text-red-600 text-[12px] font-bold mt-1">{{ $message }}</p>
+                @enderror
+              </div>
+              <div>
+                <label class="block text-sm font-bold text-slate-700 mb-2">Harga Baru <span class="text-red-500">*</span></label>
+                <div class="relative">
+                  <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 font-semibold">Rp</span>
+                  <input type="number" name="new_price" required min="1000" class="w-full pl-10 pr-4 py-3 rounded-[12px] border border-slate-200 focus:border-amber-400 focus:ring-2 focus:ring-amber-100 outline-none text-sm font-semibold
+                     @error('new_price') input-error @enderror" placeholder="0">
+                </div>
+                @error('new_price')
+                  <p class="text-red-600 text-[12px] font-bold mt-1">{{ $message }}</p>
+                @enderror
+              </div>
+              <div>
+                <label class="block text-sm font-bold text-slate-700 mb-2">Deskripsi</label>
+                <textarea name="description" rows="2" class="w-full px-4 py-3 rounded-[12px] border border-slate-200 focus:border-amber-400 focus:ring-2 focus:ring-amber-100 outline-none text-sm" placeholder="Detail tambahan..."></textarea>
+              </div>
+              <div class="flex gap-3 pt-2">
+                <button type="button" @click="showNego = false" class="flex-1 py-3 rounded-[12px] bg-slate-100 text-slate-600 font-bold text-sm">Batal</button>
+                <button type="submit" class="flex-1 py-3 rounded-[12px] bg-amber-500 text-white font-bold text-sm hover:bg-amber-600">Kirim</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        {{-- Modal Konfirmasi Tolak --}}
+        <div x-show="showReject" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div @click="showReject = false" class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm"></div>
+          <div class="relative w-full max-w-md bg-white rounded-[20px] shadow-xl p-6">
+            <div class="text-center">
+              <div class="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="ri-close-line text-2xl text-red-600"></i>
+              </div>
+              <h3 class="font-display text-lg font-bold text-slate-900 mb-2">Tolak Pesanan?</h3>
+              <p class="text-sm text-slate-500 mb-5">Mohon berikan alasan penolakan.</p>
+              <form action="{{ route('client.orders.reject', $order->id) }}" method="POST" class="space-y-4">
+                @csrf
+                <textarea name="reason" rows="3" required class="w-full px-4 py-3 rounded-[12px] border border-slate-200 text-sm" placeholder="Alasan menolak..."></textarea>
+                <div class="flex gap-3">
+                  <button type="button" @click="showReject = false" class="flex-1 py-2.5 rounded-[12px] bg-slate-100 text-slate-600 font-bold text-sm">Batal</button>
+                  <button type="submit" class="flex-1 py-2.5 rounded-[12px] bg-red-500 text-white font-bold text-sm hover:bg-red-600">Ya, Tolak</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+      @endif
+
       {{-- Brief + Attachment --}}
       <div class="bg-white border border-slate-200 rounded-[18px] p-6">
         <h2 class="font-display font-extrabold text-slate-900 text-[1.25rem]">Brief</h2>
@@ -156,20 +270,73 @@
           @endforelse
         </div>
 
-        <form method="POST" action="{{ route('client.messages.send') }}" class="mt-5 flex flex-col sm:flex-row gap-3">
-          @csrf
-          <input type="hidden" name="order_id" value="{{ $order->id }}"/>
-          <input type="text" name="message"
-                 class="flex-1 px-4 py-2.5 rounded-[12px] bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-200"
-                 placeholder="Tulis pesan...">
-          <button class="px-5 py-2.5 rounded-[12px] bg-slate-900 text-white font-bold text-[13px] hover:bg-black transition-all">
-            Kirim
-          </button>
-        </form>
-        @error('message')
-          <p class="text-red-600 text-[12px] font-bold mt-2">{{ $message }}</p>
-        @enderror
+            <form action="{{ route('client.messages.send') }}" class="mt-5 flex flex-col sm:flex-row gap-3">
+              @csrf
+              <input type="hidden" name="order_id" value="{{ $order->id }}"/>
+              <input type="text" name="message"
+                     class="flex-1 px-4 py-2.5 rounded-[12px] bg-slate-50 border border-slate-200 focus:border-[#0f766e] focus:ring-2 focus:ring-[#0f766e]/20 outline-none transition-all
+                     @error('message') input-error @enderror"
+                     placeholder="Tulis pesan...">
+              <button type="submit" class="px-5 py-2.5 rounded-[12px] bg-slate-900 text-white font-bold text-[13px] hover:bg-black transition-all">
+                Kirim
+              </button>
+            </form>
+            @error('message')
+              <p class="text-red-600 text-[12px] font-bold mt-2">{{ $message }}</p>
+            @enderror
       </div>
+
+      {{-- REVISION REQUEST (show when order is In Progress only) --}}
+      @if($order->status === 'In Progress')
+      <div x-data="{ showRevision: false }" class="bg-white border border-slate-200 rounded-[18px] p-6">
+        <div class="flex items-center justify-between gap-3 mb-4">
+          <div>
+            <h2 class="font-display font-extrabold text-slate-900 text-[1.25rem] flex items-center gap-2">
+              <i class="ri-refresh-line text-amber-500"></i>
+              Permintaan Revisi
+            </h2>
+            <p class="text-slate-500 text-[13.5px] mt-1">Tidak puas dengan hasil? Ajukan revisi.</p>
+          </div>
+          @if($order->status !== 'Revision')
+          <button @click="showRevision = true" class="px-4 py-2.5 rounded-[12px] bg-amber-50 border border-amber-200 text-amber-700 font-bold text-[13px] hover:bg-amber-100 transition-all">
+            <i class="ri-add-line mr-1"></i> Ajukan Revisi
+          </button>
+          @else
+          <span class="px-3 py-1.5 rounded-full text-[12px] font-bold bg-amber-100 text-amber-700">
+            Revisi Diproses
+          </span>
+          @endif
+        </div>
+
+        {{-- Revision Modal --}}
+        <div x-show="showRevision" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div @click="showRevision = false" class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm"></div>
+          <div class="relative w-full max-w-lg bg-white rounded-[24px] shadow-xl p-6 sm:p-8">
+            <button @click="showRevision = false" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500">
+              <i class="ri-close-line"></i>
+            </button>
+            <h2 class="font-display text-xl font-bold text-slate-900 mb-1">Ajukan Revisi</h2>
+            <p class="text-sm text-slate-500 mb-5">Jelaskan bagian yang perlu direvisi</p>
+            
+            <form action="{{ route('client.orders.revision', $order->id) }}" method="POST" class="space-y-4">
+              @csrf
+              <div>
+                <label class="block text-sm font-bold text-slate-700 mb-2">Alasan Revisi <span class="text-red-500">*</span></label>
+                <textarea name="reason" rows="3" required class="w-full px-4 py-3 rounded-[12px] border border-slate-200 focus:border-amber-400 focus:ring-2 focus:ring-amber-100 outline-none text-sm" placeholder="Bagian yang ingin direvisi..."></textarea>
+              </div>
+              <div>
+                <label class="block text-sm font-bold text-slate-700 mb-2">Detail Tambahan</label>
+                <textarea name="description" rows="2" class="w-full px-4 py-3 rounded-[12px] border border-slate-200 focus:border-amber-400 focus:ring-2 focus:ring-amber-100 outline-none text-sm" placeholder="Detail tambahan..."></textarea>
+              </div>
+              <div class="flex gap-3 pt-2">
+                <button type="button" @click="showRevision = false" class="flex-1 py-3 rounded-[12px] bg-slate-100 text-slate-600 font-bold text-sm">Batal</button>
+                <button type="submit" class="flex-1 py-3 rounded-[12px] bg-amber-500 text-white font-bold text-sm hover:bg-amber-600">Kirim Revisi</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      @endif
 
       {{-- Review --}}
       <div class="bg-white border border-slate-200 rounded-[18px] p-6">
@@ -178,7 +345,15 @@
 
         @if(!empty($order->review))
           <div class="mt-4 rounded-[16px] border border-slate-200 bg-slate-50 p-5">
-            <p class="font-extrabold text-slate-900">Kamu sudah memberi review.</p>
+            <div class="flex items-center justify-between mb-2">
+              <p class="font-extrabold text-slate-900">Kamu sudah memberi review.</p>
+              <form action="{{ route('client.reviews.destroy', $order->id) }}" method="POST" onsubmit="return confirm('Hapus review ini?')">
+                @csrf @method('DELETE')
+                <button type="submit" class="px-3 py-1.5 rounded-lg bg-red-50 text-red-600 text-[11px] font-bold hover:bg-red-100 transition-all">
+                  <i class="ri-delete-bin-line mr-1"></i> Hapus
+                </button>
+              </form>
+            </div>
             <p class="text-slate-600 text-[13.5px] mt-2">
               Rating: <span class="font-extrabold">{{ $order->review->rating ?? '-' }}</span>
             </p>
@@ -229,6 +404,12 @@
         </div>
 
         <div class="mt-5 pt-5 border-t border-slate-100 space-y-3">
+          @if($order->status === 'Negotiated')
+          <a href="{{ route('client.orders.checkout', $order->id) }}"
+             class="w-full inline-flex items-center justify-center px-5 py-3 rounded-[12px] bg-[#0f766e] text-white font-bold text-[13px] hover:bg-[#0a5e58] transition-all">
+            Bayar Sekarang <i class="ri-bank-card-line ml-2"></i>
+          </a>
+          @endif
           <a href="{{ route('client.services.show', $order->service_id) }}"
              class="w-full inline-flex items-center justify-center px-5 py-3 rounded-[12px] bg-white border border-slate-200 text-slate-700 font-bold text-[13px]
                     hover:border-[#0f766e] hover:text-[#0f766e] transition-all">

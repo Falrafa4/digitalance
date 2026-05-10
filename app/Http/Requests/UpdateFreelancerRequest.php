@@ -22,10 +22,14 @@ class UpdateFreelancerRequest extends FormRequest
     public function rules(): array
     {
         $freelancer = $this->route('freelancer');
+        $id = is_object($freelancer) ? $freelancer->id : $freelancer;
+
         return [
-            'name' => 'required|string',
-            'email' => 'required|email|unique:freelancers,email,' . $freelancer->id,
-            'phone' => 'required|string'
+            'bio'    => 'nullable|string',
+            'status' => 'required|in:Pending,Approved,Suspended,Rejected',
+            'name'   => 'nullable|string|max:255',
+            'email'  => 'nullable|email',
+            'phone'  => 'nullable|string|max:20',
         ];
     }
 }

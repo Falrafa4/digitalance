@@ -22,11 +22,9 @@ class StoreFreelancerRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string',
-            'email' => 'required|email|unique:freelancers,email',
-            'phone' => 'required|string',
-            'password' => 'required|string|min:6',
             'student_id' => 'required|exists:skomda_students,id|unique:freelancers,student_id',
+            'password'   => 'required|string|min:6',
+            'bio'        => 'nullable|string|max:500',
         ];
     }
 }

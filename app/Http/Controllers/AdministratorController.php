@@ -45,11 +45,15 @@ class AdministratorController extends Controller
 
     public function update(UpdateAdminProfileRequest $request, Administrator $administrator) {
         $data = $request->validated();
+        $isSelf = auth()->guard('administrator')->id() === $administrator->id;
 
         if ($request->filled('password')) {
-            if (!Hash::check($request->current_password, $administrator->password)) {
-                return back()->withErrors(['current_password' => 'Password saat ini salah.']);
+            if ($isSelf) {
+                if (!Hash::check($request->current_password, $administrator->password)) {
+                    return back()->withErrors(['current_password' => 'Password saat ini salah.']);
+                }
             }
+            // Jika bukan self, admin bisa reset password admin lain tanpa tau password lama
             $data['password'] = Hash::make($data['password']);
         } else {
             unset($data['password']);

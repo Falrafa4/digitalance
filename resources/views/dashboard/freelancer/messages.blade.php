@@ -37,8 +37,13 @@
                     $order = $latestMsg->order;
                     $clientName = $order->client->user->name ?? $order->client->name ?? 'Klien';
                     $isLog = str_contains(strtolower($latestMsg->message), 'status changed') || str_contains(strtolower($latestMsg->message), 'payment');
+                    $latestFromClient = $thread->where('sender', 'client')->sortByDesc('created_at')->first();
+                    $hasFreelancerResponse = $latestFromClient 
+                        ? $thread->where('sender', 'freelancer')->where('created_at', '>', $latestFromClient->created_at)->count() > 0 
+                        : false;
+                    $needsResponse = $latestFromClient && !$hasFreelancerResponse && !$isLog;
                 @endphp
-                <div class="msg-card bg-white border border-slate-200 rounded-[20px] p-5 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer" 
+                <div class="msg-card bg-white border {{ $needsResponse ? 'border-amber-300 bg-amber-50/30' : 'border-slate-200' }} rounded-[20px] p-5 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer" 
                      data-type="{{ $isLog ? 'log' : 'chat' }}"
                      onclick="openChatModal({{ $orderId }}, '{{ addslashes($clientName) }}')">
                     <div class="flex items-center gap-4 mb-4 pb-4 border-b border-slate-100">
@@ -46,14 +51,27 @@
                             <div class="w-[50px] h-[50px] rounded-2xl bg-gradient-to-br from-[#0f766e] to-teal-500 text-white flex items-center justify-center text-xl shadow-md">
                                 <i class="ri-user-smile-line"></i>
                             </div>
-                            <div class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-emerald-500 border-2 border-white"></div>
+                            @if($needsResponse)
+                                <div class="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-amber-500 border-2 border-white flex items-center justify-center">
+                                    <i class="ri-error-warning-fill text-[8px] text-white"></i>
+                                </div>
+                            @else
+                                <div class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-emerald-500 border-2 border-white"></div>
+                            @endif
                         </div>
                         <div class="min-w-0 flex-1">
                             <div class="flex items-center justify-between gap-2">
                                 <h3 class="font-bold text-slate-900 truncate">{{ $clientName }}</h3>
-                                <span class="px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase {{ $isLog ? 'bg-blue-50 text-blue-600' : 'bg-teal-50 text-teal-700' }}">
-                                    {{ $isLog ? 'Log' : 'Chat' }}
-                                </span>
+                                <div class="flex items-center gap-1.5 flex-shrink-0">
+                                    @if($needsResponse)
+                                        <span class="px-2 py-0.5 rounded-md text-[9px] font-extrabold uppercase bg-amber-100 text-amber-700 animate-pulse">
+                                            Perlu Respons
+                                        </span>
+                                    @endif
+                                    <span class="px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase {{ $isLog ? 'bg-blue-50 text-blue-600' : 'bg-teal-50 text-teal-700' }}">
+                                        {{ $isLog ? 'Log' : 'Chat' }}
+                                    </span>
+                                </div>
                             </div>
                             <p class="text-[12px] font-bold text-slate-400 uppercase tracking-wider truncate">Order #{{ $orderId }}</p>
                         </div>
@@ -62,8 +80,8 @@
                     <div>
                         <div class="flex items-center justify-between mb-1.5">
                             <p class="text-[11px] font-bold text-slate-400">{{ $latestMsg->created_at->diffForHumans() }}</p>
-                            @if(!$isLog && $latestMsg->sender === 'client')
-                                <span class="w-2 h-2 rounded-full bg-[#0f766e] animate-pulse"></span>
+                            @if(!$isLog && $needsResponse)
+                                <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
                             @endif
                         </div>
                         <p class="text-[13px] text-slate-600 line-clamp-2">
@@ -72,6 +90,13 @@
                             @endif
                             {{ $latestMsg->message }}
                         </p>
+                    </div>
+
+                    <div class="mt-3 pt-3 border-t border-slate-100 flex justify-end">
+                        <a href="{{ route('freelancer.orders.show', $orderId) }}#riwayat-nego"
+                           class="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-600 text-[10px] font-bold hover:bg-[#0f766e] hover:text-white transition-all flex items-center gap-1">
+                            <i class="ri-external-link-line"></i> Buka Nego
+                        </a>
                     </div>
                 </div>
             @endforeach
