@@ -155,13 +155,17 @@
     <script>
         // Modal logic
         function openPrivacyModal() {
-            document.getElementById('privacy-modal').classList.remove('hidden');
+            const modal = document.getElementById('privacy-modal');
+            modal.classList.remove('hidden');
+            window.DigitalanceUtils.focusTrap(modal);
         }
         function closePrivacyModal() {
             document.getElementById('privacy-modal').classList.add('hidden');
         }
         function openTnCModal() {
-            document.getElementById('tnc-modal').classList.remove('hidden');
+            const modal = document.getElementById('tnc-modal');
+            modal.classList.remove('hidden');
+            window.DigitalanceUtils.focusTrap(modal);
         }
         function closeTnCModal() {
             document.getElementById('tnc-modal').classList.add('hidden');

@@ -234,7 +234,7 @@
 </div>
             @endif
             
-            @if($order->status == 'Negotiated')
+          @if($order->status == 'Negotiated')
             <!-- NEGOTIATION RESPONSE SYSTEM -->
             <div class="mb-8 relative z-10">
                 <div class="bg-white rounded-2xl shadow-md border border-teal-100 p-8">
@@ -248,7 +248,7 @@
                         </div>
                     </div>
                     
-                    <form action="{{ route('freelancer.orders.accept', $order->id) }}" method="POST">
+                    <form action="{{ route('freelancer.orders.accept', $order->id) }}" method="POST" x-data="{ isSubmitting: false }" @submit="isSubmitting = true">
                         @csrf
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                             <div>
@@ -275,9 +275,9 @@
                                 placeholder="Tulis pesan konfirmasi atau alasan perubahan harga..."></textarea>
                         </div>
 
-                        <button type="submit" class="w-full py-4 bg-[#0f766e] hover:bg-[#0a5e58] text-white font-bold rounded-xl transition-all shadow-lg shadow-teal-100 flex items-center justify-center gap-2">
-                            <i class="ri-check-double-line text-lg"></i>
-                            ACC & Update Penawaran Harga
+                        <button type="submit" :disabled="isSubmitting" class="w-full py-4 bg-[#0f766e] hover:bg-[#0a5e58] text-white font-bold rounded-xl transition-all shadow-lg shadow-teal-100 flex items-center justify-center gap-2 disabled:opacity-50">
+                            <span x-show="!isSubmitting"><i class="ri-check-double-line text-lg mr-1"></i> ACC & Update Penawaran Harga</span>
+                            <span x-show="isSubmitting"><i class="ri-loader-4-line animate-spin mr-1"></i> Memproses...</span>
                         </button>
                     </form>
                 </div>
@@ -335,7 +335,7 @@
                     </div>
                 </div>
                 
-                <form action="{{ route('freelancer.results.store', $order->id) }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+                <form action="{{ route('freelancer.results.store', $order->id) }}" method="POST" enctype="multipart/form-data" class="space-y-4" x-data="{ isSubmitting: false }" @submit="isSubmitting = true">
                     @csrf
                     <div>
                         <label class="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Versi/Version</label>
@@ -349,9 +349,9 @@
                         <label class="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">File Hasil <span class="text-red-500">*</span></label>
                         <input type="file" name="file" required accept=".pdf,.doc,.docx,.zip,.rar,.jpg,.jpeg,.png" class="w-full px-4 py-3 rounded-[12px] border border-slate-200 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 outline-none text-sm">
                     </div>
-                    <button type="submit" class="w-full py-3.5 rounded-[14px] bg-emerald-500 text-white font-bold text-[14px] hover:bg-emerald-600 transition-all flex items-center justify-center gap-2">
-                        <i class="ri-send-plane-line"></i>
-                        Kirim Hasil ke Klien
+                    <button type="submit" :disabled="isSubmitting" class="w-full py-3.5 rounded-[14px] bg-emerald-500 text-white font-bold text-[14px] hover:bg-emerald-600 transition-all flex items-center justify-center gap-2 disabled:opacity-50">
+                        <span x-show="!isSubmitting"><i class="ri-send-plane-line mr-1"></i> Kirim Hasil ke Klien</span>
+                        <span x-show="isSubmitting"><i class="ri-loader-4-line animate-spin mr-1"></i> Memproses...</span>
                     </button>
                 </form>
             </div>
@@ -446,8 +446,11 @@
     </div>
 
     <!-- MODAL PENOLAKAN -->
-    <div x-show="showRejectModal" x-cloak class="fixed inset-0 z-[1000] flex items-center justify-center p-4"
-        aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div x-show="showRejectModal" 
+         x-init="$watch('showRejectModal', value => { if(value) { $nextTick(() => window.DigitalanceUtils.focusTrap($el)) } })"
+         x-cloak 
+         class="fixed inset-0 z-[1000] flex items-center justify-center p-4"
+         aria-labelledby="modal-title" role="dialog" aria-modal="true">
 
         <!-- Backdrop Blur -->
         <div x-show="showRejectModal" x-transition:enter="transition ease-out duration-300"
@@ -473,7 +476,7 @@
                 <p class="text-slate-500 text-sm mb-8 leading-relaxed">Tindakan ini tidak dapat dibatalkan. Klien akan
                     menerima notifikasi bahwa Anda menolak pesanan ini.</p>
 
-                <form action="{{ route('freelancer.orders.reject', $order->id) }}" method="POST">
+                <form action="{{ route('freelancer.orders.reject', $order->id) }}" method="POST" x-data="{ isSubmitting: false }" @submit="isSubmitting = true">
                     @csrf
                     @method('POST')
                     <div class="mb-8">
@@ -490,9 +493,10 @@
                             class="flex-1 py-4 px-6 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-xl transition-all uppercase text-xs tracking-widest">
                             Batal
                         </button>
-                        <button type="submit" :disabled="!reason.trim()"
-                            class="flex-1 py-4 px-6 bg-rose-600 hover:bg-rose-700 disabled:opacity-50 text-white font-black rounded-xl transition-all shadow-lg shadow-rose-200 uppercase text-xs tracking-widest">
-                            Ya, Tolak
+                        <button type="submit" :disabled="!reason.trim() || isSubmitting"
+                            class="flex-1 py-4 px-6 bg-rose-600 hover:bg-rose-700 disabled:opacity-50 text-white font-black rounded-xl transition-all shadow-lg shadow-rose-200 uppercase text-xs tracking-widest flex items-center justify-center gap-2">
+                            <span x-show="!isSubmitting">Ya, Tolak</span>
+                            <span x-show="isSubmitting"><i class="ri-loader-4-line animate-spin"></i></span>
                         </button>
                     </div>
                 </form>

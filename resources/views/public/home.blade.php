@@ -4,10 +4,11 @@
 
 @section('content')
     <!-- HERO -->
-    <section class="pt-24 pb-16 bg-slate-100 min-h-[90vh] flex items-center" id="home">
+    <section class="pt-24 pb-16 bg-slate-100 min-h-[90vh] flex items-center" id="home" x-data="{ loaded: false }" x-init="setTimeout(() => loaded = true, 800)">
         <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center w-full">
             <div class="flex flex-col gap-6 items-start max-sm:items-center max-sm:text-center">
-                <div
+                <div x-show="!loaded" class="skeleton w-48 h-8 rounded-full mb-2"></div>
+                <div x-show="loaded" x-cloak
                     class="hero-anim inline-flex items-center gap-2 bg-emerald-500/10 text-emerald-600 px-4 py-2 rounded-full text-sm font-bold">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="2">
@@ -19,28 +20,36 @@
                     The #1 Talent Hub for SKOMDA Students
                 </div>
 
-                <h1
+                <div x-show="!loaded" class="space-y-3 w-full">
+                    <div class="skeleton w-full h-12 rounded-xl"></div>
+                    <div class="skeleton w-3/4 h-12 rounded-xl"></div>
+                </div>
+                <h1 x-show="loaded" x-cloak
                     class="hero-anim font-display text-[clamp(2.4rem,4vw,3.8rem)] font-extrabold leading-[1.13] tracking-tight text-slate-900">
                     Digitalance:
                     <span class="gradient-text">Expert SKOMDA</span><br />
                     <span id="typingTarget" class="typing-cursor">Freelance Solutions</span>
                 </h1>
 
-                <p class="hero-anim text-lg text-slate-500 leading-relaxed max-w-[95%]">
+                <div x-show="!loaded" class="skeleton w-full h-20 rounded-xl"></div>
+                <p x-show="loaded" x-cloak class="hero-anim text-lg text-slate-500 leading-relaxed max-w-[95%]">
                     Menghubungkan industri kreatif dengan talenta muda
                     terbaik dari SKOMDA. Karya berkualitas, harga
                     terjangkau, dedikasi tanpa batas.
                 </p>
 
-                <div class="hero-anim glass-card rounded-3xl p-6 w-full">
+                <div class="hero-anim glass-card rounded-3xl p-6 w-full relative">
+                    <div x-show="!loaded" class="absolute inset-0 bg-white/80 backdrop-blur-sm z-20 flex items-center justify-center rounded-3xl">
+                        <div class="skeleton w-[90%] h-[80%] rounded-2xl"></div>
+                    </div>
                     <div class="flex gap-1 bg-slate-100 p-1 rounded-full w-fit mb-4">
                         <button class="role-btn active px-5 py-2 rounded-full font-bold text-sm cursor-pointer border-none"
-                            data-role="client">
+                            data-role="client" aria-label="Switch to Client role">
                             Client
                         </button>
                         <button
                             class="role-btn px-5 py-2 rounded-full font-bold text-sm cursor-pointer border-none bg-transparent text-slate-500"
-                            data-role="freelancer">
+                            data-role="freelancer" aria-label="Switch to Freelancer role">
                             Freelancer
                         </button>
                     </div>
@@ -48,7 +57,8 @@
                         <input type="text" name="q" id="heroSearch" placeholder="Cari jasa: Web Design, Video Editing…"
                             class="w-full px-6 py-4 pr-36 border-2 border-slate-200 rounded-2xl text-base text-slate-900 bg-white transition-all focus:outline-none focus:border-primary" />
                         <button type="submit"
-                            class="absolute right-2 top-2 bottom-2 bg-primary text-white border-none px-5 rounded-xl font-bold cursor-pointer flex items-center gap-2 hover:bg-teal-800 transition-all text-sm">
+                            class="absolute right-2 top-2 bottom-2 bg-primary text-white border-none px-5 rounded-xl font-bold cursor-pointer flex items-center gap-2 hover:bg-teal-800 transition-all text-sm"
+                            aria-label="Search services">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                 stroke-width="2.5">
                                 <circle cx="11" cy="11" r="8" />
@@ -75,7 +85,8 @@
             </div>
 
             <div class="relative max-lg:order-first">
-                <div class="animate-float relative">
+                <div x-show="!loaded" class="skeleton w-full h-[440px] rounded-[2rem]"></div>
+                <div x-show="loaded" x-cloak class="animate-float relative">
                     <div class="blob-1 absolute w-44 h-44 bg-emerald-400/20 rounded-full blur-3xl -top-8 -left-8 z-0">
                     </div>
                     <div class="blob-2 absolute w-64 h-64 bg-teal-700/20 rounded-full blur-3xl -bottom-8 -right-8 z-0">
@@ -99,95 +110,111 @@
     </section>
 
     <!-- STATS -->
-    <section class="bg-white py-12 border-t border-b border-slate-200">
+    <section class="bg-white py-12 border-t border-b border-slate-200" x-data="{ loaded: false }" x-init="setTimeout(() => loaded = true, 1200)">
         <div class="max-w-7xl mx-auto px-6 grid grid-cols-2 lg:grid-cols-4 gap-6 stagger">
-            <div class="reveal flex flex-col items-center text-center gap-3 group cursor-default">
-                <div
-                    class="w-14 h-14 bg-slate-100 rounded-2xl flex items-center justify-center text-primary transition-all group-hover:bg-primary group-hover:text-white group-hover:scale-110">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2">
-                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                        <circle cx="9" cy="7" r="4" />
-                        <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-                        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-                    </svg>
+            <template x-if="!loaded">
+                <div class="col-span-4 grid grid-cols-2 lg:grid-cols-4 gap-6">
+                    @foreach(range(1,4) as $i)
+                        <div class="flex flex-col items-center gap-3">
+                            <div class="skeleton w-14 h-14 rounded-2xl"></div>
+                            <div class="skeleton w-16 h-8 rounded-lg"></div>
+                            <div class="skeleton w-24 h-4 rounded-md"></div>
+                        </div>
+                    @endforeach
                 </div>
-                <p class="stat-number font-display text-[2rem] font-extrabold leading-none" data-target="500"
-                    data-suffix="+">
-                    0
-                </p>
-                <div>
-                    <p class="font-bold text-[0.95rem]">Registered Users</p>
-                    <p class="text-xs text-slate-500 font-medium">
-                        Active community
-                    </p>
-                </div>
-            </div>
+            </template>
+            <template x-if="loaded">
+                <div class="contents">
+                    <div class="reveal flex flex-col items-center text-center gap-3 group cursor-default">
+                        <div
+                            class="w-14 h-14 bg-slate-100 rounded-2xl flex items-center justify-center text-primary transition-all group-hover:bg-primary group-hover:text-white group-hover:scale-110">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                                <circle cx="9" cy="7" r="4" />
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                            </svg>
+                        </div>
+                        <p class="stat-number font-display text-[2rem] font-extrabold leading-none" data-target="500"
+                            data-suffix="+">
+                            0
+                        </p>
+                        <div>
+                            <p class="font-bold text-[0.95rem]">Registered Users</p>
+                            <p class="text-xs text-slate-500 font-medium">
+                                Active community
+                            </p>
+                        </div>
+                    </div>
 
-            <div class="reveal flex flex-col items-center text-center gap-3 group cursor-default">
-                <div
-                    class="w-14 h-14 bg-slate-100 rounded-2xl flex items-center justify-center text-primary transition-all group-hover:bg-primary group-hover:text-white group-hover:scale-110">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2">
-                        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
-                    </svg>
-                </div>
-                <p class="stat-number font-display text-[2rem] font-extrabold leading-none" data-target="250"
-                    data-suffix="+">
-                    0
-                </p>
-                <div>
-                    <p class="font-bold text-[0.95rem]">
-                        Completed Projects
-                    </p>
-                    <p class="text-xs text-slate-500 font-medium">
-                        Successfully delivered
-                    </p>
-                </div>
-            </div>
+                    <div class="reveal flex flex-col items-center text-center gap-3 group cursor-default">
+                        <div
+                            class="w-14 h-14 bg-slate-100 rounded-2xl flex items-center justify-center text-primary transition-all group-hover:bg-primary group-hover:text-white group-hover:scale-110">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+                            </svg>
+                        </div>
+                        <p class="stat-number font-display text-[2rem] font-extrabold leading-none" data-target="250"
+                            data-suffix="+">
+                            0
+                        </p>
+                        <div>
+                            <p class="font-bold text-[0.95rem]">
+                                Completed Projects
+                            </p>
+                            <p class="text-xs text-slate-500 font-medium">
+                                Successfully delivered
+                            </p>
+                        </div>
+                    </div>
 
-            <div class="reveal flex flex-col items-center text-center gap-3 group cursor-default">
-                <div
-                    class="w-14 h-14 bg-slate-100 rounded-2xl flex items-center justify-center text-primary transition-all group-hover:bg-primary group-hover:text-white group-hover:scale-110">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2">
-                        <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-                    </svg>
-                </div>
-                <p class="stat-number font-display text-[2rem] font-extrabold leading-none" data-prefix="Rp "
-                    data-target="50" data-suffix="M+">
-                    0
-                </p>
-                <div>
-                    <p class="font-bold text-[0.95rem]">Total Earnings</p>
-                    <p class="text-xs text-slate-500 font-medium">
-                        Paid to freelancers
-                    </p>
-                </div>
-            </div>
+                    <div class="reveal flex flex-col items-center text-center gap-3 group cursor-default">
+                        <div
+                            class="w-14 h-14 bg-slate-100 rounded-2xl flex items-center justify-center text-primary transition-all group-hover:bg-primary group-hover:text-white group-hover:scale-110">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                            </svg>
+                        </div>
+                        <p class="stat-number font-display text-[2rem] font-extrabold leading-none" data-prefix="Rp "
+                            data-target="50" data-suffix="M+">
+                            0
+                        </p>
+                        <div>
+                            <p class="font-bold text-[0.95rem]">Total Earnings</p>
+                            <p class="text-xs text-slate-500 font-medium">
+                                Paid to freelancers
+                            </p>
+                        </div>
+                    </div>
 
-            <div class="reveal flex flex-col items-center text-center gap-3 group cursor-default">
-                <div
-                    class="w-14 h-14 bg-slate-100 rounded-2xl flex items-center justify-center text-primary transition-all group-hover:bg-primary group-hover:text-white group-hover:scale-110">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2">
-                        <polygon
-                            points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                    </svg>
+                    <div class="reveal flex flex-col items-center text-center gap-3 group cursor-default">
+                        <div
+                            class="w-14 h-14 bg-slate-100 rounded-2xl flex items-center justify-center text-primary transition-all group-hover:bg-primary group-hover:text-white group-hover:scale-110">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <polygon
+                                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                            </svg>
+                        </div>
+                        <p class="stat-number font-display text-[2rem] font-extrabold leading-none" data-target="4.8"
+                            data-suffix="/5" data-decimal="1">
+                            0
+                        </p>
+                        <div>
+                            <p class="font-bold text-[0.95rem]">Average Rating</p>
+                            <p class="text-xs text-slate-500 font-medium">
+                                Client satisfaction
+                            </p>
+                        </div>
+                    </div>
                 </div>
-                <p class="stat-number font-display text-[2rem] font-extrabold leading-none" data-target="4.8"
-                    data-suffix="/5" data-decimal="1">
-                    0
-                </p>
-                <div>
-                    <p class="font-bold text-[0.95rem]">Average Rating</p>
-                    <p class="text-xs text-slate-500 font-medium">
-                        Client satisfaction
-                    </p>
-                </div>
-            </div>
+            </template>
         </div>
     </section>
+
 
     <!-- WHY CHOOSE US -->
     <section class="py-24" id="services">

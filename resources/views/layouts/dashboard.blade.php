@@ -43,12 +43,18 @@
 </head>
 
 <body class="bg-slate-50 text-slate-900 font-sans h-screen overflow-hidden">
+    {{-- Skip to main content link for accessibility --}}
+    <a href="#main-content"
+       class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[9999] focus:px-4 focus:py-2 focus:bg-[#0f766e] focus:text-white focus:rounded-lg focus:font-bold focus:text-sm">
+        Skip to main content
+    </a>
+
     <div class="flex h-screen">
         <!-- Sidebar (role-aware) -->
         <x-sidebar />
 
         <!-- Main -->
-        <main class="flex-1 px-11 py-7 overflow-y-auto min-w-0">
+        <main id="main-content" tabindex="-1" class="flex-1 px-11 py-7 overflow-y-auto min-w-0 focus:outline-none">
             <!-- Header (role-aware) -->
             <x-header />
 
@@ -59,7 +65,7 @@
     @yield('modals')
 
     <!-- Toast Container -->
-    <div id="toast-container"></div>
+    <div id="toast-container" role="region" aria-label="Notifications" aria-live="polite"></div>
 
     <!-- Notification Drawer -->
     <x-notification-drawer />
@@ -192,19 +198,27 @@
         document.addEventListener('submit', (e) => {
             const form = e.target;
             const btn = form.querySelector('button[type="submit"]');
-            if (btn && !btn.classList.contains('no-loader')) {
+            if (btn && !btn.classList.contains('no-loader') && !btn.classList.contains('no-auto-loader')) {
                 const originalContent = btn.innerHTML;
-                btn.classList.add('btn-loading');
-                btn.disabled = true;
                 btn.dataset.originalContent = originalContent;
+                btn.disabled = true;
+                btn.setAttribute('aria-busy', 'true');
+                btn.classList.add('btn-loading');
 
-                // Safety timeout in case of failed AJAX or something
-                setTimeout(() => {
-                    if (btn.disabled) {
+                // Safety timeout - restore if form doesn't navigate
+                if (form.method.toUpperCase() === 'GET') return;
+                const timeoutKey = 'submit-timeout-' + btn.dataset.submitTimeoutId;
+                clearTimeout(window[timeoutKey]);
+                window[timeoutKey] = setTimeout(() => {
+                    if (btn.disabled && document.body.contains(btn)) {
                         btn.disabled = false;
+                        btn.removeAttribute('aria-busy');
                         btn.classList.remove('btn-loading');
+                        if (btn.dataset.originalContent) {
+                            btn.innerHTML = btn.dataset.originalContent;
+                        }
                     }
-                }, 10000);
+                }, 15000);
             }
         });
 
