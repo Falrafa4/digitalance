@@ -18,50 +18,47 @@ class ClientController extends Controller
     /**
      * Get All Data for User Management (Admin Dashboard)
      */
-    public function index()
+    public function index(Request $request)
     {
-        $clientsData = Client::all()->transform(fn($c) => [
-            'id' => $c->id,
-            'name' => $c->name,
-            'email' => $c->email,
-            'phone' => $c->phone,
-            'role' => 'Client',
-            'status' => 'Active',
-            'joinDate' => $c->created_at?->format('d M Y') ?? '-',
-        ]);
+        $q = $request->query('q');
+        $role = $request->query('role', 'all');
 
-        $freelancersData = Freelancer::with('skomda_student')->get()
-            ->map(function ($f) {
-                return [
-                    'id' => $f->id,
-                    'name' => $f->skomda_student->name ?? '-',
-                    'email' => $f->skomda_student->email ?? '-',
-                    'phone' => $f->skomda_student->phone ?? '-',
-                    'bio' => $f->bio ?? '-',
-                    'role' => 'Freelancer',
-                    'status' => ucfirst($f->status ?? 'Pending'),
-                    'joinDate' => $f->created_at?->format('d M Y') ?? '-',
-                ];
-            });
+        $clientsQuery = Client::query()->select('id', 'name', 'email', 'phone', \DB::raw("'Client' as role"), \DB::raw("'Active' as status"), 'created_at');
+        $skomdaQuery = SkomdaStudent::query()->select('id', 'name', 'email', 'phone', \DB::raw("'Skomda Student' as role"), \DB::raw("'Active' as status"), 'created_at');
+        // For freelancer, we need to join or select carefully.
+        $freelancersQuery = Freelancer::join('skomda_students', 'freelancers.student_id', '=', 'skomda_students.id')
+            ->select('freelancers.id', 'skomda_students.name', 'skomda_students.email', 'skomda_students.phone', \DB::raw("'Freelancer' as role"), 'freelancers.status', 'freelancers.created_at');
 
-        $skomdaData = SkomdaStudent::all()
-            ->transform(fn($s) => [
-                'id' => $s->id,
-                'nis' => $s->nis,
-                'name' => $s->name,
-                'email' => $s->email,
-                'class' => $s->class,
-                'major' => $s->major,
-                'phone' => $s->phone ?? '-',
-                'role' => 'Skomda Student',
-                'status' => 'Active',
-                'joinDate' => $s->created_at?->format('d M Y') ?? '-',
-            ]);
+        if ($q) {
+            $clientsQuery->where(fn($query) => $query->where('name', 'like', "%{$q}%")->orWhere('email', 'like', "%{$q}%"));
+            $skomdaQuery->where(fn($query) => $query->where('name', 'like', "%{$q}%")->orWhere('email', 'like', "%{$q}%")->orWhere('nis', 'like', "%{$q}%"));
+            $freelancersQuery->where(fn($query) => $query->where('skomda_students.name', 'like', "%{$q}%")->orWhere('skomda_students.email', 'like', "%{$q}%"));
+        }
+
+        if ($role === 'Client') {
+            $users = $clientsQuery->latest()->paginate(12)->withQueryString();
+        } elseif ($role === 'Freelancer') {
+            $users = $freelancersQuery->latest('freelancers.created_at')->paginate(12)->withQueryString();
+        } elseif ($role === 'Skomda Student') {
+            $users = $skomdaQuery->latest()->paginate(12)->withQueryString();
+        } else {
+            // Combined using Union
+            $combined = $clientsQuery->union($skomdaQuery)->union($freelancersQuery);
+            $users = \DB::table(\DB::raw("({$combined->toSql()}) as combined"))
+                ->mergeBindings($combined->getQuery())
+                ->orderBy('created_at', 'desc')
+                ->paginate(12)
+                ->withQueryString();
+        }
+
+        // We still need skomdaData for the 'Add Freelancer' dropdown
+        $skomdaAll = SkomdaStudent::select('id', 'name', 'nis')->get();
 
         return view('dashboard.admin.clients', [
-            'clientsData' => ['data' => $clientsData],
-            'freelancersData' => ['data' => $freelancersData],
-            'skomdaData' => ['data' => $skomdaData],
+            'users' => $users,
+            'role' => $role,
+            'q' => $q,
+            'skomdaAll' => $skomdaAll
         ]);
     }
 

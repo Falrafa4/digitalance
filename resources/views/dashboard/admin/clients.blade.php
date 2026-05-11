@@ -1,340 +1,382 @@
 @extends('layouts.dashboard')
 @section('title', 'User Management | Digitalance')
-
 @section('styles')
     <link rel="stylesheet" href="{{ asset('css/dashboard/admin/clients.css') }}">
+    <style>
+        .role-badge { px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider; }
+        .role-Client { background: #e0f2fe; color: #075985; }
+        .role-Freelancer { background: #f0fdfa; color: #0f766e; }
+        .role-SkomdaStudent { background: #f1f5f9; color: #475569; }
+    </style>
 @endsection
 
 @section('content')
-    <div class="content-scroll flex-1 px-8 py-7 overflow-y-auto">
-
-        <!-- Page Header -->
-        <div class="flex items-end justify-between mb-8 gap-4 flex-wrap animate-fadeUp">
-            <div>
-                <h1 class="font-display text-[2.1rem] font-extrabold text-slate-900">Client Management</h1>
-                <p class="text-slate-500 text-[0.95rem] mt-1">
-                    Kelola seluruh client yang terdaftar di platform Digitalance.
-                </p>
+    <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8 animate-fadeUp">
+        <div>
+            <h1 class="font-display text-[2.1rem] font-extrabold text-slate-900">User Management</h1>
+            <p class="text-slate-500 text-[0.95rem] mt-1">Kelola seluruh pengguna platform: Client, Freelancer, dan Siswa Skomda.</p>
+        </div>
+        <div class="flex items-center gap-3">
+             <div class="bg-white px-5 py-3 rounded-2xl border border-slate-100 flex items-center gap-3 shadow-sm">
+                <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg shadow-sm">
+                    <i class="ri-group-line"></i>
+                </div>
+                <div>
+                    <div class="text-[1.2rem] font-black text-slate-900 leading-none">{{ $users->total() }}</div>
+                    <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Total Users</div>
+                </div>
             </div>
+            <button id="btn-add-user" class="px-6 py-3.5 bg-[#0f766e] text-white font-black text-[13px] rounded-2xl shadow-teal-md hover:bg-[#0a5e58] transition-all flex items-center gap-2">
+                <i class="ri-user-add-line"></i> Add New User
+            </button>
+        </div>
+    </div>
 
-            <div class="header-actions">
-                <button id="btn-add-user"
-                    class="inline-flex items-center gap-2 px-[22px] py-[11px] bg-[#0f766e] text-white font-display font-bold text-[13px] rounded-[12px] shadow-teal-md hover:bg-[#0a5e58] hover:shadow-teal-lg transition-all duration-200 hover:-translate-y-0.5 cursor-pointer border-none whitespace-nowrap">
-                    <i class="ri-user-add-line"></i> Add New User
-                </button>
-            </div>
+    <div class="flex items-center justify-between gap-4 mb-8 flex-wrap animate-fadeUp-2">
+        <div class="flex gap-2 flex-wrap">
+             <a href="{{ route('admin.clients.index', ['role' => 'all']) }}" 
+               class="px-[18px] py-2 rounded-full border-[1.5px] font-bold text-[12.5px] transition-all {{ $role === 'all' ? 'border-[#0f766e] bg-[#0f766e] text-white shadow-teal-sm' : 'border-slate-200 bg-white text-slate-500 hover:border-[#0f766e]' }}">
+                All Users
+            </a>
+            @foreach(['Client', 'Freelancer', 'Skomda Student'] as $r)
+                <a href="{{ route('admin.clients.index', ['role' => $r]) }}" 
+                   class="px-[18px] py-2 rounded-full border-[1.5px] font-bold text-[12.5px] transition-all {{ $role === $r ? 'border-[#0f766e] bg-[#0f766e] text-white shadow-teal-sm' : 'border-slate-200 bg-white text-slate-500 hover:border-[#0f766e]' }}">
+                    {{ $r }}s
+                </a>
+            @endforeach
         </div>
 
-        <!-- Filter Bar -->
-        <div class="flex items-center justify-between gap-4 mb-4 flex-wrap animate-fadeUp-2">
-            <div class="flex gap-2 flex-wrap" id="filter-tabs">
-                <button
-                    class="filter-tab px-[18px] py-2 rounded-full border-[1.5px] border-[#0f766e] bg-[#0f766e] text-white font-bold text-[12.5px] shadow-teal-sm cursor-pointer transition-all duration-150 active"
-                    data-filter="all">All Users</button>
-                <button
-                    class="filter-tab px-[18px] py-2 rounded-full border-[1.5px] border-slate-200 bg-white text-slate-500 font-bold text-[12.5px] cursor-pointer transition-all duration-150 hover:border-[#0f766e] hover:text-[#0f766e]"
-                    data-filter="Client">Clients</button>
-                <button
-                    class="filter-tab px-[18px] py-2 rounded-full border-[1.5px] border-slate-200 bg-white text-slate-500 font-bold text-[12.5px] cursor-pointer transition-all duration-150 hover:border-[#0f766e] hover:text-[#0f766e]"
-                    data-filter="Freelancer">Freelancers</button>
-                <button
-                    class="filter-tab px-[18px] py-2 rounded-full border-[1.5px] border-slate-200 bg-white text-slate-500 font-bold text-[12.5px] cursor-pointer transition-all duration-150 hover:border-[#0f766e] hover:text-[#0f766e]"
-                    data-filter="Skomda Student">Skomda Students</button>
-            </div>
+        <form action="{{ route('admin.clients.index') }}" method="GET" class="relative">
+            <input type="hidden" name="role" value="{{ $role }}">
+            <i class="ri-search-line absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-[15px]"></i>
+            <input type="text" name="q" value="{{ $q }}" placeholder="Search name or email..." 
+                   class="pl-10 pr-4 py-[9px] w-[260px] border-[1.5px] border-slate-200 rounded-[14px] text-[13px] font-semibold text-slate-700 bg-white outline-none focus:border-[#0f766e] transition-all" />
+        </form>
+    </div>
 
-            <div class="relative">
-                <i
-                    class="ri-search-line absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[15px] pointer-events-none"></i>
-                <input type="text" id="user-search" placeholder="Cari nama, email, role…"
-                    class="pl-9 pr-4 py-[9px] w-[260px] border-[1.5px] border-slate-200 rounded-[11px] text-[13px] font-semibold text-slate-700 bg-white outline-none transition-all duration-200 placeholder:font-normal placeholder:text-slate-400 focus:border-[#0f766e] focus:shadow-[0_0_0_3px_rgba(15,118,110,0.08)]" />
-            </div>
+    <div class="bg-white rounded-[24px] border border-slate-200 overflow-hidden animate-fadeUp-3 shadow-sm">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-slate-50/50 border-b border-slate-100">
+                        <th class="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">User Details</th>
+                        <th class="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">Role Type</th>
+                        <th class="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">Account Status</th>
+                        <th class="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">Joined Date</th>
+                        <th class="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-50">
+                    @forelse($users as $user)
+                        <tr class="hover:bg-slate-50/50 transition-colors group">
+                            <td class="px-6 py-4">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-500 font-bold text-sm group-hover:bg-[#0f766e] group-hover:text-white transition-all">
+                                        {{ substr($user->name, 0, 1) }}
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <span class="text-[13.5px] font-black text-slate-900">{{ $user->name }}</span>
+                                        <span class="text-[11px] text-slate-400 font-bold tracking-tight">{{ $user->email }}</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="role-badge py-1 px-2.5 rounded-lg text-[10px] font-black uppercase tracking-wider role-{{ str_replace(' ', '', $user->role) }}">
+                                    {{ $user->role }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="text-[10px] font-black uppercase py-1 px-2.5 rounded-lg {{ $user->status == 'Active' || $user->status == 'Approved' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600' }}">
+                                    {{ $user->status }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="text-[12px] text-slate-500 font-bold uppercase tracking-widest">{{ \Carbon\Carbon::parse($user->created_at)->format('d M Y') }}</span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="flex items-center justify-center gap-2">
+                                    <button onclick="window.openUserModal('{{ $user->role }}', {{ $user->id }})" class="w-9 h-9 rounded-xl bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-[#0f766e] hover:text-white transition-all">
+                                        <i class="ri-edit-line"></i>
+                                    </button>
+                                    @if($user->role === 'Client')
+                                        <form action="{{ route('admin.clients.destroy', $user->id) }}" method="POST" onsubmit="return confirm('Hapus client ini secara permanen?')">
+                                            @csrf @method('DELETE')
+                                            <button type="submit" class="w-9 h-9 rounded-xl bg-red-50 text-red-400 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all">
+                                                <i class="ri-delete-bin-line"></i>
+                                            </button>
+                                        </form>
+                                    @endif
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="5" class="px-6 py-24 text-center">
+                                <div class="w-16 h-16 bg-slate-50 rounded-[20px] flex items-center justify-center mx-auto mb-5 text-slate-200 text-3xl">
+                                    <i class="ri-user-search-line"></i>
+                                </div>
+                                <h3 class="text-slate-900 font-black text-lg">No Users Found</h3>
+                                <p class="text-slate-400 text-sm font-medium">Tidak ada pengguna yang ditemukan dengan kriteria ini.</p>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
+    </div>
 
-        <!-- Pagination Bar -->
-        <div class="pagination-bar animate-fadeUp-2">
-            <div class="pagination-left">
-                <span class="pagination-meta" id="pagination-meta">Showing 0–0 of 0</span>
-            </div>
-
-            <div class="pagination-right">
-                <label class="per-page">
-                    <span>Per page</span>
-                    <select id="per-page" class="per-page-select">
-                        <option value="8">8</option>
-                        <option value="12" selected>12</option>
-                        <option value="16">16</option>
-                        <option value="24">24</option>
-                    </select>
-                </label>
-
-                <div class="pagination-controls" id="pagination-controls"></div>
-            </div>
-        </div>
-
-        <!-- User Grid -->
-        <div class="grid gap-[18px] pb-6 animate-fadeUp-3"
-            style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));" id="user-grid"></div>
-
+    <div class="mt-10 pagination-container">
+        {{ $users->links() }}
     </div>
 @endsection
 
 @section('modals')
-    <!-- Add User Modal -->
-    <div class="overlay fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-200"
-        id="modal-add">
-        <div
-            class="modal-box bg-white rounded-[18px] w-full max-w-[520px] max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
-            <div class="flex items-center justify-between px-[26px] py-[22px] border-b border-slate-100 flex-shrink-0">
-                <span class="font-display text-[1.1rem] font-extrabold text-slate-900">Add New User</span>
-                <button onclick="window.closeModal('modal-add')"
-                    class="w-[34px] h-[34px] bg-slate-100 rounded-[9px] flex items-center justify-center text-[18px] text-slate-500 cursor-pointer border-none hover:bg-red-50 hover:text-red-500 transition-all duration-150">
-                    <i class="ri-close-line"></i>
-                </button>
-            </div>
-
-            <div class="px-[26px] py-[22px] overflow-y-auto flex-1">
-                <div class="grid grid-cols-2 gap-3 mb-4" id="add-basic-group">
-                    <div class="flex flex-col gap-1.5">
-                        <label class="text-[11px] font-bold text-slate-500 uppercase tracking-[.1em]">Full Name</label>
-                        <input id="add-name" type="text" placeholder="John Doe"
-                            class="py-[10px] px-[13px] bg-slate-50 border-[1.5px] border-slate-200 rounded-[11px] text-[13.5px] font-sans outline-none transition-all duration-200 focus:border-[#0f766e] focus:bg-white focus:shadow-[0_0_0_3px_rgba(15,118,110,0.08)]" />
-                    </div>
-                    <div class="flex flex-col gap-1.5">
-                        <label class="text-[11px] font-bold text-slate-500 uppercase tracking-[.1em]">Email</label>
-                        <input id="add-email" type="email" placeholder="john@example.com"
-                            class="py-[10px] px-[13px] bg-slate-50 border-[1.5px] border-slate-200 rounded-[11px] text-[13.5px] font-sans outline-none transition-all duration-200 focus:border-[#0f766e] focus:bg-white focus:shadow-[0_0_0_3px_rgba(15,118,110,0.08)]" />
-                    </div>
+    <!-- Edit User Modal (Existing) -->
+    <div class="fixed inset-0 z-[100] bg-slate-900/40 backdrop-blur-sm flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300" id="modal-user-overlay">
+        <div class="bg-white rounded-[32px] w-full max-w-[500px] shadow-2xl overflow-hidden transform scale-95 transition-all duration-300" id="modal-user-box">
+             <div class="p-8">
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="text-[1.5rem] font-black text-slate-900">Edit Profile</h2>
+                    <button onclick="window.closeUserModal()" class="w-10 h-10 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center hover:bg-red-50 hover:text-red-500 transition">
+                        <i class="ri-close-line text-xl"></i>
+                    </button>
                 </div>
-
-                <div class="grid grid-cols-2 gap-3 mb-4" id="add-password-group">
-                    <div class="flex flex-col gap-1.5">
-                        <label class="text-[11px] font-bold text-slate-500 uppercase tracking-[.1em]">Password</label>
-                        <input id="add-password" type="password" placeholder="Min 8 chars"
-                            class="py-[10px] px-[13px] bg-slate-50 border-[1.5px] border-slate-200 rounded-[11px] text-[13.5px] font-sans outline-none transition-all duration-200 focus:border-[#0f766e] focus:bg-white focus:shadow-[0_0_0_3px_rgba(15,118,110,0.08)]" />
-                    </div>
-
-                    <div class="flex flex-col gap-1.5">
-                        <label class="text-[11px] font-bold text-slate-500 uppercase tracking-[.1em]">Confirm
-                            Password</label>
-                        <input id="add-password-confirmation" type="password" placeholder="Repeat password"
-                            class="py-[10px] px-[13px] bg-slate-50 border-[1.5px] border-slate-200 rounded-[11px] text-[13.5px] font-sans outline-none transition-all duration-200 focus:border-[#0f766e] focus:bg-white focus:shadow-[0_0_0_3px_rgba(15,118,110,0.08)]" />
-                    </div>
-                </div>
-
-                <div class="flex flex-col gap-1.5 mb-4">
-                    <label class="text-[11px] font-bold text-slate-500 uppercase tracking-[.1em]">Role</label>
-                    <div id="add-roles" class="flex flex-col gap-2"></div>
-                    <input type="hidden" id="add-role" value="Client" />
-                </div>
-
-                <div class="grid grid-cols-2 gap-3 mb-4" id="add-client-group">
-                    <div class="flex flex-col gap-1.5">
-                        <label class="text-[11px] font-bold text-slate-500 uppercase tracking-[.1em]">Location</label>
-                        <input id="add-location" type="text" placeholder="Jakarta, Indonesia"
-                            class="py-[10px] px-[13px] bg-slate-50 border-[1.5px] border-slate-200 rounded-[11px] text-[13.5px] font-sans outline-none transition-all duration-200 focus:border-[#0f766e] focus:bg-white focus:shadow-[0_0_0_3px_rgba(15,118,110,0.08)]" />
-                    </div>
-                    <div class="flex flex-col gap-1.5">
-                        <label class="text-[11px] font-bold text-slate-500 uppercase tracking-[.1em]">Phone</label>
-                        <input id="add-phone" type="text" placeholder="+62 812 xxx xxx"
-                            class="py-[10px] px-[13px] bg-slate-50 border-[1.5px] border-slate-200 rounded-[11px] text-[13.5px] font-sans outline-none transition-all duration-200 focus:border-[#0f766e] focus:bg-white focus:shadow-[0_0_0_3px_rgba(15,118,110,0.08)]" />
-                    </div>
-                </div>
-
-                <div id="add-skomda-group" style="display:none;">
-                    <div class="grid grid-cols-2 gap-3 mb-4">
-                        <div class="flex flex-col gap-1.5">
-                            <label class="text-[11px] font-bold text-slate-500 uppercase tracking-[.1em]">NIS</label>
-                            <input id="add-nis" type="text" placeholder="123456789"
-                                class="py-[10px] px-[13px] bg-slate-50 border-[1.5px] border-slate-200 rounded-[11px] text-[13.5px] font-sans outline-none transition-all duration-200 focus:border-[#0f766e] focus:bg-white focus:shadow-[0_0_0_3px_rgba(15,118,110,0.08)]" />
+                <form id="edit-user-form" method="POST">
+                    @csrf @method('PUT')
+                    <div class="space-y-5 mb-10">
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2.5">Full Name</label>
+                            <input type="text" name="name" id="user-name" class="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700">
                         </div>
-
-                        <div class="flex flex-col gap-1.5">
-                            <label class="text-[11px] font-bold text-slate-500 uppercase tracking-[.1em]">Class</label>
-                            <input id="add-class" type="text" placeholder="XI SIJA 1"
-                                class="py-[10px] px-[13px] bg-slate-50 border-[1.5px] border-slate-200 rounded-[11px] text-[13.5px] font-sans outline-none transition-all duration-200 focus:border-[#0f766e] focus:bg-white focus:shadow-[0_0_0_3px_rgba(15,118,110,0.08)]" />
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2.5">Email Address</label>
+                            <input type="email" name="email" id="user-email" class="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2.5">Phone Number</label>
+                            <input type="text" name="phone" id="user-phone" class="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700">
                         </div>
                     </div>
+                    <div class="flex gap-4">
+                        <button type="button" onclick="window.closeUserModal()" class="flex-1 py-4 bg-slate-100 text-slate-500 font-bold rounded-2xl">Batal</button>
+                        <button type="submit" class="flex-1 py-4 bg-[#0f766e] text-white font-bold rounded-2xl shadow-xl shadow-teal-sm hover:bg-[#0a5e58] transition-all">Update Account</button>
+                    </div>
+                </form>
+             </div>
+        </div>
+    </div>
 
-                    <div class="flex flex-col gap-1.5 mb-4">
-                        <label class="text-[11px] font-bold text-slate-500 uppercase tracking-[.1em]">Major</label>
-                        <select id="add-major"
-                            class="py-[10px] px-[13px] bg-slate-50 border-[1.5px] border-slate-200 rounded-[11px] text-[13.5px] font-sans outline-none transition-all duration-200 focus:border-[#0f766e] focus:bg-white focus:shadow-[0_0_0_3px_rgba(15,118,110,0.08)]">
-                            <option value="SIJA" selected>SIJA</option>
-                            <option value="TJAT">TJAT</option>
-                        </select>
+    <!-- Add User Modal (Dynamic Roles) -->
+    <div class="fixed inset-0 z-[100] bg-slate-900/40 backdrop-blur-sm flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300" id="modal-add-overlay">
+        <div class="bg-white rounded-[32px] w-full max-w-[520px] shadow-2xl overflow-hidden transform scale-95 transition-all duration-300" id="modal-add-box">
+             <div class="p-8">
+                <div class="flex justify-between items-center mb-8">
+                    <div>
+                        <h2 class="text-[1.5rem] font-black text-slate-900">Add New User</h2>
+                        <p class="text-slate-400 text-sm font-medium mt-1">Daftarkan pengguna baru ke platform.</p>
+                    </div>
+                    <button onclick="window.closeAddModal()" class="w-10 h-10 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center hover:bg-red-50 hover:text-red-500 transition">
+                        <i class="ri-close-line text-xl"></i>
+                    </button>
+                </div>
+                
+                <div class="mb-8">
+                    <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3">Select User Role</label>
+                    <div class="grid grid-cols-3 gap-3">
+                        <button type="button" onclick="window.setAddRole('Client')" id="role-btn-Client" class="role-selector py-3 rounded-2xl border-2 border-slate-100 font-black text-[11px] uppercase tracking-wider text-slate-400 hover:border-[#0f766e] hover:text-[#0f766e] transition-all active">Client</button>
+                        <button type="button" onclick="window.setAddRole('Freelancer')" id="role-btn-Freelancer" class="role-selector py-3 rounded-2xl border-2 border-slate-100 font-black text-[11px] uppercase tracking-wider text-slate-400 hover:border-[#0f766e] hover:text-[#0f766e] transition-all">Freelancer</button>
+                        <button type="button" onclick="window.setAddRole('Skomda Student')" id="role-btn-Student" class="role-selector py-3 rounded-2xl border-2 border-slate-100 font-black text-[11px] uppercase tracking-wider text-slate-400 hover:border-[#0f766e] hover:text-[#0f766e] transition-all">Student</button>
                     </div>
                 </div>
 
-                <div id="add-freelancer-group" style="display:none;">
-                    <div class="flex flex-col gap-1.5 mb-4">
-                        <label class="text-[11px] font-bold text-slate-500 uppercase tracking-[.1em]">
-                            Skomda Student
-                        </label>
-
-                        <div class="relative w-full">
-                            <select name="skomda-student-id" id="add-student-id"
-                                class="w-full py-[10px] pl-[13px] pr-[36px] appearance-none bg-slate-50 border-[1.5px] border-slate-200 rounded-[11px] text-[13.5px] font-sans outline-none cursor-pointer transition-all duration-200 focus:border-[#0f766e] focus:bg-white focus:shadow-[0_0_0_3px_rgba(15,118,110,0.08)]">
-                                <option value="" selected disabled>Pilih Skomda Student...</option>
-                                @if(isset($skomdaData['data']) && is_iterable($skomdaData['data']))
-                                    @foreach ($skomdaData['data'] as $student)
-                                        <option value="{{ $student['id'] ?? '' }}">
-                                            {{ $student['name'] ?? 'Unknown' }} ({{ $student['nis'] ?? 'N/A' }})
-                                        </option>
-                                    @endforeach
-                                @endif
+                <form id="add-user-form" method="POST" action="{{ route('admin.clients.store') }}">
+                    @csrf
+                    <input type="hidden" name="role" id="add-role-input" value="Client">
+                    
+                    <div id="fields-common" class="space-y-5">
+                        <!-- Client & Student Fields -->
+                        <div class="field-group" id="group-name">
+                            <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2">Full Name</label>
+                            <input type="text" name="name" class="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700" placeholder="e.g. Budi Santoso">
+                        </div>
+                        
+                        <!-- Freelancer specific: Select Student -->
+                        <div class="field-group hidden" id="group-student">
+                            <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2">Select Skomda Student</label>
+                            <select name="student_id" class="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700 appearance-none">
+                                <option value="" selected disabled>Pilih Siswa...</option>
+                                @foreach($skomdaAll as $s)
+                                    <option value="{{ $s->id }}">{{ $s->name }} ({{ $s->nis }})</option>
+                                @endforeach
                             </select>
+                        </div>
 
-                            <div
-                                class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-slate-400">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M19 9l-7 7-7-7"></path>
-                                </svg>
+                        <div class="field-group" id="group-email">
+                            <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2">Email Address</label>
+                            <input type="email" name="email" class="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700" placeholder="name@example.com">
+                        </div>
+
+                        <div class="field-group" id="group-password">
+                            <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2">Initial Password</label>
+                            <input type="password" name="password" class="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700" placeholder="Min. 8 characters">
+                        </div>
+
+                        <!-- Student specific fields -->
+                        <div class="grid grid-cols-2 gap-4 hidden" id="group-student-meta">
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2">NIS</label>
+                                <input type="text" name="nis" class="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700" placeholder="123456789">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2">Class</label>
+                                <input type="text" name="class" class="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700" placeholder="XI SIJA 1">
                             </div>
                         </div>
 
-                        <p class="text-[11px] text-slate-400 mt-1">Freelancer harus terhubung ke data Skomda Student.</p>
+                        <div class="field-group hidden" id="group-major">
+                            <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2">Major</label>
+                            <select name="major" class="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700 appearance-none">
+                                <option value="SIJA">Sistem Informatika, Jaringan & Aplikasi (SIJA)</option>
+                                <option value="TJAT">Teknik Jaringan Akses Telekomunikasi (TJAT)</option>
+                            </select>
+                        </div>
+
+                        <div class="field-group" id="group-phone">
+                            <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2">Phone Number</label>
+                            <input type="text" name="phone" class="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700" placeholder="+62...">
+                        </div>
+                        
+                        <div class="field-group hidden" id="group-bio">
+                            <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2">Short Bio</label>
+                            <textarea name="bio" rows="2" class="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700 resize-none" placeholder="Freelancer bio..."></textarea>
+                        </div>
                     </div>
 
-                    <div class="flex flex-col gap-1.5 mb-4">
-                        <label class="text-[11px] font-bold text-slate-500 uppercase tracking-[.1em]">Bio</label>
-                        <textarea id="add-bio" rows="3" placeholder="Optional bio..."
-                            class="py-[10px] px-[13px] bg-slate-50 border-[1.5px] border-slate-200 rounded-[11px] text-[13.5px] font-sans outline-none transition-all duration-200 resize-y focus:border-[#0f766e] focus:bg-white focus:shadow-[0_0_0_3px_rgba(15,118,110,0.08)]"></textarea>
+                    <div class="flex gap-4 mt-10">
+                        <button type="button" onclick="window.closeAddModal()" class="flex-1 py-4 bg-slate-100 text-slate-500 font-bold rounded-2xl hover:bg-slate-200 transition-all">Cancel</button>
+                        <button type="submit" class="flex-1 py-4 bg-[#0f766e] text-white font-bold rounded-2xl shadow-xl shadow-teal-sm hover:bg-[#0a5e58] transition-all">Create Account</button>
                     </div>
-                </div>
-            </div>
-
-            <div class="flex gap-2.5 px-[26px] py-[16px] border-t border-slate-100 bg-slate-50 flex-shrink-0">
-                <button onclick="window.closeModal('modal-add')"
-                    class="flex-1 py-[11px] rounded-[11px] bg-slate-100 text-slate-500 font-bold text-[13px] cursor-pointer border-none hover:bg-slate-200 transition-all duration-150">Cancel</button>
-                <button onclick="window.submitAddUser()"
-                    class="flex-1 py-[11px] rounded-[11px] bg-[#0f766e] text-white font-bold text-[13px] cursor-pointer border-none shadow-teal-sm hover:bg-[#0a5e58] transition-all duration-150">Save
-                    User</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Edit User Modal -->
-    <div class="overlay fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-200"
-        id="modal-edit">
-        <div
-            class="modal-box bg-white rounded-[18px] w-full max-w-[520px] max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
-            <div class="flex items-center justify-between px-[26px] py-[22px] border-b border-slate-100 flex-shrink-0">
-                <span class="font-display text-[1.1rem] font-extrabold text-slate-900">Edit User</span>
-                <button onclick="window.closeModal('modal-edit')"
-                    class="w-[34px] h-[34px] bg-slate-100 rounded-[9px] flex items-center justify-center text-[18px] text-slate-500 cursor-pointer border-none hover:bg-red-50 hover:text-red-500 transition-all duration-150">
-                    <i class="ri-close-line"></i>
-                </button>
-            </div>
-
-            <div class="px-[26px] py-[22px] overflow-y-auto flex-1">
-                <input type="hidden" id="edit-uid" />
-                <div class="grid grid-cols-2 gap-3 mb-4">
-                    <div class="flex flex-col gap-1.5">
-                        <label class="text-[11px] font-bold text-slate-500 uppercase tracking-[.1em]">Full Name</label>
-                        <input id="edit-name" type="text" required
-                            class="py-[10px] px-[13px] bg-slate-50 border-[1.5px] border-slate-200 rounded-[11px] text-[13.5px] font-sans outline-none transition-all duration-200 focus:border-[#0f766e] focus:bg-white focus:shadow-[0_0_0_3px_rgba(15,118,110,0.08)]" />
-                    </div>
-                    <div class="flex flex-col gap-1.5">
-                        <label class="text-[11px] font-bold text-slate-500 uppercase tracking-[.1em]">Email</label>
-                        <input id="edit-email" type="email" required
-                            class="py-[10px] px-[13px] bg-slate-50 border-[1.5px] border-slate-200 rounded-[11px] text-[13.5px] font-sans outline-none transition-all duration-200 focus:border-[#0f766e] focus:bg-white focus:shadow-[0_0_0_3px_rgba(15,118,110,0.08)]" />
-                    </div>
-                </div>
-
-                <div class="flex flex-col gap-1.5 mb-4">
-                    <label class="text-[11px] font-bold text-slate-500 uppercase tracking-[.1em]">Status</label>
-                    <select id="edit-status"
-                        class="form-select py-[10px] px-[13px] bg-slate-50 border-[1.5px] border-slate-200 rounded-[11px] text-[13.5px] font-sans outline-none transition-all duration-200 focus:border-[#0f766e] focus:bg-white focus:shadow-[0_0_0_3px_rgba(15,118,110,0.08)]">
-                        <option value="Active">Active</option>
-                        <option value="Pending">Pending</option>
-                        <option value="Inactive">Inactive</option>
-                        <option value="Suspended">Suspended</option>
-                        <option value="Approved">Approved</option>
-                        <option value="Rejected">Rejected</option>
-                    </select>
-                </div>
-
-                <div class="grid grid-cols-2 gap-3 mb-4">
-                    <div class="flex flex-col gap-1.5">
-                        <label class="text-[11px] font-bold text-slate-500 uppercase tracking-[.1em]">Location</label>
-                        <input id="edit-location" type="text"
-                            class="py-[10px] px-[13px] bg-slate-50 border-[1.5px] border-slate-200 rounded-[11px] text-[13.5px] font-sans outline-none transition-all duration-200 focus:border-[#0f766e] focus:bg-white focus:shadow-[0_0_0_3px_rgba(15,118,110,0.08)]" />
-                    </div>
-                    <div class="flex flex-col gap-1.5">
-                        <label class="text-[11px] font-bold text-slate-500 uppercase tracking-[.1em]">Phone</label>
-                        <input id="edit-phone" type="text"
-                            class="py-[10px] px-[13px] bg-slate-50 border-[1.5px] border-slate-200 rounded-[11px] text-[13.5px] font-sans outline-none transition-all duration-200 focus:border-[#0f766e] focus:bg-white focus:shadow-[0_0_0_3px_rgba(15,118,110,0.08)]" />
-                    </div>
-                </div>
-
-                <div class="flex flex-col gap-1.5 mb-4">
-                    <label class="text-[11px] font-bold text-slate-500 uppercase tracking-[.1em]">Bio</label>
-                    <textarea id="edit-bio" rows="3"
-                        class="py-[10px] px-[13px] bg-slate-50 border-[1.5px] border-slate-200 rounded-[11px] text-[13.5px] font-sans outline-none transition-all duration-200 resize-y focus:border-[#0f766e] focus:bg-white focus:shadow-[0_0_0_3px_rgba(15,118,110,0.08)]"></textarea>
-                </div>
-
-                <div class="flex flex-col gap-1.5" id="edit-skills-group" style="display:none;">
-                    <label class="text-[11px] font-bold text-slate-500 uppercase tracking-[.1em]">Skills <span
-                            class="normal-case tracking-normal font-normal text-slate-400">(comma separated)</span></label>
-                    <input id="edit-skills" type="text" placeholder="UI Design, React, Node.js"
-                        class="py-[10px] px-[13px] bg-slate-50 border-[1.5px] border-slate-200 rounded-[11px] text-[13.5px] font-sans outline-none transition-all duration-200 focus:border-[#0f766e] focus:bg-white focus:shadow-[0_0_0_3px_rgba(15,118,110,0.08)]" />
-                </div>
-            </div>
-
-            <div class="flex gap-2.5 px-[26px] py-[16px] border-t border-slate-100 bg-slate-50 flex-shrink-0">
-                <button onclick="window.closeModal('modal-edit')"
-                    class="flex-1 py-[11px] rounded-[11px] bg-slate-100 text-slate-500 font-bold text-[13px] cursor-pointer border-none hover:bg-slate-200 transition-all duration-150">Cancel</button>
-                <button onclick="window.submitEditUser()"
-                    class="flex-1 py-[11px] rounded-[11px] bg-[#0f766e] text-white font-bold text-[13px] cursor-pointer border-none shadow-teal-sm hover:bg-[#0a5e58] transition-all duration-150">Save
-                    Changes</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Detail Modal -->
-    <div class="overlay fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-200"
-        id="modal-detail">
-        <div
-            class="modal-box bg-white rounded-[18px] w-full max-w-[580px] max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
-            <div id="detail-content" class="flex flex-col flex-1 overflow-y-auto"></div>
-        </div>
-    </div>
-
-    <!-- Confirm Delete Modal -->
-    <div class="overlay fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-200"
-        id="modal-delete">
-        <div class="modal-box bg-white rounded-[18px] w-full max-w-[400px] shadow-2xl overflow-hidden">
-            <div class="px-[26px] pt-[30px] pb-[24px] text-center">
-                <div
-                    class="w-[72px] h-[72px] mx-auto mb-5 bg-red-50 rounded-full flex items-center justify-center text-[2rem] text-red-500">
-                    <i class="ri-error-warning-fill"></i>
-                </div>
-                <h3 class="font-display text-[1.2rem] font-extrabold text-slate-900 mb-2">Hapus Akun?</h3>
-                <p class="text-[13.5px] text-slate-500 leading-relaxed" id="delete-text"></p>
-            </div>
-            <div class="flex gap-2.5 px-[26px] py-[16px] border-t border-slate-100 bg-slate-50">
-                <button onclick="window.closeModal('modal-delete')"
-                    class="flex-1 py-[11px] rounded-[11px] bg-slate-100 text-slate-500 font-bold text-[13px] cursor-pointer border-none hover:bg-slate-200 transition-all duration-150">Batal</button>
-                <button id="btn-confirm-delete"
-                    class="flex-1 py-[11px] rounded-[11px] bg-red-500 text-white font-bold text-[13px] cursor-pointer border-none shadow-[0_3px_10px_rgba(239,68,68,.25)] hover:bg-red-600 transition-all duration-150">Ya,
-                    Hapus</button>
-            </div>
+                </form>
+             </div>
         </div>
     </div>
 @endsection
 
 @section('scripts')
-    <script src="{{ asset('js/notif-drawer.js') }}"></script>
-
     <script>
-        window.__CLIENTS_PAGE__ = {
-            clientsData: {!! json_encode($clientsData ?? ['total' => 0, 'data' => []]) !!},
-            freelancersData: {!! json_encode($freelancersData ?? ['total' => 0, 'data' => []]) !!},
-            skomdaData: {!! json_encode($skomdaData ?? ['total' => 0, 'data' => []]) !!}
-        };
-    </script>
+        window.__USERS_DATA__ = @json($users->items());
 
-    <!-- Baru load clients.js SETELAH notif-drawer.js dan data di-set -->
-    <script src="{{ asset('js/dashboard/admin/clients.js') }}"></script>
+        window.openUserModal = function(role, id) {
+            const u = window.__USERS_DATA__.find(x => x.id == id && x.role == role);
+            if (!u) return;
+
+            document.getElementById('user-name').value = u.name;
+            document.getElementById('user-email').value = u.email;
+            document.getElementById('user-phone').value = u.phone || '';
+
+            const form = document.getElementById('edit-user-form');
+            if (role === 'Client') {
+                form.action = `/admin/clients/${id}`;
+            } else if (role === 'Freelancer') {
+                form.action = `/admin/freelancers/${id}`;
+            } else {
+                form.action = `/admin/skomda-students/${id}`;
+            }
+
+            const overlay = document.getElementById('modal-user-overlay');
+            const box = document.getElementById('modal-user-box');
+            overlay.classList.remove('opacity-0', 'pointer-events-none');
+            box.classList.remove('scale-95');
+        };
+
+        window.closeUserModal = function() {
+            const overlay = document.getElementById('modal-user-overlay');
+            const box = document.getElementById('modal-user-box');
+            overlay.classList.add('opacity-0', 'pointer-events-none');
+            box.classList.add('scale-95');
+        };
+
+        window.openAddModal = function() {
+            const overlay = document.getElementById('modal-add-overlay');
+            const box = document.getElementById('modal-add-box');
+            overlay.classList.remove('opacity-0', 'pointer-events-none');
+            box.classList.remove('scale-95');
+        };
+
+        window.closeAddModal = function() {
+            const overlay = document.getElementById('modal-add-overlay');
+            const box = document.getElementById('modal-add-box');
+            overlay.classList.add('opacity-0', 'pointer-events-none');
+            box.classList.add('scale-95');
+        };
+
+        window.setAddRole = function(role) {
+            // Update UI
+            document.querySelectorAll('.role-selector').forEach(btn => {
+                btn.classList.remove('active', 'border-[#0f766e]', 'text-[#0f766e]');
+                btn.classList.add('border-slate-100', 'text-slate-400');
+            });
+            
+            const activeBtn = document.getElementById(role === 'Skomda Student' ? 'role-btn-Student' : `role-btn-${role}`);
+            activeBtn.classList.add('active', 'border-[#0f766e]', 'text-[#0f766e]');
+            activeBtn.classList.remove('border-slate-100', 'text-slate-400');
+
+            // Update Form
+            const form = document.getElementById('add-user-form');
+            const roleInput = document.getElementById('add-role-input');
+            roleInput.value = role;
+
+            // Reset visibility
+            const groups = {
+                name: document.getElementById('group-name'),
+                email: document.getElementById('group-email'),
+                phone: document.getElementById('group-phone'),
+                password: document.getElementById('group-password'),
+                student: document.getElementById('group-student'),
+                studentMeta: document.getElementById('group-student-meta'),
+                major: document.getElementById('group-major'),
+                bio: document.getElementById('group-bio')
+            };
+
+            // Toggle logic
+            if (role === 'Client') {
+                form.action = "{{ route('admin.clients.store') }}";
+                groups.name.classList.remove('hidden');
+                groups.email.classList.remove('hidden');
+                groups.phone.classList.remove('hidden');
+                groups.password.classList.remove('hidden');
+                groups.student.classList.add('hidden');
+                groups.studentMeta.classList.add('hidden');
+                groups.major.classList.add('hidden');
+                groups.bio.classList.add('hidden');
+            } else if (role === 'Freelancer') {
+                form.action = "{{ route('admin.freelancers.store') }}";
+                groups.name.classList.add('hidden');
+                groups.email.classList.add('hidden');
+                groups.phone.classList.add('hidden');
+                groups.password.classList.remove('hidden');
+                groups.student.classList.remove('hidden');
+                groups.studentMeta.classList.add('hidden');
+                groups.major.classList.add('hidden');
+                groups.bio.classList.remove('hidden');
+            } else if (role === 'Skomda Student') {
+                form.action = "{{ route('admin.skomda-students.store') }}";
+                groups.name.classList.remove('hidden');
+                groups.email.classList.remove('hidden');
+                groups.phone.classList.remove('hidden');
+                groups.password.classList.add('hidden'); // SkomdaStudent doesn't have password in its own table usually
+                groups.student.classList.add('hidden');
+                groups.studentMeta.classList.remove('hidden');
+                groups.major.classList.remove('hidden');
+                groups.bio.classList.add('hidden');
+            }
+        };
+
+        // Initialize Role Selectors
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('btn-add-user')?.addEventListener('click', window.openAddModal);
+            // Default Role: Client
+            window.setAddRole('Client');
+        });
+    </script>
 @endsection

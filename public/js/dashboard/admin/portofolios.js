@@ -142,8 +142,8 @@ function openPortModal(id) {
     const p = portfoliosData.find(x => String(x.id) === String(id));
     if (!p) return;
 
-    const overlay = document.getElementById('detail-modal-overlay');
-    const box = document.getElementById('detail-modal-box');
+    const overlay = document.getElementById('modal-portofolios-overlay');
+    const box = document.getElementById('modal-portofolios-box');
     
     const fName = p.service?.freelancer?.skomda_student?.name 
                   ?? p.service?.freelancer?.name 
@@ -181,7 +181,8 @@ function openPortModal(id) {
             <div class="text-sm text-slate-600 leading-relaxed mb-6 bg-slate-50 p-4 rounded-xl border border-slate-100">${p.description || 'Tidak ada deskripsi tersedia.'}</div>
 
             <div class="flex gap-2 border-t border-slate-100 pt-4">
-                <button class="flex-1 bg-red-50 text-red-600 py-2.5 rounded-xl font-bold text-sm hover:bg-red-100 transition flex items-center justify-center gap-2" onclick="deletePort('${p.id}'); closePortModal()"><i class="ri-delete-bin-line"></i> Hapus</button>
+                <button class="flex-1 bg-slate-100 text-slate-700 py-2.5 rounded-xl font-bold text-sm hover:bg-slate-200 transition flex items-center justify-center gap-2" onclick="openEditPortModal('${p.id}')"><i class="ri-edit-line"></i> Edit</button>
+                <button class="flex-1 bg-red-50 text-red-600 py-2.5 rounded-xl font-bold text-sm hover:bg-red-100 transition flex items-center justify-center gap-2" onclick="deletePort('${p.id}')"><i class="ri-delete-bin-line"></i> Hapus</button>
             </div>
         </div>
     `;
@@ -191,8 +192,62 @@ function openPortModal(id) {
     overlay.style.display = 'flex';
 }
 
+function openEditPortModal(id) {
+    const p = portfoliosData.find(x => String(x.id) === String(id));
+    if (!p) return;
+
+    const overlay = document.getElementById('modal-portofolios-overlay');
+    const box = document.getElementById('modal-portofolios-box');
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
+
+    box.innerHTML = `
+        <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
+            <span class="font-bold text-slate-900">Edit Portofolio #${p.id}</span>
+            <button onclick="openPortModal('${id}')" class="w-8 h-8 flex items-center justify-center bg-slate-100 text-slate-500 rounded-lg hover:bg-slate-200 transition"><i class="ri-arrow-left-line"></i></button>
+        </div>
+        <form action="/admin/portofolios/${p.id}" method="POST" class="p-6">
+            <input type="hidden" name="_token" value="${csrfToken}">
+            <input type="hidden" name="_method" value="PUT">
+            
+            <div class="space-y-4">
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Judul Portofolio</label>
+                    <input type="text" name="title" required value="${p.title}" class="py-2.5 px-3.5 bg-slate-50 border-[1.5px] border-slate-200 rounded-xl text-[13.5px] outline-none focus:border-[#0f766e] focus:bg-white transition-all" />
+                </div>
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Deskripsi</label>
+                    <textarea name="description" rows="4" class="py-2.5 px-3.5 bg-slate-50 border-[1.5px] border-slate-200 rounded-xl text-[13.5px] outline-none focus:border-[#0f766e] focus:bg-white transition-all resize-none">${p.description || ''}</textarea>
+                </div>
+                <div class="bg-blue-50 p-4 rounded-xl border border-blue-100 text-blue-700 text-xs leading-relaxed">
+                    <i class="ri-information-line mr-1"></i> Perubahan pada portofolio akan langsung terlihat oleh klien di halaman publik.
+                </div>
+            </div>
+
+            <div class="flex gap-2.5 mt-8">
+                <button type="button" onclick="openPortModal('${id}')" class="flex-1 py-3 rounded-xl bg-slate-100 text-slate-600 font-bold text-[13px] hover:bg-slate-200 transition-all">Batal</button>
+                <button type="submit" class="flex-1 py-3 rounded-xl bg-[#0f766e] text-white font-bold text-[13px] shadow-teal-sm hover:bg-[#0a5e58] transition-all">Simpan Perubahan</button>
+            </div>
+        </form>
+    `;
+}
+
+function deletePort(id) {
+    if (!confirm('Apakah Anda yakin ingin menghapus portofolio ini? Tindakan ini tidak dapat dibatalkan.')) return;
+
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = `/admin/portofolios/${id}`;
+    form.innerHTML = `
+        <input type="hidden" name="_token" value="${csrfToken}">
+        <input type="hidden" name="_method" value="DELETE">
+    `;
+    document.body.appendChild(form);
+    form.submit();
+}
+
 function closePortModal() {
-    const overlay = document.getElementById('detail-modal-overlay');
+    const overlay = document.getElementById('modal-portofolios-overlay');
     overlay.classList.remove('open');
     overlay.style.display = 'none';
 }
@@ -251,7 +306,7 @@ function initPage() {
     initSearch();
     initFilters();
 
-    const overlay = document.getElementById('detail-modal-overlay');
+    const overlay = document.getElementById('modal-portofolios-overlay');
     if (overlay) {
         overlay.addEventListener('click', (e) => { if (e.target === overlay) closePortModal(); });
     }

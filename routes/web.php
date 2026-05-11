@@ -94,9 +94,13 @@ Route::middleware('auth:administrator')->prefix('admin')->name('admin.')->group(
 
     // Portofolios (CRUD)
     Route::get('/portofolios', [PortofolioController::class, 'index'])->name('portofolios.index');
+    Route::put('/portofolios/{id}', [PortofolioController::class, 'adminUpdate'])->name('portofolios.update');
+    Route::delete('/portofolios/{id}', [PortofolioController::class, 'adminDestroy'])->name('portofolios.destroy');
 
     // Order (CRUD)
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
+    Route::get('/orders/{id}/dispute', [DashboardController::class, 'getDisputeDetail'])->name('admin.orders.dispute');
+    Route::get('/freelancers/{id}/detail', [DashboardController::class, 'getFreelancerDetail'])->name('admin.freelancers.detail');
     Route::post('/orders/{id}/status', [OrderController::class, 'updateStatus'])->name('orders.updateStatus');
     Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
     Route::delete('/orders/{id}', [OrderController::class, 'destroy'])->name('orders.destroy');
@@ -109,9 +113,11 @@ Route::middleware('auth:administrator')->prefix('admin')->name('admin.')->group(
 
     // Results (CRUD)
     Route::get('/results', [ResultController::class, 'index'])->name('results.index');
+    Route::get('/results/{result}', [ResultController::class, 'show'])->name('results.show');
 
     // Reviews (CRUD)
     Route::get('/reviews', [ReviewController::class, 'index'])->name('reviews.index');
+    Route::delete('/reviews/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
 
     // Negotiations (CRUD)
     Route::get('/negotiations', [NegotiationController::class, 'index'])->name('negotiations.index');
@@ -136,8 +142,19 @@ Route::middleware('auth:client')->prefix('client')->name('client.')->group(funct
     Route::post('/orders', [OrderController::class, 'storePage'])->name('orders.store');
     Route::get('/orders/{order}', [OrderController::class, 'clientShowPage'])->name('orders.show');
     Route::post('/orders/{order}/attachments', [OrderController::class, 'uploadAttachment'])->name('orders.attachments.store');
+    Route::post('/orders/{order}/accept', [OrderController::class, 'clientAcceptOrder'])->name('orders.accept');
+    Route::post('/orders/{order}/reject', [OrderController::class, 'clientRejectOrder'])->name('orders.reject');
+    Route::post('/orders/{order}/nego', [OrderController::class, 'clientNegoOrder'])->name('orders.nego');
+    Route::post('/orders/{order}/revision', [OrderController::class, 'clientRequestRevision'])->name('orders.revision');
+    Route::post('/orders/{order}/complete', [OrderController::class, 'clientCompleteOrder'])->name('orders.complete');
+    Route::get('/orders/{order}/checkout', [OrderController::class, 'checkout'])->name('orders.checkout');
+    Route::post('/orders/{order}/checkout', [OrderController::class, 'processPayment'])->name('orders.process-payment');
 
-    // Talents
+    // Results (Client)
+    Route::get('/results', [ResultController::class, 'clientIndex'])->name('results.index');
+    Route::get('/results/{result}', [ResultController::class, 'clientShow'])->name('results.show');
+
+    // Talents (Freelancers)
     Route::get('/talents', [FreelancerController::class, 'clientFindTalent'])->name('talents.index');
     Route::get('/talents/{freelancer}', [FreelancerController::class, 'clientTalentShow'])->name('talents.show');
 
@@ -160,12 +177,20 @@ Route::middleware('auth:client')->prefix('client')->name('client.')->group(funct
     Route::get('/reviews/order/{orderId}', [ReviewController::class, 'clientShowByOrderId'])->name('reviews.showByOrderId');
     Route::get('/reviews/create/{orderId}', [ReviewController::class, 'clientCreate'])->name('reviews.create');
     Route::post('/reviews', [ReviewController::class, 'clientStore'])->name('reviews.store');
+    Route::delete('/reviews/{orderId}', [ReviewController::class, 'clientDestroy'])->name('reviews.destroy');
 
     // Offers
     Route::get('/offers', [OfferController::class, 'clientIndex'])->name('offers.index');
     Route::get('/offers/{offer}', [OfferController::class, 'clientShow'])->name('offers.show');
     Route::post('/offers/{offer}/accept', [OfferController::class, 'clientAccept'])->name('offers.accept');
     Route::post('/offers/{offer}/reject', [OfferController::class, 'clientReject'])->name('offers.reject');
+
+    // Negotiations
+    Route::post('/offers/{offer}/negotiations', [NegotiationController::class, 'clientStoreNegotiation'])->name('negotiations.store');
+
+    // Portofolios
+    Route::get('/freelancers/{freelancer_id}/portofolios', [PortofolioController::class, 'showAllFreelancerPortofolios'])->name('freelancers.portofolios');
+    Route::get('/portofolios/{id}', [PortofolioController::class, 'showFreelancerPortofolio'])->name('portofolios.show');
 });
 
 // ── FREELANCER ───────────────────────────────────────────
@@ -195,6 +220,8 @@ Route::middleware('auth:freelancer')->prefix('freelancer')->name('freelancer.')-
     Route::patch('/orders/{id}/price', [OrderController::class, 'updateAgreedPrice'])->name('orders.updateAgreedPrice');
     Route::post('/orders/{order}/accept', [OrderController::class, 'freelancerAccept'])->name('orders.accept');
     Route::post('/orders/{order}/reject', [OrderController::class, 'freelancerReject'])->name('orders.reject');
+    Route::post('/orders/{order}/revision/approve', [OrderController::class, 'freelancerApproveRevision'])->name('orders.revision.approve');
+    Route::post('/orders/{order}/revision/reject', [OrderController::class, 'freelancerRejectRevision'])->name('orders.revision.reject');
 
     // crud review
     Route::get('/reviews', [ReviewController::class, 'freelancerIndex'])->name('reviews.index');
@@ -221,11 +248,18 @@ Route::middleware('auth:freelancer')->prefix('freelancer')->name('freelancer.')-
 
     // crud negotiations
     Route::get('/negotiations', [NegotiationController::class, 'freelancerGetMessages'])->name('negotiations.index');
+    Route::get('/negotiations/{negotiation}', [NegotiationController::class, 'freelancerShowNegotiation'])->name('negotiations.show');
     Route::post('/negotiations', [NegotiationController::class, 'freelancerSendMessage'])->name('negotiations.send-message');
+    Route::post('/negotiations/{negotiation}/accept', [NegotiationController::class, 'freelancerAcceptNegotiation'])->name('negotiations.accept');
+    Route::post('/negotiations/{negotiation}/reject', [NegotiationController::class, 'freelancerRejectNegotiation'])->name('negotiations.reject');
 
     // crud results
     Route::get('/results', [ResultController::class, 'freelancerIndex'])->name('results.index');
-    Route::resource('results', ResultController::class)->except(['index', 'create', 'edit']);
+    Route::post('/results/{order_id}', [ResultController::class, 'store'])->name('results.store');
+    Route::get('/results/{result}', [ResultController::class, 'show'])->name('results.show');
+    Route::put('/results/{result}', [ResultController::class, 'update'])->name('results.update');
+    Route::delete('/results/{result}', [ResultController::class, 'destroy'])->name('results.destroy');
+    // Route::resource('results', ResultController::class)->except(['index', 'create', 'edit']);
 
     // crud offers
     Route::get('/offers', [OfferController::class, 'freelancerIndex'])->name('offers.index');

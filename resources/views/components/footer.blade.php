@@ -1,14 +1,14 @@
 <footer class="bg-slate-100 border-t border-slate-200">
-    <div class="max-w-7xl mx-auto px-6">
-        <div class="grid grid-cols-1 lg:grid-cols-[2fr_4fr] gap-12 py-20 border-b border-slate-200">
-            <div class="flex flex-col gap-7">
-                <div class="flex items-center gap-2 font-display text-2xl font-black text-slate-900">
+    <div class="max-w-7xl mx-auto px-6 py-12">
+        <div class="flex flex-col md:flex-row md:justify-between md:items-start gap-10">
+            <!-- KIRI: Logo, deskripsi, sosmed -->
+            <div class="flex flex-col gap-4 md:max-w-sm">
+                <div class="flex items-center gap-2 font-display text-2xl font-black text-slate-900 select-none">
                     <svg width="36" height="36" viewBox="0 0 32 32" fill="none">
                         <rect width="32" height="32" rx="8" fill="url(#lg2)" />
                         <path d="M16 8L24 12V20L16 24L8 20V12L16 8Z" fill="white" />
                         <defs>
-                            <linearGradient id="lg2" x1="0" y1="0" x2="32"
-                                y2="32">
+                            <linearGradient id="lg2" x1="0" y1="0" x2="32" y2="32">
                                 <stop offset="0%" stop-color="#0F766E" />
                                 <stop offset="100%" stop-color="#10B981" />
                             </linearGradient>
@@ -16,147 +16,161 @@
                     </svg>
                     Digitalance
                 </div>
-                <p class="text-slate-500 italic font-medium leading-relaxed pr-8">
-                    Platform freelance eksklusif untuk siswa/i SKOMDA.
-                    Connecting talent dengan opportunity.
+                <p class="text-slate-500 italic font-medium leading-relaxed">
+                    Platform freelance eksklusif untuk siswa/i SKOMDA. Connecting talent dengan opportunity.
                 </p>
-                <div class="flex gap-3">
-                    <a href="#"
-                        class="w-11 h-11 rounded-xl bg-white flex items-center justify-center text-slate-700 shadow-sm transition-all hover:bg-primary hover:text-white">
-                        <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
-                            <path
-                                d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+                <div class="flex items-center gap-2 mt-1">
+                    <!-- Email -->
+                    <a href="mailto:digitalance@skomda.ac.id"
+                        class="bg-white text-slate-500 hover:text-primary border border-slate-200 rounded-full w-10 h-10 flex items-center justify-center transition-colors"
+                        aria-label="Email">
+                        <!-- Icon Email -->
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path d="M3 8l9 6 9-6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            <rect width="18" height="14" x="3" y="5" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" rx="2" />
                         </svg>
                     </a>
-                    <a href="#"
-                        class="w-11 h-11 rounded-xl bg-white flex items-center justify-center text-slate-700 shadow-sm transition-all hover:bg-primary hover:text-white">
-                        <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
-                            <path
-                                d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
+                    <!-- LinkedIn -->
+                    <a href="https://www.linkedin.com/company/your-link" target="_blank"
+                        class="bg-white text-slate-500 hover:text-primary border border-slate-200 rounded-full w-10 h-10 flex items-center justify-center transition-colors"
+                        aria-label="LinkedIn">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M19 0h-14c-2.76 0-5 2.24-5 5v14c0 2.76 2.24 5 5 5h14c2.76 0 5-2.24 5-5v-14c0-2.76-2.24-5-5-5zm-11 
+          19h-3v-11h3v11zm-1.5-12.28c-.97 0-1.75-.79-1.75-1.77 0-.99.78-1.77 1.75-1.77s1.75.78 1.75 1.77c0 .98-.78 
+          1.77-1.75 1.77zm13.5 12.28h-3v-5.6c0-1.34-.48-2.26-1.7-2.26-.93 0-1.48.63-1.72 1.24-.09.22-.11.51-.11.81v5.81h-3v-11h3v1.5c.4-.63
+          1.13-1.51 2.76-1.51 2.01 0 3.5 1.31 3.5 4.13v6.88z" />
                         </svg>
                     </a>
-                    <a href="#"
-                        class="w-11 h-11 rounded-xl bg-white flex items-center justify-center text-slate-700 shadow-sm transition-all hover:bg-primary hover:text-white">
-                        <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
+                    <!-- Instagram -->
+                    <a href="https://instagram.com/yourprofile" target="_blank"
+                        class="bg-white text-slate-500 hover:text-primary border border-slate-200 rounded-full w-10 h-10 flex items-center justify-center transition-colors"
+                        aria-label="Instagram">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                             <path
-                                d="M0 3v18h24v-18h-24zm6.623 7.929l-4.623 5.712v-9.458l4.623 3.746zm-4.141-5.929h19.035l-9.517 7.713-9.518-7.713zm5.694 7.188l3.824 3.099 3.83-3.104 5.612 6.817h-18.779l5.513-6.812zm9.208-1.264l4.616-3.741v9.348l-4.616-5.607z" />
+                                d="M7.75 2h8.5A5.75 5.75 0 0 1 22 7.75v8.5A5.75 5.75 0 0 1 16.25 22h-8.5A5.75 5.75 0 0 1 2 16.25v-8.5A5.75 5.75 0 0 1 7.75 2zm0 1.5A4.25 4.25 0 0 0 3.5 7.75v8.5A4.25 4.25 0 0 0 7.75 20.5h8.5A4.25 4.25 0 0 0 20.5 16.25v-8.5A4.25 4.25 0 0 0 16.25 3.5zm8.75 2.25a.75.75 0 0 1 .75.75v1.5a.75.75 0 0 1-1.5 0v-1.5a.75.75 0 0 1 .75-.75zm-4 1.75A5 5 0 1 1 7.5 13.5 5 5 0 0 1 12 7.5zm0 1.5a3.5 3.5 0 1 0 3.5 3.5A3.5 3.5 0 0 0 12 9z" />
                         </svg>
                     </a>
                 </div>
             </div>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-10">
+            <!-- KANAN: NAV & LEGAL -->
+            <div class="flex flex-row gap-16 w-full md:w-auto justify-start md:justify-end">
+                <!-- Navigasi -->
                 <div>
-                    <h4 class="font-display font-black text-xs text-slate-900 uppercase tracking-widest mb-5">
-                        Platform
-                    </h4>
-                    <ul class="list-none flex flex-col gap-3 p-0 m-0">
-                        <li>
-                            <a href="#"
-                                class="text-slate-500 no-underline font-semibold text-sm hover:text-primary transition-colors">Browse
-                                Projects</a>
-                        </li>
-                        <li>
-                            <a href="#"
-                                class="text-slate-500 no-underline font-semibold text-sm hover:text-primary transition-colors">Find
-                                Freelancers</a>
-                        </li>
-                        <li>
-                            <a href="#"
-                                class="text-slate-500 no-underline font-semibold text-sm hover:text-primary transition-colors">How
-                                It Works</a>
-                        </li>
-                        <li>
-                            <a href="#"
-                                class="text-slate-500 no-underline font-semibold text-sm hover:text-primary transition-colors">Pricing</a>
-                        </li>
+                    <h4 class="font-display font-black text-xs text-slate-900 uppercase tracking-widest mb-3">Navigasi</h4>
+                    <ul class="flex flex-col gap-2">
+                        <li><a href="{{ route('home') }}#home" class="text-slate-700 font-semibold text-sm hover:text-primary transition-colors">Home</a></li>
+                        <li><a href="{{ route('home') }}#services" class="text-slate-700 font-semibold text-sm hover:text-primary transition-colors">Services</a></li>
+                        <li><a href="{{ route('home') }}#faq" class="text-slate-700 font-semibold text-sm hover:text-primary transition-colors">FAQ</a></li>
+                        <li><a href="/login" class="text-slate-700 font-semibold text-sm hover:text-primary transition-colors">Get Started</a></li>
                     </ul>
                 </div>
+                <!-- Legal -->
                 <div>
-                    <h4 class="font-display font-black text-xs text-slate-900 uppercase tracking-widest mb-5">
-                        Resources
-                    </h4>
-                    <ul class="list-none flex flex-col gap-3 p-0 m-0">
+                    <h4 class="font-display font-black text-xs text-slate-900 uppercase tracking-widest mb-3">Legal</h4>
+                    <ul class="flex flex-col gap-2">
                         <li>
-                            <a href="#"
-                                class="text-slate-500 no-underline font-semibold text-sm hover:text-primary transition-colors">Help
-                                Center</a>
+                            <button onclick="openPrivacyModal()" type="button" class="text-slate-700 font-semibold text-sm hover:text-primary focus:outline-none transition-colors text-left w-full">Privasi</button>
                         </li>
                         <li>
-                            <a href="#"
-                                class="text-slate-500 no-underline font-semibold text-sm hover:text-primary transition-colors">Blog</a>
-                        </li>
-                        <li>
-                            <a href="#"
-                                class="text-slate-500 no-underline font-semibold text-sm hover:text-primary transition-colors">Success
-                                Stories</a>
-                        </li>
-                        <li>
-                            <a href="#"
-                                class="text-slate-500 no-underline font-semibold text-sm hover:text-primary transition-colors">Guidelines</a>
-                        </li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="font-display font-black text-xs text-slate-900 uppercase tracking-widest mb-5">
-                        Company
-                    </h4>
-                    <ul class="list-none flex flex-col gap-3 p-0 m-0">
-                        <li>
-                            <a href="#"
-                                class="text-slate-500 no-underline font-semibold text-sm hover:text-primary transition-colors">About
-                                Us</a>
-                        </li>
-                        <li>
-                            <a href="#"
-                                class="text-slate-500 no-underline font-semibold text-sm hover:text-primary transition-colors">Careers</a>
-                        </li>
-                        <li>
-                            <a href="#"
-                                class="text-slate-500 no-underline font-semibold text-sm hover:text-primary transition-colors">Press
-                                Kit</a>
-                        </li>
-                        <li>
-                            <a href="#"
-                                class="text-slate-500 no-underline font-semibold text-sm hover:text-primary transition-colors">Contact</a>
-                        </li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="font-display font-black text-xs text-slate-900 uppercase tracking-widest mb-5">
-                        Legal
-                    </h4>
-                    <ul class="list-none flex flex-col gap-3 p-0 m-0">
-                        <li>
-                            <a href="#"
-                                class="text-slate-500 no-underline font-semibold text-sm hover:text-primary transition-colors">Terms
-                                of Service</a>
-                        </li>
-                        <li>
-                            <a href="#"
-                                class="text-slate-500 no-underline font-semibold text-sm hover:text-primary transition-colors">Privacy
-                                Policy</a>
-                        </li>
-                        <li>
-                            <a href="#"
-                                class="text-slate-500 no-underline font-semibold text-sm hover:text-primary transition-colors">Cookie
-                                Policy</a>
-                        </li>
-                        <li>
-                            <a href="#"
-                                class="text-slate-500 no-underline font-semibold text-sm hover:text-primary transition-colors">Disclaimer</a>
+                            <button onclick="openTnCModal()" type="button" class="text-slate-700 font-semibold text-sm hover:text-primary focus:outline-none transition-colors text-left w-full">Terms of Condition</button>
                         </li>
                     </ul>
                 </div>
             </div>
         </div>
-        <div class="flex flex-wrap justify-between items-center py-8 gap-4">
-            <p class="text-slate-400 font-semibold text-sm">
-                © 2026 Digitalance. All rights reserved.
-            </p>
-            <div class="flex gap-6 text-xs font-bold uppercase tracking-widest text-slate-400">
-                <span class="cursor-pointer hover:text-primary transition-colors">Verified Platform</span>
-                <span class="cursor-pointer hover:text-primary transition-colors">Secure Payment</span>
+        <div class="border-t border-slate-200 mt-10 pt-6 flex flex-col items-center justify-center gap-3">
+            <span class="text-slate-400 font-semibold text-xs text-center">© {{ date('Y') }} Digitalance. All rights reserved.</span>
+        </div>
+    </div>
+
+    <!-- Modal Privasi -->
+    <div id="privacy-modal" class="fixed inset-0 z-[1000] hidden bg-black/40 flex items-center justify-center"
+        style="backdrop-filter:blur(2px)">
+        <div
+            class="bg-white rounded-2xl w-[95vw] max-w-2xl p-8 shadow-xl relative overflow-y-auto max-h-[85vh] flex flex-col">
+            <button type="button" onclick="closePrivacyModal()"
+                class="absolute top-4 right-4 text-slate-400 hover:text-primary text-2xl outline-none"
+                aria-label="Tutup"><span aria-hidden="true">&times;</span></button>
+            <h2 class="font-display text-xl font-bold text-primary mb-2">Kebijakan Privasi</h2>
+            <div class="text-slate-600 text-sm leading-relaxed space-y-4">
+                <p>
+                    Digitalance sangat menghormati privasi pengguna. Kami mengumpulkan data minimum yang diperlukan
+                    untuk keperluan operasional platform, seperti nama, email, dan riwayat transaksi. Data Anda tidak
+                    akan diperjualbelikan ke pihak ketiga.
+                </p>
+                <p>
+                    Data Anda digunakan untuk:
+                <ul class="list-disc pl-5 mt-1">
+                    <li>Mengelola akun dan portofolio Anda di marketplace Digitalance.</li>
+                    <li>Memproses transaksi antara freelancer dan klien secara aman.</li>
+                    <li>Meningkatkan kualitas layanan, serta mengirimkan update atau notifikasi terkait akun.</li>
+                </ul>
+                </p>
+                <p>Digitalance menerapkan standar keamanan terbaik dan staff kami terlatih untuk menjaga data Anda
+                    sebaik-baiknya. Anda dapat meminta penghapusan akun dan data personal dengan menghubungi kontak
+                    layanan Digitalance.</p>
+                <p>Seluruh aktivitas di Digitalance tunduk pada aturan perundang-undangan Indonesia. Untuk pertanyaan
+                    privasi lebih lanjut, hubungi kami di email resmi portal ini.</p>
             </div>
         </div>
     </div>
+
+    <!-- Modal Terms of Condition -->
+    <div id="tnc-modal" class="fixed inset-0 z-[1000] hidden bg-black/40 flex items-center justify-center"
+        style="backdrop-filter:blur(2px)">
+        <div
+            class="bg-white rounded-2xl w-[95vw] max-w-2xl p-8 shadow-xl relative overflow-y-auto max-h-[85vh] flex flex-col">
+            <button type="button" onclick="closeTnCModal()"
+                class="absolute top-4 right-4 text-slate-400 hover:text-primary text-2xl outline-none"
+                aria-label="Tutup"><span aria-hidden="true">&times;</span></button>
+            <h2 class="font-display text-xl font-bold text-primary mb-2">Syarat & Ketentuan</h2>
+            <div class="text-slate-600 text-sm leading-relaxed space-y-4">
+                <p>
+                    Dengan menggunakan Digitalance, Anda dianggap telah membaca, memahami, dan menyetujui seluruh syarat
+                    berikut:
+                </p>
+                <ul class="list-decimal pl-5">
+                    <li>Hanya siswa/i SKOMDA yang boleh mendaftar sebagai freelancer di marketplace ini.</li>
+                    <li>Setiap pengguna wajib mengisi data akurat dan bertanggung jawab atas data pribadi serta hasil
+                        karyanya.</li>
+                    <li>Transaksi dilakukan secara aman di dalam platform, admin Digitalance bertindak sebagai perantara
+                        jika terjadi sengketa transaksi.</li>
+                    <li>Dilarang melakukan aktivitas curang, membagikan kontak pribadi sebelum deal, atau
+                        memperjualbelikan akun.</li>
+                    <li>Konten portofolio, deskripsi jasa, dan komunikasi wajib mengikuti norma, hukum, dan etika SKOMDA
+                        & Indonesia.</li>
+                    <li>Pelaku pelanggaran dapat dikenai sanksi mulai dari teguran hingga penghapusan akun secara
+                        permanen tanpa pengembalian saldo.</li>
+                </ul>
+                <p>Platform menyediakan layanan transaksi freelance terbatas pada ruang lingkup yang diatur oleh
+                    kebijakan sekolah dan perundang-undangan Indonesia.</p>
+                <p>Digitalance dapat sewaktu-waktu mengubah syarat & ketentuan. Segala perubahan akan diinformasikan
+                    melalui platform ini. Lanjutkan penggunaan berarti Anda menyetujui versi terbaru.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Modal logic
+        function openPrivacyModal() {
+            document.getElementById('privacy-modal').classList.remove('hidden');
+        }
+        function closePrivacyModal() {
+            document.getElementById('privacy-modal').classList.add('hidden');
+        }
+        function openTnCModal() {
+            document.getElementById('tnc-modal').classList.remove('hidden');
+        }
+        function closeTnCModal() {
+            document.getElementById('tnc-modal').classList.add('hidden');
+        }
+        // close modal jika klik overlay atau ESC
+        window.addEventListener('keydown', e => {
+            if (e.key === 'Escape') { closePrivacyModal(); closeTnCModal(); }
+        });
+        document.getElementById('privacy-modal').addEventListener('click', function (e) { if (e.target === this) { closePrivacyModal(); } });
+        document.getElementById('tnc-modal').addEventListener('click', function (e) { if (e.target === this) { closeTnCModal(); } });
+    </script>
 </footer>

@@ -37,7 +37,7 @@
             @foreach ($administrators as $admin)
                 <div class="user-card-item bg-white border-[1.5px] border-slate-100 rounded-[20px] p-5 flex flex-col hover:border-[#0f766e] hover:shadow-xl transition-all duration-300 group"
                     data-id="{{ $admin->id }}" data-name="{{ $admin->name }}" data-email="{{ $admin->email }}"
-                    data-phone="{{ $admin->phone }}" data-status="{{ $admin->status }}" data-bio="{{ $admin->bio }}">
+                    data-status="{{ $admin->status }}">
 
                     <div class="flex justify-between items-start mb-4">
                         <div class="relative">

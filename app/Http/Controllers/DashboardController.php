@@ -19,11 +19,56 @@ class DashboardController extends Controller
         $totalFreelancers = Freelancer::count();
         $totalSkomda = SkomdaStudent::count();
 
+        $pendingVerifications = Freelancer::with('skomda_student')
+            ->where('status', 'Pending')
+            ->latest()
+            ->take(3)
+            ->get();
+
+        $totalPendingCount = Freelancer::where('status', 'Pending')->count();
+
+        // Count "disputes" - for now we use 'Revision' as a proxy if no dispute table exists
+        $disputedOrders = Order::with(['client', 'service.freelancer'])
+            ->where('status', 'Revision')
+            ->latest()
+            ->get();
+        $openDisputes = $disputedOrders->count();
+
+        // Advanced Stats
+        $totalTurnover = Transaction::where('status', 'Paid')->sum('amount');
+        $totalRevenue = $totalTurnover * 0.10; // 10% platform fee as requested
+        $recentTransactions = Transaction::with(['order.client'])->latest()->take(5)->get();
+
+        $todayTurnover = Transaction::where('status', 'Paid')
+            ->whereDate('created_at', now()->toDateString())
+            ->sum('amount');
+        $todayOrders = Order::whereDate('created_at', now()->toDateString())->count();
+        $todayRevenue = $todayTurnover * 0.10;
+
+        // Monthly Revenue Chart Data (10% Platform Fee)
+        $monthlyTurnover = Transaction::where('status', 'Paid')
+            ->selectRaw('SUM(amount * 0.10) as total, MONTH(created_at) as month, YEAR(created_at) as year')
+            ->where('created_at', '>=', now()->subMonths(6))
+            ->groupBy('year', 'month')
+            ->orderBy('year')
+            ->orderBy('month')
+            ->get();
+
         return view('dashboard.admin.dashboard', compact(
             'totalUsers',
             'totalClients',
             'totalFreelancers',
-            'totalSkomda'
+            'totalSkomda',
+            'pendingVerifications',
+            'totalPendingCount',
+            'openDisputes',
+            'disputedOrders',
+            'totalRevenue',
+            'totalTurnover',
+            'recentTransactions',
+            'todayOrders',
+            'todayRevenue',
+            'monthlyTurnover'
         ));
     }
 
@@ -55,9 +100,33 @@ class DashboardController extends Controller
             ->take(3)
             ->get();
 
+        $projectsData = $projects->map(function($o) {
+            return [
+                'id' => $o->id,
+                'brief' => $o->brief,
+                'status' => $o->status,
+                'deadline' => $o->deadline,
+                'agreed_price' => $o->agreed_price,
+                'service_id' => $o->service_id,
+                'service' => [
+                    'title' => ($o->service->title ?? $o->service->name ?? 'Service')
+                ],
+                'href' => route('client.orders.show', $o->id),
+            ];
+        });
+
+        $statsData = [
+            'total' => $projects->count() ? $projects->count() + ($activeProjects + $completedProjects - $projects->count()) : ($activeProjects + $completedProjects),
+            'active' => $activeProjects,
+            'completed' => $completedProjects,
+            'totalSpent' => $totalSpent
+        ];
+
         return view('dashboard.client.dashboard', compact(
             'user',
             'projects',
+            'projectsData',
+            'statsData',
             'activeProjects',
             'totalSpent',
             'completedProjects'
@@ -119,6 +188,17 @@ class DashboardController extends Controller
             })
             ->values();
 
+        $ordersWithStatusChange = $orders->whereIn('status', ['Revision', 'Completed'])->take(3)->map(function ($order) {
+            return [
+                'id' => $order->id,
+                'title' => $order->service->title ?? 'Service',
+                'client_name' => $order->client->name ?? 'Client',
+                'status' => $order->status,
+                'agreed_price' => $order->agreed_price,
+                'created_at' => $order->created_at,
+            ];
+        })->values();
+
         $dashboardData = [
             'stats' => [
                 'activeOrders' => $activeOrders,
@@ -128,6 +208,7 @@ class DashboardController extends Controller
             ],
             'latestOrders' => $latestOrders,
             'jobOpportunities' => $jobOpportunities,
+            'ordersWithStatusChange' => $ordersWithStatusChange,
         ];
 
         return view('dashboard.freelancer.dashboard', compact('dashboardData'));
@@ -135,16 +216,34 @@ class DashboardController extends Controller
 
     public function verifyFreelancer($id)
     {
-        $freelancer = Freelancer::findOrFail($id);
+        $freelancer = Freelancer::with('skomda_student')->findOrFail($id);
         $freelancer->update(['status' => 'Approved']);
+
+        \App\Models\Notification::create([
+            'title' => 'Akun Diverifikasi',
+            'message' => 'Selamat, akun freelancer kamu telah disetujui oleh admin!',
+            'type' => 'success',
+            'role' => 'freelancer',
+            'user_id' => $freelancer->id,
+            'link' => '/freelancer/profile'
+        ]);
 
         return response()->json(['message' => 'Success']);
     }
 
     public function rejectFreelancer($id)
     {
-        $freelancer = Freelancer::findOrFail($id);
+        $freelancer = Freelancer::with('skomda_student')->findOrFail($id);
         $freelancer->update(['status' => 'Rejected']);
+
+        \App\Models\Notification::create([
+            'title' => 'Verifikasi Ditolak',
+            'message' => 'Maaf, pengajuan akun freelancer kamu belum dapat kami setujui saat ini.',
+            'type' => 'danger',
+            'role' => 'freelancer',
+            'user_id' => $freelancer->id,
+            'link' => '/freelancer/profile'
+        ]);
 
         return response()->json(['message' => 'Success']);
     }
@@ -285,6 +384,31 @@ class DashboardController extends Controller
         }
         
         return view('dashboard.admin.search', compact('results', 'q')); // Reuse the same search view for now
+    }
+
+    public function getDisputeDetail($id)
+    {
+        $order = Order::with(['client', 'service.freelancer', 'negotiations' => function($q) {
+            $q->latest();
+        }, 'results' => function($q) {
+            $q->latest();
+        }])->findOrFail($id);
+
+        return response()->json([
+            'order' => $order,
+            'client' => $order->client,
+            'freelancer' => $order->service->freelancer,
+            'negotiations' => $order->negotiations,
+            'results' => $order->results,
+        ]);
+    }
+
+    public function getFreelancerDetail($id)
+    {
+        $freelancer = Freelancer::with('skomda_student')
+            ->withCount(['services', 'portofolios'])
+            ->findOrFail($id);
+        return response()->json($freelancer);
     }
 
     public function freelancerSearch(\Illuminate\Http\Request $request)

@@ -13,6 +13,7 @@
         rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet" />
     <link rel="stylesheet" href="{{ asset('css/dashboard/dashboard.css') }}">
+    @vite(['resources/js/app.js'])
 
     @yield('styles')
     @stack('styles')
@@ -125,6 +126,8 @@
                 </button>
             `;
             
+            toast.setAttribute('role', 'alert');
+            toast.setAttribute('aria-live', 'polite');
             container.appendChild(toast);
             
             // Auto remove after 5s

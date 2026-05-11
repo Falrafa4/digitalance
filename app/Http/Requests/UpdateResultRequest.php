@@ -23,7 +23,7 @@ class UpdateResultRequest extends FormRequest
     {
         return [
             'note' => 'nullable|string|max:255',
-            'message' => 'nullable|string|max:1000',
+            'version' => 'nullable|string|max:100',
         ];
     }
 }

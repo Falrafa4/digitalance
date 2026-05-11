@@ -24,7 +24,7 @@ class StoreOfferRequest extends FormRequest
         return [
             'order_id' => 'required|exists:orders,id',
             'title' => 'required|string|max:255',
-            'desciption' => 'nullable|string',
+            'description' => 'nullable|string',
             'offered_price' => 'required|decimal:0,2',
             'deadline' => 'required|date'
         ];

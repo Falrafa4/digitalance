@@ -67,10 +67,20 @@ class FreelancerController extends Controller
     // =========================
     // ADMIN ONLY
     // =========================
-    public function index()
+    public function index(Request $request)
     {
-        $freelancers = Freelancer::with('skomda_student')->get();
-        return view('dashboard.admin.freelancers', compact('freelancers'));
+        $q = $request->query('q');
+        $query = Freelancer::with('skomda_student');
+
+        if ($q) {
+            $query->whereHas('skomda_student', function($sq) use ($q) {
+                $sq->where('name', 'like', "%{$q}%")
+                   ->orWhere('email', 'like', "%{$q}%");
+            });
+        }
+
+        $freelancers = $query->latest()->get();
+        return view('dashboard.admin.freelancers', compact('freelancers', 'q'));
     }
 
     public function store(StoreFreelancerRequest $request)
@@ -79,6 +89,11 @@ class FreelancerController extends Controller
         $data['password'] = Hash::make($data['password']);
 
         Freelancer::create($data);
+
+        if ($request->expectsJson()) {
+            return response()->json(['message' => 'Akun freelancer berhasil dibuat'], 201);
+        }
+
         return redirect()->route('admin.freelancers.index')->with('success', 'Akun freelancer berhasil dibuat');
     }
 
@@ -96,14 +111,41 @@ class FreelancerController extends Controller
 
     public function update(UpdateFreelancerRequest $request, Freelancer $freelancer)
     {
-        $freelancer->update($request->validated());
+        $validated = $request->validated();
+        
+        // Update Freelancer fields
+        $freelancer->update([
+            'bio' => $validated['bio'] ?? $freelancer->bio,
+            'status' => $validated['status'] ?? $freelancer->status,
+        ]);
+
+        // Update linked SkomdaStudent fields
+        if ($freelancer->skomda_student) {
+            $studentData = [];
+            if (isset($validated['name'])) $studentData['name'] = $validated['name'];
+            if (isset($validated['email'])) $studentData['email'] = $validated['email'];
+            if (isset($validated['phone'])) $studentData['phone'] = $validated['phone'];
+            
+            if (!empty($studentData)) {
+                $freelancer->skomda_student->update($studentData);
+            }
+        }
+
+        if ($request->expectsJson()) {
+            return response()->json(['message' => 'Akun freelancer berhasil diperbarui'], 200);
+        }
+
         return redirect()->route('admin.freelancers.index')->with('success', 'Akun freelancer berhasil diperbarui');
     }
 
-    public function destroy(string $id)
+    public function destroy(Request $request, string $id)
     {
         $freelancer = Freelancer::findOrFail($id);
         $freelancer->delete();
+
+        if ($request->expectsJson()) {
+            return response()->json(['message' => 'Akun freelancer berhasil dihapus'], 200);
+        }
 
         return redirect()->route('admin.freelancers.index')->with('success', 'Akun freelancer berhasil dihapus');
     }
@@ -134,7 +176,7 @@ class FreelancerController extends Controller
     {
         $freelancer = Freelancer::findOrFail($id);
         $freelancer->update([
-            'status' => 'Active'
+            'status' => 'Approved'
         ]);
 
         return redirect()->route('admin.freelancers.index')
@@ -144,30 +186,30 @@ class FreelancerController extends Controller
     // =========================
     // CLIENT ONLY (Find Talent)
     // =========================
-
+    
     public function clientFindTalent()
-{
-    $freelancers = Freelancer::with('skomda_student')->latest()->get();
+    {
+        $freelancers = Freelancer::with('skomda_student')->latest()->get();
 
-    foreach ($freelancers as $f) {
-        $f->services_count = Service::where('freelancer_id', $f->id)->count();
+        foreach ($freelancers as $f) {
+            $f->services_count = Service::where('freelancer_id', $f->id)->count();
+        }
+
+        return view('dashboard.client.talents.find-talent', compact('freelancers'));
     }
-
-    return view('dashboard.client.talents.find-talent', compact('freelancers'));
-}
 
     /**
      * CLIENT: Talent detail (profil + list services)
      */
     public function clientTalentShow(Freelancer $freelancer)
-{
-    $freelancer->load('skomda_student');
+    {
+        $freelancer->load('skomda_student');
 
-    $services = Service::with('service_category:id,name')
-        ->where('freelancer_id', $freelancer->id)
-        ->latest()
-        ->get();
+        $services = Service::with('service_category:id,name')
+            ->where('freelancer_id', $freelancer->id)
+            ->latest()
+            ->get();
 
-    return view('dashboard.client.talents.talent-show', compact('freelancer', 'services'));
-}
+        return view('dashboard.client.talents.talent-show', compact('freelancer', 'services'));
+    }
 }

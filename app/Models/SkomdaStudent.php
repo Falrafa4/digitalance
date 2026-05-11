@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class SkomdaStudent extends Model
 {
     use HasFactory;
-    protected $fillable = ['nis', 'name', 'email', 'class', 'major'];
+    protected $fillable = ['nis', 'name', 'email', 'phone', 'class', 'major'];
     
     public function getRouteKeyName()
     {

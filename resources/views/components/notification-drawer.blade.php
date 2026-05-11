@@ -4,13 +4,24 @@
     $isClient = Auth::guard('client')->check();
     $isFreelancer = Auth::guard('freelancer')->check();
 
-    $role = $isAdmin ? 'administrator' : ($isClient ? 'client' : ($isFreelancer ? 'freelancer' : null));
+    $role = $isAdmin ? 'admin' : ($isClient ? 'client' : ($isFreelancer ? 'freelancer' : null));
 
     // Get the actual logged-in user from the active guard
     $user =
         Auth::guard('administrator')->user()
         ?? Auth::guard('client')->user()
         ?? Auth::guard('freelancer')->user();
+
+    // Fetch from DB
+    $dbNotifications = \App\Models\Notification::where(function($q) use ($role, $user) {
+        $q->where('role', $role);
+        if ($user) {
+            $q->orWhere('user_id', $user->id);
+        }
+    })
+    ->latest()
+    ->take(10)
+    ->get();
 @endphp
 
 
@@ -63,49 +74,32 @@
         {{-- Content --}}
         <div class="p-4 overflow-y-auto h-[calc(100%-80px)]">
 
-            @if (isset($notifications) && count($notifications) > 0)
+            @if ($dbNotifications->count() > 0)
 
                 <div class="flex flex-col gap-2.5">
-                    @foreach ($notifications as $n)
+                    @foreach ($dbNotifications as $n)
                         <div class="bg-white border border-slate-200 rounded-2xl p-4 hover:border-[#10B981] transition cursor-pointer"
-                            @if (!empty($n['action_url']))
-                                onclick="window.location.href='{{ url($n['action_url']) }}'"
+                            @if (!empty($n->link))
+                                onclick="window.location.href='{{ url($n->link) }}'"
                             @endif
                         >
                             <div class="flex items-start gap-3">
                                 <span class="w-9 h-9 rounded-xl bg-[#f0fdf9] text-[#0f766e] flex items-center justify-center">
-                                    <i class="{{ $n['icon'] ?? 'ri-notification-3-line' }}"></i>
+                                    <i class="ri-notification-3-line"></i>
                                 </span>
 
                                 <div class="flex-1">
                                     <p class="text-[13.5px] font-bold text-slate-900">
-                                        {{ $n['title'] ?? 'Notification' }}
+                                        {{ $n->title }}
                                     </p>
 
                                     <p class="text-[12px] text-slate-500 mt-0.5">
-                                        {{ $n['message'] ?? '' }}
+                                        {{ $n->message }}
                                     </p>
 
-                                    @if (!empty($n['time']))
-                                        <p class="text-[11px] text-slate-400 mt-2">
-                                            {{ $n['time'] }}
-                                        </p>
-                                    @endif
-
-                                    @if (!empty($n['type']))
-                                        <span class="inline-block mt-2 px-2 py-1 text-[10px] font-semibold rounded-lg
-                                            @if ($n['type'] === 'client')
-                                                bg-blue-100 text-blue-700
-                                            @elseif ($n['type'] === 'freelancer')
-                                                bg-purple-100 text-purple-700
-                                            @elseif ($n['type'] === 'administrator')
-                                                bg-red-100 text-red-700
-                                            @else
-                                                bg-slate-100 text-slate-700
-                                            @endif">
-                                            {{ ucfirst($n['type']) }}
-                                        </span>
-                                    @endif
+                                    <p class="text-[11px] text-slate-400 mt-2">
+                                        {{ $n->created_at->diffForHumans() }}
+                                    </p>
                                 </div>
                             </div>
                         </div>

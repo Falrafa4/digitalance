@@ -24,7 +24,7 @@
       'actionLabel' => 'Browse Katalog'
     ])
   @else
-    <div data-client-pager data-page-size="8" class="space-y-4">
+    <div data-client-pager data-page-size="8" class="space-y-4" x-data="{ loading: false }">
       <div class="grid grid-cols-1 xl:grid-cols-2 gap-5" data-pager-list>
         @foreach($orders as $o)
           <div data-pager-item class="bg-white border border-slate-200 rounded-[18px] p-5 hover:shadow-lg transition-all">
@@ -70,4 +70,21 @@
     @include('dashboard.client._ui.client-pager')
   @endif
 </section>
+@endsection
+
+@section('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const pagerEl = document.querySelector('[data-client-pager]');
+  if (!pagerEl) return;
+
+  pagerEl.addEventListener('submit', 'form', function(e) {
+    const btn = e.target.querySelector('button[type="submit"]');
+    if (btn) {
+      btn.classList.add('btn-loading');
+      btn.disabled = true;
+    }
+  });
+});
+</script>
 @endsection

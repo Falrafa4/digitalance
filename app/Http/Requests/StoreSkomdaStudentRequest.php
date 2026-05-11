@@ -22,10 +22,12 @@ class StoreSkomdaStudentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string',
+            'name'  => 'required|string|max:255',
             'email' => 'required|email|unique:skomda_students,email',
-            'phone' => 'required|string',
-            'password' => 'required|string|min:6'
+            'nis'   => 'required|string|max:9|unique:skomda_students,nis',
+            'class' => 'required|string|max:255',
+            'major' => 'required|in:SIJA,TJAT',
+            'phone' => 'nullable|string|max:20',
         ];
     }
 }

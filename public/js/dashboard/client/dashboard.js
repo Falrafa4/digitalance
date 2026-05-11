@@ -1,66 +1,117 @@
-// ─── DATA ───
-const projects = [
-  { title: 'Website Redesign',       client: 'Acme Corp',  amount: 'Rp5.000',  status: 'In Progress' },
-  { title: 'Mobile App Development', client: 'Beta LLC',   amount: 'Rp12.000', status: 'Pending'     },
-  { title: 'SEO Optimization',       client: 'Gamma Inc',  amount: 'Rp3.000',  status: 'Completed'   }
-];
+(() => {
+  const page = window.__PAGE__ || {};
+  const projects = page.projects || [];
+  const stats = page.stats || {};
 
-const hasUnreadMessages = true;
+  const $ = (id) => document.getElementById(id);
+  const $$ = (sel) => Array.from(document.querySelectorAll(sel));
 
-// ─── BADGE MAP ───
-const BADGE_MAP = {
-  'In Progress': 'badge-progress',
-  'Pending':     'badge-pending',
-  'Completed':   'badge-completed'
-};
+  const money = (v) => {
+    if (!v && v !== 0) return '—';
+    try {
+      return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(v);
+    } catch (e) {
+      return String(v);
+    }
+  };
 
-// ─── NOTIFIKASI ───
-function initNotification() {
-  const notifBtn = document.getElementById('notif-btn');
-  if (!notifBtn) {
-    console.error("Element #notif-btn tidak ditemukan.");
-    return;
+  const safeText = (v) => (v === null || v === undefined ? '' : String(v));
+
+  const STATUS_BADGE = {
+    'In Progress': 'bg-indigo-50 text-indigo-700 border border-indigo-100',
+    'Pending': 'bg-amber-50 text-amber-700 border border-amber-100',
+    'Negotiated': 'bg-cyan-50 text-cyan-700 border border-cyan-100',
+    'Paid': 'bg-emerald-50 text-emerald-700 border border-emerald-100',
+    'Revision': 'bg-violet-50 text-violet-700 border border-violet-100',
+    'Completed': 'bg-emerald-50 text-emerald-700 border border-emerald-100',
+    'Cancelled': 'bg-rose-50 text-rose-700 border border-rose-100',
+    'Rejected': 'bg-rose-50 text-rose-700 border border-rose-100',
+  };
+
+  function formatDeadline(date) {
+    if (!date) return '—';
+    try {
+      const d = new Date(date);
+      return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+    } catch {
+      return safeText(date);
+    }
   }
 
-  notifBtn.classList.toggle('has-unread', hasUnreadMessages);
-
-  notifBtn.addEventListener('click', () => {
-    notifBtn.classList.remove('has-unread');
-  });
-}
-
-// ─── RENDER PROJECT CARDS ───
-function renderProjects() {
-  const grid = document.getElementById('project-grid');
-  if (!grid) return;
-
-  if (!projects || projects.length === 0) {
-    grid.innerHTML = `
-      <div class="empty-state">
-        <div class="empty-icon"><i class="ri-folder-open-line"></i></div>
-        <h3>No projects found</h3>
-        <p>It seems you don't have any active projects right now.</p>
-        <button class="btn-empty">Post New Project</button>
-      </div>`;
-    return;
+  function renderStats() {
+    const statCards = $$('[data-client-stat]');
+    statCards.forEach(el => {
+      const key = el.dataset.clientStat;
+      const value = stats[key];
+      if (value !== undefined) {
+        if (key === 'totalSpent') {
+          el.textContent = money(value);
+        } else {
+          el.textContent = value;
+        }
+      }
+    });
   }
 
-  grid.innerHTML = projects.map(p => `
-    <div class="project-card">
-      <span class="badge ${BADGE_MAP[p.status] ?? 'badge-pending'}">${p.status}</span>
-      <h3 class="card-title-text">${p.title}</h3>
-      <div class="card-footer-item">
-        <span class="client-name">${p.client}</span>
-        <span class="project-amount">${p.amount}</span>
-      </div>
-    </div>`
-  ).join('');
-}
+  function renderProjects() {
+    const grid = $('project-grid');
+    if (!grid) return;
 
-// ─── INIT ───
-function initDashboard() {
-  initNotification();
-  renderProjects();
-}
+    if (!projects.length) {
+      grid.innerHTML = `
+        <div class="col-span-full py-10 px-5 text-center bg-white border-2 border-dashed border-slate-200 rounded-[18px]">
+          <div class="text-slate-300 text-[42px] mb-2"><i class="ri-inbox-2-line"></i></div>
+          <p class="text-slate-900 font-extrabold text-[1.05rem]">No projects found</p>
+          <p class="text-slate-500 mt-1.5 text-[13px]">It seems you don't have any active projects right now.</p>
+        </div>`;
+      return;
+    }
 
-document.addEventListener('DOMContentLoaded', initDashboard);
+    grid.innerHTML = projects.slice(0, 6).map(p => {
+      const badgeCls = STATUS_BADGE[p.status] || 'bg-slate-50 text-slate-600 border border-slate-100';
+      const deadline = formatDeadline(p.deadline);
+      const amount = p.agreed_price ? money(p.agreed_price) : '—';
+      const href = p.href || `/client/orders/${p.id}`;
+      const serviceTitle = p.service?.title || p.service_title || 'Service';
+
+      return `
+        <div class="bg-white border border-slate-200 rounded-[18px] p-5 flex flex-col sm:flex-row sm:items-center gap-4 hover:shadow-lg transition-all">
+          <div class="flex-1 min-w-0">
+            <p class="text-slate-900 font-extrabold text-[14.5px] truncate">${safeText(serviceTitle)}</p>
+            <p class="text-slate-500 text-[13px] mt-1 line-clamp-1">${safeText(p.brief || '')}</p>
+            <div class="flex flex-wrap items-center gap-2 mt-3">
+              <span class="px-3 py-1 rounded-full text-[12px] font-bold ${badgeCls}">${safeText(p.status)}</span>
+              <span class="px-3 py-1 rounded-full text-[12px] font-bold bg-white text-slate-600 border border-slate-200">Deadline: ${deadline}</span>
+              <span class="px-3 py-1 rounded-full text-[12px] font-bold bg-white text-slate-600 border border-slate-200">${amount}</span>
+            </div>
+          </div>
+          <div class="flex gap-2 sm:flex-col sm:items-end">
+            <a href="${href}" class="px-4 py-2.5 rounded-[12px] bg-slate-900 text-white font-bold text-[12.5px] hover:bg-black transition-all">Detail</a>
+            ${p.service_id ? `<a href="/client/services/${p.service_id}" class="px-4 py-2.5 rounded-[12px] bg-white border-[1.5px] border-slate-200 text-slate-700 font-bold text-[12.5px] hover:border-[#0f766e] hover:text-[#0f766e] transition-all">Lihat Jasa</a>` : ''}
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  function refresh() {
+    renderStats();
+    renderProjects();
+  }
+
+  function init() {
+    refresh();
+
+    const notifBtn = $('notif-btn');
+    if (notifBtn) {
+      const hasUnread = page.hasUnread || page.unread || false;
+      notifBtn.classList.toggle('has-unread', hasUnread);
+      notifBtn.addEventListener('click', () => notifBtn.classList.remove('has-unread'));
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();

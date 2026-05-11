@@ -79,15 +79,30 @@ class ServiceController extends Controller
     /**
      * Get All Services (ADMIN ONLY)
      */
-    public function index()
+    public function index(Request $request)
     {
-        $services = Service::with([
+        $status = $request->query('status');
+        $search = $request->query('q');
+
+        $query = Service::with([
             'service_category:id,name',
-            'freelancer' => function ($query) {
-                $query->select('id', 'student_id')
-                    ->with('skomda_student:id,name');
-            }
-        ])->latest()->get();
+            'freelancer.skomda_student:id,name'
+        ]);
+
+        if ($status && $status !== 'all') {
+            $query->where('status', $status);
+        }
+
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhereHas('freelancer.skomda_student', function($fq) use ($search) {
+                      $fq->where('name', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        $services = $query->latest()->paginate(12)->withQueryString();
 
         return view('dashboard.admin.services', compact('services'));
     }
@@ -110,11 +125,11 @@ class ServiceController extends Controller
     public function clientShow(Service $service)
     {
         $service->load([
-            'category:id,name',
+            'service_category:id,name',
             'freelancer.skomda_student:id,name,email'
         ]);
 
-        $otherServices = Service::with('category:id,name')
+        $otherServices = Service::with('service_category:id,name')
             ->where('freelancer_id', $service->freelancer_id)
             ->where('id', '!=', $service->id)
             ->latest()

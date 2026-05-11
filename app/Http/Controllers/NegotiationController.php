@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Events\NegotiationSent;
 use App\Http\Requests\SendMessageRequest;
 use App\Models\Negotiation;
+use App\Models\Offer;
 use App\Models\Order;
 use Illuminate\Http\Request;
 
@@ -40,10 +41,22 @@ class NegotiationController extends Controller
         $order = Order::with('service')->find($request->order_id);
 
         if (!$order) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Order tidak ditemukan.',
+                ], 404);
+            }
             return redirect()->back()->with('error', 'Order tidak ditemukan.');
         }
 
         if ($freelancer->id !== $order->service->freelancer_id) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Anda tidak memiliki izin untuk mengirim pesan di negosiasi ini.',
+                ], 403);
+            }
             return redirect()->back()->with('error', 'Anda tidak memiliki izin untuk mengirim pesan di negosiasi ini.');
         }
 
@@ -57,6 +70,20 @@ class NegotiationController extends Controller
 
         broadcast(new NegotiationSent($negotiation))->toOthers();
 
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Pesan berhasil dikirim',
+                'data' => [
+                    'id' => $negotiation->id,
+                    'order_id' => $negotiation->order_id,
+                    'sender' => $negotiation->sender,
+                    'message' => $negotiation->message,
+                    'created_at' => optional($negotiation->created_at)->toISOString(),
+                ],
+            ]);
+        }
+
         return redirect()->back()->with('success', 'Pesan berhasil dikirim');
     }
 
@@ -69,41 +96,142 @@ class NegotiationController extends Controller
      * Menampilkan list negotiation berdasarkan order milik client
      */
     public function clientInbox()
-{
-    $client = auth('client')->user();
+    {
+        $client = auth('client')->user();
 
-    $threads = Negotiation::with('order.service.freelancer.skomda_student')
-        ->whereHas('order', fn($q) => $q->where('client_id', $client->id))
-        ->latest()
-        ->get();
+        $negotiations = Negotiation::with('order.service.freelancer.skomda_student')
+            ->whereHas('order', fn($q) => $q->where('client_id', $client->id))
+            ->get();
 
-    return view('dashboard.client.messages', compact('threads'));
-}
-
-public function clientSendMessage(Request $request)
-{
-    $client = auth('client')->user();
-
-    $validated = $request->validate([
-        'order_id' => 'required|integer|exists:orders,id',
-        'message' => 'required|string|max:2000',
-    ]);
-
-    $order = Order::where('client_id', $client->id)->findOrFail($validated['order_id']);
-
-    $negotiation = Negotiation::create([
-        'order_id' => $order->id,
-        'sender' => 'client',
-        'message' => $validated['message'],
-    ]);
-
-    broadcast(new NegotiationSent($negotiation))->toOthers();
-
-    if ($order->status === 'pending') {
-        $order->status = 'negotiated';
-        $order->save();
+        return view('dashboard.client.messages', compact('negotiations'));
     }
 
-    return back()->with('success', 'Pesan terkirim');
-}
+    public function clientSendMessage(Request $request)
+    {
+        $client = auth('client')->user();
+
+        $validated = $request->validate([
+            'order_id' => 'required|integer|exists:orders,id',
+            'message' => 'required|string|max:2000',
+        ]);
+
+        $order = Order::where('client_id', $client->id)->findOrFail($validated['order_id']);
+
+        $negotiation = Negotiation::create([
+            'order_id' => $order->id,
+            'sender' => 'client',
+            'message' => $validated['message'],
+        ]);
+
+        broadcast(new NegotiationSent($negotiation))->toOthers();
+
+        if ($order->status === 'Pending') {
+            $order->status = 'Negotiated';
+            $order->save();
+        }
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Pesan terkirim',
+                'data' => [
+                    'id' => $negotiation->id,
+                    'order_id' => $negotiation->order_id,
+                    'sender' => $negotiation->sender,
+                    'message' => $negotiation->message,
+                    'created_at' => optional($negotiation->created_at)->toISOString(),
+                ],
+            ]);
+        }
+
+        return back()->with('success', 'Pesan terkirim');
+    }
+
+    // =========================
+    // CLIENT: Store Negotiation (New Price Proposal)
+    // =========================
+    public function clientStoreNegotiation(Request $request, Offer $offer)
+    {
+        $client = auth('client')->user();
+
+        if ($offer->order->client_id !== $client->id) {
+            abort(403, 'Akses ditolak.');
+        }
+
+        if ($offer->status !== 'Sent') {
+            return redirect()->back()->with('error', 'Penawaran yang sudah diproses tidak bisa dinegosiasikan.');
+        }
+
+        $validated = $request->validate([
+            'reason' => 'required|string|max:1000',
+            'new_price' => 'required|integer|min:1000',
+            'description' => 'nullable|string|max:2000',
+        ]);
+
+        $message = "Negosiasi harga: " . $validated['reason'] . 
+                   "\nHarga tawaran: Rp " . number_format($validated['new_price'], 0, ',', '.') . 
+                   "\nDeskripsi: " . ($validated['description'] ?? '-');
+
+        $negotiation = Negotiation::create([
+            'order_id' => $offer->order_id,
+            'sender' => 'client',
+            'message' => $message,
+        ]);
+
+        $offer->order->update(['status' => 'Negotiated']);
+
+        return redirect()->route('client.offers.show', $offer->id)->with('success', 'Negosiasi berhasil dikirim');
+    }
+
+    // =========================
+    // FREELANCER: Accept Negotiation
+    // =========================
+    public function freelancerAcceptNegotiation(Negotiation $negotiation)
+    {
+        $freelancer = auth('freelancer')->user();
+
+        if ($negotiation->order->service->freelancer_id !== $freelancer->id) {
+            abort(403, 'Akses ditolak.');
+        }
+
+        $negotiation->update([
+            'message' => $negotiation->message . "\n\n[SISTEM: Negosiasi harga diterima oleh Freelancer]",
+        ]);
+
+        return redirect()->back()->with('success', 'Negosiasi diterima.');
+    }
+
+    // =========================
+    // FREELANCER: Reject Negotiation
+    // =========================
+    public function freelancerRejectNegotiation(Negotiation $negotiation)
+    {
+        $freelancer = auth('freelancer')->user();
+
+        if ($negotiation->order->service->freelancer_id !== $freelancer->id) {
+            abort(403, 'Akses ditolak.');
+        }
+
+        $negotiation->update([
+            'message' => $negotiation->message . "\n\n[SISTEM: Negosiasi harga ditolak oleh Freelancer]",
+        ]);
+
+        return redirect()->back()->with('success', 'Negosiasi ditolak.');
+    }
+
+    // =========================
+    // FREELANCER: Show Negotiation Detail
+    // =========================
+    public function freelancerShowNegotiation(Negotiation $negotiation)
+    {
+        $freelancer = auth('freelancer')->user();
+
+        if ($negotiation->order->service->freelancer_id !== $freelancer->id) {
+            abort(403, 'Akses ditolak.');
+        }
+
+        $negotiation->load(['order.service', 'order.client', 'order.offers']);
+
+        return view('dashboard.freelancer.negotiation-view', compact('negotiation'));
+    }
 }

@@ -7,6 +7,7 @@
 // use App\Http\Controllers\ServiceCategoryController;
 // use App\Http\Controllers\ServiceController;
 // use App\Http\Controllers\SkomdaStudentController;
+use App\Http\Controllers\Api\ClientControllerApi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -20,6 +21,12 @@ Route::get('/test', function () {
         'message' => 'OK'
     ]);
 });
+
+Route::get('/clients', [ClientControllerApi::class, 'index']);
+Route::post('/clients', [ClientControllerApi::class, 'store']);
+Route::get('/clients/{id}', [ClientControllerApi::class, 'show']);
+Route::put('/clients/{id}', [ClientControllerApi::class, 'update']);
+Route::delete('/clients/{id}', [ClientControllerApi::class, 'destroy']);
 
 // Route::prefix('auth')->group(function () {
 //     Route::post('/register-client', [AuthController::class, 'register_client']);

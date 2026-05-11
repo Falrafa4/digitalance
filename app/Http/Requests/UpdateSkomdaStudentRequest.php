@@ -21,10 +21,16 @@ class UpdateSkomdaStudentRequest extends FormRequest
      */
     public function rules(): array
     {
+        $id = $this->route('skomda_student');
+        if (is_object($id)) $id = $id->id;
+
         return [
-            'name' => 'required|string',
-            'email' => 'required|email|unique:skomda_students,email,' . $this->route('skomda_student')->id,
-            'phone' => 'required|string',
+            'name'  => 'required|string|max:255',
+            'email' => 'required|email|unique:skomda_students,email,' . $id,
+            'nis'   => 'required|string|max:9|unique:skomda_students,nis,' . $id,
+            'class' => 'required|string|max:255',
+            'major' => 'required|in:SIJA,TJAT',
+            'phone' => 'nullable|string|max:20',
         ];
     }
 }
