@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Events\NegotiationSent;
 use App\Http\Requests\SendMessageRequest;
 use App\Models\Negotiation;
+use App\Models\Offer;
 use App\Models\Order;
 use Illuminate\Http\Request;
 
@@ -40,10 +41,22 @@ class NegotiationController extends Controller
         $order = Order::with('service')->find($request->order_id);
 
         if (!$order) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Order tidak ditemukan.',
+                ], 404);
+            }
             return redirect()->back()->with('error', 'Order tidak ditemukan.');
         }
 
         if ($freelancer->id !== $order->service->freelancer_id) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Anda tidak memiliki izin untuk mengirim pesan di negosiasi ini.',
+                ], 403);
+            }
             return redirect()->back()->with('error', 'Anda tidak memiliki izin untuk mengirim pesan di negosiasi ini.');
         }
 
@@ -56,6 +69,20 @@ class NegotiationController extends Controller
         ]);
 
         broadcast(new NegotiationSent($negotiation))->toOthers();
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Pesan berhasil dikirim',
+                'data' => [
+                    'id' => $negotiation->id,
+                    'order_id' => $negotiation->order_id,
+                    'sender' => $negotiation->sender,
+                    'message' => $negotiation->message,
+                    'created_at' => optional($negotiation->created_at)->toISOString(),
+                ],
+            ]);
+        }
 
         return redirect()->back()->with('success', 'Pesan berhasil dikirim');
     }
@@ -74,11 +101,7 @@ class NegotiationController extends Controller
 
         $threads = Negotiation::with('order.service.freelancer.skomda_student')
             ->whereHas('order', fn($q) => $q->where('client_id', $client->id))
-            ->latest()
-            ->get()
-            ->groupBy('order_id')
-            ->map(fn($messages) => $messages->first())
-            ->values();
+            ->get();
 
         return view('dashboard.client.messages', compact('threads'));
     }
@@ -105,6 +128,20 @@ class NegotiationController extends Controller
         if ($order->status === 'Pending') {
             $order->status = 'Negotiated';
             $order->save();
+        }
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Pesan terkirim',
+                'data' => [
+                    'id' => $negotiation->id,
+                    'order_id' => $negotiation->order_id,
+                    'sender' => $negotiation->sender,
+                    'message' => $negotiation->message,
+                    'created_at' => optional($negotiation->created_at)->toISOString(),
+                ],
+            ]);
         }
 
         return back()->with('success', 'Pesan terkirim');

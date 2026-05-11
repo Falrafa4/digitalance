@@ -13,9 +13,9 @@ Broadcast::channel('negotiation.{orderId}', function ($user, $orderId) {
     }
 
     // freelancer boleh
-    if (auth('freelancer')->check() && $order->service->freelancer_id === auth('freelancer')->id()) {
+    if (auth('freelancer')->check() && optional($order->service)->freelancer_id === auth('freelancer')->id()) {
         return true;
     }
 
     return false;
-});
+}, ['guards' => ['client', 'freelancer']]);
