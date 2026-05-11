@@ -277,7 +277,6 @@
                 throw new Error(payload.message || 'Gagal mengirim pesan.');
             }
 
-            appendMessage(Number(payload.data.order_id), payload.data);
             textarea.value = '';
         } catch (error) {
             if (window.showToast) {

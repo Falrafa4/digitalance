@@ -24,7 +24,7 @@
         </button>
     </div>
 
-    @if(empty($threads) || count($threads) === 0)
+    @if(empty($negotiations) || $negotiations->isEmpty())
         <div class="text-center py-16 px-5 bg-white border-2 border-dashed border-slate-200 rounded-[20px]">
             <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center text-slate-300 text-3xl mx-auto mb-4">
                 <i class="ri-message-3-line"></i>
@@ -34,47 +34,73 @@
         </div>
     @else
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 pb-6">
-            @foreach($threads as $t)
+            @foreach($negotiations->groupBy('order_id') as $orderId => $thread)
                 @php
-                    $order = $t->order;
-                    $freelancerName = optional(optional($order->service)->freelancer)->name ?? 'Freelancer';
-                    $isLog = str_contains(strtolower($t->message ?? ''), 'status') || str_contains(strtolower($t->message ?? ''), 'payment') || str_contains(strtolower($t->message ?? ''), 'ditolak') || str_contains(strtolower($t->message ?? ''), 'diterima');
+                    $latestMsg = $thread->sortByDesc('created_at')->first();
+                    $order = $latestMsg->order;
+                    $freelancerName = $order->service->freelancer->skomda_student->name ?? 'Freelancer';
+                    $isLog = str_contains(strtolower($latestMsg->message), 'status changed') || str_contains(strtolower($latestMsg->message), 'payment');
+                    $latestFromFreelancer = $thread->where('sender', 'freelancer')->sortByDesc('created_at')->first();
+                    $hasClientResponse = $latestFromFreelancer
+                        ? $thread->where('sender', 'client')->where('created_at', '>', $latestFromFreelancer->created_at)->count() > 0
+                        : false;
+                    $needsResponse = $latestFromFreelancer && !$hasClientResponse && !$isLog;
                 @endphp
-                <div class="msg-card bg-white border border-slate-200 rounded-[20px] p-5 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer" 
-                     data-order-id="{{ $t->order_id }}"
+                <div class="msg-card bg-white border {{ $needsResponse ? 'border-amber-300 bg-amber-50/30' : 'border-slate-200' }} rounded-[20px] p-5 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer"
+                     data-order-id="{{ $orderId }}"
                      data-type="{{ $isLog ? 'log' : 'chat' }}"
-                     onclick="openChatModal({{ $t->order_id }}, '{{ addslashes($freelancerName) }}')">
+                     onclick="openChatModal({{ $orderId }}, '{{ addslashes($freelancerName) }}')">
                     <div class="flex items-center gap-4 mb-4 pb-4 border-b border-slate-100">
                         <div class="relative">
                             <div class="w-[50px] h-[50px] rounded-2xl bg-gradient-to-br from-[#0f766e] to-teal-500 text-white flex items-center justify-center text-xl shadow-md">
                                 <i class="ri-user-smile-line"></i>
                             </div>
-                            <div class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-emerald-500 border-2 border-white"></div>
+                            @if($needsResponse)
+                                <div class="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-amber-500 border-2 border-white flex items-center justify-center">
+                                    <i class="ri-error-warning-fill text-[8px] text-white"></i>
+                                </div>
+                            @else
+                                <div class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-emerald-500 border-2 border-white"></div>
+                            @endif
                         </div>
                         <div class="min-w-0 flex-1">
                             <div class="flex items-center justify-between gap-2">
                                 <h3 class="font-bold text-slate-900 truncate">{{ $freelancerName }}</h3>
-                                <span class="px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase {{ $isLog ? 'bg-blue-50 text-blue-600' : 'bg-teal-50 text-teal-700' }}">
-                                    {{ $isLog ? 'Log' : 'Chat' }}
-                                </span>
+                                <div class="flex items-center gap-1.5 flex-shrink-0">
+                                    @if($needsResponse)
+                                        <span class="px-2 py-0.5 rounded-md text-[9px] font-extrabold uppercase bg-amber-100 text-amber-700 animate-pulse">
+                                            Perlu Respons
+                                        </span>
+                                    @endif
+                                    <span class="px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase {{ $isLog ? 'bg-blue-50 text-blue-600' : 'bg-teal-50 text-teal-700' }}">
+                                        {{ $isLog ? 'Log' : 'Chat' }}
+                                    </span>
+                                </div>
                             </div>
-                            <p class="text-[12px] font-bold text-slate-400 uppercase tracking-wider truncate">Order #{{ $t->order_id }}</p>
+                            <p class="text-[12px] font-bold text-slate-400 uppercase tracking-wider truncate">Order #{{ $orderId }}</p>
                         </div>
                     </div>
 
                     <div>
                         <div class="flex items-center justify-between mb-1.5">
-                            <p data-role="preview-time" class="text-[11px] font-bold text-slate-400">{{ $t->created_at->diffForHumans() }}</p>
-                            @if(!$isLog && $t->sender === 'freelancer')
-                                <span class="w-2 h-2 rounded-full bg-[#0f766e] animate-pulse"></span>
+                            <p data-role="preview-time" class="text-[11px] font-bold text-slate-400">{{ $latestMsg->created_at->diffForHumans() }}</p>
+                            @if(!$isLog && $needsResponse)
+                                <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
                             @endif
                         </div>
                         <p data-role="preview-message" class="text-[13px] text-slate-600 line-clamp-2">
-                            @if($t->sender === 'client')
+                            @if($latestMsg->sender === 'client')
                                 <span class="font-bold text-[#0f766e]">Kamu:</span> 
                             @endif
-                            {{ $t->message }}
+                            {{ $latestMsg->message }}
                         </p>
+                    </div>
+
+                    <div class="mt-3 pt-3 border-t border-slate-100 flex justify-end">
+                        <a href="{{ route('client.orders.show', $orderId) }}#riwayat-nego"
+                           class="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-600 text-[10px] font-bold hover:bg-[#0f766e] hover:text-white transition-all flex items-center gap-1">
+                            <i class="ri-external-link-line"></i> Buka Nego
+                        </a>
                     </div>
                 </div>
             @endforeach
@@ -131,8 +157,8 @@
 
 <script>
     const threadData = {};
-    @if(!empty($threads))
-        @foreach($threads->groupBy('order_id') as $orderId => $msgs)
+    @if(!empty($negotiations) && $negotiations->isNotEmpty())
+        @foreach($negotiations->groupBy('order_id') as $orderId => $msgs)
             threadData[{{ $orderId }}] = @json($msgs->sortBy('created_at')->values());
         @endforeach
     @endif
@@ -252,7 +278,6 @@
                 throw new Error(payload.message || 'Gagal mengirim pesan.');
             }
 
-            appendMessage(Number(payload.data.order_id), payload.data);
             textarea.value = '';
         } catch (error) {
             if (window.showToast) {

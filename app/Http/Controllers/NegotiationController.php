@@ -99,11 +99,11 @@ class NegotiationController extends Controller
     {
         $client = auth('client')->user();
 
-        $threads = Negotiation::with('order.service.freelancer.skomda_student')
+        $negotiations = Negotiation::with('order.service.freelancer.skomda_student')
             ->whereHas('order', fn($q) => $q->where('client_id', $client->id))
             ->get();
 
-        return view('dashboard.client.messages', compact('threads'));
+        return view('dashboard.client.messages', compact('negotiations'));
     }
 
     public function clientSendMessage(Request $request)
