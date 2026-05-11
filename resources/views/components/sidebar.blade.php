@@ -56,9 +56,9 @@
 
             <a href="{{ route('admin.clients.index') }}"
                 class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
-                            {{ request()->routeIs('admin.clients.*', 'admin.freelancers.*', 'admin.skomda-students.*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}"
-                aria-current="{{ request()->routeIs('admin.clients.*', 'admin.freelancers.*', 'admin.skomda-students.*') ? 'page' : '' }}">
-                <i class="ri-user-line text-[17px]" aria-hidden="true"></i> Client
+                            {{ request()->routeIs('admin.clients.*', 'admin.freelancers.*', 'admin.skomda-students.*', 'admin.user') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}"
+                aria-current="{{ request()->routeIs('admin.clients.*', 'admin.freelancers.*', 'admin.skomda-students.*', 'admin.user') ? 'page' : '' }}">
+                <i class="ri-user-line text-[17px]" aria-hidden="true"></i> Users
             </a>
 
             <a href="{{ route('admin.admins.index') }}"
@@ -116,10 +116,9 @@
                 aria-current="{{ request()->routeIs('admin.results.*') ? 'page' : '' }}">
                 <i class="ri-task-line text-[17px]" aria-hidden="true"></i> Results
             </a>
-        @endif
 
         {{-- CLIENT --}}
-        @if($isClient)
+        @elseif($isClient)
             <a href="{{ route('client.dashboard') }}" class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
                  {{ request()->routeIs('client.dashboard') ? $active : $inactive }}"
                 aria-current="{{ request()->routeIs('client.dashboard') ? 'page' : '' }}">
@@ -157,7 +156,7 @@
             </a>
 
             <a href="{{ route('client.offers.index') }}" class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
-                      {{ request()->routeIs('client.offers.*') ? $active : $inactive }}"
+                       {{ request()->routeIs('client.offers.*') ? $active : $inactive }}"
                 aria-current="{{ request()->routeIs('client.offers.*') ? 'page' : '' }}">
                 <i class="ri-price-tag-3-line text-[17px]" aria-hidden="true"></i> Offers
             </a>
@@ -173,10 +172,9 @@
                 aria-current="{{ request()->routeIs('client.history.*') ? 'page' : '' }}">
                 <i class="ri-history-line text-[17px]" aria-hidden="true"></i> History
             </a>
-        @endif
 
         {{-- FREELANCER --}}
-        @if($isFreelancer)
+        @elseif($isFreelancer)
             <a href="{{ route('freelancer.dashboard') }}"
                 class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
                             {{ request()->routeIs('freelancer.dashboard') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}"

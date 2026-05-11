@@ -26,9 +26,6 @@ class UpdateSkomdaStudentRequest extends FormRequest
 
         return [
             'name'  => 'required|string|max:255',
-            'email' => 'required|email|unique:skomda_students,email,' . $id,
-            'nis'   => 'required|string|max:9|unique:skomda_students,nis,' . $id,
-            'class' => 'required|string|max:255',
             'major' => 'required|in:SIJA,TJAT',
             'phone' => 'nullable|string|max:20',
         ];

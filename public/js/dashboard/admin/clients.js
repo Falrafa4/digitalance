@@ -113,7 +113,7 @@
     const u = usersData.find(x => x._uid === uid);
     if (!u) return;
     deleteTargetUid = uid;
-    $('delete-text').innerHTML = `Are you sure you want to delete <strong>${u.name}</strong>?`;
+    $('delete-text').innerHTML = `Are you sure you want to delete <strong>${window.DigitalanceUtils?.escapeHtml(u.name) || u.name}</strong>?`;
     openModal('modal-delete');
   };
 

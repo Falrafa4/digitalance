@@ -6,6 +6,37 @@
   const $ = (id) => document.getElementById(id);
   const $$ = (sel) => Array.from(document.querySelectorAll(sel));
 
+  let isLoading = false;
+
+  const showLoading = () => {
+    isLoading = true;
+    const grid = $('project-grid');
+    if (!grid) return;
+
+    grid.innerHTML = Array(3).fill(`
+      <div class="p-5 flex flex-col sm:flex-row sm:items-center gap-4">
+        <div class="flex-1 min-w-0 space-y-2">
+          <div class="skeleton h-5 w-3/4"></div>
+          <div class="skeleton h-4 w-1/2"></div>
+          <div class="flex gap-2 mt-3">
+            <div class="skeleton h-6 w-20 rounded-full"></div>
+            <div class="skeleton h-6 w-28 rounded-full"></div>
+            <div class="skeleton h-6 w-24 rounded-full"></div>
+          </div>
+        </div>
+        <div class="flex gap-2 sm:flex-col sm:items-end">
+          <div class="skeleton h-10 w-16 rounded-xl"></div>
+          <div class="skeleton h-10 w-24 rounded-xl"></div>
+        </div>
+      </div>
+    `).join('');
+  };
+
+  const hideLoading = () => {
+    isLoading = false;
+    renderProjects();
+  };
+
   const money = (v) => {
     if (!v && v !== 0) return '—';
     try {

@@ -14,50 +14,32 @@
         rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet" />
     <link rel="stylesheet" href="{{ asset('css/dashboard/dashboard.css') }}">
-    @vite(['resources/js/app.js'])
-
-    @yield('styles')
-    @stack('styles')
-
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
+                    colors: {
+                        primary: '#0f766e',
+                        secondary: '#10b981',
+                        accent: '#f97316',
+                    },
                     fontFamily: {
-                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        sans: ['Plus Jakarta Sans', 'Sora', 'sans-serif'],
                         display: ['Sora', 'sans-serif'],
                     },
-                    colors: {
-                        primary: '#0F766E',
-                        'primary-light': '#10B981',
-                        teal: { deep: '#0f766e' },
-                        orange: '#f97316',
-                    },
-                    borderRadius: { '2xl': '16px', '3xl': '24px' },
-                    keyframes: {
-                        fadeUp: {
-                            from: { opacity: '0', transform: 'translateY(16px)' },
-                            to: { opacity: '1', transform: 'translateY(0)' },
-                        },
-                    },
-                    animation: {
-                        fadeUp: 'fadeUp 0.6s ease both',
-                        'fadeUp-delay-1': 'fadeUp 0.6s 0.1s ease both',
-                        'fadeUp-delay-2': 'fadeUp 0.6s 0.2s ease both',
-                        'fadeUp-delay-3': 'fadeUp 0.6s 0.3s ease both',
-                    },
                     boxShadow: {
-                        'teal-md': '0 6px 18px rgba(15,118,110,0.22)',
-                        'teal-lg': '0 10px 25px rgba(15,118,110,0.25)',
-                        'teal-xl': '0 15px 30px rgba(15,118,110,0.35)',
-                        'green-sm': '0 4px 12px rgba(16,185,129,0.3)',
-                        'red-sm': '0 4px 12px rgba(239,68,68,0.3)',
-                    },
-                },
-            },
-        };
+                        'teal-sm': '0 4px 14px 0 rgba(15, 118, 110, 0.15)',
+                        'teal-md': '0 6px 20px rgba(15, 118, 110, 0.2)',
+                    }
+                }
+            }
+        }
     </script>
+    <script src="{{ asset('js/utils.js') }}"></script>
+
+    @yield('styles')
+    @stack('styles')
 </head>
 
 <body class="bg-slate-50 text-slate-900 font-sans h-screen overflow-hidden">
@@ -211,9 +193,11 @@
             const form = e.target;
             const btn = form.querySelector('button[type="submit"]');
             if (btn && !btn.classList.contains('no-loader')) {
+                const originalContent = btn.innerHTML;
                 btn.classList.add('btn-loading');
                 btn.disabled = true;
-                
+                btn.dataset.originalContent = originalContent;
+
                 // Safety timeout in case of failed AJAX or something
                 setTimeout(() => {
                     if (btn.disabled) {
@@ -223,6 +207,24 @@
                 }, 10000);
             }
         });
+
+        // AJAX form loading state
+        window.showAjaxLoading = function(btn) {
+            if (!btn) return;
+            const original = btn.innerHTML;
+            btn.dataset.ajaxOriginal = original;
+            btn.disabled = true;
+            btn.classList.add('btn-loading');
+        };
+
+        window.hideAjaxLoading = function(btn) {
+            if (!btn) return;
+            btn.disabled = false;
+            btn.classList.remove('btn-loading');
+            if (btn.dataset.ajaxOriginal) {
+                btn.innerHTML = btn.dataset.ajaxOriginal;
+            }
+        };
 
         document.addEventListener('DOMContentLoaded', () => {
             const WELCOME_KEY = 'digitalance_welcome_shown';
@@ -236,10 +238,19 @@
 
             // Laravel Flash Messages
             @if(session('success'))
-                window.showToast('{!! session('success') !!}', 'success');
+                window.showToast(@json(session('success')), 'success');
             @endif
             @if(session('error'))
-                window.showToast('{!! session('error') !!}', 'danger');
+                window.showToast(@json(session('error')), 'danger');
+            @endif
+            @if(session('warning'))
+                window.showToast(@json(session('warning')), 'warning');
+            @endif
+            @if(session('info'))
+                window.showToast(@json(session('info')), 'info');
+            @endif
+            @if($errors->any())
+                window.showToast('Validation Error', @json($errors->first()), 'danger');
             @endif
         });
     </script>

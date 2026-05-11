@@ -35,12 +35,9 @@
                             <button onclick="openEditModal({{ $port->id }}, '{{ addslashes($port->title) }}', '{{ addslashes($port->description) }}', {{ $port->service_id }})" class="w-10 h-10 rounded-full bg-white text-slate-700 flex items-center justify-center hover:bg-emerald-50 hover:text-emerald-600 transition-colors">
                                 <i class="ri-pencil-line"></i>
                             </button>
-                            <form action="{{ route('freelancer.portofolios.destroy', $port->id) }}" method="POST" onsubmit="return confirm('Hapus portofolio ini?')">
-                                @csrf @method('DELETE')
-                                <button class="w-10 h-10 rounded-full bg-white text-slate-700 flex items-center justify-center hover:bg-red-50 hover:text-red-600 transition-colors">
-                                    <i class="ri-delete-bin-line"></i>
-                                </button>
-                            </form>
+                            <button onclick="window.openPortDeleteModal({{ $port->id }})" class="w-10 h-10 rounded-full bg-white text-slate-700 flex items-center justify-center hover:bg-red-50 hover:text-red-600 transition-colors">
+                                <i class="ri-delete-bin-line"></i>
+                            </button>
                         </div>
                     </div>
                     <div class="p-5">
@@ -92,6 +89,23 @@
     </div>
 </div>
 
+<!-- Delete Confirmation Modal -->
+<div class="fixed inset-0 z-[200] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300" id="modal-delete-port-overlay">
+    <div class="bg-white rounded-[24px] w-full max-w-[400px] shadow-2xl overflow-hidden transform scale-95 transition-all duration-300">
+        <div class="px-8 pt-8 pb-6 text-center">
+            <div class="w-[72px] h-[72px] mx-auto mb-5 bg-red-50 rounded-full flex items-center justify-center text-[2rem] text-red-500">
+                <i class="ri-error-warning-fill"></i>
+            </div>
+            <h3 class="text-[1.3rem] font-black text-slate-900 mb-2">Hapus Portofolio?</h3>
+            <p class="text-[13.5px] text-slate-500 leading-relaxed">Portofolio ini akan dihapus permanen dan tidak dapat dikembalikan.</p>
+        </div>
+        <div class="flex gap-3 px-8 pb-8">
+            <button onclick="window.closePortDeleteModal()" class="flex-1 py-3.5 rounded-xl bg-slate-100 text-slate-600 font-bold text-[13px] hover:bg-slate-200 transition-all">Batal</button>
+            <button id="btn-confirm-delete-port" class="flex-1 py-3.5 rounded-xl bg-red-500 text-white font-bold text-[13px] hover:bg-red-600 transition-all shadow-lg shadow-red-200">Ya, Hapus</button>
+        </div>
+    </div>
+</div>
+
 <!-- Add simple script to handle modal visibility -->
 <style>
     #modal-add.open { display: flex; opacity: 1; }
@@ -101,5 +115,28 @@
     function openEditModal(id, title, desc, service_id) {
         alert('Fitur edit portofolio (ID: ' + id + ') belum sepenuhnya dibuatkan modal di Phase 3 ini. Silakan arahkan ke halaman edit atau buat modal edit serupa modal Add.');
     }
+
+    window.openPortDeleteModal = function(id) {
+        const overlay = document.getElementById('modal-delete-port-overlay');
+        overlay.classList.remove('opacity-0', 'pointer-events-none');
+
+        const btn = document.getElementById('btn-confirm-delete-port');
+        btn.onclick = function() {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/freelancer/portofolios/' + id;
+            form.innerHTML = `
+                <input type="hidden" name="_token" value="${document.querySelector('meta[name="csrf-token"]').content}">
+                <input type="hidden" name="_method" value="DELETE">
+            `;
+            document.body.appendChild(form);
+            form.submit();
+        };
+    };
+
+    window.closePortDeleteModal = function() {
+        const overlay = document.getElementById('modal-delete-port-overlay');
+        overlay.classList.add('opacity-0', 'pointer-events-none');
+    };
 </script>
 @endsection

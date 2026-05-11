@@ -51,7 +51,7 @@
 }
 .grain {
     position: fixed; inset: 0; pointer-events: none; z-index: 999; opacity: .03;
-    background-image: url("data:image/svg+xml,%3Csvg...");
+    background-image: url("data:image/svg+xml,%3Csvg width='64' height='64' viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise' x='0' y='0'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='64' height='64' filter='url(%23noise)'/%3E%3C/svg%3E");
 }
         .notify-error {
             display: flex; gap: .7rem; align-items: flex-start; margin-bottom: 1.1rem;
@@ -61,6 +61,10 @@
         .notify-error svg { min-width: 1.2em; margin-top: 2px;}
         .notify-error .notify-texts { display: flex; flex-direction: column; gap: 1px;}
         .notify-error strong { color: #b91c1c; font-weight: 800; font-size: 1em;}
+        .input-error { border-color: #ef4444 !important; box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1); }
+        .req-item.met { color: #22c55e; }
+        .req-item.met .req-check { color: #22c55e; }
+        .req-check { font-size: 10px; }
     </style>
 @endsection
 
@@ -319,11 +323,33 @@
                                     <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none"
                                         width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                         stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
-                                    <input type="password" name="password" placeholder="Isi dengan password kuat" required
+                                    <input id="registerPasswordField" type="password" name="password" placeholder="Isi dengan password kuat" required
                                         class="inp w-full pl-10 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-[0.86rem] transition-all" />
                                 @error('password')
                                     <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
                                 @enderror
+                                </div>
+                                <div class="mt-2">
+                                    <div class="flex items-center gap-2 mb-1.5">
+                                        <div class="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                                            <div class="password-strength-bar h-full transition-all duration-300" style="width: 0%"></div>
+                                        </div>
+                                        <span class="password-strength-label text-[10px] font-extrabold uppercase tracking-wide w-16 text-right"></span>
+                                    </div>
+                                    <div class="password-requirements grid grid-cols-2 gap-x-4 gap-y-1">
+                                        <div class="req-item flex items-center gap-1.5 text-[10px] text-slate-400" data-req="length">
+                                            <span class="req-check">○</span> Min. 8 karakter
+                                        </div>
+                                        <div class="req-item flex items-center gap-1.5 text-[10px] text-slate-400" data-req="upper">
+                                            <span class="req-check">○</span> Huruf besar (A-Z)
+                                        </div>
+                                        <div class="req-item flex items-center gap-1.5 text-[10px] text-slate-400" data-req="lower">
+                                            <span class="req-check">○</span> Huruf kecil (a-z)
+                                        </div>
+                                        <div class="req-item flex items-center gap-1.5 text-[10px] text-slate-400" data-req="number">
+                                            <span class="req-check">○</span> Angka (0-9)
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <button type="submit"

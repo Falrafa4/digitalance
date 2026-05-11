@@ -5,6 +5,9 @@ document.addEventListener("DOMContentLoaded", () => {
     let skills = [];
     const MAX_SKILLS = 5;
 
+    // VALIDATION STATE
+    const validationErrors = {};
+
     // DATA KATEGORI DIAMBIL DARI BACKEND
     let availableCategories = [];
     if (window.serviceCategories && Array.isArray(window.serviceCategories)) {
@@ -66,6 +69,178 @@ document.addEventListener("DOMContentLoaded", () => {
             btnText: "Kembali ke Akses",
             img: "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&q=80&w=1000",
         },
+    };
+
+    // PASSWORD STRENGTH
+    const calculateStrength = (password) => {
+        let score = 0;
+        if (!password) return 0;
+        if (password.length >= 8) score++;
+        if (password.length >= 12) score++;
+        if (/[A-Z]/.test(password)) score++;
+        if (/[a-z]/.test(password)) score++;
+        if (/[0-9]/.test(password)) score++;
+        if (/[^A-Za-z0-9]/.test(password)) score++;
+        return Math.min(score, 5);
+    };
+
+    const getStrengthLabel = (score) => {
+        if (score <= 1) return { label: 'Lemah', color: '#ef4444' };
+        if (score <= 2) return { label: 'Cukup', color: '#f97316' };
+        if (score <= 3) return { label: 'Sedang', color: '#eab308' };
+        if (score <= 4) return { label: 'Kuat', color: '#22c55e' };
+        return { label: 'Sangat Kuat', color: '#0f766e' };
+    };
+
+    const updatePasswordStrength = (input) => {
+        const wrapper = input.closest('.relative')?.parentElement;
+        const strengthBar = wrapper?.querySelector('.password-strength-bar');
+        const strengthLabel = wrapper?.querySelector('.password-strength-label');
+        const strengthReqs = wrapper?.querySelector('.password-requirements');
+
+        if (!strengthBar || !strengthLabel) return;
+
+        const password = input.value;
+        const score = calculateStrength(password);
+        const { label, color } = getStrengthLabel(score);
+        const percentage = (score / 5) * 100;
+
+        strengthBar.style.width = `${percentage}%`;
+        strengthBar.style.backgroundColor = color;
+        strengthLabel.textContent = password ? label : '';
+        strengthLabel.style.color = color;
+
+        // Update requirements checkmarks
+        if (strengthReqs) {
+            const reqs = strengthReqs.querySelectorAll('.req-item');
+            reqs.forEach(req => {
+                const reqType = req.dataset.req;
+                let met = false;
+                switch(reqType) {
+                    case 'length': met = password.length >= 8; break;
+                    case 'upper': met = /[A-Z]/.test(password); break;
+                    case 'lower': met = /[a-z]/.test(password); break;
+                    case 'number': met = /[0-9]/.test(password); break;
+                    case 'special': met = /[^A-Za-z0-9]/.test(password); break;
+                }
+                req.classList.toggle('met', met);
+            });
+        }
+    };
+
+    // CLIENT-SIDE VALIDATION
+    const validators = {
+        name: (val) => {
+            if (!val?.trim()) return 'Nama wajib diisi';
+            if (val.trim().length < 2) return 'Nama minimal 2 karakter';
+            return null;
+        },
+        email: (val) => {
+            if (!val?.trim()) return 'Email wajib diisi';
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(val)) return 'Format email tidak valid';
+            return null;
+        },
+        phone: (val) => {
+            if (!val?.trim()) return 'Nomor telepon wajib diisi';
+            const phoneRegex = /^[\d\s\-\+]{10,}$/;
+            if (!phoneRegex.test(val.replace(/\s/g, ''))) return 'Nomor telepon tidak valid';
+            return null;
+        },
+        password: (val) => {
+            if (!val) return 'Password wajib diisi';
+            if (val.length < 8) return 'Password minimal 8 karakter';
+            return null;
+        },
+        student_id: (val) => {
+            if (!val?.trim()) return 'Pilih siswa dari daftar';
+            return null;
+        }
+    };
+
+    const showFieldError = (input, message) => {
+        if (!input) return;
+        const wrapper = input.closest('div');
+        let errorEl = wrapper?.querySelector('.field-error');
+
+        if (!errorEl) {
+            errorEl = document.createElement('p');
+            errorEl.className = 'field-error text-xs text-red-600 mt-1.5 font-bold';
+            wrapper?.appendChild(errorEl);
+        }
+
+        errorEl.textContent = message;
+        input.classList.add('input-error');
+        input.classList.remove('border-slate-200');
+        input.classList.add('border-red-300');
+    };
+
+    const clearFieldError = (input) => {
+        if (!input) return;
+        const wrapper = input.closest('div');
+        const errorEl = wrapper?.querySelector('.field-error');
+        if (errorEl) errorEl.remove();
+        input.classList.remove('input-error');
+        input.classList.remove('border-red-300');
+        input.classList.add('border-slate-200');
+    };
+
+    const validateField = (name, value) => {
+        const validator = validators[name];
+        if (!validator) return null;
+        return validator(value);
+    };
+
+    const setupFieldValidation = (input, fieldName) => {
+        if (!input) return;
+
+        input.addEventListener('blur', () => {
+            const error = validateField(fieldName, input.value);
+            if (error) {
+                showFieldError(input, error);
+            } else {
+                clearFieldError(input);
+            }
+        });
+
+        input.addEventListener('input', () => {
+            if (fieldName === 'password') {
+                updatePasswordStrength(input);
+            }
+            const wrapper = input.closest('div');
+            const errorEl = wrapper?.querySelector('.field-error');
+            if (errorEl && input.value) {
+                const error = validateField(fieldName, input.value);
+                if (!error) clearFieldError(input);
+            }
+        });
+    };
+
+    const validateForm = (form) => {
+        let isValid = true;
+        const errors = {};
+
+        const fields = form.querySelectorAll('input:not([type="hidden"]), select, textarea');
+        fields.forEach(field => {
+            const name = field.name;
+            if (!validators[name]) return;
+            if (field.disabled || field.type === 'hidden') return;
+
+            const error = validateField(fieldNameFromInput(field), field.value);
+            if (error) {
+                showFieldError(field, error);
+                errors[name] = error;
+                isValid = false;
+            } else {
+                clearFieldError(field);
+            }
+        });
+
+        return { isValid, errors };
+    };
+
+    const fieldNameFromInput = (input) => {
+        return input.name || input.id;
     };
 
     function showPanel(el) {
@@ -388,7 +563,7 @@ document.addEventListener("DOMContentLoaded", () => {
         initMode = "register";
         if (window.oldRole) initRole = window.oldRole;
     }
-    updateRole(initRole);
+        updateRole(initRole);
 
     if(window.panelShowMode){
         showCorrectPanelFromError();
@@ -410,4 +585,69 @@ document.addEventListener("DOMContentLoaded", () => {
             showPanel(loginPanel);
         }
     }
+
+    // SETUP PASSWORD STRENGTH & VALIDATION
+    const registerPasswordField = document.getElementById('registerPasswordField');
+    if (registerPasswordField) {
+        registerPasswordField.addEventListener('input', () => {
+            updatePasswordStrength(registerPasswordField);
+        });
+        registerPasswordField.addEventListener('blur', () => {
+            const error = validateField('password', registerPasswordField.value);
+            if (error) {
+                showFieldError(registerPasswordField, error);
+            }
+        });
+    }
+
+    // Setup field validations
+    const setupValidations = () => {
+        const nameInput = document.querySelector('#clientFields input[name="name"]');
+        const emailInput = document.querySelector('#clientFields input[name="email"]');
+        const phoneInput = document.querySelector('#clientFields input[name="phone"]');
+        const studentSelect = document.getElementById('studentSelect');
+
+        setupFieldValidation(nameInput, 'name');
+        setupFieldValidation(emailInput, 'email');
+        setupFieldValidation(phoneInput, 'phone');
+        setupFieldValidation(studentSelect, 'student_id');
+    };
+
+    setupValidations();
+
+    // FORM SUBMISSION VALIDATION
+    registerForm?.addEventListener('submit', (e) => {
+        if (currentRole === 'client') {
+            const nameInput = document.querySelector('#clientFields input[name="name"]');
+            const emailInput = document.querySelector('#clientFields input[name="email"]');
+            const phoneInput = document.querySelector('#clientFields input[name="phone"]');
+            const passwordInput = registerPasswordField;
+
+            let hasError = false;
+
+            [nameInput, emailInput, phoneInput, passwordInput].forEach(input => {
+                if (!input) return;
+                clearFieldError(input);
+                const error = validateField(input.name, input.value);
+                if (error) {
+                    showFieldError(input, error);
+                    hasError = true;
+                }
+            });
+
+            if (hasError) {
+                e.preventDefault();
+                registerForm.querySelector('button[type="submit"]')?.classList.remove('btn-loading');
+                registerForm.querySelector('button[type="submit"]')?.removeAttribute('disabled');
+            }
+        } else {
+            const studentIdInput = document.getElementById('studentIdInput');
+            if (!studentIdInput?.value) {
+                e.preventDefault();
+                showFieldError(studentSelect, 'Pilih siswa dari daftar');
+                registerForm.querySelector('button[type="submit"]')?.classList.remove('btn-loading');
+                registerForm.querySelector('button[type="submit"]')?.removeAttribute('disabled');
+            }
+        }
+    });
 });

@@ -33,7 +33,8 @@
     const status = s?.status ?? 'Draft';
     const price = s?.price ?? s?.starting_price ?? s?.min_price ?? null;
     const desc = s?.description ?? s?.desc ?? '';
-    return { id, title, category, status, price, desc, _raw: s };
+    const rejectReason = s?.reject_reason ?? null;
+    return { id, title, category, status, price, desc, rejectReason, _raw: s };
   }
 
   let data = servicesRaw.map(normalizeService);
@@ -105,8 +106,18 @@
       const hrefShow = s.id ? `${links.showPrefix || '/freelancer/services/'}${s.id}` : null;
       const hrefEdit = s.id ? `${links.showPrefix || '/freelancer/services/'}${s.id}${links.editSuffix || '/edit'}` : null;
 
+      const rejectionAlert = s.rejectReason ? `
+        <div class="mb-3.5 p-2.5 bg-amber-50 border border-amber-100 rounded-xl flex items-center gap-2.5 animate-pulse-slow">
+          <div class="w-6 h-6 rounded-lg bg-amber-100 flex items-center justify-center text-amber-600">
+            <i class="ri-error-warning-fill text-sm"></i>
+          </div>
+          <span class="text-[10px] font-black text-amber-700 uppercase tracking-widest">Perlu Perbaikan</span>
+        </div>
+      ` : '';
+
       return `
-        <div class="bg-white border border-slate-200 rounded-[22px] p-[18px] transition-all duration-200 hover:-translate-y-0.5 hover:border-emerald-300 hover:shadow-[0_10px_28px_rgba(2,6,23,0.08)] overflow-hidden">
+        <div class="bg-white border border-slate-200 rounded-[22px] p-[18px] transition-all duration-200 hover:-translate-y-0.5 hover:border-amber-300 hover:shadow-[0_10px_28px_rgba(2,6,23,0.08)] overflow-hidden">
+          ${rejectionAlert}
           <div class="flex items-start justify-between gap-3 mb-3">
             <div class="min-w-0">
               <div class="text-slate-900 font-extrabold text-[15px] truncate">${safeText(s.title)}</div>

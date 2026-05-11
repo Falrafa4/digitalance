@@ -50,6 +50,7 @@ Route::middleware('auth:administrator')->prefix('admin')->name('admin.')->group(
     Route::post('/admins', [AdministratorController::class, 'store'])->name('admins.store');
     Route::put('/admins/{administrator}', [AdministratorController::class, 'update'])->name('admins.update');
     Route::delete('/admins/{administrator}', [AdministratorController::class, 'destroy'])->name('admins.destroy');
+    Route::put('/admins/{administrator}/password', [AdministratorController::class, 'updateAdminPassword'])->name('admins.password');
 
     // Clients (CRUD)
     Route::get('/clients', [ClientController::class, 'index'])->name('clients.index');
@@ -57,29 +58,28 @@ Route::middleware('auth:administrator')->prefix('admin')->name('admin.')->group(
     Route::get('/clients/{client}', [ClientController::class, 'show'])->name('clients.show');
     Route::put('/clients/{client}', [ClientController::class, 'update'])->name('clients.update');
     Route::delete('/clients/{client}', [ClientController::class, 'destroy'])->name('clients.destroy');
+    Route::put('/clients/{client}/password', [ClientController::class, 'updateClientPassword'])->name('clients.password');
 
-    // Freelancers (CRUD)
+    // Freelancers (CRUD) - No create/edit pages, handled via modal
     Route::get('/freelancers', [FreelancerController::class, 'index'])->name('freelancers.index');
-    Route::get('/freelancers/create', [FreelancerController::class, 'create'])->name('freelancers.create');
     Route::post('/freelancers', [FreelancerController::class, 'store'])->name('freelancers.store');
     Route::get('/freelancers/{freelancer}', [FreelancerController::class, 'show'])->name('freelancers.show');
-    Route::get('/freelancers/{freelancer}/edit', [FreelancerController::class, 'edit'])->name('freelancers.edit');
     Route::put('/freelancers/{freelancer}', [FreelancerController::class, 'update'])->name('freelancers.update');
     Route::delete('/freelancers/{freelancer}', [FreelancerController::class, 'destroy'])->name('freelancers.destroy');
+    Route::put('/freelancers/{freelancer}/password', [ClientController::class, 'updateFreelancerPassword'])->name('freelancers.password');
 
     // Freelancers (Actions)
     Route::post('/freelancers/{freelancer}/verify', [FreelancerController::class, 'verify'])->name('freelancers.verify');
     Route::post('/freelancers/{freelancer}/suspend', [FreelancerController::class, 'suspend'])->name('freelancers.suspend');
     Route::post('/freelancers/{freelancer}/unsuspend', [FreelancerController::class, 'unsuspend'])->name('freelancers.unsuspend');
 
-    // Skomda Students (CRUD)
+    // Skomda Students (CRUD) - No create/edit pages, handled via modal
     Route::get('/skomda-students', [SkomdaStudentController::class, 'index'])->name('skomda-students.index');
-    Route::get('/skomda-students/create', [SkomdaStudentController::class, 'create'])->name('skomda-students.create');
     Route::post('/skomda-students', [SkomdaStudentController::class, 'store'])->name('skomda-students.store');
     Route::get('/skomda-students/{skomda_student}', [SkomdaStudentController::class, 'show'])->name('skomda-students.show');
-    Route::get('/skomda-students/{skomda_student}/edit', [SkomdaStudentController::class, 'edit'])->name('skomda-students.edit');
     Route::put('/skomda-students/{skomda_student}', [SkomdaStudentController::class, 'update'])->name('skomda-students.update');
     Route::delete('/skomda-students/{skomda_student}', [SkomdaStudentController::class, 'destroy'])->name('skomda-students.destroy');
+    Route::put('/skomda-students/{skomda_student}/password', [ClientController::class, 'updateSkomdaPassword'])->name('skomda-students.password');
 
     // Services (CRUD)
     Route::get('/services', [ServiceController::class, 'index'])->name('services.index');
@@ -239,6 +239,7 @@ Route::middleware('auth:freelancer')->prefix('freelancer')->name('freelancer.')-
     Route::get('/services/{service}/edit', [ServiceController::class, 'edit'])->name('services.edit');
     Route::put('/services/{service}', [ServiceController::class, 'update'])->name('services.update');
     Route::delete('/services/{service}', [ServiceController::class, 'destroy'])->name('services.destroy');
+    Route::post('/services/{id}/submit', [ServiceController::class, 'submit'])->name('services.submit');
 
     // crud portofolios
     Route::get('/portofolios', [PortofolioController::class, 'freelancerIndex'])->name('portofolios.index');

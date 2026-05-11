@@ -14,7 +14,7 @@ class TransactionController extends Controller
     {
         $transactions = Transaction::with([
             'order.client'
-        ])->latest()->paginate(15);
+        ])->latest()->get();
 
         return view('dashboard.admin.transactions', compact('transactions'));
     }

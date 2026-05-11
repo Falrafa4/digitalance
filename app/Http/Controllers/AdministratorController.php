@@ -104,4 +104,18 @@ class AdministratorController extends Controller
 
         return back()->with('password_success', 'Password berhasil diperbarui.');
     }
+
+    public function updateAdminPassword(Request $request, $id)
+    {
+        $request->validate([
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $admin = Administrator::findOrFail($id);
+        $admin->update([
+            'password' => Hash::make($request->password),
+        ]);
+
+        return redirect()->route('admin.admins.index')->with('success', 'Password ' . $admin->name . ' berhasil diperbarui');
+    }
 }

@@ -150,12 +150,6 @@
             class="bg-white rounded-2xl shadow-2xl max-w-lg w-full mx-4 overflow-hidden transform transition-all">
         </div>
     </div>
-
-    @if($offers instanceof \Illuminate\Pagination\LengthAwarePaginator && $offers->hasPages())
-    <div class="px-6 py-4 border-t border-slate-100 bg-slate-50">
-        {{ $offers->links() }}
-    </div>
-    @endif
 @endsection
 
 @section('scripts')

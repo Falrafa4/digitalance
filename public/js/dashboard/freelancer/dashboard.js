@@ -4,6 +4,53 @@
   const $ = (id) => document.getElementById(id);
   const $$ = (sel) => Array.from(document.querySelectorAll(sel));
 
+  let isLoading = false;
+
+  const showLoading = () => {
+    isLoading = true;
+    const statsGrid = $('freelancer-stats');
+    if (!statsGrid) return;
+
+    statsGrid.querySelectorAll('[data-stat]').forEach(el => {
+      el.innerHTML = '<div class="skeleton h-8 w-16 inline-block"></div>';
+    });
+
+    const orderList = $('latest-order-list');
+    if (orderList) {
+      orderList.innerHTML = Array(3).fill(`
+        <div class="p-5 flex flex-col sm:flex-row sm:items-center gap-4">
+          <div class="flex-1 min-w-0 space-y-2">
+            <div class="skeleton h-5 w-3/4"></div>
+            <div class="skeleton h-4 w-1/2"></div>
+            <div class="flex gap-2 mt-3">
+              <div class="skeleton h-6 w-20 rounded-full"></div>
+              <div class="skeleton h-6 w-28 rounded-full"></div>
+            </div>
+          </div>
+          <div class="skeleton h-10 w-16 rounded-xl"></div>
+        </div>
+      `).join('');
+    }
+
+    const jobList = $('job-opp-list');
+    if (jobList) {
+      jobList.innerHTML = Array(3).fill(`
+        <div class="p-4 rounded-[16px] bg-slate-50 border border-slate-200 space-y-3">
+          <div class="skeleton h-5 w-3/4"></div>
+          <div class="skeleton h-4 w-1/2"></div>
+          <div class="flex justify-between items-center">
+            <div class="skeleton h-4 w-12"></div>
+            <div class="skeleton h-6 w-20"></div>
+          </div>
+        </div>
+      `).join('');
+    }
+  };
+
+  const hideLoading = () => {
+    isLoading = false;
+  };
+
   const money = (v) => {
     if (v === null || v === undefined || v === '') return '—';
     if (typeof v === 'string') return v;
@@ -19,7 +66,10 @@
     return Number.isFinite(n) ? n : 0;
   };
 
-  const safeText = (v) => (v === null || v === undefined ? '' : String(v));
+  const safeText = (v) => {
+    if (v === null || v === undefined) return '';
+    return window.DigitalanceUtils?.escapeHtml(String(v)) || String(v);
+  };
 
   // Flexible keys (backend can pass any of these)
   const stats = page.stats || page.summary || page.kpis || {};

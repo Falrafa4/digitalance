@@ -44,13 +44,10 @@
                             <img class="w-14 h-14 rounded-[15px] object-cover border-2 border-slate-50 group-hover:border-teal-100 transition-all"
                                 src="{{ $admin->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode($admin->name) . '&background=0f766e&color=ffffff' }}"
                                 alt="{{ $admin->name }}" />
-                            <span
-                                class="absolute -bottom-1 -right-1 w-4 h-4 border-2 border-white rounded-full {{ $admin->status === 'Active' ? 'bg-green-500' : 'bg-slate-300' }}"></span>
                         </div>
-                        <span
-                            class="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider {{ $admin->status === 'Active' ? 'bg-green-50 text-green-600' : 'bg-slate-100 text-slate-500' }}">
-                            {{ $admin->status }}
-                        </span>
+                        <button onclick="openPasswordModal({{ $admin->id }})" class="w-9 h-9 rounded-xl bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-amber-500 hover:text-white transition-all" title="Change Password">
+                            <i class="ri-lock-password-line"></i>
+                        </button>
                     </div>
 
                     <h3 class="font-display font-bold text-[16px] text-slate-900 mb-0.5 line-clamp-1">{{ $admin->name }}</h3>
@@ -169,6 +166,22 @@
                 <button id="btn-confirm-delete-admin"
                     class="flex-1 py-[11px] rounded-[11px] bg-red-500 text-white font-bold text-[13px] cursor-pointer hover:bg-red-600 transition-all">Ya,
                     Hapus</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: Change Password Admin -->
+    <div class="overlay fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-200"
+        id="modal-password-admin">
+        <div class="modal-box bg-white rounded-[18px] w-full max-w-[420px] shadow-2xl overflow-hidden">
+            <div class="flex items-center justify-between px-[26px] py-[22px] border-b border-slate-100">
+                <h3 class="font-display text-[1.1rem] font-extrabold text-slate-900">Change Password</h3>
+                <button onclick="closeModal('modal-password-admin')"
+                    class="w-[34px] h-[34px] bg-slate-100 rounded-[9px] flex items-center justify-center text-[18px] text-slate-500 cursor-pointer border-none hover:bg-red-50 hover:text-red-500 transition-all">
+                    <i class="ri-close-line"></i>
+                </button>
+            </div>
+            <div id="password-modal-content">
             </div>
         </div>
     </div>

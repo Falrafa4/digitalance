@@ -39,6 +39,10 @@
                 class="px-[18px] py-2 rounded-full border-[1.5px] font-bold text-[12.5px] transition-all {{ request('status') == 'Rejected' ? 'border-[#0f766e] bg-[#0f766e] text-white shadow-teal-sm' : 'border-slate-200 bg-white text-slate-500' }}">
                 Rejected
             </a>
+            <a href="{{ route('admin.services.index', array_merge(request()->query(), ['status' => 'Draft'])) }}"
+                class="px-[18px] py-2 rounded-full border-[1.5px] font-bold text-[12.5px] transition-all {{ request('status') == 'Draft' ? 'border-[#0f766e] bg-[#0f766e] text-white shadow-teal-sm' : 'border-slate-200 bg-white text-slate-500' }}">
+                Draft
+            </a>
         </div>
 
         <form action="{{ route('admin.services.index') }}" method="GET" class="relative">
@@ -102,7 +106,7 @@
 @section('modals')
     <div class="fixed inset-0 z-[100] bg-slate-900/40 backdrop-blur-sm flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300"
         id="modal-service-overlay">
-        <div class="bg-white rounded-[28px] w-full max-w-[500px] shadow-2xl overflow-hidden transform scale-95 transition-all duration-300"
+        <div class="bg-white rounded-[32px] w-full max-w-[600px] shadow-2xl overflow-hidden transform scale-95 transition-all duration-300"
             id="modal-service-box">
             <!-- Content via JS -->
         </div>
@@ -142,48 +146,100 @@
             const overlay = document.getElementById('modal-service-overlay');
             if (!box || !overlay) return;
 
+            let actionButtons = '';
+            let rejectionInfo = '';
+
+            if (s.status === 'Draft') {
+                actionButtons = `
+                    <div class="p-4 bg-amber-50 rounded-2xl border border-amber-100">
+                        <p class="text-[11px] text-amber-700 font-bold leading-relaxed flex items-start gap-2">
+                            <i class="ri-information-line mt-0.5"></i>
+                            <span>Service ini masih berstatus Draft. Tunggu freelancer mengajukan ke admin untuk direview.</span>
+                        </p>
+                    </div>
+                `;
+            } else if (s.status === 'Pending') {
+                actionButtons = `
+                    <div class="flex gap-3">
+                        <button onclick="window.updateServiceStatus(${s.id}, 'Rejected')" class="flex-1 py-4 bg-red-50 text-red-600 font-bold rounded-2xl text-[13px] hover:bg-red-600 hover:text-white transition-all">Reject</button>
+                        <button onclick="window.updateServiceStatus(${s.id}, 'Approved')" class="flex-1 py-4 bg-[#0f766e] text-white font-bold rounded-2xl text-[13px] hover:bg-[#0a5e58] transition-all shadow-lg shadow-teal-sm">Approve</button>
+                    </div>
+                `;
+            } else if (s.status === 'Rejected') {
+                rejectionInfo = `
+                    <div class="p-4 bg-red-50 rounded-2xl border border-red-100 mb-6">
+                        <p class="text-[11px] text-red-700 font-bold leading-relaxed flex items-start gap-2">
+                            <i class="ri-close-circle-line mt-0.5"></i>
+                            <span>Service ini telah ditolak. ${s.reject_reason ? 'Alasan: ' + s.reject_reason : 'Freelancer perlu mengajukan ulang.'}</span>
+                        </p>
+                    </div>
+                `;
+                actionButtons = `
+                    <div class="flex gap-3">
+                        <button onclick="window.updateServiceStatus(${s.id}, 'Rejected')" class="flex-1 py-4 bg-red-50 text-red-600 font-bold rounded-2xl text-[13px] hover:bg-red-600 hover:text-white transition-all">Reject Ulang</button>
+                        <button onclick="window.updateServiceStatus(${s.id}, 'Approved')" class="flex-1 py-4 bg-[#0f766e] text-white font-bold rounded-2xl text-[13px] hover:bg-[#0a5e58] transition-all shadow-lg shadow-teal-sm">Approve</button>
+                    </div>
+                `;
+            } else if (s.status === 'Approved') {
+                actionButtons = `
+                    <div class="p-4 bg-emerald-50 rounded-2xl border border-emerald-100">
+                        <p class="text-[11px] text-emerald-700 font-bold leading-relaxed flex items-start gap-2">
+                            <i class="ri-checkbox-circle-line mt-0.5"></i>
+                            <span>Service ini sudah disetujui dan ditampilkan ke publik.</span>
+                        </p>
+                    </div>
+                `;
+            }
+
             box.innerHTML = `
-                        <div class="p-8">
-                            <div class="flex justify-between items-start mb-6">
-                                <div class="w-16 h-16 rounded-[22px] bg-[#f0fdfa] text-[#0f766e] flex items-center justify-center text-[2rem] shadow-sm border border-[#ccfbf1]">
-                                     <i class="ri-tools-line"></i>
-                                </div>
-                                <button onclick="window.closeServiceDetail()" class="w-9 h-9 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center hover:bg-red-50 hover:text-red-500 transition">
-                                    <i class="ri-close-line text-xl"></i>
-                                </button>
-                            </div>
+                <div class="relative">
+                    <!-- Gradient Header -->
+                    <div class="h-28 bg-gradient-to-r from-[#0f766e] to-[#10b981] flex items-center px-8 relative">
+                        <div class="flex-1">
+                            <h2 class="text-white font-black text-xl tracking-tight">Service Details</h2>
+                            <p class="text-white/70 text-[10px] font-bold uppercase tracking-[0.2em]">Service ID: #SRV-${s.id}</p>
+                        </div>
+                        <button onclick="window.closeServiceDetail()" class="w-10 h-10 bg-white/20 text-white rounded-full flex items-center justify-center hover:bg-white/30 transition">
+                            <i class="ri-close-line text-xl"></i>
+                        </button>
+                    </div>
 
-                            <h2 class="text-[1.5rem] font-black text-slate-900 mb-2 leading-tight">${s.title}</h2>
-                            <div class="flex items-center gap-2 mb-6">
-                                <span class="status-pill status-${s.status.toLowerCase()}">${s.status}</span>
-                                <span class="text-[12px] font-bold text-slate-400 font-mono">#SRV-${s.id}</span>
+                    <!-- Content -->
+                    <div class="px-8 pb-8 -mt-8 relative z-10">
+                        <div class="bg-white rounded-2xl p-6 shadow-xl border border-slate-50 mb-6">
+                            <div class="flex justify-between items-start mb-4">
+                                <h3 class="text-[1.5rem] font-black text-slate-900 leading-tight flex-1 pr-4">${s.title}</h3>
+                                <span class="px-3 py-1 bg-teal-50 text-[#0f766e] text-[10px] font-black rounded-lg uppercase tracking-wider border border-teal-100 shadow-sm">${s.status}</span>
                             </div>
-
-                            <div class="grid grid-cols-2 gap-4 mb-8">
-                                <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                                     <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Harga Dasar</p>
-                                     <p class="text-slate-900 font-black text-lg">Rp${Number(s.base_price).toLocaleString('id-ID')}</p>
-                                </div>
-                                <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                                     <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Freelancer</p>
-                                     <p class="text-slate-900 font-bold text-[13.5px] truncate">${s.freelancer?.skomda_student?.name || 'N/A'}</p>
-                                </div>
-                            </div>
-
-                            <div class="mb-8">
-                                <p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2">Deskripsi Layanan</p>
-                                <p class="text-[13px] text-slate-600 leading-relaxed max-h-32 overflow-y-auto pr-2">${s.description || 'Tidak ada deskripsi.'}</p>
-                            </div>
-
-                            <div class="flex flex-col gap-3">
-                                <div class="flex gap-3">
-                                     <button onclick="window.updateServiceStatus(${s.id}, 'Rejected')" class="flex-1 py-3.5 bg-red-50 text-red-600 font-bold rounded-xl text-sm hover:bg-red-600 hover:text-white transition-all">Reject</button>
-                                     <button onclick="window.updateServiceStatus(${s.id}, 'Approved')" class="flex-1 py-3.5 bg-[#0f766e] text-white font-bold rounded-xl text-sm hover:bg-[#0a5e58] transition-all shadow-lg shadow-teal-sm">Approve Service</button>
-                                </div>
-                                <button onclick="window.closeServiceDetail()" class="py-3 bg-slate-100 text-slate-500 font-bold rounded-xl text-sm hover:bg-slate-200 transition-all">Close</button>
+                            <div class="flex items-center justify-between pt-4 border-t border-slate-50">
+                                <span class="text-[13px] font-bold text-slate-500">Starting Price</span>
+                                <span class="text-[1.5rem] font-black text-[#0f766e]">Rp${Number(s.price_min || s.base_price).toLocaleString('id-ID')}</span>
                             </div>
                         </div>
-                    `;
+
+                        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100 mb-6">
+                            <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Service Provider</span>
+                            <div class="flex items-center gap-4">
+                                <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(s.freelancer?.skomda_student?.name || 'F')}&background=0f766e&color=fff" class="w-11 h-11 rounded-xl shadow-sm" />
+                                <div>
+                                    <p class="text-[14px] font-black text-slate-800">${s.freelancer?.skomda_student?.name || 'N/A'}</p>
+                                    <p class="text-[11px] font-bold text-slate-400 uppercase tracking-tight">${s.freelancer?.skomda_student?.major || 'Freelancer'}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-6">
+                            <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Service Description</span>
+                            <div class="bg-slate-50/50 p-5 rounded-2xl border border-slate-100/50">
+                                <p class="text-[13px] text-slate-600 leading-relaxed font-medium max-h-[120px] overflow-y-auto pr-2 custom-scrollbar">${s.description || 'No description provided.'}</p>
+                            </div>
+                        </div>
+
+                        ${rejectionInfo}
+                        ${actionButtons}
+                    </div>
+                </div>
+            `;
 
             overlay.classList.remove('opacity-0', 'pointer-events-none');
             box.classList.remove('scale-95');
@@ -203,13 +259,17 @@
         };
 
         window.updateServiceStatus = async function (id, status) {
-            const confirmMsg = status === 'Approved'
-                ? 'Yakin ingin MENYETUJUI layanan ini? Layanan akan ditampilkan ke publik.'
-                : 'Yakin ingin MENOLAK layanan ini? Freelancer akan diberitahu.';
-
-            if (!await customConfirm(confirmMsg)) return;
+            const box = document.getElementById('modal-service-box');
+            const actionBtn = event?.target;
 
             try {
+                if (actionBtn) {
+                    actionBtn.disabled = true;
+                    actionBtn.classList.add('btn-loading');
+                }
+
+                const bodyData = { status: status };
+
                 const response = await fetch(`/admin/services/${id}/status`, {
                     method: 'POST',
                     headers: {
@@ -217,13 +277,18 @@
                         'Content-Type': 'application/json',
                         'Accept': 'application/json'
                     },
-                    body: JSON.stringify({ status: status })
+                    body: JSON.stringify(bodyData)
                 });
 
                 if (!response.ok) throw new Error('Gagal memperbarui status');
 
+                window.showToast?.('Status berhasil diperbarui!', 'success');
                 window.location.reload();
             } catch (e) {
+                if (actionBtn) {
+                    actionBtn.disabled = false;
+                    actionBtn.classList.remove('btn-loading');
+                }
                 if (window.showToast) {
                     window.showToast(e.message || 'Terjadi kesalahan.', 'danger');
                 } else {

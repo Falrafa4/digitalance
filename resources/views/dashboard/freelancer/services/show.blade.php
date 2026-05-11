@@ -8,11 +8,36 @@
                 class="inline-flex items-center gap-2 text-slate-500 hover:text-slate-800 transition-colors font-semibold text-sm">
                 <i class="ri-arrow-left-line"></i> Kembali
             </a>
-            <a href="{{ route('freelancer.services.edit', $service->id) }}"
-                class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#0f766e] text-white font-semibold hover:bg-teal-800 transition-colors">
-                <i class="ri-pencil-line"></i> Edit Service
-            </a>
+            <div class="flex items-center gap-2">
+                @if($service->status === 'Draft')
+                <form id="form-submit-service" action="{{ route('freelancer.services.submit', $service->id) }}" method="POST">
+                    @csrf
+                    <button type="button" onclick="window.confirmSubmitService()" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-orange-500 text-white font-semibold hover:bg-orange-600 transition-colors shadow-orange-sm">
+                        <i class="ri-send-plane-fill"></i> Submit for Review
+                    </button>
+                </form>
+                @endif
+                <a href="{{ route('freelancer.services.edit', $service->id) }}"
+                    class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#0f766e] text-white font-semibold hover:bg-teal-800 transition-colors">
+                    <i class="ri-pencil-line"></i> Edit Service
+                </a>
+            </div>
         </div>
+
+        @if($service->reject_reason)
+        <div class="mb-6 p-5 bg-amber-50 border border-amber-200 rounded-xl flex items-start gap-4 shadow-sm animate-pulse-slow">
+            <div class="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 flex-shrink-0">
+                <i class="ri-error-warning-line text-xl"></i>
+            </div>
+            <div>
+                <h4 class="text-amber-900 font-bold text-sm mb-1">Catatan Perbaikan Admin</h4>
+                <p class="text-amber-800 text-[13px] leading-relaxed font-medium">
+                    {{ $service->reject_reason }}
+                </p>
+                <p class="text-amber-600 text-[11px] mt-2 font-bold uppercase tracking-wider italic">* Silakan edit dan ajukan kembali layanan ini agar dapat dipublikasikan.</p>
+            </div>
+        </div>
+        @endif
 
         <div class="bg-white border border-slate-200 rounded-xl p-8">
             <div class="flex items-start justify-between gap-4 border-b border-slate-100 pb-6 mb-6">
@@ -50,4 +75,11 @@
             </div>
         </div>
     </div>
+    <script>
+        window.confirmSubmitService = async function() {
+            if (await window.customConfirm('Yakin ingin mengajukan layanan ini untuk ditinjau admin? Pastikan semua informasi sudah benar.')) {
+                document.getElementById('form-submit-service').submit();
+            }
+        };
+    </script>
 @endsection

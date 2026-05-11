@@ -14,7 +14,7 @@
                 {{ now()->format('l, d F Y') }} — Berikut ringkasan aktivitas platform hari ini.
             </p>
         </div>
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-3" id="dashboard-summary-cards">
             <div class="bg-white px-4 py-2 rounded-xl border border-slate-200 shadow-sm flex flex-col items-end">
                 <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Today's Orders</span>
                 <span class="text-lg font-black text-slate-900">{{ $todayOrders ?? 0 }}</span>
@@ -27,7 +27,7 @@
     </section>
 
     {{-- Advanced Metrics --}}
-    <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6 mb-10">
+    <section id="stats-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6 mb-10">
         {{-- Total Users --}}
         <div class="bg-white p-5 rounded-[22px] border border-slate-100 flex items-center gap-4 transition-all hover:shadow-lg hover:-translate-y-1">
             <div class="w-12 h-12 flex items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600 text-xl shadow-inner">
