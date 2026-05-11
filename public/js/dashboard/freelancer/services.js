@@ -1,6 +1,7 @@
 (() => {
   const page = window.__FREELANCER_SERVICES__ || {};
   const servicesRaw = Array.isArray(page.services) ? page.services : [];
+  const createUrl = page.createUrl || null;
   const links = page.links || {};
 
   const $ = (id) => document.getElementById(id);
@@ -62,7 +63,24 @@
     return res;
   }
 
-  function emptyState() {
+  function emptyStateForEmptyServices() {
+    return `
+      <div class="col-span-full py-16 px-5 text-center bg-white border-2 border-dashed border-slate-200 rounded-3xl">
+        <div class="text-slate-300 text-[48px] mb-4">
+          <i class="ri-tools-line"></i>
+        </div>
+        <h3 class="text-xl font-bold text-slate-900">Belum Ada Layanan</h3>
+        <p class="text-slate-500 mt-2 mb-6">Buat layanan pertamamu untuk mulai menerima pesanan.</p>
+        ${createUrl
+          ? `<a href="${createUrl}" class="inline-flex items-center px-5 py-3 bg-[#0f766e] text-white rounded-xl font-bold hover:bg-[#0a5e58] transition-all">
+                <i class="ri-add-line mr-2"></i> Buat Layanan Baru
+             </a>`
+          : ''}
+      </div>
+    `;
+  }
+
+  function emptyStateForFilter() {
     return `
       <div class="col-span-full py-16 px-5 text-center bg-white border-2 border-dashed border-slate-200 rounded-3xl">
         <i class="ri-inbox-archive-line text-[3rem] text-slate-300 block mb-3"></i>
@@ -78,7 +96,7 @@
 
     const rows = filterData();
     if (!rows.length) {
-      grid.innerHTML = emptyState();
+      grid.innerHTML = data.length === 0 ? emptyStateForEmptyServices() : emptyStateForFilter();
       return;
     }
 

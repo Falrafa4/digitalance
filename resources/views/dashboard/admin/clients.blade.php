@@ -283,32 +283,12 @@
                 form.action = `/admin/skomda-students/${id}`;
             }
 
-            const overlay = document.getElementById('modal-user-overlay');
-            const box = document.getElementById('modal-user-box');
-            overlay.classList.remove('opacity-0', 'pointer-events-none');
-            box.classList.remove('scale-95');
+            window.openModal('modal-user-overlay');
         };
 
-        window.closeUserModal = function() {
-            const overlay = document.getElementById('modal-user-overlay');
-            const box = document.getElementById('modal-user-box');
-            overlay.classList.add('opacity-0', 'pointer-events-none');
-            box.classList.add('scale-95');
-        };
-
-        window.openAddModal = function() {
-            const overlay = document.getElementById('modal-add-overlay');
-            const box = document.getElementById('modal-add-box');
-            overlay.classList.remove('opacity-0', 'pointer-events-none');
-            box.classList.remove('scale-95');
-        };
-
-        window.closeAddModal = function() {
-            const overlay = document.getElementById('modal-add-overlay');
-            const box = document.getElementById('modal-add-box');
-            overlay.classList.add('opacity-0', 'pointer-events-none');
-            box.classList.add('scale-95');
-        };
+        window.closeUserModal = () => window.closeModal('modal-user-overlay');
+        window.openAddModal = () => window.openModal('modal-add-overlay');
+        window.closeAddModal = () => window.closeModal('modal-add-overlay');
 
         window.setAddRole = function(role) {
             // Update UI

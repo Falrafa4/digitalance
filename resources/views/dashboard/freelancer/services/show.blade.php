@@ -9,39 +9,44 @@
                 <i class="ri-arrow-left-line"></i> Kembali
             </a>
             <a href="{{ route('freelancer.services.edit', $service->id) }}"
-                class="px-4 py-2 rounded-[11px] bg-[#0f766e] text-white font-bold text-[12.5px] hover:bg-[#0c615a] transition-all">
+                class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#0f766e] text-white font-semibold hover:bg-teal-800 transition-colors">
                 <i class="ri-pencil-line"></i> Edit Service
             </a>
         </div>
 
-        <div class="bg-white border border-slate-200 rounded-[22px] p-7">
-            <div class="flex items-start justify-between gap-4 border-b border-slate-100 pb-5 mb-5">
-                <div>
-                    <h1 class="font-display text-[1.7rem] font-extrabold text-slate-900">{{ $service->title }}</h1>
-                    <p class="text-slate-500 text-[13px] mt-1">Kategori: {{ $service->service_category->name ?? '-' }}</p>
+        <div class="bg-white border border-slate-200 rounded-xl p-8">
+            <div class="flex items-start justify-between gap-4 border-b border-slate-100 pb-6 mb-6">
+                <div class="flex-1">
+                    <h1 class="font-display text-[2rem] font-extrabold text-slate-900 mb-2">{{ $service->title }}</h1>
+                    <p class="text-slate-500 text-sm">Kategori: <span
+                            class="font-semibold">{{ $service->service_category->name ?? '-' }}</span></p>
                 </div>
-                <span
-                    class="px-3 py-1 rounded-lg bg-slate-100 text-slate-700 font-bold text-[12px]">{{ $service->status ?? 'Draft' }}</span>
+                <x-crud-status-badge :status="$service->status ?? 'Draft'" />
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
-                <div class="bg-slate-50 rounded-[14px] p-4 border border-slate-100">
-                    <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Min Price</p>
-                    <p class="font-semibold text-slate-800">Rp
-                        {{ number_format((float) ($service->price_min ?? 0), 0, ',', '.') }}</p>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+                <div class="bg-slate-50 rounded-lg p-5 border border-slate-100">
+                    <p class="text-xs font-semibold text-slate-500 uppercase mb-1">Min Price</p>
+                    <p class="text-lg font-bold text-slate-900">
+                        Rp{{ number_format((float) ($service->price_min ?? 0), 0, ',', '.') }}</p>
                 </div>
-                <div class="bg-slate-50 rounded-[14px] p-4 border border-slate-100">
-                    <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Max Price</p>
-                    <p class="font-semibold text-slate-800">Rp
-                        {{ number_format((float) ($service->price_max ?? 0), 0, ',', '.') }}</p>
+                <div class="bg-slate-50 rounded-lg p-5 border border-slate-100">
+                    <p class="text-xs font-semibold text-slate-500 uppercase mb-1">Max Price</p>
+                    <p class="text-lg font-bold text-slate-900">
+                        Rp{{ number_format((float) ($service->price_max ?? 0), 0, ',', '.') }}</p>
+                </div>
+                <div class="bg-slate-50 rounded-lg p-5 border border-slate-100">
+                    <p class="text-xs font-semibold text-slate-500 uppercase mb-1">Delivery Time</p>
+                    <p class="text-lg font-bold text-slate-900">{{ $service->delivery_time ?? '-' }} days</p>
                 </div>
             </div>
 
             <div>
-                <h3 class="font-bold text-slate-900 mb-3 text-[15px]">Deskripsi</h3>
+                <h3 class="font-bold text-slate-900 mb-3">Description</h3>
                 <div
-                    class="bg-slate-50 rounded-[16px] p-5 border border-slate-100 text-slate-700 text-[14px] leading-relaxed whitespace-pre-wrap">
-                    {{ $service->description ?: 'Belum ada deskripsi.' }}</div>
+                    class="bg-slate-50 rounded-lg p-5 border border-slate-100 text-slate-700 leading-relaxed whitespace-pre-wrap">
+                    {{ $service->description ?: 'No description provided.' }}
+                </div>
             </div>
         </div>
     </div>

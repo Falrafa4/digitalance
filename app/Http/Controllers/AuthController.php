@@ -64,13 +64,13 @@ class AuthController extends Controller
 
         if (Auth::guard('client')->attempt($credentials)) {
             $request->session()->regenerate();
-            return redirect()->intended('/client')
+            return redirect()->route('client.dashboard')
                 ->with('success', 'Login sebagai client berhasil');
         }
 
         if (Auth::guard('administrator')->attempt($credentials)) {
             $request->session()->regenerate();
-            return redirect()->intended('/admin')
+            return redirect()->route('admin.dashboard')
                 ->with('success', 'Login sebagai administrator berhasil');
         }
 
@@ -83,7 +83,7 @@ class AuthController extends Controller
         if ($freelancer && Hash::check($credentials['password'], $freelancer->password)) {
             Auth::guard('freelancer')->login($freelancer);
             $request->session()->regenerate();
-            return redirect()->intended('/freelancer')
+            return redirect()->route('freelancer.dashboard')
                 ->with('success', 'Login sebagai freelancer berhasil');
         }
 

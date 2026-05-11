@@ -16,10 +16,13 @@
     'draft' => ['bg' => 'bg-slate-100', 'text' => 'text-slate-700', 'border' => 'border-slate-200', 'icon' => 'ri-draft-line'],
   ];
 
-  $style = $map[$status] ?? ['bg' => 'bg-slate-100', 'text' => 'text-slate-700', 'border' => 'border-slate-200', 'icon' => 'ri-information-line'];
+  $defaultStyle = ['bg' => 'bg-slate-50', 'text' => 'text-slate-600', 'border' => 'border-slate-200', 'icon' => 'ri-information-line'];
+  $style = $map[$status] ?? $defaultStyle;
+  $statusLabel = trim((string) $statusRaw) === '' || $statusRaw === '-' ? 'Unknown' : \Illuminate\Support\Str::headline($statusRaw);
 @endphp
 
-<span class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[12px] font-extrabold border {{ $style['bg'] }} {{ $style['text'] }} {{ $style['border'] }}">
+<span
+  class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[12px] font-extrabold border {{ $style['bg'] }} {{ $style['text'] }} {{ $style['border'] }}">
   <i class="{{ $style['icon'] }}"></i>
-  {{ \Illuminate\Support\Str::headline($statusRaw) }}
+  {{ $statusLabel }}
 </span>

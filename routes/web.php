@@ -68,9 +68,9 @@ Route::middleware('auth:administrator')->prefix('admin')->name('admin.')->group(
     Route::delete('/freelancers/{freelancer}', [FreelancerController::class, 'destroy'])->name('freelancers.destroy');
 
     // Freelancers (Actions)
-    Route::post('/freelancers/{freelancer}/verify', [FreelancerController::class, 'verify'])->name('admin.freelancers.verify');
-    Route::post('/freelancers/{freelancer}/suspend', [FreelancerController::class, 'suspend'])->name('admin.freelancers.suspend');
-    Route::post('/freelancers/{freelancer}/unsuspend', [FreelancerController::class, 'unsuspend'])->name('admin.freelancers.unsuspend');
+    Route::post('/freelancers/{freelancer}/verify', [FreelancerController::class, 'verify'])->name('freelancers.verify');
+    Route::post('/freelancers/{freelancer}/suspend', [FreelancerController::class, 'suspend'])->name('freelancers.suspend');
+    Route::post('/freelancers/{freelancer}/unsuspend', [FreelancerController::class, 'unsuspend'])->name('freelancers.unsuspend');
 
     // Skomda Students (CRUD)
     Route::get('/skomda-students', [SkomdaStudentController::class, 'index'])->name('skomda-students.index');
@@ -83,7 +83,7 @@ Route::middleware('auth:administrator')->prefix('admin')->name('admin.')->group(
 
     // Services (CRUD)
     Route::get('/services', [ServiceController::class, 'index'])->name('services.index');
-    Route::post('/services/{id}/status', [ServiceController::class, 'updateStatus'])->name('admin.services.updateStatus');
+    Route::post('/services/{id}/status', [ServiceController::class, 'updateStatus'])->name('services.updateStatus');
 
     // Service Categories (CRUD)
     Route::get('/service-categories', [ServiceCategoryController::class, 'index'])->name('service-categories.index');
@@ -99,8 +99,8 @@ Route::middleware('auth:administrator')->prefix('admin')->name('admin.')->group(
 
     // Order (CRUD)
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
-    Route::get('/orders/{id}/dispute', [DashboardController::class, 'getDisputeDetail'])->name('admin.orders.dispute');
-    Route::get('/freelancers/{id}/detail', [DashboardController::class, 'getFreelancerDetail'])->name('admin.freelancers.detail');
+    Route::get('/orders/{id}/dispute', [DashboardController::class, 'getDisputeDetail'])->name('orders.dispute');
+    Route::get('/freelancers/{id}/detail', [DashboardController::class, 'getFreelancerDetail'])->name('freelancers.detail');
     Route::post('/orders/{id}/status', [OrderController::class, 'updateStatus'])->name('orders.updateStatus');
     Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
     Route::delete('/orders/{id}', [OrderController::class, 'destroy'])->name('orders.destroy');
@@ -197,7 +197,7 @@ Route::middleware('auth:client')->prefix('client')->name('client.')->group(funct
 Route::middleware('auth:freelancer')->prefix('freelancer')->name('freelancer.')->group(function () {
     Route::get('/', [DashboardController::class, 'freelancer'])->name('dashboard');
     // Alias URL (optional): /freelancer/dashboard -> same dashboard page
-    Route::get('/dashboard', [DashboardController::class, 'freelancer']);
+    Route::get('/dashboard', [DashboardController::class, 'freelancer'])->name('dashboard-alias');
     Route::get('/profile', [FreelancerController::class, 'profile'])->name('profile');
     Route::get('/search', [DashboardController::class, 'freelancerSearch'])->name('search');
     Route::post('/profile', [FreelancerController::class, 'updateProfile'])->name('profile.update');
@@ -233,6 +233,7 @@ Route::middleware('auth:freelancer')->prefix('freelancer')->name('freelancer.')-
 
     // crud services
     Route::get('/services', [ServiceController::class, 'freelancerIndex'])->name('services.index');
+    Route::get('/services/create', [ServiceController::class, 'create'])->name('services.create');
     Route::post('/services', [ServiceController::class, 'store'])->name('services.store');
     Route::get('/services/{service}', [ServiceController::class, 'show'])->name('services.show');
     Route::get('/services/{service}/edit', [ServiceController::class, 'edit'])->name('services.edit');

@@ -94,11 +94,11 @@ class ServiceController extends Controller
         }
 
         if ($search) {
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                  ->orWhereHas('freelancer.skomda_student', function($fq) use ($search) {
-                      $fq->where('name', 'like', "%{$search}%");
-                  });
+                    ->orWhereHas('freelancer.skomda_student', function ($fq) use ($search) {
+                        $fq->where('name', 'like', "%{$search}%");
+                    });
             });
         }
 
@@ -154,14 +154,30 @@ class ServiceController extends Controller
     }
 
     /**
+     * Show create service form (FREELANCER ONLY)
+     */
+    public function create()
+    {
+        $categories = ServiceCategory::query()
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get();
+
+        return view('dashboard.freelancer.services.create', compact('categories'));
+    }
+
+    /**
      * Store New Service (FREELANCER ONLY)
      */
     public function store(StoreServiceRequest $request)
     {
         $freelancer = auth('freelancer')->user();
-        Service::create(array_merge($request->validated(), ['freelancer_id' => $freelancer->id]));
+        $service = Service::create(array_merge($request->validated(), [
+            'freelancer_id' => $freelancer->id,
+            'status' => 'Pending',
+        ]));
 
-        return redirect()->route('freelancer.services.index')->with('success', 'Layanan berhasil ditambahkan');
+        return redirect()->route('freelancer.services.show', $service->id)->with('success', 'Layanan berhasil ditambahkan');
     }
 
     /**
