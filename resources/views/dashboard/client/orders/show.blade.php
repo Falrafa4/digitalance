@@ -311,19 +311,4 @@
         <h3 class="font-display font-extrabold text-slate-900 text-[1.2rem]">Freelancer</h3>
         <div class="flex items-center gap-3 mt-4">
           <div class="w-12 h-12 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400"><i class="ri-user-3-line text-[20px]"></i></div>
-          <div>
-            <p class="font-extrabold text-slate-900">{{ optional(optional(optional($order->service)->freelancer)->skomda_student)->name ?? 'Freelancer' }}</p>
-            <p class="text-slate-500 text-[13px]">SKOMDA Student</p>
-          </div>
-        </div>
-        <div class="mt-5 pt-5 border-t border-slate-100 space-y-3">
-          @if($order->status === 'Negotiated')
-            <a href="{{ route('client.orders.checkout', $order->id) }}" class="w-full inline-flex items-center justify-center px-5 py-3 rounded-[12px] bg-[#0f766e] text-white font-bold text-[13px] hover:bg-[#0a5e58] transition-all">Bayar Sekarang <i class="ri-bank-card-line ml-2"></i></a>
-          @endif
-          <a href="{{ route('client.services.show', $order->service_id) }}" class="w-full inline-flex items-center justify-center px-5 py-3 rounded-[12px] bg-white border border-slate-200 text-slate-700 font-bold text-[13px] hover:border-[#0f766e] hover:text-[#0f766e] transition-all">Lihat Jasa <i class="ri-external-link-line ml-2"></i></a>
-        </div>
-      </div>
-    </aside>
-  </div>
-</section>
-@endsection
+          <
