@@ -15,7 +15,7 @@
               Kategori: <span class="font-bold">{{ $service->service_category->name ?? '-' }}</span>
             </p>
           </div>
-          @include('dashboard.client._ui.status-badge', ['status' => $service->status ?? 'Approved'])
+          <x-crud-status-badge :status="$service->status ?? 'Approved'" border />
         </div>
 
         <p class="text-slate-600 mt-4 leading-relaxed text-[14px]">

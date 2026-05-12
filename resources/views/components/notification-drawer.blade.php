@@ -1,26 +1,6 @@
 @php
-    $isAdmin = Auth::guard('administrator')->check();
-    $isClient = Auth::guard('client')->check();
-    $isFreelancer = Auth::guard('freelancer')->check();
-
-    $role = $isAdmin ? 'admin' : ($isClient ? 'client' : ($isFreelancer ? 'freelancer' : null));
-
-    $user = Auth::guard('administrator')->user()
-        ?? Auth::guard('client')->user()
-        ?? Auth::guard('freelancer')->user();
-
-    \App\Models\Notification::where('created_at', '<', now()->subDays(30))->delete();
-
-    $dbNotifications = \App\Models\Notification::where('role', $role)
-        ->where(function ($q) use ($user) {
-            $q->where('user_id', $user->id)
-                ->orWhereNull('user_id');
-        })
-        ->latest()
-        ->take(30)
-        ->get();
-
-    $unreadCount = $dbNotifications->where('is_read', false)->count();
+    $dbNotifications = $notifNotifications ?? collect();
+    $unreadCount = $notifUnreadCount ?? 0;
 @endphp
 
 {{-- Slide-in Notification Drawer --}}
@@ -46,7 +26,7 @@
             <div>
                 <h3 class="font-display text-[1.05rem] font-extrabold text-slate-900 leading-tight">Notifikasi</h3>
                 <p class="text-[11px] font-semibold mt-0.5 {{ $unreadCount > 0 ? 'text-teal-600' : 'text-slate-400' }}">
-                    {{ $unreadCount > 0 ? $unreadCount . ' belum dibaca' : 'Semua sudah dibaca' }}
+                    {{ $unreadCount > 0 ? $unreadCount.' belum dibaca' : 'Semua sudah dibaca' }}
                 </p>
             </div>
         </div>
@@ -131,71 +111,3 @@
     </div>
 </aside>
 
-<script>
-    function openNotificationDrawer() {
-        var overlay = document.getElementById('notif-overlay');
-        var panel = document.getElementById('notif-panel');
-        if (!overlay || !panel) return;
-
-        overlay.classList.remove('hidden');
-        requestAnimationFrame(function () {
-            panel.style.transform = 'translateX(0)';
-        });
-        document.body.style.overflow = 'hidden';
-    }
-
-    function closeNotificationDrawer() {
-        var overlay = document.getElementById('notif-overlay');
-        var panel = document.getElementById('notif-panel');
-        if (!overlay || !panel) return;
-
-        panel.style.transform = 'translateX(100%)';
-        setTimeout(function () {
-            overlay.classList.add('hidden');
-            document.body.style.overflow = '';
-        }, 300);
-    }
-
-    function markAllNotificationsRead(e) {
-        if (!e) return;
-        var btn = e.currentTarget;
-        btn.disabled = true;
-        btn.innerHTML = '<i class="ri-loader-4-line animate-spin mr-0.5"></i> Memproses...';
-
-        fetch('{{ route('notifications.mark-all-read') }}', {
-            method: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                'Accept': 'application/json',
-            }
-        }).then(function (res) { return res.json(); })
-            .then(function (data) {
-                if (data.success) {
-                    document.querySelectorAll('.notif-item').forEach(function (el) {
-                        el.classList.remove('bg-teal-50/40', 'hover:bg-teal-50/70');
-                        el.classList.add('bg-white', 'hover:bg-slate-50');
-                        var dot = el.querySelector('span.bg-teal-500');
-                        if (dot) dot.remove();
-                    });
-                    var bellBadge = document.querySelector('#notif-btn .has-unread');
-                    if (bellBadge) bellBadge.remove();
-                    var headerText = document.querySelector('#notif-panel h3 + p');
-                    if (headerText) {
-                        headerText.classList.remove('text-teal-600');
-                        headerText.classList.add('text-slate-400');
-                        headerText.textContent = 'Semua sudah dibaca';
-                    }
-                    var btnParent = btn.closest('div');
-                    if (btnParent) btnParent.remove();
-                }
-            })
-            .catch(function () {
-                btn.disabled = false;
-                btn.innerHTML = '<i class="ri-check-double-line mr-0.5"></i> Tandai Baca';
-            });
-    }
-
-    document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape') closeNotificationDrawer();
-    });
-</script>

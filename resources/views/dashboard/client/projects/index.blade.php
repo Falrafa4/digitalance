@@ -34,7 +34,7 @@
                 <p class="font-extrabold text-slate-900">Order #{{ $p->id }}</p>
                 <p class="text-slate-500 text-[13px] mt-1 truncate">{{ $p->service->title ?? '-' }}</p>
               </div>
-              @include('dashboard.client._ui.status-badge', ['status' => $p->status ?? '-'])
+              <x-crud-status-badge :status="$p->status ?? '-'" border />
             </div>
 
             <div class="mt-4 flex gap-2">

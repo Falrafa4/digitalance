@@ -6,9 +6,6 @@
     let currentPage = 1;
     let itemsPerPage = 10;
     
-    // State Filter
-    let activeFilter = 'all';
-
     const $ = (id) => document.getElementById(id);
 
     // 2. KONFIGURASI STATUS SESUAI DATABASE

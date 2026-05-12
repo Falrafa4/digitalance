@@ -31,7 +31,7 @@
           </div>
 
           <div class="flex flex-wrap items-center gap-2">
-            @include('dashboard.client._ui.status-badge', ['status' => $order->status ?? '-'])
+            <x-crud-status-badge :status="$order->status ?? '-'" border />
             <span class="px-3 py-1 rounded-full text-[12px] font-extrabold bg-white text-slate-700 border border-slate-200">
               Agreed: Rp {{ number_format((float)($order->agreed_price ?? 0), 0, ',', '.') }}
             </span>

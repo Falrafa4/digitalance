@@ -23,15 +23,7 @@ body {
     display: block;
 }
 
-.card-approved {
-    border-color: #10B981 !important;
-    background: #f0fdf9 !important;
-}
-
-.card-rejected {
-    border-color: #ef4444 !important;
-    background: #fef2f2 !important;
-}
+/* .card-approved / .card-rejected moved to _shared.css */
 
 #toast-container {
     position: fixed;

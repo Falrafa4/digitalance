@@ -23,7 +23,7 @@
       </div>
 
       @if(isset($transaction->status))
-        @include('dashboard.client._ui.status-badge', ['status' => $transaction->status])
+        <x-crud-status-badge :status="$transaction->status" border />
       @endif
     </div>
 

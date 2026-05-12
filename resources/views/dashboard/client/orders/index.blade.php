@@ -39,7 +39,7 @@
                 </p>
               </div>
 
-              @include('dashboard.client._ui.status-badge', ['status' => $o->status ?? '-'])
+              <x-crud-status-badge :status="$o->status ?? '-'" border />
             </div>
 
             <div class="flex gap-2 mt-4">

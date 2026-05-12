@@ -1,5 +1,3 @@
-let hasUnreadMessages = true;
-
 // Data injection dari Blade
 const rawPortfolios = window.__PORTOFOLIOS_PAGE__?.data;
 let portfoliosData = Array.isArray(rawPortfolios) ? rawPortfolios : (rawPortfolios?.data || []);

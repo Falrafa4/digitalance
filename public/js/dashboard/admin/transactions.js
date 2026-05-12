@@ -1,64 +1,21 @@
 (() => {
+    const U = window.DashboardUtils;
+    const $ = (id) => U.$(id);
+    const formatRupiah = (n) => U.formatRupiah(n);
+    const apiRequest = (url, opts) => U.apiRequest(url, opts);
+    const showToast = (msg, type) => U.showToast(msg, type);
+    const openModal = (id) => U.openModal(id);
+    const closeModal = (id) => U.closeModal(id);
+
     const page = window.__TRANSACTIONS_PAGE__ || {};
     let trxData = Array.isArray(page.data) ? page.data : (page.data?.data || []);
-    
+
     let currentPage = 1;
     let itemsPerPage = 10;
-    
     let reportTargetId = null;
 
-    const $ = (id) => document.getElementById(id);
-
-    function formatRupiah(number) {
-        if (!number) return 'Rp 0';
-        return new Intl.NumberFormat('id-ID', { 
-            style: 'currency', 
-            currency: 'IDR', 
-            minimumFractionDigits: 0 
-        }).format(number);
-    }
-
-    function getCsrfToken() {
-        return document.querySelector('meta[name="csrf-token"]')?.content || 
-               document.querySelector('input[name="_token"]')?.value || '';
-    }
-
-    async function apiRequest(url, { method = 'POST', body = null } = {}) {
-        const headers = { 'X-CSRF-TOKEN': getCsrfToken(), 'Accept': 'application/json' };
-        let payload = body;
-        if (body && typeof body === 'object' && !(body instanceof FormData)) {
-            headers['Content-Type'] = 'application/json';
-            payload = JSON.stringify(body);
-        }
-        const res = await fetch(url, { method, headers, body: payload });
-        let data = null;
-        const ct = res.headers.get('content-type') || '';
-        if (ct.includes('application/json')) { try { data = await res.json(); } catch (e) {} }
-        if (!res.ok) throw new Error(data?.message || `Request gagal (${res.status}).`);
-        return data;
-    }
-
-    function showToast(msg, type = 'success') {
-        if (window.showToast) return window.showToast(msg, type);
-        alert(msg);
-    }
-
-    function openModal(id) {
-        const el = $(id);
-        if (el) { el.classList.remove('opacity-0', 'pointer-events-none'); el.style.opacity = '1'; el.style.pointerEvents = 'all'; }
-    }
-    function closeModal(id) {
-        const el = $(id);
-        if (el) { el.classList.add('opacity-0', 'pointer-events-none'); el.style.opacity = '0'; el.style.pointerEvents = 'none'; }
-    }
     window.openModal = openModal;
     window.closeModal = closeModal;
-
-    function setupOverlayListeners() {
-        document.querySelectorAll('.overlay').forEach(ov => {
-            ov.addEventListener('click', e => { if (e.target === ov) closeModal(ov.id); });
-        });
-    }
 
     // RENDER STATS
     function renderStats() {
@@ -286,14 +243,13 @@
     }
 
     function init() {
-        setupOverlayListeners();
+        U.setupOverlayListeners();
         renderStats();
         refreshGrid();
         initFilters();
-        
+
         $('trx-search-input')?.addEventListener('input', () => { currentPage = 1; refreshGrid(); });
     }
 
-    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
-    else init();
+    U.ready(init);
 })();

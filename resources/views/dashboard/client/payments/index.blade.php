@@ -31,7 +31,7 @@
               </div>
 
               @if(isset($t->status))
-                @include('dashboard.client._ui.status-badge', ['status' => $t->status])
+                <x-crud-status-badge :status="$t->status" border />
               @endif
             </div>
 

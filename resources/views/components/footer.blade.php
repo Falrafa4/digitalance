@@ -152,29 +152,4 @@
         </div>
     </div>
 
-    <script>
-        // Modal logic
-        function openPrivacyModal() {
-            const modal = document.getElementById('privacy-modal');
-            modal.classList.remove('hidden');
-            window.DigitalanceUtils.focusTrap(modal);
-        }
-        function closePrivacyModal() {
-            document.getElementById('privacy-modal').classList.add('hidden');
-        }
-        function openTnCModal() {
-            const modal = document.getElementById('tnc-modal');
-            modal.classList.remove('hidden');
-            window.DigitalanceUtils.focusTrap(modal);
-        }
-        function closeTnCModal() {
-            document.getElementById('tnc-modal').classList.add('hidden');
-        }
-        // close modal jika klik overlay atau ESC
-        window.addEventListener('keydown', e => {
-            if (e.key === 'Escape') { closePrivacyModal(); closeTnCModal(); }
-        });
-        document.getElementById('privacy-modal').addEventListener('click', function (e) { if (e.target === this) { closePrivacyModal(); } });
-        document.getElementById('tnc-modal').addEventListener('click', function (e) { if (e.target === this) { closeTnCModal(); } });
-    </script>
 </footer>

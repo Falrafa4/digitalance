@@ -32,6 +32,8 @@
         }
     </script>
     <script src="{{ asset('js/utils.js') }}" defer></script>
+    <script src="{{ asset('js/dashboard/shared/footer.js') }}" defer></script>
+    <script src="{{ asset('js/dashboard/shared/flash.js') }}" defer></script>
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
 

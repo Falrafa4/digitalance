@@ -1,4 +1,6 @@
-// State management
+const $ = (id) => document.getElementById(id);
+const $$ = (sel) => Array.from(document.querySelectorAll(sel));
+
 let offersState = {
     data: [],
     filteredData: [],
@@ -20,10 +22,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const pageData = window.__OFFERS_PAGE__ || {};
     offersState.data = Array.isArray(pageData.offers) ? pageData.offers : [];
     negoState.data = Array.isArray(pageData.negotiations) ? pageData.negotiations : [];
-    
+
     offersState.filteredData = [...offersState.data];
     negoState.filteredData = [...negoState.data];
-    
+
     initPage();
 });
 
@@ -34,8 +36,9 @@ function initPage() {
     initTabEvents();
     initFilterEvents();
     initPaginationEvents();
-    
-    const overlay = document.getElementById('modal-offers-overlay');
+    initSearchEvents();
+
+    const overlay = $('modal-offers-overlay');
     if (overlay) {
         overlay.addEventListener('click', (e) => {
             if (e.target === overlay) closeModal();
@@ -101,7 +104,7 @@ function filterNegoData() {
 // ==========================================
 
 function renderStats() {
-    const row = document.getElementById('stats-row');
+    const row = $('stats-row');
     if (!row) return;
 
     const totalOffers = offersState.data.length;
@@ -134,9 +137,9 @@ function renderStats() {
 }
 
 function renderOffers() {
-    const tbody = document.getElementById('offers-tbody');
-    const emptyState = document.getElementById('offers-empty');
-    const pagination = document.getElementById('offers-pagination');
+    const tbody = $('offers-tbody');
+    const emptyState = $('offers-empty');
+    const pagination = $('offers-pagination');
     if (!tbody) return;
 
     const start = (offersState.currentPage - 1) * offersState.pageSize;
@@ -145,16 +148,16 @@ function renderOffers() {
 
     tbody.innerHTML = '';
     if (paginatedData.length === 0) {
-        emptyState?.classList.remove('hidden');
-        pagination?.classList.add('hidden');
+        if (emptyState) emptyState.classList.remove('hidden');
+        if (pagination) pagination.classList.add('hidden');
         return;
     }
 
-    emptyState?.classList.add('hidden');
-    pagination?.classList.remove('hidden');
-    
+    if (emptyState) emptyState.classList.add('hidden');
+    if (pagination) pagination.classList.remove('hidden');
+
     paginatedData.forEach(offer => {
-        const row = `
+        tbody.insertAdjacentHTML('beforeend', `
             <tr class="hover:bg-gray-50 transition border-b border-gray-50">
                 <td class="px-6 py-4 text-sm font-bold text-gray-700">#OFF-${offer.id}</td>
                 <td class="px-6 py-4">
@@ -172,21 +175,19 @@ function renderOffers() {
                     </button>
                 </td>
             </tr>
-        `;
-        tbody.insertAdjacentHTML('beforeend', row);
+        `);
     });
 
-    // Update Pagination Info
     const total = offersState.filteredData.length;
     updatePaginationInfo('offers', start, end, total, offersState.currentPage, offersState.pageSize);
 }
 
 function updatePaginationInfo(prefix, start, end, total, currentPage, pageSize) {
-    const showingStartEl = document.getElementById(prefix + '-showing-start');
-    const showingEndEl = document.getElementById(prefix + '-showing-end');
-    const totalEl = document.getElementById(prefix + '-total');
-    const prevBtn = document.getElementById(prefix + '-prev-btn');
-    const nextBtn = document.getElementById(prefix + '-next-btn');
+    const showingStartEl = $(prefix + '-showing-start');
+    const showingEndEl = $(prefix + '-showing-end');
+    const totalEl = $(prefix + '-total');
+    const prevBtn = $(prefix + '-prev-btn');
+    const nextBtn = $(prefix + '-next-btn');
 
     if (showingStartEl) showingStartEl.textContent = total === 0 ? 0 : start + 1;
     if (showingEndEl) showingEndEl.textContent = Math.min(end, total);
@@ -196,9 +197,9 @@ function updatePaginationInfo(prefix, start, end, total, currentPage, pageSize) 
 }
 
 function renderNego() {
-    const tbody = document.getElementById('nego-tbody');
-    const emptyState = document.getElementById('nego-empty');
-    const pagination = document.getElementById('nego-pagination');
+    const tbody = $('nego-tbody');
+    const emptyState = $('nego-empty');
+    const pagination = $('nego-pagination');
     if (!tbody) return;
 
     const start = (negoState.currentPage - 1) * negoState.pageSize;
@@ -207,17 +208,17 @@ function renderNego() {
 
     tbody.innerHTML = '';
     if (paginatedData.length === 0) {
-        emptyState?.classList.remove('hidden');
-        pagination?.classList.add('hidden');
+        if (emptyState) emptyState.classList.remove('hidden');
+        if (pagination) pagination.classList.add('hidden');
         return;
     }
 
-    emptyState?.classList.add('hidden');
-    pagination?.classList.remove('hidden');
-    
+    if (emptyState) emptyState.classList.add('hidden');
+    if (pagination) pagination.classList.remove('hidden');
+
     paginatedData.forEach(n => {
         const negoId = (n && (n.id || n.nego_id)) ? (n.id || n.nego_id) : '';
-        const row = `
+        tbody.insertAdjacentHTML('beforeend', `
             <tr class="hover:bg-gray-50 transition border-b border-gray-50">
                 <td class="px-6 py-4 text-sm font-bold text-gray-700">#NG-${negoId}</td>
                 <td class="px-6 py-4 text-sm text-gray-500">#ORD-${n.order_id || ''}</td>
@@ -232,11 +233,9 @@ function renderNego() {
                     </button>
                 </td>
             </tr>
-        `;
-        tbody.insertAdjacentHTML('beforeend', row);
+        `);
     });
 
-    // Update Pagination Info
     const total = negoState.filteredData.length;
     updatePaginationInfo('nego', start, end, total, negoState.currentPage, negoState.pageSize);
 }
@@ -246,28 +245,28 @@ function renderNego() {
 // ==========================================
 
 function initTabEvents() {
-    const tabs = document.querySelectorAll('.section-tab');
-    tabs.forEach(tab => {
+    $$('.section-tab').forEach(tab => {
         tab.addEventListener('click', function() {
-            tabs.forEach(t => {
+            $$('.section-tab').forEach(t => {
                 t.classList.remove('active', 'text-teal-600', 'border-teal-600');
                 t.classList.add('text-gray-500', 'border-transparent');
             });
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            $$('.tab-content').forEach(c => c.classList.remove('active'));
 
             this.classList.add('active', 'text-teal-600', 'border-teal-600');
             this.classList.remove('text-gray-500', 'border-transparent');
-            
+
             const target = this.getAttribute('data-target');
-            document.getElementById(target)?.classList.add('active');
+            const targetEl = document.getElementById(target);
+            if (targetEl) targetEl.classList.add('active');
         });
     });
 }
 
 function initFilterEvents() {
-    document.querySelectorAll('.filter-tab').forEach(f => {
+    $$('.filter-tab').forEach(f => {
         f.addEventListener('click', function() {
-            document.querySelectorAll('.filter-tab').forEach(t => {
+            $$('.filter-tab').forEach(t => {
                 t.classList.remove('active', 'bg-teal-600', 'text-white');
                 t.classList.add('bg-white', 'text-gray-600');
             });
@@ -278,36 +277,63 @@ function initFilterEvents() {
 }
 
 function initPaginationEvents() {
-    document.getElementById('offers-prev-btn').addEventListener('click', () => {
+    const offersPrev = document.getElementById('offers-prev-btn');
+    const offersNext = document.getElementById('offers-next-btn');
+    const negoPrev = document.getElementById('nego-prev-btn');
+    const negoNext = document.getElementById('nego-next-btn');
+
+    if (offersPrev) offersPrev.addEventListener('click', () => {
         if (offersState.currentPage > 1) updateOffersState({ currentPage: offersState.currentPage - 1 });
     });
-    document.getElementById('offers-next-btn').addEventListener('click', () => {
+    if (offersNext) offersNext.addEventListener('click', () => {
         if (offersState.currentPage * offersState.pageSize < offersState.filteredData.length) {
             updateOffersState({ currentPage: offersState.currentPage + 1 });
         }
     });
-
-    document.getElementById('nego-prev-btn').addEventListener('click', () => {
+    if (negoPrev) negoPrev.addEventListener('click', () => {
         if (negoState.currentPage > 1) updateNegoState({ currentPage: negoState.currentPage - 1 });
     });
-    document.getElementById('nego-next-btn').addEventListener('click', () => {
+    if (negoNext) negoNext.addEventListener('click', () => {
         if (negoState.currentPage * negoState.pageSize < negoState.filteredData.length) {
             updateNegoState({ currentPage: negoState.currentPage + 1 });
         }
     });
 }
 
-function handleSearch() {
-    const q = document.getElementById('global-search-input').value;
-    updateOffersState({ searchQuery: q });
-    updateNegoState({ searchQuery: q });
+function initSearchEvents() {
+    const searchInput = document.getElementById('global-search-input');
+    if (searchInput) {
+        searchInput.addEventListener('input', () => {
+            const q = searchInput.value;
+            updateOffersState({ searchQuery: q });
+            updateNegoState({ searchQuery: q });
+        });
+    }
+}
+
+function openModal() {
+    const overlay = $('modal-offers-overlay');
+    if (overlay) {
+        overlay.classList.remove('hidden');
+        overlay.classList.remove('opacity-0', 'pointer-events-none');
+        overlay.style.opacity = '1';
+        overlay.style.pointerEvents = 'all';
+    }
+}
+
+function closeModal() {
+    const overlay = $('modal-offers-overlay');
+    if (overlay) {
+        overlay.classList.add('hidden');
+    }
 }
 
 function openOfferModal(id) {
     const o = offersState.data.find(x => x.id == id);
     if (!o) return;
 
-    const box = document.getElementById('modal-offers-box');
+    const box = $('modal-offers-box');
+    if (!box) return;
     box.innerHTML = `
         <div class="p-6">
             <div class="flex justify-between items-center mb-6">
@@ -339,14 +365,15 @@ function openOfferModal(id) {
             <button onclick="closeModal()" class="mt-8 w-full py-3 bg-gray-900 text-white font-bold rounded-xl hover:bg-black transition">Tutup Detail</button>
         </div>
     `;
-    document.getElementById('modal-offers-overlay').classList.remove('hidden');
+    openModal();
 }
 
 function openNegoModal(id) {
     const n = negoState.data.find(x => x.id == id);
     if (!n) return;
 
-    const box = document.getElementById('modal-offers-box');
+    const box = $('modal-offers-box');
+    if (!box) return;
     box.innerHTML = `
         <div class="p-6">
             <div class="flex justify-between items-center mb-6">
@@ -378,11 +405,7 @@ function openNegoModal(id) {
             <button onclick="closeModal()" class="mt-8 w-full py-3 bg-gray-900 text-white font-bold rounded-xl hover:bg-black transition">Tutup Detail</button>
         </div>
     `;
-    document.getElementById('modal-offers-overlay').classList.remove('hidden');
-}
-
-function closeModal() {
-    document.getElementById('modal-offers-overlay').classList.add('hidden');
+    openModal();
 }
 
 function getStatusColor(status) {

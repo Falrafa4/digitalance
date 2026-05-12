@@ -48,6 +48,21 @@
         ?? Auth::guard('client')->user()
         ?? Auth::guard('freelancer')->user();
     $notifRole = Auth::guard('administrator')->check() ? 'admin' : (Auth::guard('client')->check() ? 'client' : (Auth::guard('freelancer')->check() ? 'freelancer' : null));
+
+    \App\Models\Notification::where('created_at', '<', now()->subDays(30))->delete();
+
+    $notifNotifications = $notifRole
+        ? \App\Models\Notification::where('role', $notifRole)
+            ->where(function ($q) use ($notifUser) {
+                $q->where('user_id', $notifUser->id)
+                    ->orWhereNull('user_id');
+            })
+            ->latest()
+            ->take(30)
+            ->get()
+        : collect();
+
+    $notifUnreadCount = $notifNotifications->where('is_read', false)->count();
 @endphp
     {{-- Skip to main content link for accessibility --}}
     <a href="#main-content"
@@ -78,6 +93,7 @@
 
     <script src="{{ asset('js/dashboard/confirm-modal.js') }}"></script>
     <script src="{{ asset('js/dashboard/search.js') }}"></script>
+    <script src="{{ asset('js/dashboard/shared/notification-drawer.js') }}"></script>
 
     <script>
         // Global JS Error Boundary

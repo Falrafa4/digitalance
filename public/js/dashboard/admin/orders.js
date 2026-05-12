@@ -1,6 +1,4 @@
 (() => {
-  let hasUnreadMessages = true;
-
   /**
    * 1. DATA NORMALIZER
    * Fungsi ini sangat penting untuk menyamakan format data.
