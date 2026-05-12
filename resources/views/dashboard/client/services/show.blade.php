@@ -35,27 +35,21 @@
         </div>
       </div>
 
+      @if($otherServices->count() > 0)
       <div class="bg-white border border-slate-200 rounded-[18px] p-6">
         <h2 class="font-display font-extrabold text-slate-900 text-[1.25rem]">Layanan Lain</h2>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-          @forelse(($otherServices ?? []) as $os)
+          @foreach($otherServices as $os)
             <a href="{{ route('client.services.show', $os->id) }}"
                class="border border-slate-200 rounded-[18px] p-5 hover:shadow-md transition-all bg-white">
               <p class="font-extrabold text-slate-900 truncate">{{ $os->title ?? 'Service' }}</p>
-              <p class="text-slate-500 text-[13px] mt-1">{{ $os->service_category->name ?? '-' }}</p>
+              <p class="text-slate-500 text-[13px] mt-1">{{ $os->category->name ?? '-' }}</p>
             </a>
-          @empty
-            <div class="sm:col-span-2">
-              @include('dashboard.client._ui.empty', [
-                'icon' => 'ri-folder-unknow-line',
-                'title' => 'Belum ada layanan lain',
-                'desc' => 'Freelancer ini belum menambahkan layanan lain.'
-              ])
-            </div>
-          @endforelse
+          @endforeach
         </div>
       </div>
+      @endif
     </div>
 
     <aside class="w-full lg:w-[360px] shrink-0 space-y-6">
@@ -76,11 +70,11 @@
         </div>
 
         <div class="mt-5 pt-5 border-t border-slate-100">
-          <a href="{{ route('client.talents.index') }}"
-             class="w-full inline-flex items-center justify-center px-5 py-3 rounded-[12px] bg-white border border-slate-200 text-slate-700 font-bold text-[13px]
-                    hover:border-[#0f766e] hover:text-[#0f766e] transition-all">
-            Find Talent <i class="ri-user-search-line ml-2"></i>
-          </a>
+        <a href="{{ route('client.talents.index') }}"
+           class="w-full inline-flex items-center justify-center px-5 py-3 rounded-[12px] bg-white border border-slate-200 text-slate-700 font-bold text-[13px]
+                  hover:border-[#0f766e] hover:text-[#0f766e] transition-all">
+          Lihat Freelancer Lain <i class="ri-user-search-line ml-2"></i>
+        </a>
         </div>
       </div>
     </aside>

@@ -43,6 +43,12 @@
 </head>
 
 <body class="bg-slate-50 text-slate-900 font-sans h-screen overflow-hidden">
+@php
+    $notifUser = Auth::guard('administrator')->user()
+        ?? Auth::guard('client')->user()
+        ?? Auth::guard('freelancer')->user();
+    $notifRole = Auth::guard('administrator')->check() ? 'admin' : (Auth::guard('client')->check() ? 'client' : (Auth::guard('freelancer')->check() ? 'freelancer' : null));
+@endphp
     {{-- Skip to main content link for accessibility --}}
     <a href="#main-content"
        class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[9999] focus:px-4 focus:py-2 focus:bg-[#0f766e] focus:text-white focus:rounded-lg focus:font-bold focus:text-sm">
@@ -72,7 +78,6 @@
 
     <script src="{{ asset('js/dashboard/confirm-modal.js') }}"></script>
     <script src="{{ asset('js/dashboard/search.js') }}"></script>
-    <script src="{{ asset('js/dashboard/notif-drawer.js') }}"></script>
 
     <script>
         // Global JS Error Boundary

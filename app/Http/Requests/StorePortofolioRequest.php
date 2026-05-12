@@ -25,7 +25,7 @@ class StorePortofolioRequest extends FormRequest
             'service_id' => 'required|exists:services,id',
             'title' => 'required|string',
             'description' => 'required|string',
-            'media_url' => 'required|url'
+            'media_url' => 'required|url',
         ];
     }
 }

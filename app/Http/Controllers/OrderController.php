@@ -25,19 +25,19 @@ class OrderController extends Controller
         }
 
         if ($search) {
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('id', 'like', "%{$search}%")
-                  ->orWhereHas('client', function($cq) use ($search) {
-                      $cq->where('name', 'like', "%{$search}%");
-                  })
-                  ->orWhereHas('service', function($sq) use ($search) {
-                      $sq->where('title', 'like', "%{$search}%");
-                  });
+                    ->orWhereHas('client', function ($cq) use ($search) {
+                        $cq->where('name', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('service', function ($sq) use ($search) {
+                        $sq->where('title', 'like', "%{$search}%");
+                    });
             });
         }
 
         $orders = $query->latest()->paginate(12)->withQueryString();
-        
+
         // Data for dropdowns in Add Order modal (if still needed)
         $clients = \App\Models\Client::orderBy('name')->get();
         $freelancers = \App\Models\Freelancer::with('skomda_student')->get();
@@ -63,7 +63,7 @@ class OrderController extends Controller
             'service_id' => 'required|integer|exists:services,id',
             'brief' => 'required|string',
             'status' => 'nullable|in:Pending,Negotiated,Paid,In Progress,Revision,Completed,Cancelled',
-            'agreed_price' => 'nullable|decimal:2'
+            'agreed_price' => 'nullable|decimal:2',
         ]);
 
         $service = Service::findOrFail($validated['service_id']);
@@ -105,7 +105,7 @@ class OrderController extends Controller
             'offers',
             'transactions',
             'results',
-            'review'
+            'review',
         ]);
 
         return view('dashboard.client.orders.show', compact('order'));
@@ -113,6 +113,10 @@ class OrderController extends Controller
 
     public function create(Service $service)
     {
+        if ($service->status !== 'Approved') {
+            return redirect()->route('client.services.index')->with('warning', 'Layanan tidak tersedia untuk diorder.');
+        }
+
         $service->load(['freelancer.skomda_student', 'service_category']);
 
         return view('dashboard.client.orders.create', compact('service'));
@@ -128,6 +132,10 @@ class OrderController extends Controller
         ]);
 
         $service = Service::findOrFail($validated['service_id']);
+
+        if ($service->status !== 'Approved') {
+            return redirect()->route('client.services.index')->with('error', 'Layanan tidak tersedia.');
+        }
 
         $order = Order::create([
             'service_id' => $service->id,
@@ -151,7 +159,7 @@ class OrderController extends Controller
 
         $path = $request->file('file')->store('order-attachments', 'public');
 
-        $order->brief = trim(($order->brief ?? '') . "\n\nAttachment: " . $path);
+        $order->brief = trim(($order->brief ?? '')."\n\nAttachment: ".$path);
         $order->save();
 
         return back()->with('success', 'Attachment berhasil diupload');
@@ -186,6 +194,7 @@ class OrderController extends Controller
     // =========================
     // FREELANCER ONLY
     // =========================
+
     public function freelancerIndex(Request $request)
     {
         $freelancer = $request->user('freelancer');
@@ -203,7 +212,7 @@ class OrderController extends Controller
     public function freelancerShow(Order $order)
     {
         $freelancer = auth('freelancer')->user();
-        
+
         // Cek akses: Pesanan harus milik service yang dikelola freelancer ini
         abort_unless($order->service->freelancer_id === $freelancer->id, 403);
 
@@ -217,7 +226,7 @@ class OrderController extends Controller
         $validated = $request->validate($this->statusValidationRules());
 
         $order = Order::findOrFail($id);
-        
+
         // Cek akses
         $freelancer = auth('freelancer')->user();
         abort_unless($order->service->freelancer_id === $freelancer->id, 403);
@@ -231,18 +240,18 @@ class OrderController extends Controller
     {
         $validated = $request->validate([
             'agreed_price' => 'required|numeric|min:0',
-            'note' => 'nullable|string'
+            'note' => 'nullable|string',
         ]);
 
         $order = Order::findOrFail($id);
-        
+
         // Cek akses
         $freelancer = auth('freelancer')->user();
         abort_unless($order->service->freelancer_id === $freelancer->id, 403);
 
         $order->update([
             'agreed_price' => $validated['agreed_price'],
-            'status' => 'Negotiated'
+            'status' => 'Negotiated',
         ]);
 
         return redirect()->route('freelancer.orders.show', $order->id)->with('success', 'Penawaran harga berhasil dikirim');
@@ -255,19 +264,19 @@ class OrderController extends Controller
 
         $validated = $request->validate([
             'agreed_price' => 'required|numeric|min:0',
-            'note' => 'nullable|string'
+            'note' => 'nullable|string',
         ]);
 
         $order->update([
             'agreed_price' => $validated['agreed_price'],
-            'status' => 'Negotiated'
+            'status' => 'Negotiated',
         ]);
 
         // Opsional: Jika ada sistem pesan, simpan catatan sebagai pesan negosiasi
         if ($request->filled('note')) {
             $order->negotiations()->create([
                 'sender' => 'freelancer',
-                'message' => $validated['note']
+                'message' => $validated['note'],
             ]);
         }
 
@@ -277,17 +286,17 @@ class OrderController extends Controller
     public function freelancerReject(Request $request, Order $order)
     {
         $freelancer = auth('freelancer')->user();
-        
+
         // Cek akses: Pesanan harus milik service yang dikelola freelancer ini
         abort_unless($order->service->freelancer_id === $freelancer->id, 403);
 
         $request->validate([
-            'reason' => 'required|string'
+            'reason' => 'required|string',
         ]);
 
         $order->update([
             'status' => 'Cancelled',
-            'brief' => $order->brief . "\n\nRejection Reason: " . $request->reason
+            'brief' => $order->brief."\n\nRejection Reason: ".$request->reason,
         ]);
 
         return redirect()->route('freelancer.orders.index')->with('success', 'Pesanan telah ditolak');
@@ -320,7 +329,7 @@ class OrderController extends Controller
             return redirect()->back()->with('error', 'Order tidak dalam status negosiasi.');
         }
 
-        if (!$order->agreed_price) {
+        if (! $order->agreed_price) {
             return redirect()->back()->with('error', 'Belum ada harga yang disepakati.');
         }
 
@@ -350,13 +359,18 @@ class OrderController extends Controller
             return redirect()->route('client.orders.show', $order->id)->with('error', 'Pembayaran tidak dapat diproses.');
         }
 
+        // Idempotency: prevent double payment
+        if ($order->transactions()->where('status', 'Paid')->exists()) {
+            return redirect()->route('client.orders.show', $order->id)->with('warning', 'Pembayaran sudah pernah dilakukan.');
+        }
+
         // Validasi payment method
         $request->validate([
             'payment_method' => 'required|in:qris,va_bca,va_mandiri,va_bri',
         ]);
 
         // Hitung total dengan biaya platform 10%
-        $price = (float)$order->agreed_price;
+        $price = (float) $order->agreed_price;
         $platformFee = $price * 0.1;
         $total = $price + $platformFee;
 
@@ -379,7 +393,7 @@ class OrderController extends Controller
 
         $methodLabel = $paymentMethodLabels[$request->payment_method] ?? 'QRIS';
 
-        return redirect()->route('client.orders.show', $order->id)->with('success', 'Pembayaran sebesar Rp ' . number_format($total, 0, ',', '.') . ' via ' . $methodLabel . ' berhasil!');
+        return redirect()->route('client.orders.show', $order->id)->with('success', 'Pembayaran sebesar Rp '.number_format($total, 0, ',', '.').' via '.$methodLabel.' berhasil!');
     }
 
     // =========================
@@ -398,7 +412,7 @@ class OrderController extends Controller
 
         $order->negotiations()->create([
             'sender' => 'client',
-            'message' => 'Order ditolak. Alasan: ' . $request->reason,
+            'message' => 'Order ditolak. Alasan: '.$request->reason,
         ]);
 
         return redirect()->route('client.orders.index')->with('success', 'Order telah ditolak.');
@@ -420,7 +434,7 @@ class OrderController extends Controller
 
         $order->negotiations()->create([
             'sender' => 'client',
-            'message' => 'Negosiasi harga: ' . $validated['reason'] . "\n\nHarga tawaran: Rp " . number_format($validated['new_price'], 0, ',', '.') . "\n\nDetail: " . ($validated['description'] ?? '-'),
+            'message' => 'Negosiasi harga: '.$validated['reason']."\n\nHarga tawaran: Rp ".number_format($validated['new_price'], 0, ',', '.')."\n\nDetail: ".($validated['description'] ?? '-'),
         ]);
 
         return redirect()->back()->with('success', 'Negosiasi berhasil dikirim ke freelancer.');
@@ -434,7 +448,7 @@ class OrderController extends Controller
         $client = auth('client')->user();
         abort_unless($order->client_id === $client->id, 403);
 
-        if (!in_array($order->status, ['In Progress', 'Completed'])) {
+        if (! in_array($order->status, ['In Progress', 'Completed'])) {
             return redirect()->back()->with('error', 'Revision hanya bisa diminta pada pekerjaan yang sedang berlangsung atau sudah selesai.');
         }
 
@@ -445,7 +459,7 @@ class OrderController extends Controller
 
         $order->negotiations()->create([
             'sender' => 'client',
-            'message' => 'Permintaan Revisi: ' . $validated['reason'] . "\n\nDetail: " . ($validated['description'] ?? '-'),
+            'message' => 'Permintaan Revisi: '.$validated['reason']."\n\nDetail: ".($validated['description'] ?? '-'),
         ]);
 
         $order->update(['status' => 'Revision']);
@@ -514,7 +528,7 @@ class OrderController extends Controller
 
         $order->negotiations()->create([
             'sender' => 'freelancer',
-            'message' => '[REVISION REJECTED] Revisi ditolak. Alasan: ' . $request->reason,
+            'message' => '[REVISION REJECTED] Revisi ditolak. Alasan: '.$request->reason,
         ]);
 
         return redirect()->back()->with('error', 'Revisi ditolak.');

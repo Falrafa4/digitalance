@@ -35,7 +35,7 @@
                   {{ $o->service->title ?? '-' }}
                 </p>
                 <p class="text-slate-400 text-[12px] font-bold mt-2">
-                  Agreed: Rp {{ number_format((float)($o->agreed_price ?? 0), 0, ',', '.') }}
+                  Agreed: {{ $o->agreed_price ? 'Rp ' . number_format((float) $o->agreed_price, 0, ',', '.') : 'Belum disepakati' }}
                 </p>
               </div>
 
@@ -70,21 +70,4 @@
     @include('dashboard.client._ui.client-pager')
   @endif
 </section>
-@endsection
-
-@section('scripts')
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  const pagerEl = document.querySelector('[data-client-pager]');
-  if (!pagerEl) return;
-
-  pagerEl.addEventListener('submit', 'form', function(e) {
-    const btn = e.target.querySelector('button[type="submit"]');
-    if (btn) {
-      btn.classList.add('btn-loading');
-      btn.disabled = true;
-    }
-  });
-});
-</script>
 @endsection

@@ -427,7 +427,7 @@
                                 </span>
                             </div>
                             @if($nego->sender == 'client' && $order->status != 'Completed')
-                                <a href="{{ route('freelancer.negotiations.view', $nego->order_id) }}"
+                                <a href="{{ route('freelancer.negotiations.show', $nego->order_id) }}"
                                    class="px-3 py-1.5 rounded-lg bg-[#0f766e]/10 text-[#0f766e] text-[10px] font-bold hover:bg-[#0f766e]/20 transition-colors flex items-center gap-1">
                                     <i class="ri-reply-line"></i> Buka & Respond
                                 </a>

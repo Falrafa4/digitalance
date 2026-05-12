@@ -22,9 +22,10 @@ class UpdateClientProfileRequest extends FormRequest
     public function rules(): array
     {
         $client = $this->route('client');
+
         return [
             'name' => 'required|string',
-            'email' => 'required|email|unique:clients,email,' . $client->id,
+            'email' => 'required|email|unique:clients,email,'.$client->id,
             'phone' => 'required|string',
         ];
     }

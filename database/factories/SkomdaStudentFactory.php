@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\SkomdaStudent>
  */
@@ -19,12 +20,12 @@ class SkomdaStudentFactory extends Factory
             $major = 'SIJA';
         }
 
-        $name = fake()->randomElement($firstNames) . ' ' . fake()->randomElement($lastNames);
+        $name = fake()->randomElement($firstNames).' '.fake()->randomElement($lastNames);
 
         return [
             'nis' => fake()->unique()->numerify('#########'),
             'name' => $name,
-            'email' => fake()->unique()->userName() . '@student.smktelkom-sda.sch.id',
+            'email' => fake()->unique()->userName().'@student.smktelkom-sda.sch.id',
             'class' => $class,
             'major' => $major,
         ];

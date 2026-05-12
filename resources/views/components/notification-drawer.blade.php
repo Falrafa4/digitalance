@@ -1,122 +1,201 @@
 @php
-    // Detect active guard + role (multi-guard safe)
     $isAdmin = Auth::guard('administrator')->check();
     $isClient = Auth::guard('client')->check();
     $isFreelancer = Auth::guard('freelancer')->check();
 
     $role = $isAdmin ? 'admin' : ($isClient ? 'client' : ($isFreelancer ? 'freelancer' : null));
 
-    // Get the actual logged-in user from the active guard
-    $user =
-        Auth::guard('administrator')->user()
+    $user = Auth::guard('administrator')->user()
         ?? Auth::guard('client')->user()
         ?? Auth::guard('freelancer')->user();
 
-    // Fetch from DB
-    $dbNotifications = \App\Models\Notification::where(function($q) use ($role, $user) {
-        $q->where('role', $role);
-        if ($user) {
-            $q->orWhere('user_id', $user->id);
-        }
-    })
-    ->latest()
-    ->take(10)
-    ->get();
+    \App\Models\Notification::where('created_at', '<', now()->subDays(30))->delete();
+
+    $dbNotifications = \App\Models\Notification::where('role', $role)
+        ->where(function ($q) use ($user) {
+            $q->where('user_id', $user->id)
+                ->orWhereNull('user_id');
+        })
+        ->latest()
+        ->take(30)
+        ->get();
+
+    $unreadCount = $dbNotifications->where('is_read', false)->count();
 @endphp
 
-
-
 {{-- Slide-in Notification Drawer --}}
-<div id="notif-drawer" class="fixed inset-0 z-[9998] hidden" aria-hidden="true">
+<div id="notif-overlay"
+    class="fixed inset-0 z-[9998] hidden"
+    aria-hidden="true">
+    <div class="absolute inset-0 bg-slate-900/30 backdrop-blur-sm"
+        onclick="closeNotificationDrawer()"></div>
+</div>
 
-    {{-- Backdrop --}}
-    <div id="notif-backdrop"
-        class="absolute inset-0 bg-slate-900/30 backdrop-blur-[2px] opacity-0 transition-opacity duration-200"></div>
+<aside id="notif-panel"
+    class="fixed top-0 right-0 h-full w-[400px] max-w-[95vw] bg-white shadow-[-8px_0_30px_rgba(0,0,0,0.08)] translate-x-full transition-transform duration-300 ease-out flex flex-col z-[9999]"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Notifikasi">
 
-    {{-- Panel --}}
-    <aside id="notif-panel"
-        class="absolute top-0 right-0 h-full w-[380px] max-w-[92vw] bg-white border-l border-slate-200 shadow-2xl translate-x-full transition-transform duration-200 ease-out"
-        role="dialog"
-        aria-modal="true"
-        aria-label="Notifications"
-    >
-
-        {{-- Header --}}
-        <div class="flex items-center justify-between px-6 py-5 border-b border-slate-200">
-            <div class="min-w-0">
-                <h3 class="font-display text-[1.15rem] font-extrabold text-slate-900 truncate">
-                    Notifications
-                </h3>
-
-                <p class="text-[12px] text-slate-500 mt-0.5">
-                    @switch($role)
-                        @case('administrator')
-                            Update sistem terbaru untuk admin.
-                            @break
-                        @case('client')
-                            Notifikasi pekerjaan dan penawaran Anda.
-                            @break
-                        @case('freelancer')
-                            Notifikasi proyek dan pesan klien.
-                            @break
-                        @default
-                            Notifikasi terbaru.
-                    @endswitch
+    {{-- Header --}}
+    <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between flex-shrink-0">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-emerald-500 flex items-center justify-center text-white shadow-sm">
+                <i class="ri-notification-3-fill text-lg"></i>
+            </div>
+            <div>
+                <h3 class="font-display text-[1.05rem] font-extrabold text-slate-900 leading-tight">Notifikasi</h3>
+                <p class="text-[11px] font-semibold mt-0.5 {{ $unreadCount > 0 ? 'text-teal-600' : 'text-slate-400' }}">
+                    {{ $unreadCount > 0 ? $unreadCount . ' belum dibaca' : 'Semua sudah dibaca' }}
                 </p>
             </div>
+        </div>
 
-            <button id="notif-close" type="button"
-                class="w-10 h-10 rounded-xl border border-slate-200 bg-white flex items-center justify-center text-slate-500 hover:text-slate-900 hover:border-slate-300 transition">
-                <i class="ri-close-line text-[18px]"></i>
+        <div class="flex items-center gap-2">
+            @if ($unreadCount > 0)
+                <button onclick="markAllNotificationsRead(event)"
+                    class="px-3 py-1.5 rounded-lg text-[11px] font-bold text-teal-700 bg-teal-50 hover:bg-teal-100 border border-teal-100 transition-all">
+                    <i class="ri-check-double-line mr-0.5"></i> Tandai Baca
+                </button>
+            @endif
+            <button onclick="closeNotificationDrawer()"
+                class="w-9 h-9 rounded-xl border border-slate-200 bg-white flex items-center justify-center text-slate-400 hover:text-slate-700 hover:border-slate-300 transition-all shadow-sm">
+                <i class="ri-close-line text-[16px]"></i>
             </button>
         </div>
+    </div>
 
-        {{-- Content --}}
-        <div class="p-4 overflow-y-auto h-[calc(100%-80px)]">
+    {{-- Notification List --}}
+    <div class="flex-1 overflow-y-auto" id="notif-list">
+        @if ($dbNotifications->count() > 0)
+            @foreach ($dbNotifications as $n)
+                <div class="notif-item px-5 py-4 border-b border-slate-50 transition-all duration-200 cursor-pointer
+                    {{ $n->is_read ? 'bg-white hover:bg-slate-50' : 'bg-teal-50/40 hover:bg-teal-50/70' }}"
+                    @if (!empty($n->link))
+                        onclick="window.location.href='{{ url($n->link) }}'"
+                    @endif
+                    data-id="{{ $n->id }}">
 
-            @if ($dbNotifications->count() > 0)
-
-                <div class="flex flex-col gap-2.5">
-                    @foreach ($dbNotifications as $n)
-                        <div class="bg-white border border-slate-200 rounded-2xl p-4 hover:border-[#10B981] transition cursor-pointer"
-                            @if (!empty($n->link))
-                                onclick="window.location.href='{{ url($n->link) }}'"
+                    <div class="flex items-start gap-3">
+                        <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0
+                            @if ($n->type === 'success' || $n->type === 'approved') bg-emerald-100 text-emerald-600
+                            @elseif ($n->type === 'danger' || $n->type === 'rejected') bg-red-100 text-red-500
+                            @elseif ($n->type === 'warning') bg-amber-100 text-amber-600
+                            @else bg-blue-100 text-blue-600 @endif">
+                            @if ($n->type === 'success' || $n->type === 'approved')
+                                <i class="ri-checkbox-circle-fill text-lg"></i>
+                            @elseif ($n->type === 'danger' || $n->type === 'rejected')
+                                <i class="ri-error-warning-fill text-lg"></i>
+                            @elseif ($n->type === 'warning')
+                                <i class="ri-alert-fill text-lg"></i>
+                            @else
+                                <i class="ri-information-fill text-lg"></i>
                             @endif
-                        >
-                            <div class="flex items-start gap-3">
-                                <span class="w-9 h-9 rounded-xl bg-[#f0fdf9] text-[#0f766e] flex items-center justify-center">
-                                    <i class="ri-notification-3-line"></i>
-                                </span>
-
-                                <div class="flex-1">
-                                    <p class="text-[13.5px] font-bold text-slate-900">
-                                        {{ $n->title }}
-                                    </p>
-
-                                    <p class="text-[12px] text-slate-500 mt-0.5">
-                                        {{ $n->message }}
-                                    </p>
-
-                                    <p class="text-[11px] text-slate-400 mt-2">
-                                        {{ $n->created_at->diffForHumans() }}
-                                    </p>
-                                </div>
-                            </div>
                         </div>
-                    @endforeach
+
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-start justify-between gap-2">
+                                <p class="font-bold text-[13px] text-slate-900 leading-tight">
+                                    {{ $n->title }}
+                                </p>
+                                @if (!$n->is_read)
+                                    <span class="w-2 h-2 rounded-full bg-teal-500 flex-shrink-0 mt-1.5"></span>
+                                @endif
+                            </div>
+                            <p class="text-[12px] text-slate-500 mt-1 leading-relaxed line-clamp-2">
+                                {{ $n->message }}
+                            </p>
+                            <span class="text-[10px] text-slate-400 font-semibold mt-2 block">
+                                {{ $n->created_at->diffForHumans() }}
+                            </span>
+                        </div>
+                    </div>
                 </div>
-
-            @else
-
-                {{-- Empty --}}
-                <div class="text-center py-14 px-6 bg-white border-2 border-dashed border-slate-200 rounded-3xl">
-                    <i class="ri-notification-off-line text-[46px] text-slate-300 mb-3"></i>
-                    <h4 class="font-bold text-slate-900">No Notifications</h4>
-                    <p class="text-slate-400 text-[13px]">Belum ada update baru hari ini.</p>
+            @endforeach
+        @else
+            <div class="flex flex-col items-center justify-center py-20 text-center px-8">
+                <div class="w-20 h-20 rounded-full bg-slate-50 flex items-center justify-center mb-5">
+                    <i class="ri-notification-off-line text-4xl text-slate-300"></i>
                 </div>
+                <h4 class="font-display font-bold text-slate-700 text-[1rem] mb-1">Tidak Ada Notifikasi</h4>
+                <p class="text-slate-400 text-[13px]">Update terbaru akan muncul di sini.</p>
+            </div>
+        @endif
+    </div>
 
-            @endif
+    {{-- Footer --}}
+    <div class="px-6 py-4 border-t border-slate-100 flex-shrink-0">
+        <p class="text-[11px] text-center text-slate-400 font-bold uppercase tracking-widest">
+            Digitalance Notifications
+        </p>
+    </div>
+</aside>
 
-        </div>
-    </aside>
-</div>
+<script>
+    function openNotificationDrawer() {
+        var overlay = document.getElementById('notif-overlay');
+        var panel = document.getElementById('notif-panel');
+        if (!overlay || !panel) return;
+
+        overlay.classList.remove('hidden');
+        requestAnimationFrame(function () {
+            panel.style.transform = 'translateX(0)';
+        });
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeNotificationDrawer() {
+        var overlay = document.getElementById('notif-overlay');
+        var panel = document.getElementById('notif-panel');
+        if (!overlay || !panel) return;
+
+        panel.style.transform = 'translateX(100%)';
+        setTimeout(function () {
+            overlay.classList.add('hidden');
+            document.body.style.overflow = '';
+        }, 300);
+    }
+
+    function markAllNotificationsRead(e) {
+        if (!e) return;
+        var btn = e.currentTarget;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="ri-loader-4-line animate-spin mr-0.5"></i> Memproses...';
+
+        fetch('{{ route('notifications.mark-all-read') }}', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Accept': 'application/json',
+            }
+        }).then(function (res) { return res.json(); })
+            .then(function (data) {
+                if (data.success) {
+                    document.querySelectorAll('.notif-item').forEach(function (el) {
+                        el.classList.remove('bg-teal-50/40', 'hover:bg-teal-50/70');
+                        el.classList.add('bg-white', 'hover:bg-slate-50');
+                        var dot = el.querySelector('span.bg-teal-500');
+                        if (dot) dot.remove();
+                    });
+                    var bellBadge = document.querySelector('#notif-btn .has-unread');
+                    if (bellBadge) bellBadge.remove();
+                    var headerText = document.querySelector('#notif-panel h3 + p');
+                    if (headerText) {
+                        headerText.classList.remove('text-teal-600');
+                        headerText.classList.add('text-slate-400');
+                        headerText.textContent = 'Semua sudah dibaca';
+                    }
+                    var btnParent = btn.closest('div');
+                    if (btnParent) btnParent.remove();
+                }
+            })
+            .catch(function () {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="ri-check-double-line mr-0.5"></i> Tandai Baca';
+            });
+    }
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closeNotificationDrawer();
+    });
+</script>

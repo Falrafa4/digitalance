@@ -6,7 +6,6 @@
 @endsection
 
 @section('content')
-<script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 @if(session('success'))
   <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -310,5 +309,39 @@
       <div class="bg-white border border-slate-200 rounded-[18px] p-6">
         <h3 class="font-display font-extrabold text-slate-900 text-[1.2rem]">Freelancer</h3>
         <div class="flex items-center gap-3 mt-4">
-          <div class="w-12 h-12 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400"><i class="ri-user-3-line text-[20px]"></i></div>
-          <
+          <div class="w-12 h-12 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400">
+            <i class="ri-user-3-line text-[20px]"></i>
+          </div>
+          <div class="min-w-0">
+            <p class="font-bold text-slate-900 text-[14px] truncate">
+              {{ optional(optional($order->service->freelancer)->skomda_student)->name ?? 'Freelancer' }}
+            </p>
+            <p class="text-slate-500 text-[12px] font-bold">Verified Professional</p>
+          </div>
+        </div>
+
+        <div class="mt-6 pt-5 border-t border-slate-100 space-y-3">
+          <a href="{{ route('client.talents.show', $order->service->freelancer_id) }}" 
+             class="block w-full px-4 py-3 rounded-[12px] bg-slate-50 border border-slate-200 text-slate-700 font-bold text-[12.5px] hover:border-[#0f766e] hover:text-[#0f766e] transition-all text-center">
+            Lihat Profil
+          </a>
+          <a href="{{ route('client.messages.index') }}" 
+             class="block w-full px-4 py-3 rounded-[12px] bg-[#0f766e] text-white font-bold text-[12.5px] hover:bg-[#0a5e58] transition-all text-center">
+            Chat Freelancer
+          </a>
+        </div>
+      </div>
+
+      <div class="bg-white border border-slate-200 rounded-[18px] p-6">
+        <h3 class="font-display font-extrabold text-slate-900 text-[1rem]">Bantuan</h3>
+        <p class="text-slate-500 text-[12.5px] mt-2 leading-relaxed">
+          Punya kendala dengan pesanan? Silakan hubungi admin via chat bantuan atau buka tiket bantuan.
+        </p>
+        <button class="w-full mt-4 py-2.5 rounded-[12px] bg-slate-50 text-slate-600 font-bold text-[12px] hover:bg-slate-100 transition-all">
+          Buka Tiket
+        </button>
+      </div>
+    </aside>
+  </div>
+</section>
+@endsection

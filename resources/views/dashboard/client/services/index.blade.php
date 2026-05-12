@@ -21,15 +21,13 @@
                     {{ $s->title ?? 'Service' }}
                   </p>
                   <p class="text-slate-500 text-[13px] mt-1">
-                    Kategori: <span class="font-bold">{{ $s->service_category->name ?? '-' }}</span>
+                    Kategori: <span class="font-bold">{{ $s->category->name ?? '-' }}</span>
                   </p>
                   <p class="text-slate-500 text-[13px] mt-1">
                     Oleh: <span
                       class="font-bold">{{ optional(optional($s->freelancer)->skomda_student)->name ?? 'Freelancer' }}</span>
                   </p>
                 </div>
-
-                <x-crud-status-badge :status="$s->status ?? 'Approved'" />
               </div>
 
               <p class="text-slate-600 text-[13.5px] leading-relaxed mt-3 line-clamp-3">
@@ -77,8 +75,8 @@
           </div>
         </div>
       </div>
-
-      @include('dashboard.client._ui.client-pager')
     @endif
+
+    @include('dashboard.client._ui.client-pager')
   </section>
 @endsection

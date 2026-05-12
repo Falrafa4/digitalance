@@ -23,8 +23,8 @@ class StoreFreelancerRequest extends FormRequest
     {
         return [
             'student_id' => 'required|exists:skomda_students,id|unique:freelancers,student_id',
-            'password'   => 'required|string|min:6',
-            'bio'        => 'nullable|string|max:500',
+            'password' => 'required|string|min:6',
+            'bio' => 'nullable|string|max:500',
         ];
     }
 }

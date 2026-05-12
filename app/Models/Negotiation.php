@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Negotiation extends Model
 {
     use HasFactory;
+
     protected $fillable = ['order_id', 'sender', 'message', 'proposed_price', 'reason', 'description', 'status'];
 
     public function order()
@@ -18,7 +19,7 @@ class Negotiation extends Model
     public function getTimeAttribute(): string
     {
         return date(
-            "d M Y, H:i:s",
+            'd M Y, H:i:s',
             strtotime($this->attributes['created_at'])
         );
     }

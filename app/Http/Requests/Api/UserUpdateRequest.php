@@ -23,7 +23,7 @@ class UserUpdateRequest extends FormRequest
     {
         return [
             'name' => 'required|string',
-            'email' => 'required|email|unique:clients,email,' . $this->route('id'),
+            'email' => 'required|email|unique:clients,email,'.$this->route('id'),
             'phone' => 'required|string',
         ];
     }

@@ -8,7 +8,6 @@
 @endphp
 
 @section('content')
-<script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 <div class="animate-fadeUp flex-1 px-8 py-7 overflow-y-auto"
      x-data="{
         method: 'qris',

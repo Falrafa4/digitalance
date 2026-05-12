@@ -149,6 +149,18 @@
                 <i class="ri-briefcase-4-line text-[17px]" aria-hidden="true"></i> My Projects
             </a>
 
+            <a href="{{ route('client.results.index') }}" class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
+                 {{ request()->routeIs('client.results.*') ? $active : $inactive }}"
+                aria-current="{{ request()->routeIs('client.results.*') ? 'page' : '' }}">
+                <i class="ri-task-line text-[17px]" aria-hidden="true"></i> Hasil Kerja
+            </a>
+
+            <a href="{{ route('client.loker.index') }}" class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
+                 {{ request()->routeIs('client.loker.*') ? $active : $inactive }}"
+                aria-current="{{ request()->routeIs('client.loker.*') ? 'page' : '' }}">
+                <i class="ri-briefcase-2-line text-[17px]" aria-hidden="true"></i> Lowongan Kerja
+            </a>
+
             <a href="{{ route('client.messages.index') }}" class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
                  {{ request()->routeIs('client.messages.*') ? $active : $inactive }}"
                 aria-current="{{ request()->routeIs('client.messages.*') ? 'page' : '' }}">
@@ -236,6 +248,13 @@
                             {{ request()->routeIs('freelancer.portofolios.*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}"
                 aria-current="{{ request()->routeIs('freelancer.portofolios.*') ? 'page' : '' }}">
                 <i class="ri-folder-user-line text-[17px]" aria-hidden="true"></i> Portofolios
+            </a>
+
+            <a href="{{ route('freelancer.loker.index') }}"
+                class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
+                            {{ request()->routeIs('freelancer.loker.*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}"
+                aria-current="{{ request()->routeIs('freelancer.loker.*') ? 'page' : '' }}">
+                <i class="ri-briefcase-2-line text-[17px]" aria-hidden="true"></i> Lowongan Kerja
             </a>
         @endif
 

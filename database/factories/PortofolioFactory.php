@@ -31,7 +31,7 @@ class PortofolioFactory extends Factory
             'service_id' => Service::inRandomOrder()->first()->id,
             'title' => $sample['title'],
             'description' => $sample['description'],
-            'media_url' => 'https://picsum.photos/seed/portfolio-' . fake()->unique()->numberBetween(1, 9999) . '/1280/720',
+            'media_url' => 'https://picsum.photos/seed/portfolio-'.fake()->unique()->numberBetween(1, 9999).'/1280/720',
         ];
     }
 }

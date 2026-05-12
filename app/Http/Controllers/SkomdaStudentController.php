@@ -61,6 +61,7 @@ class SkomdaStudentController extends Controller
         // Freelancer hanya bisa melihat data siswa, tidak bisa melakukan CRUD
         // data siswa untuk mendaftarkan diri mereka ke freelancer, jadi freelancer harus berasal dari siswa SMK Telkom Sidoarjo
         $skomdaStudents = SkomdaStudent::paginate(10);
+
         return view('dashboard.freelancer.skomda_students', compact('skomdaStudents'));
     }
 }

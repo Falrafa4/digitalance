@@ -7,8 +7,8 @@ use App\Http\Requests\UpdateFreelancerPasswordRequest;
 use App\Http\Requests\UpdateFreelancerRequest;
 use App\Models\Freelancer;
 use App\Models\Service;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class FreelancerController extends Controller
 {
@@ -26,7 +26,7 @@ class FreelancerController extends Controller
 
         return view('dashboard.freelancer.profile', [
             'user' => $freelancer,
-            'role' => 'Freelancer'
+            'role' => 'Freelancer',
         ]);
     }
 
@@ -42,7 +42,7 @@ class FreelancerController extends Controller
     {
         $freelancer = auth('freelancer')->user();
 
-        if (!Hash::check($request->current_password, $freelancer->password)) {
+        if (! Hash::check($request->current_password, $freelancer->password)) {
             return redirect()->route('freelancer.profile')->with('error', 'Password lama salah');
         }
 
@@ -56,11 +56,12 @@ class FreelancerController extends Controller
     {
         $freelancer = auth('freelancer')->user();
 
-        if (!Hash::check($request->password, $freelancer->password)) {
+        if (! Hash::check($request->password, $freelancer->password)) {
             return redirect()->route('freelancer.profile')->with('error', 'Password salah');
         }
 
         $freelancer->delete();
+
         return redirect()->route('home')->with('success', 'Akun freelancer berhasil dihapus');
     }
 
@@ -89,19 +90,21 @@ class FreelancerController extends Controller
     public function show(Freelancer $freelancer)
     {
         $freelancer->load('skomda_student');
+
         return view('dashboard.admin.freelancers', compact('freelancer'));
     }
 
     public function showServices(Freelancer $freelancer)
     {
         $freelancer->load(['services', 'skomda_student', 'services.category']);
+
         return view('dashboard.admin.freelancers.services', compact('freelancer'));
     }
 
     public function update(UpdateFreelancerRequest $request, Freelancer $freelancer)
     {
         $validated = $request->validated();
-        
+
         // Update Freelancer fields
         $freelancer->update([
             'bio' => $validated['bio'] ?? $freelancer->bio,
@@ -111,11 +114,17 @@ class FreelancerController extends Controller
         // Update linked SkomdaStudent fields
         if ($freelancer->skomda_student) {
             $studentData = [];
-            if (isset($validated['name'])) $studentData['name'] = $validated['name'];
-            if (isset($validated['email'])) $studentData['email'] = $validated['email'];
-            if (isset($validated['phone'])) $studentData['phone'] = $validated['phone'];
-            
-            if (!empty($studentData)) {
+            if (isset($validated['name'])) {
+                $studentData['name'] = $validated['name'];
+            }
+            if (isset($validated['email'])) {
+                $studentData['email'] = $validated['email'];
+            }
+            if (isset($validated['phone'])) {
+                $studentData['phone'] = $validated['phone'];
+            }
+
+            if (! empty($studentData)) {
                 $freelancer->skomda_student->update($studentData);
             }
         }
@@ -143,7 +152,7 @@ class FreelancerController extends Controller
     {
         $freelancer = Freelancer::findOrFail($id);
         $freelancer->update([
-            'status' => 'Approved'
+            'status' => 'Approved',
         ]);
 
         return redirect()->route('admin.freelancers.index')
@@ -154,7 +163,7 @@ class FreelancerController extends Controller
     {
         $freelancer = Freelancer::findOrFail($id);
         $freelancer->update([
-            'status' => 'Suspended'
+            'status' => 'Suspended',
         ]);
 
         return redirect()->route('admin.freelancers.index')
@@ -165,7 +174,7 @@ class FreelancerController extends Controller
     {
         $freelancer = Freelancer::findOrFail($id);
         $freelancer->update([
-            'status' => 'Approved'
+            'status' => 'Approved',
         ]);
 
         return redirect()->route('admin.freelancers.index')
@@ -175,13 +184,18 @@ class FreelancerController extends Controller
     // =========================
     // CLIENT ONLY (Find Talent)
     // =========================
-    
+
     public function clientFindTalent()
     {
-        $freelancers = Freelancer::with('skomda_student')->latest()->get();
+        $freelancers = Freelancer::with('skomda_student')
+            ->where('status', 'Approved')
+            ->latest()
+            ->get();
 
         foreach ($freelancers as $f) {
-            $f->services_count = Service::where('freelancer_id', $f->id)->count();
+            $f->services_count = Service::where('freelancer_id', $f->id)
+                ->where('status', 'Approved')
+                ->count();
         }
 
         return view('dashboard.client.talents.find-talent', compact('freelancers'));
@@ -192,10 +206,15 @@ class FreelancerController extends Controller
      */
     public function clientTalentShow(Freelancer $freelancer)
     {
+        if ($freelancer->status !== 'Approved') {
+            return redirect()->route('client.talents.index')->with('warning', 'Freelancer tidak tersedia.');
+        }
+
         $freelancer->load('skomda_student');
 
         $services = Service::with('service_category:id,name')
             ->where('freelancer_id', $freelancer->id)
+            ->where('status', 'Approved')
             ->latest()
             ->get();
 

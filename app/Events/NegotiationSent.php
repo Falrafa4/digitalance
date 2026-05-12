@@ -12,6 +12,7 @@ use Illuminate\Queue\SerializesModels;
 class NegotiationSent implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
+
     public Negotiation $negotiation;
 
     /**
@@ -24,7 +25,7 @@ class NegotiationSent implements ShouldBroadcastNow
 
     public function broadcastOn()
     {
-        return new PrivateChannel('negotiation.' . $this->negotiation->order_id);
+        return new PrivateChannel('negotiation.'.$this->negotiation->order_id);
     }
 
     public function broadcastWith(): array

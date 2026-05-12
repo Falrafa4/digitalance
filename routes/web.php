@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FreelancerController;
+use App\Http\Controllers\LokerController;
 use App\Http\Controllers\NegotiationController;
 use App\Http\Controllers\OfferController;
 use App\Http\Controllers\OrderController;
@@ -28,6 +29,37 @@ Route::get('/register-freelancer', [PageController::class, 'registerFreelancer']
 Route::post('/register-client', [AuthController::class, 'registerClient'])->name('register-process');
 Route::post('/register-freelancer', [AuthController::class, 'registerFreelancer'])->name('register-freelancer-process');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+// ── SHARED ──────────────────────────────────────────────
+Route::middleware('auth:administrator,client,freelancer')->group(function () {
+    Route::post('/notifications/mark-all-read', function () {
+        $role = null;
+        $user = null;
+
+        if (auth('administrator')->check()) {
+            $role = 'admin';
+            $user = auth('administrator')->user();
+        } elseif (auth('client')->check()) {
+            $role = 'client';
+            $user = auth('client')->user();
+        } elseif (auth('freelancer')->check()) {
+            $role = 'freelancer';
+            $user = auth('freelancer')->user();
+        }
+
+        if ($role && $user) {
+            \App\Models\Notification::where('role', $role)
+                ->where(function ($q) use ($user) {
+                    $q->where('user_id', $user->id)
+                        ->orWhereNull('user_id');
+                })
+                ->where('is_read', false)
+                ->update(['is_read' => true]);
+        }
+
+        return response()->json(['success' => true]);
+    })->name('notifications.mark-all-read');
+});
 
 // ── ADMIN ────────────────────────────────────────────────
 Route::middleware('auth:administrator')->prefix('admin')->name('admin.')->group(function () {
@@ -127,6 +159,9 @@ Route::middleware('auth:administrator')->prefix('admin')->name('admin.')->group(
 Route::middleware('auth:client')->prefix('client')->name('client.')->group(function () {
     Route::get('/', [DashboardController::class, 'client'])->name('dashboard');
     Route::get('/profile', [ClientController::class, 'profile'])->name('profile');
+    Route::put('/profile', [ClientController::class, 'updateProfile'])->name('profile.update');
+    Route::put('/password', [ClientController::class, 'updatePassword'])->name('password.update');
+    Route::get('/settings', [ClientController::class, 'settings'])->name('settings');
     Route::get('/search', [DashboardController::class, 'clientSearch'])->name('search');
 
     // Service Categories
@@ -191,6 +226,16 @@ Route::middleware('auth:client')->prefix('client')->name('client.')->group(funct
     // Portofolios
     Route::get('/freelancers/{freelancer_id}/portofolios', [PortofolioController::class, 'showAllFreelancerPortofolios'])->name('freelancers.portofolios');
     Route::get('/portofolios/{id}', [PortofolioController::class, 'showFreelancerPortofolio'])->name('portofolios.show');
+
+    // Loker (Client)
+    Route::get('/loker', [LokerController::class, 'clientIndex'])->name('loker.index');
+    Route::get('/loker/create', [LokerController::class, 'clientCreate'])->name('loker.create');
+    Route::post('/loker', [LokerController::class, 'clientStore'])->name('loker.store');
+    Route::get('/loker/{loker}/edit', [LokerController::class, 'clientEdit'])->name('loker.edit');
+    Route::put('/loker/{loker}', [LokerController::class, 'clientUpdate'])->name('loker.update');
+    Route::delete('/loker/{loker}', [LokerController::class, 'clientDestroy'])->name('loker.destroy');
+    Route::post('/loker/applications/{application}/approve', [LokerController::class, 'approveApplication'])->name('loker.applications.approve');
+    Route::post('/loker/applications/{application}/reject', [LokerController::class, 'rejectApplication'])->name('loker.applications.reject');
 });
 
 // ── FREELANCER ───────────────────────────────────────────
@@ -267,4 +312,10 @@ Route::middleware('auth:freelancer')->prefix('freelancer')->name('freelancer.')-
     Route::get('/offers', [OfferController::class, 'freelancerIndex'])->name('offers.index');
     Route::post('/offers', [OfferController::class, 'freelancerStore'])->name('offers.store');
     Route::put('/offers/{offer}', [OfferController::class, 'freelancerUpdate'])->name('offers.update');
+
+    // loker (freelancer)
+    Route::get('/loker', [LokerController::class, 'freelancerIndex'])->name('loker.index');
+    Route::get('/loker/{loker}', [LokerController::class, 'freelancerShow'])->name('loker.show');
+    Route::post('/loker/{loker}/apply', [LokerController::class, 'freelancerApply'])->name('loker.apply');
+    Route::get('/loker/my/applications', [LokerController::class, 'freelancerMyApplications'])->name('loker.my-applications');
 });

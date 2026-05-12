@@ -6,8 +6,8 @@ use App\Models\Client;
 use App\Models\Freelancer;
 use App\Models\Offer;
 use App\Models\Order;
-use App\Models\SkomdaStudent;
 use App\Models\Service;
+use App\Models\SkomdaStudent;
 use App\Models\Transaction;
 
 class DashboardController extends Controller
@@ -76,14 +76,22 @@ class DashboardController extends Controller
     {
         $user = auth()->guard('client')->user();
 
-        if (!$user) {
+        if (! $user) {
             abort(403, 'Unauthorized');
         }
 
         $allOrders = Order::where('client_id', $user->id)->get();
 
         $activeProjects = $allOrders
-            ->whereIn('status', ['Pending', 'In Progress'])
+            ->whereIn('status', ['Pending', 'Negotiated', 'In Progress', 'Revision'])
+            ->count();
+
+        $totalSpent = $allOrders
+            ->whereIn('status', ['Paid', 'Completed'])
+            ->sum('agreed_price');
+
+        $completedProjects = $allOrders
+            ->where('status', 'Completed')
             ->count();
 
         $totalSpent = $allOrders
@@ -100,7 +108,7 @@ class DashboardController extends Controller
             ->take(3)
             ->get();
 
-        $projectsData = $projects->map(function($o) {
+        $projectsData = $projects->map(function ($o) {
             return [
                 'id' => $o->id,
                 'brief' => $o->brief,
@@ -109,17 +117,17 @@ class DashboardController extends Controller
                 'agreed_price' => $o->agreed_price,
                 'service_id' => $o->service_id,
                 'service' => [
-                    'title' => ($o->service->title ?? $o->service->name ?? 'Service')
+                    'title' => ($o->service->title ?? $o->service->name ?? 'Service'),
                 ],
                 'href' => route('client.orders.show', $o->id),
             ];
         });
 
         $statsData = [
-            'total' => $projects->count() ? $projects->count() + ($activeProjects + $completedProjects - $projects->count()) : ($activeProjects + $completedProjects),
+            'total' => $allOrders->count(),
             'active' => $activeProjects,
             'completed' => $completedProjects,
-            'totalSpent' => $totalSpent
+            'totalSpent' => $totalSpent,
         ];
 
         return view('dashboard.client.dashboard', compact(
@@ -137,7 +145,7 @@ class DashboardController extends Controller
     {
         $freelancer = auth('freelancer')->user();
 
-        if (!$freelancer) {
+        if (! $freelancer) {
             abort(403, 'Unauthorized');
         }
 
@@ -225,7 +233,7 @@ class DashboardController extends Controller
             'type' => 'success',
             'role' => 'freelancer',
             'user_id' => $freelancer->id,
-            'link' => '/freelancer/profile'
+            'link' => '/freelancer/profile',
         ]);
 
         return response()->json(['message' => 'Success']);
@@ -242,7 +250,7 @@ class DashboardController extends Controller
             'type' => 'danger',
             'role' => 'freelancer',
             'user_id' => $freelancer->id,
-            'link' => '/freelancer/profile'
+            'link' => '/freelancer/profile',
         ]);
 
         return response()->json(['message' => 'Success']);
@@ -269,11 +277,11 @@ class DashboardController extends Controller
     public function search(\Illuminate\Http\Request $request)
     {
         $q = $request->query('q');
-        
+
         $results = collect();
-        
+
         if ($q) {
-            $fuzzy = '%' . str_replace(' ', '%', $q) . '%';
+            $fuzzy = '%'.str_replace(' ', '%', $q).'%';
 
             // Search Menus
             $menus = collect([
@@ -287,9 +295,9 @@ class DashboardController extends Controller
                 ['name' => 'Reviews', 'url' => route('admin.reviews.index'), 'desc' => 'Ulasan klien terhadap freelancer'],
                 ['name' => 'Settings', 'url' => route('admin.settings'), 'desc' => 'Pengaturan dashboard dan panduan'],
                 ['name' => 'Profile', 'url' => route('admin.profile'), 'desc' => 'Pengaturan akun administrator'],
-            ])->filter(function($menu) use ($q) {
+            ])->filter(function ($menu) use ($q) {
                 return stripos($menu['name'], $q) !== false || stripos($menu['desc'], $q) !== false;
-            })->map(function($item) {
+            })->map(function ($item) {
                 return (object) [
                     'title' => $item['name'],
                     'name' => $item['name'],
@@ -303,46 +311,50 @@ class DashboardController extends Controller
             // Search Clients
             $clients = Client::where('name', 'like', $fuzzy)
                 ->orWhere('email', 'like', $fuzzy)
-                ->get()->map(function($item) {
+                ->get()->map(function ($item) {
                     $item->search_type = 'Client';
-                    $item->search_url = route('admin.clients.index') . '?q=' . urlencode($item->name);
+                    $item->search_url = route('admin.clients.index').'?q='.urlencode($item->name);
+
                     return $item;
                 });
-                
+
             // Search Freelancers
-            $freelancers = Freelancer::whereHas('skomda_student', function($query) use ($fuzzy) {
-                    $query->where('name', 'like', $fuzzy)
-                          ->orWhere('email', 'like', $fuzzy)
-                          ->orWhere('major', 'like', $fuzzy)
-                          ->orWhere('nis', 'like', $fuzzy);
-                })
-                ->get()->map(function($item) {
+            $freelancers = Freelancer::whereHas('skomda_student', function ($query) use ($fuzzy) {
+                $query->where('name', 'like', $fuzzy)
+                    ->orWhere('email', 'like', $fuzzy)
+                    ->orWhere('major', 'like', $fuzzy)
+                    ->orWhere('nis', 'like', $fuzzy);
+            })
+                ->get()->map(function ($item) {
                     $item->search_type = 'Freelancer';
-                    $item->search_url = route('admin.freelancers.index') . '?q=' . urlencode($item->name);
+                    $item->search_url = route('admin.freelancers.index').'?q='.urlencode($item->name);
+
                     return $item;
                 });
-                
+
             // Search Services
             $services = Service::where('title', 'like', $fuzzy)
                 ->orWhere('description', 'like', $fuzzy)
-                ->get()->map(function($item) {
+                ->get()->map(function ($item) {
                     $item->search_type = 'Service';
-                    $item->search_url = route('admin.services.index') . '?q=' . urlencode($item->title);
+                    $item->search_url = route('admin.services.index').'?q='.urlencode($item->title);
+
                     return $item;
                 });
-                
+
             // Search Orders
             $orders = Order::where('id', 'like', $fuzzy)
                 ->orWhere('brief', 'like', $fuzzy)
-                ->orWhereHas('client', function($query) use ($fuzzy) {
+                ->orWhereHas('client', function ($query) use ($fuzzy) {
                     $query->where('name', 'like', $fuzzy);
                 })
-                ->orWhereHas('service', function($query) use ($fuzzy) {
+                ->orWhereHas('service', function ($query) use ($fuzzy) {
                     $query->where('title', 'like', $fuzzy);
                 })
-                ->get()->map(function($item) {
+                ->get()->map(function ($item) {
                     $item->search_type = 'Order';
                     $item->search_url = route('admin.orders.index');
+
                     return $item;
                 });
 
@@ -351,37 +363,41 @@ class DashboardController extends Controller
                 ->orWhere('order_id', 'like', $fuzzy)
                 ->orWhere('status', 'like', $fuzzy)
                 ->orWhere('type', 'like', $fuzzy)
-                ->get()->map(function($item) {
-                    $item->title = "Transaksi #" . $item->id;
+                ->get()->map(function ($item) {
+                    $item->title = 'Transaksi #'.$item->id;
                     $item->search_type = 'Transaction';
                     $item->search_url = route('admin.transactions.index');
+
                     return $item;
                 });
-                
+
             // Search Skomda Students
             $skomdaStudents = SkomdaStudent::where('name', 'like', $fuzzy)
                 ->orWhere('email', 'like', $fuzzy)
                 ->orWhere('nis', 'like', $fuzzy)
-                ->get()->map(function($item) {
+                ->get()->map(function ($item) {
                     $item->search_type = 'Student';
-                    $item->search_url = route('admin.skomda-students.index') . '?q=' . urlencode($item->name);
+                    $item->search_url = route('admin.skomda-students.index').'?q='.urlencode($item->name);
+
                     return $item;
                 });
 
             // Search Service Categories
             $categories = \App\Models\ServiceCategory::where('name', 'like', $fuzzy)
-                ->get()->map(function($item) {
+                ->get()->map(function ($item) {
                     $item->search_type = 'Category';
                     $item->search_url = route('admin.service-categories.index');
+
                     return $item;
                 });
 
             // Search Portofolios
             $portofolios = \App\Models\Portofolio::where('title', 'like', $fuzzy)
                 ->orWhere('description', 'like', $fuzzy)
-                ->get()->map(function($item) {
+                ->get()->map(function ($item) {
                     $item->search_type = 'Portofolio';
                     $item->search_url = route('admin.portofolios.index');
+
                     return $item;
                 });
 
@@ -389,40 +405,44 @@ class DashboardController extends Controller
             $offers = Offer::where('id', 'like', $fuzzy)
                 ->orWhere('title', 'like', $fuzzy)
                 ->orWhere('description', 'like', $fuzzy)
-                ->get()->map(function($item) {
+                ->get()->map(function ($item) {
                     $item->search_type = 'Offer';
                     $item->search_url = route('admin.offers.index');
+
                     return $item;
                 });
 
             // Search Results
             $results_data = \App\Models\Result::where('note', 'like', $fuzzy)
                 ->orWhere('version', 'like', $fuzzy)
-                ->get()->map(function($item) {
-                    $item->title = "Result " . ($item->version ?? $item->id);
+                ->get()->map(function ($item) {
+                    $item->title = 'Result '.($item->version ?? $item->id);
                     $item->search_type = 'Result';
                     $item->search_url = route('admin.results.index');
+
                     return $item;
                 });
 
             // Search Reviews
             $reviews = \App\Models\Review::where('comment', 'like', $fuzzy)
-                ->get()->map(function($item) {
-                    $item->title = "Review for Order #" . $item->order_id;
+                ->get()->map(function ($item) {
+                    $item->title = 'Review for Order #'.$item->order_id;
                     $item->search_type = 'Review';
                     $item->search_url = route('admin.reviews.index');
+
                     return $item;
                 });
 
             // Search Negotiations (Chat messages)
             $negotiations = \App\Models\Negotiation::where('message', 'like', $fuzzy)
-                ->get()->map(function($item) {
-                    $item->title = "Chat in Order #" . $item->order_id;
+                ->get()->map(function ($item) {
+                    $item->title = 'Chat in Order #'.$item->order_id;
                     $item->search_type = 'Chat';
                     $item->search_url = route('admin.negotiations.index');
+
                     return $item;
                 });
-                
+
             $results = $results->concat($menus)
                 ->concat($clients)
                 ->concat($freelancers)
@@ -437,7 +457,7 @@ class DashboardController extends Controller
                 ->concat($reviews)
                 ->concat($negotiations);
         }
-        
+
         return view('dashboard.admin.search', compact('results', 'q'));
     }
 
@@ -446,55 +466,58 @@ class DashboardController extends Controller
         $q = $request->query('q');
         $user = auth()->guard('client')->user();
         $results = collect();
-        
+
         if ($q && $user) {
-            $fuzzy = '%' . str_replace(' ', '%', $q) . '%';
+            $fuzzy = '%'.str_replace(' ', '%', $q).'%';
 
             // Search Talents (Freelancers)
-            $freelancers = Freelancer::whereHas('skomda_student', function($query) use ($fuzzy) {
-                    $query->where('name', 'like', $fuzzy)
-                          ->orWhere('major', 'like', $fuzzy);
-                })
-                ->get()->map(function($item) {
+            $freelancers = Freelancer::whereHas('skomda_student', function ($query) use ($fuzzy) {
+                $query->where('name', 'like', $fuzzy)
+                    ->orWhere('major', 'like', $fuzzy);
+            })
+                ->get()->map(function ($item) {
                     $item->search_type = 'Talent';
                     $item->search_url = route('client.talents.show', $item->id);
+
                     return $item;
                 });
-                
+
             // Search Services
             $services = Service::where('title', 'like', $fuzzy)
                 ->orWhere('description', 'like', $fuzzy)
-                ->get()->map(function($item) {
+                ->get()->map(function ($item) {
                     $item->search_type = 'Service';
                     $item->search_url = route('client.services.show', $item->id);
+
                     return $item;
                 });
-                
+
             // Search Orders (Own)
             $orders = Order::where('client_id', $user->id)
-                ->where(function($query) use ($fuzzy) {
+                ->where(function ($query) use ($fuzzy) {
                     $query->where('brief', 'like', $fuzzy)
-                          ->orWhereHas('service', function($q2) use ($fuzzy) {
-                              $q2->where('title', 'like', $fuzzy);
-                          });
+                        ->orWhereHas('service', function ($q2) use ($fuzzy) {
+                            $q2->where('title', 'like', $fuzzy);
+                        });
                 })
-                ->get()->map(function($item) {
+                ->get()->map(function ($item) {
                     $item->search_type = 'Order';
                     $item->search_url = route('client.orders.show', $item->id);
+
                     return $item;
                 });
-                
+
             $results = $results->concat($freelancers)->concat($services)->concat($orders);
         }
-        
+
         return view('dashboard.admin.search', compact('results', 'q')); // Reuse the same search view for now
     }
 
     public function getDisputeDetail($id)
     {
-        $order = Order::with(['client', 'service.freelancer', 'negotiations' => function($q) {
+        $order = Order::with(['client', 'service.freelancer', 'negotiations' => function ($q) {
             $q->latest();
-        }, 'results' => function($q) {
+        }, 'results' => function ($q) {
             $q->latest();
         }])->findOrFail($id);
 
@@ -512,6 +535,7 @@ class DashboardController extends Controller
         $freelancer = Freelancer::with('skomda_student')
             ->withCount(['services', 'portofolios'])
             ->findOrFail($id);
+
         return response()->json($freelancer);
     }
 
@@ -520,44 +544,46 @@ class DashboardController extends Controller
         $q = $request->query('q');
         $user = auth()->guard('freelancer')->user();
         $results = collect();
-        
+
         if ($q && $user) {
-            $fuzzy = '%' . str_replace(' ', '%', $q) . '%';
+            $fuzzy = '%'.str_replace(' ', '%', $q).'%';
 
             // Search Own Services
             $services = Service::where('freelancer_id', $user->id)
-                ->where(function($query) use ($fuzzy) {
+                ->where(function ($query) use ($fuzzy) {
                     $query->where('title', 'like', $fuzzy)
-                          ->orWhere('description', 'like', $fuzzy);
+                        ->orWhere('description', 'like', $fuzzy);
                 })
-                ->get()->map(function($item) {
+                ->get()->map(function ($item) {
                     $item->search_type = 'Service';
                     $item->search_url = route('freelancer.services.show', $item->id);
+
                     return $item;
                 });
-                
+
             // Search Orders (Received)
-            $orders = Order::whereHas('service', function($query) use ($user) {
-                    $query->where('freelancer_id', $user->id);
-                })
-                ->where(function($query) use ($fuzzy) {
+            $orders = Order::whereHas('service', function ($query) use ($user) {
+                $query->where('freelancer_id', $user->id);
+            })
+                ->where(function ($query) use ($fuzzy) {
                     $query->where('brief', 'like', $fuzzy)
-                          ->orWhereHas('client', function($q2) use ($fuzzy) {
-                              $q2->where('name', 'like', $fuzzy);
-                          })
-                          ->orWhereHas('service', function($q2) use ($fuzzy) {
-                              $q2->where('title', 'like', $fuzzy);
-                          });
+                        ->orWhereHas('client', function ($q2) use ($fuzzy) {
+                            $q2->where('name', 'like', $fuzzy);
+                        })
+                        ->orWhereHas('service', function ($q2) use ($fuzzy) {
+                            $q2->where('title', 'like', $fuzzy);
+                        });
                 })
-                ->get()->map(function($item) {
+                ->get()->map(function ($item) {
                     $item->search_type = 'Order';
                     $item->search_url = route('freelancer.orders.show', $item->id);
+
                     return $item;
                 });
-                
+
             $results = $results->concat($services)->concat($orders);
         }
-        
+
         return view('dashboard.admin.search', compact('results', 'q')); // Reuse the same search view
     }
 }

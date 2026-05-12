@@ -16,7 +16,7 @@ class ReviewController extends Controller
 
         $query = Review::with([
             'order.client',
-            'order.service.freelancer.skomda_student'
+            'order.service.freelancer.skomda_student',
         ]);
 
         if ($rating) {
@@ -28,11 +28,11 @@ class ReviewController extends Controller
         }
 
         if ($search) {
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('comment', 'like', "%{$search}%")
-                  ->orWhereHas('order.client', function($cq) use ($search) {
-                      $cq->where('name', 'like', "%{$search}%");
-                  });
+                    ->orWhereHas('order.client', function ($cq) use ($search) {
+                        $cq->where('name', 'like', "%{$search}%");
+                    });
             });
         }
 
@@ -44,6 +44,7 @@ class ReviewController extends Controller
     public function destroy(Review $review)
     {
         $review->delete();
+
         return redirect()->back()->with('success', 'Review berhasil dihapus.');
     }
 
@@ -69,7 +70,7 @@ class ReviewController extends Controller
 
         return view('dashboard.client.review-detail', compact('review'));
     }
-    
+
     public function clientCreate(Request $request, string $orderId)
     {
         // Pastikan order tersebut milik client yang sedang login
@@ -79,7 +80,7 @@ class ReviewController extends Controller
         // Tampilkan form review untuk client
         return view('dashboard.client.reviews.create', compact('order'));
     }
-    
+
     public function clientStore(StoreReviewRequest $request)
     {
         // Logika simpan review

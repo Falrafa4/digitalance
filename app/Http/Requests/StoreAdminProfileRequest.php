@@ -22,9 +22,9 @@ class StoreAdminProfileRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'  => 'required|string|max:255',
+            'name' => 'required|string|max:255',
             'email' => 'required|email|unique:administrators,email',
-            'password' => 'required|min:8|confirmed'
+            'password' => 'required|min:8|confirmed',
         ];
     }
 }

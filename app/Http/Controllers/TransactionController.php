@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreTransactionRequest;
-use App\Models\Transaction;
 use App\Models\Order;
+use App\Models\Transaction;
 use Illuminate\Http\Request;
 
 class TransactionController extends Controller
@@ -13,7 +13,7 @@ class TransactionController extends Controller
     public function index()
     {
         $transactions = Transaction::with([
-            'order.client'
+            'order.client',
         ])->latest()->get();
 
         return view('dashboard.admin.transactions', compact('transactions'));
@@ -50,7 +50,7 @@ class TransactionController extends Controller
         $client = auth('client')->user();
 
         $transactions = Transaction::with('order.service')
-            ->whereHas('order', fn($q) => $q->where('client_id', $client->id))
+            ->whereHas('order', fn ($q) => $q->where('client_id', $client->id))
             ->latest()
             ->get();
 

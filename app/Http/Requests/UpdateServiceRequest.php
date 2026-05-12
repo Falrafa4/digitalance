@@ -28,7 +28,7 @@ class UpdateServiceRequest extends FormRequest
             'delivery_time' => 'required|integer',
             'price_min' => 'required|numeric',
             'price_max' => 'required|numeric|gte:price_min',
-            'description' => 'required|string'
+            'description' => 'required|string',
         ];
     }
 }

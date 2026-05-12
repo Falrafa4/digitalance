@@ -26,9 +26,9 @@ class ResultFactory extends Factory
 
         return [
             'order_id' => Order::inRandomOrder()->first()->id,
-            'file_url' => 'https://files.digitalance.test/deliverables/project-' . fake()->numberBetween(100, 999) . '.zip',
+            'file_url' => 'https://files.digitalance.test/deliverables/project-'.fake()->numberBetween(100, 999).'.zip',
             'note' => fake()->randomElement($notes),
-            'version' => 'v' . fake()->numberBetween(1, 3) . '.' . fake()->numberBetween(0, 9),
+            'version' => 'v'.fake()->numberBetween(1, 3).'.'.fake()->numberBetween(0, 9),
         ];
     }
 }

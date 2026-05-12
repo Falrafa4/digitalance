@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ServiceCategory;
 use App\Models\SkomdaStudent;
+use Illuminate\Http\RedirectResponse;
 
 class PageController
 {
@@ -15,7 +16,6 @@ class PageController
     public function login()
     {
         $categories = ServiceCategory::pluck('name')->toArray();
-        // select skomdastudent yang akunnya belum terikat ke freelancers
         $students = SkomdaStudent::whereDoesntHave('freelancer')
             ->select('id', 'nis', 'name', 'email')
             ->orderBy('name')
@@ -29,8 +29,8 @@ class PageController
         return view('auth.register-client');
     }
 
-    public function registerFreelancer()
+    public function registerFreelancer(): RedirectResponse
     {
-        return view('auth.register-freelancer');
+        return redirect()->route('login')->with('show_register', true)->with('default_role', 'freelancer');
     }
 }

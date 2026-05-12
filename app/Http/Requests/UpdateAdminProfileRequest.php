@@ -24,13 +24,13 @@ class UpdateAdminProfileRequest extends FormRequest
         $adminIdFromRoute = $this->route('administrator') ? $this->route('administrator')->id : null;
         $authId = auth()->guard('administrator')->id();
         $id = $adminIdFromRoute ?? $authId;
-        $isSelf = $authId === (int)$id;
-        
+        $isSelf = $authId === (int) $id;
+
         return [
-            'name'  => 'required|string|max:255',
-            'email' => 'required|email|unique:administrators,email,' . $id,
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:administrators,email,'.$id,
             'password' => 'nullable|min:8|confirmed',
-            'current_password' => $isSelf ? 'required_with:password' : 'nullable'
+            'current_password' => $isSelf ? 'required_with:password' : 'nullable',
         ];
     }
 }

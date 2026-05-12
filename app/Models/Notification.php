@@ -16,10 +16,10 @@ class Notification extends Model
         'role',
         'user_id',
         'link',
-        'is_read'
+        'is_read',
     ];
 
     protected $casts = [
-        'is_read' => 'boolean'
+        'is_read' => 'boolean',
     ];
 }

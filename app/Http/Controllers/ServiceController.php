@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreServiceRequest;
 use App\Http\Requests\UpdateServiceRequest;
-use App\Models\ServiceCategory;
 use App\Models\Service;
+use App\Models\ServiceCategory;
 use Illuminate\Http\Request;
 
 class ServiceController extends Controller
@@ -23,7 +23,7 @@ class ServiceController extends Controller
             ->withCount([
                 'services as approved_services_count' => function ($query) {
                     $query->where('status', 'Approved');
-                }
+                },
             ])
             ->orderBy('name')
             ->get();
@@ -31,7 +31,7 @@ class ServiceController extends Controller
         $servicesQuery = Service::query()
             ->with([
                 'category:id,name',
-                'freelancer.skomda_student:id,name'
+                'freelancer.skomda_student:id,name',
             ])
             ->where('status', 'Approved');
 
@@ -41,13 +41,13 @@ class ServiceController extends Controller
 
         if ($search !== '') {
             $servicesQuery->where(function ($query) use ($search) {
-                $query->where('title', 'like', '%' . $search . '%')
-                    ->orWhere('description', 'like', '%' . $search . '%')
+                $query->where('title', 'like', '%'.$search.'%')
+                    ->orWhere('description', 'like', '%'.$search.'%')
                     ->orWhereHas('category', function ($categoryQuery) use ($search) {
-                        $categoryQuery->where('name', 'like', '%' . $search . '%');
+                        $categoryQuery->where('name', 'like', '%'.$search.'%');
                     })
                     ->orWhereHas('freelancer.skomda_student', function ($freelancerQuery) use ($search) {
-                        $freelancerQuery->where('name', 'like', '%' . $search . '%');
+                        $freelancerQuery->where('name', 'like', '%'.$search.'%');
                     });
             });
         }
@@ -60,7 +60,7 @@ class ServiceController extends Controller
         $featuredServices = Service::query()
             ->with([
                 'category:id,name',
-                'freelancer.skomda_student:id,name'
+                'freelancer.skomda_student:id,name',
             ])
             ->where('status', 'Approved')
             ->latest()
@@ -86,7 +86,7 @@ class ServiceController extends Controller
 
         $query = Service::with([
             'service_category:id,name',
-            'freelancer.skomda_student:id,name'
+            'freelancer.skomda_student:id,name',
         ]);
 
         if ($status && $status !== 'all') {
@@ -116,22 +116,30 @@ class ServiceController extends Controller
     {
         $services = Service::with([
             'category:id,name',
-            'freelancer.skomda_student:id,name'
-        ])->latest()->get();
+            'freelancer.skomda_student:id,name',
+        ])
+            ->where('status', 'Approved')
+            ->latest()
+            ->get();
 
         return view('dashboard.client.services.index', compact('services'));
     }
 
     public function clientShow(Service $service)
     {
+        if ($service->status !== 'Approved') {
+            return redirect()->route('client.services.index')->with('warning', 'Layanan tidak tersedia.');
+        }
+
         $service->load([
             'service_category:id,name',
-            'freelancer.skomda_student:id,name,email'
+            'freelancer.skomda_student:id,name,email',
         ]);
 
         $otherServices = Service::with('service_category:id,name')
             ->where('freelancer_id', $service->freelancer_id)
             ->where('id', '!=', $service->id)
+            ->where('status', 'Approved')
             ->latest()
             ->take(6)
             ->get();
@@ -186,10 +194,10 @@ class ServiceController extends Controller
     public function show(string $id)
     {
         $service = Service::with([
-            'service_category:id,name'
+            'service_category:id,name',
         ])->where('id', $id)->first();
 
-        if (!$service) {
+        if (! $service) {
             return redirect()->route('freelancer.services.index')->with('error', 'Layanan tidak ditemukan');
         }
 
@@ -257,7 +265,7 @@ class ServiceController extends Controller
     {
         $request->validate([
             'status' => 'required|in:Draft,Pending,Approved,Rejected',
-            'reject_reason' => 'nullable|string'
+            'reject_reason' => 'nullable|string',
         ]);
 
         $service = Service::findOrFail($id);
@@ -266,24 +274,24 @@ class ServiceController extends Controller
         // Custom logic: Reject returns to Draft + Notification to Freelancer
         if ($finalStatus === 'Rejected') {
             $finalStatus = 'Draft';
-            
+
             \App\Models\Notification::create([
                 'title' => 'Layanan Perlu Perbaikan',
-                'message' => "Layanan '{$service->title}' dikembalikan oleh admin. Alasan: " . ($request->reject_reason ?? 'Tidak ada alasan spesifik') . ". Silakan perbaiki dan ajukan kembali!",
+                'message' => "Layanan '{$service->title}' dikembalikan oleh admin. Alasan: ".($request->reject_reason ?? 'Tidak ada alasan spesifik').'. Silakan perbaiki dan ajukan kembali!',
                 'type' => 'warning',
                 'role' => 'freelancer',
                 'user_id' => $service->freelancer_id,
-                'link' => route('freelancer.services.edit', $service->id)
+                'link' => route('freelancer.services.edit', $service->id),
             ]);
         }
 
         $service->update([
             'status' => $finalStatus,
-            'reject_reason' => $request->status === 'Rejected' ? $request->reject_reason : null
+            'reject_reason' => $request->status === 'Rejected' ? $request->reject_reason : null,
         ]);
 
-        $msg = $request->status === 'Rejected' 
-            ? 'Layanan telah dikembalikan ke freelancer untuk diperbaiki.' 
+        $msg = $request->status === 'Rejected'
+            ? 'Layanan telah dikembalikan ke freelancer untuk diperbaiki.'
             : 'Status layanan berhasil diperbarui';
 
         return redirect()->route('admin.services.index')->with('success', $msg);

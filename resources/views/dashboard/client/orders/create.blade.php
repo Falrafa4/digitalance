@@ -17,16 +17,14 @@
                 placeholder="Tulis brief..." aria-label="Brief detail">{{ old('brief') }}</textarea>
       @error('brief') <p class="text-red-600 text-[12px] font-bold">{{ $message }}</p> @enderror
 
-      <button type="submit" 
-              :disabled="isSubmitting"
-              class="px-6 py-3 rounded-[12px] bg-slate-900 text-white font-bold text-[13px] hover:bg-black transition-all disabled:opacity-50 flex items-center gap-2">
-        <template x-if="!isSubmitting">
-          <span>Buat Order</span>
-        </template>
-        <template x-if="isSubmitting">
-          <span><i class="ri-loader-4-line animate-spin"></i> Memproses...</span>
-        </template>
-      </button>
+      <div class="flex pt-2">
+        <button type="submit" 
+                :disabled="isSubmitting"
+                class="px-8 py-3.5 rounded-[14px] bg-slate-900 text-white font-bold text-[14px] hover:bg-black hover:shadow-lg hover:shadow-slate-200 transition-all disabled:opacity-50 flex items-center justify-center gap-3 min-w-[160px]">
+          <i x-show="isSubmitting" class="ri-loader-4-line animate-spin text-lg"></i>
+          <span x-text="isSubmitting ? 'Memproses...' : 'Buat Order'">Buat Order</span>
+        </button>
+      </div>
     </form>
 
   </div>

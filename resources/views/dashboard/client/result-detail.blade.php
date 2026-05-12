@@ -68,8 +68,17 @@
 
     <div class="bg-white border border-slate-200 rounded-[18px] p-6">
       <h2 class="font-display font-extrabold text-slate-900 text-[1.25rem] mb-4">Layanan</h2>
-      <p class="font-bold text-slate-900">{{ $result->order->service->title ?? '-' }}</p>
-      <p class="text-slate-500 text-[13px] mt-1">{{ $result->order->service->service_category->name ?? '-' }}</p>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Layanan</p>
+          <p class="font-bold text-slate-900">{{ $result->order->service->title ?? '-' }}</p>
+          <p class="text-slate-500 text-[12px] mt-0.5">{{ $result->order->service->category->name ?? '-' }}</p>
+        </div>
+        <div>
+          <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Freelancer</p>
+          <p class="font-bold text-slate-900">{{ $result->order->service->freelancer->skomda_student->name ?? '-' }}</p>
+        </div>
+      </div>
     </div>
 
     <div class="flex gap-3">

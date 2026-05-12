@@ -18,7 +18,7 @@ Route::get('/user', function (Request $request) {
 Route::get('/test', function () {
     return response()->json([
         'status' => true,
-        'message' => 'OK'
+        'message' => 'OK',
     ]);
 });
 

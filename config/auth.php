@@ -40,16 +40,16 @@ return [
             'driver' => 'session',
             'provider' => 'administrators',
         ],
-        
+
         'client' => [
             'driver' => 'session',
             'provider' => 'clients',
         ],
-        
+
         'freelancer' => [
             'driver' => 'session',
             'provider' => 'freelancers',
-        ]
+        ],
     ],
 
     /*
@@ -79,7 +79,7 @@ return [
             'driver' => 'eloquent',
             'model' => App\Models\Administrator::class,
         ],
-        
+
         'clients' => [
             'driver' => 'eloquent',
             'model' => App\Models\Client::class,

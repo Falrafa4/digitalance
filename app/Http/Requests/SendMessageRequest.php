@@ -23,7 +23,7 @@ class SendMessageRequest extends FormRequest
     {
         return [
             'order_id' => 'required|exists:orders,id',
-            'message' => 'required|string'
+            'message' => 'required|string',
         ];
     }
 }

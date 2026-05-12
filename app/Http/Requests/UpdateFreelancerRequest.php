@@ -25,11 +25,11 @@ class UpdateFreelancerRequest extends FormRequest
         $id = is_object($freelancer) ? $freelancer->id : $freelancer;
 
         return [
-            'bio'    => 'nullable|string',
+            'bio' => 'nullable|string',
             'status' => 'required|in:Pending,Approved,Suspended,Rejected',
-            'name'   => 'nullable|string|max:255',
-            'email'  => 'nullable|email',
-            'phone'  => 'nullable|string|max:20',
+            'name' => 'nullable|string|max:255',
+            'email' => 'nullable|email',
+            'phone' => 'nullable|string|max:20',
         ];
     }
 }

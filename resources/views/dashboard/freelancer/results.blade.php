@@ -32,7 +32,7 @@
                     <div class="flex-1 mb-4">
                         <p class="text-[12px] font-bold text-slate-500 uppercase mb-2">Pesan/Catatan</p>
                         <div class="bg-slate-50 rounded-xl p-3 text-[13px] text-slate-700 leading-relaxed border border-slate-100">
-                            {{ $res->message ?: ($res->note ?: 'Tidak ada pesan / catatan.') }}
+                            {{ $res->version ?: ($res->note ?: 'Tidak ada versi / catatan.') }}
                         </div>
                     </div>
 

@@ -211,7 +211,6 @@
 window.__PAGE__ = {
     projects: @json($projectsData),
     stats: @json($statsData),
-    hasUnread: false
 };
 </script>
 <script src="{{ asset('js/dashboard/client/dashboard.js') }}" defer></script>

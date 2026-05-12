@@ -18,7 +18,7 @@ class Service extends Model
         'price_max',
         'delivery_time',
         'status',
-        'reject_reason'
+        'reject_reason',
     ];
 
     // ERD: services.category_id -> service_categories.id

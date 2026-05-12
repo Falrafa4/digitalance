@@ -2,14 +2,16 @@
 
 namespace App\Models;
 
-use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Sanctum\HasApiTokens;
 
 class Freelancer extends Authenticatable
 {
-    use HasFactory, HasApiTokens;
+    use HasApiTokens, HasFactory;
+
     protected $fillable = ['student_id', 'bio', 'password', 'status'];
+
     protected $hidden = ['password'];
 
     public function skomda_student()
@@ -41,7 +43,7 @@ class Freelancer extends Authenticatable
     {
         return $this->hasMany(Offer::class);
     }
-    
+
     public function getRole()
     {
         return 'freelancer';

@@ -30,9 +30,9 @@ class ClientController extends Controller
             ->select('freelancers.id', 'skomda_students.name', 'skomda_students.email', 'skomda_students.phone', \DB::raw("'Freelancer' as role"), 'freelancers.status', 'freelancers.created_at');
 
         if ($q) {
-            $clientsQuery->where(fn($query) => $query->where('name', 'like', "%{$q}%")->orWhere('email', 'like', "%{$q}%"));
-            $skomdaQuery->where(fn($query) => $query->where('name', 'like', "%{$q}%")->orWhere('email', 'like', "%{$q}%")->orWhere('nis', 'like', "%{$q}%"));
-            $freelancersQuery->where(fn($query) => $query->where('skomda_students.name', 'like', "%{$q}%")->orWhere('skomda_students.email', 'like', "%{$q}%"));
+            $clientsQuery->where(fn ($query) => $query->where('name', 'like', "%{$q}%")->orWhere('email', 'like', "%{$q}%"));
+            $skomdaQuery->where(fn ($query) => $query->where('name', 'like', "%{$q}%")->orWhere('email', 'like', "%{$q}%")->orWhere('nis', 'like', "%{$q}%"));
+            $freelancersQuery->where(fn ($query) => $query->where('skomda_students.name', 'like', "%{$q}%")->orWhere('skomda_students.email', 'like', "%{$q}%"));
         }
 
         if ($role === 'Client') {
@@ -58,7 +58,7 @@ class ClientController extends Controller
             'users' => $users,
             'role' => $role,
             'q' => $q,
-            'skomdaAll' => $skomdaAll
+            'skomdaAll' => $skomdaAll,
         ]);
     }
 
@@ -78,6 +78,7 @@ class ClientController extends Controller
     public function show(string $id)
     {
         $client = Client::findOrFail($id);
+
         return view('dashboard.admin.clients', compact('client'));
     }
 
@@ -111,7 +112,17 @@ class ClientController extends Controller
 
         return view('dashboard.client.profile', [
             'user' => $user,
-            'role' => 'Client'
+            'role' => 'Client',
+        ]);
+    }
+
+    public function settings()
+    {
+        $user = auth('client')->user();
+
+        return view('dashboard.client.settings', [
+            'user' => $user,
+            'role' => 'Client',
         ]);
     }
 
@@ -129,7 +140,7 @@ class ClientController extends Controller
         /** @var Client $client */
         $client = auth('client')->user();
 
-        if (!Hash::check($request->current_password, $client->password)) {
+        if (! Hash::check($request->current_password, $client->password)) {
             return redirect()->route('client.profile')->withErrors('Password saat ini salah');
         }
 
@@ -151,7 +162,7 @@ class ClientController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        return redirect()->route('admin.clients.index')->with('success', 'Password ' . $client->name . ' berhasil diperbarui');
+        return redirect()->route('admin.clients.index')->with('success', 'Password '.$client->name.' berhasil diperbarui');
     }
 
     public function updateFreelancerPassword(Request $request, $id)
@@ -166,7 +177,7 @@ class ClientController extends Controller
         ]);
 
         return redirect()->route('admin.clients.index', ['role' => 'Freelancer'])
-            ->with('success', 'Password ' . ($freelancer->skomda_student->name ?? 'Freelancer') . ' berhasil diperbarui');
+            ->with('success', 'Password '.($freelancer->skomda_student->name ?? 'Freelancer').' berhasil diperbarui');
     }
 
     public function updateSkomdaPassword(Request $request, $id)
@@ -181,7 +192,7 @@ class ClientController extends Controller
         ]);
 
         return redirect()->route('admin.clients.index', ['role' => 'Skomda Student'])
-            ->with('success', 'Password ' . $skomdaStudent->name . ' berhasil diperbarui');
+            ->with('success', 'Password '.$skomdaStudent->name.' berhasil diperbarui');
     }
 
     // ==========================================
@@ -191,6 +202,7 @@ class ClientController extends Controller
     public function freelancerIndex()
     {
         $clients = Client::all();
+
         return view('dashboard.freelancer.clients', compact('clients'));
     }
 }

@@ -27,7 +27,7 @@ class StoreServiceRequest extends FormRequest
             'description' => 'required|string',
             'price_min' => 'required|numeric',
             'price_max' => 'required|numeric|gte:price_min',
-            'delivery_time' => 'required|integer'
+            'delivery_time' => 'required|integer',
         ];
     }
 }

@@ -13,16 +13,7 @@
         </a>
     </div>
 
-    <div class="flex items-center gap-6 mb-8 border-b border-slate-100 pb-4">
-        <button class="msg-tab active group relative pb-2 transition-all" data-filter="chat">
-            <span class="text-[15px] font-extrabold text-[#0f766e]">Chat Percakapan</span>
-            <div class="absolute bottom-[-17px] left-0 w-full h-[3px] bg-[#0f766e] rounded-full"></div>
-        </button>
-        <button class="msg-tab group relative pb-2 transition-all" data-filter="log">
-            <span class="text-[15px] font-bold text-slate-400 group-hover:text-slate-600">Log Transaksi</span>
-            <div class="absolute bottom-[-17px] left-0 w-0 h-[3px] bg-slate-300 rounded-full group-hover:w-full transition-all"></div>
-        </button>
-    </div>
+    {{-- Tab system removed as requested --}}
 
     @if(empty($negotiations) || $negotiations->isEmpty())
         <div class="text-center py-16 px-5 bg-white border-2 border-dashed border-slate-200 rounded-[20px]">
@@ -37,14 +28,16 @@
             @foreach($negotiations->groupBy('order_id') as $orderId => $thread)
                 @php
                     $latestMsg = $thread->sortByDesc('created_at')->first();
+                    $isLog = str_contains(strtolower($latestMsg->message), 'status changed') || str_contains(strtolower($latestMsg->message), 'payment');
+                    if($isLog) continue;
+
                     $order = $latestMsg->order;
                     $freelancerName = $order->service->freelancer->skomda_student->name ?? 'Freelancer';
-                    $isLog = str_contains(strtolower($latestMsg->message), 'status changed') || str_contains(strtolower($latestMsg->message), 'payment');
                     $latestFromFreelancer = $thread->where('sender', 'freelancer')->sortByDesc('created_at')->first();
                     $hasClientResponse = $latestFromFreelancer
                         ? $thread->where('sender', 'client')->where('created_at', '>', $latestFromFreelancer->created_at)->count() > 0
                         : false;
-                    $needsResponse = $latestFromFreelancer && !$hasClientResponse && !$isLog;
+                    $needsResponse = $latestFromFreelancer && !$hasClientResponse;
                 @endphp
                 <div class="msg-card bg-white border {{ $needsResponse ? 'border-amber-300 bg-amber-50/30' : 'border-slate-200' }} rounded-[20px] p-5 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer"
                      data-order-id="{{ $orderId }}"
@@ -72,8 +65,8 @@
                                             Perlu Respons
                                         </span>
                                     @endif
-                                    <span class="px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase {{ $isLog ? 'bg-blue-50 text-blue-600' : 'bg-teal-50 text-teal-700' }}">
-                                        {{ $isLog ? 'Log' : 'Chat' }}
+                                    <span class="px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase bg-teal-50 text-teal-700">
+                                        Chat
                                     </span>
                                 </div>
                             </div>
@@ -142,7 +135,7 @@
                 <div class="flex-1">
                     <textarea name="message" rows="1" class="w-full bg-slate-50 border border-slate-200 rounded-[16px] px-5 py-3.5 text-[14px] focus:bg-white focus:border-[#0f766e] focus:ring-4 focus:ring-[#0f766e]/10 outline-none resize-none min-h-[52px] max-h-[120px]" placeholder="Ketik pesan balasan..."></textarea>
                 </div>
-                <button type="submit" class="w-[52px] h-[52px] rounded-[16px] bg-[#0f766e] text-white flex items-center justify-center text-xl hover:bg-[#0d6b63] hover:-translate-y-0.5 transition-all shadow-teal-sm flex-shrink-0">
+                <button type="submit" class="no-auto-loader w-[52px] h-[52px] rounded-[16px] bg-[#0f766e] text-white flex items-center justify-center text-xl hover:bg-[#0d6b63] hover:-translate-y-0.5 transition-all shadow-teal-sm flex-shrink-0">
                     <i class="ri-send-plane-fill"></i>
                 </button>
             </form>
@@ -168,15 +161,15 @@
     function renderMessageBubble(m) {
         const isMe = m.sender === mySender;
         const time = new Date(m.created_at).toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'});
-        const align = isMe ? 'self-end' : 'self-start';
+        const align = isMe ? 'items-end ml-auto' : 'items-start mr-auto';
         const bg = isMe ? 'bg-[#0f766e] text-white' : 'bg-white border border-slate-200 text-slate-800';
-        const radius = isMe ? 'rounded-[18px] rounded-tr-sm' : 'rounded-[18px] rounded-tl-sm';
+        const radius = isMe ? 'rounded-[20px] rounded-tr-sm' : 'rounded-[20px] rounded-tl-sm';
         const shadow = isMe ? 'shadow-teal-sm' : 'shadow-sm';
 
         return `
-            <div class="flex flex-col ${align} max-w-[80%]">
+            <div class="flex flex-col ${align} max-w-[85%]" ${m.id && String(m.id).startsWith('temp-') ? `data-temp-id="${m.id}"` : ''}>
                 <div class="px-5 py-3 ${bg} ${radius} ${shadow} text-[14px] leading-relaxed break-words whitespace-pre-wrap">${m.message}</div>
-                <span class="text-[10px] font-bold text-slate-400 mt-1 ${isMe ? 'text-right' : 'text-left'}">${time}</span>
+                <span class="text-[10px] font-bold text-slate-400 mt-1.5">${time}</span>
             </div>
         `;
     }
@@ -259,6 +252,24 @@
         const submitButton = form.querySelector('button[type="submit"]');
         const formData = new FormData(form);
 
+        const msg = textarea.value.trim();
+        if (!msg || submitButton.disabled) return;
+
+        // Optimistic UI
+        const tempId = 'temp-' + Date.now();
+        const tempMsg = {
+            id: tempId,
+            sender: mySender,
+            message: msg,
+            created_at: new Date().toISOString(),
+            order_id: Number(document.getElementById('chat-form-order-id').value),
+        };
+
+        appendMessage(tempMsg.order_id, tempMsg);
+        textarea.value = '';
+        const originalHeight = textarea.style.height;
+        textarea.style.height = 'auto';
+        
         submitButton.disabled = true;
 
         try {
@@ -277,60 +288,34 @@
             if (!response.ok || !payload.success) {
                 throw new Error(payload.message || 'Gagal mengirim pesan.');
             }
-
-            textarea.value = '';
+            
+            // Replace temp message with real one from server if needed, 
+            // but since we already appended it and IDs might differ, we just leave it for now.
+            // In a real app we'd swap IDs.
         } catch (error) {
+            // Rollback optimistic UI
+            const body = document.getElementById('chat-body');
+            const tempEl = body.querySelector(`[data-temp-id="${tempId}"]`);
+            if (tempEl) tempEl.remove();
+            
+            // Restore textarea
+            textarea.value = msg;
+            textarea.style.height = originalHeight;
+
             if (window.showToast) {
-                window.showToast(error.message, 'danger');
+                window.showToast(error.message || 'Pesan gagal terkirim. Coba lagi.', 'danger');
             }
         } finally {
             submitButton.disabled = false;
         }
     }
 
-    function initMessageTabs() {
-        const tabs = document.querySelectorAll('.msg-tab');
-        const cards = document.querySelectorAll('.msg-card');
-
-        tabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                const filter = tab.dataset.filter;
-                tabs.forEach(t => {
-                    t.classList.remove('active');
-                    t.querySelector('span').classList.replace('text-[#0f766e]', 'text-slate-400');
-                    t.querySelector('span').classList.remove('font-extrabold');
-                    t.querySelector('span').classList.add('font-bold');
-                    t.querySelector('div').classList.replace('w-full', 'w-0');
-                    t.querySelector('div').classList.replace('bg-[#0f766e]', 'bg-slate-300');
-                });
-                tab.classList.add('active');
-                tab.querySelector('span').classList.replace('text-slate-400', 'text-[#0f766e]');
-                tab.querySelector('span').classList.replace('font-bold', 'font-extrabold');
-                tab.querySelector('div').classList.replace('w-0', 'w-full');
-                tab.querySelector('div').classList.replace('bg-slate-300', 'bg-[#0f766e]');
-
-                cards.forEach(card => {
-                    if (filter === 'chat') {
-                        card.style.display = card.dataset.type === 'chat' ? 'block' : 'none';
-                    } else {
-                        card.style.display = card.dataset.type === 'log' ? 'block' : 'none';
-                    }
-                });
-            });
-        });
-
-        const firstTab = document.querySelector('.msg-tab[data-filter="chat"]');
-        if(firstTab) firstTab.click();
-    }
-
     document.addEventListener('DOMContentLoaded', () => {
-        initMessageTabs();
-
         Object.keys(threadData).forEach(orderId => subscribeOrderChannel(orderId));
 
         const sendForm = document.getElementById('chat-send-form-client');
         if (sendForm) {
-            sendForm.addEventListener('submit', handleSendMessage);
+            sendForm.addEventListener('submit', (e) => handleSendMessage(e));
         }
     });
 </script>

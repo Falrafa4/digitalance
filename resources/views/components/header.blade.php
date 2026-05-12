@@ -14,6 +14,19 @@
     } else {
         $urlProfil = route('login');
     }
+
+    $role = ($segment === 'admin') ? 'admin' : ($segment === 'client' ? 'client' : ($segment === 'freelancer' ? 'freelancer' : null));
+    $notifUnreadCount = 0;
+
+    if ($role && $user) {
+        $notifUnreadCount = \App\Models\Notification::where('role', $role)
+            ->where(function ($q) use ($user) {
+                $q->where('user_id', $user->id)
+                    ->orWhereNull('user_id');
+            })
+            ->where('is_read', false)
+            ->count();
+    }
 @endphp
 
 <header class="flex items-center justify-between mb-9">
@@ -31,11 +44,12 @@
     <div class="flex items-center gap-3.5">
 
         <div class="relative">
-            <button id="notif-btn" aria-label="Notifikasi"
+            <button id="notif-btn" aria-label="Notifikasi" onclick="openNotificationDrawer()"
                 class="w-11 h-11 rounded-xl border-[1.5px] border-slate-200 bg-white cursor-pointer flex items-center justify-center text-slate-500 text-[19px] transition-all duration-200 hover:border-[#0f766e] hover:text-[#0f766e]">
                 <i class="ri-notification-3-line pointer-events-none"></i>
-                <span
-                    class="has-unread absolute top-[9px] right-[9px] w-2 h-2 bg-orange-500 border-2 border-white rounded-full pointer-events-none"></span>
+                @if ($notifUnreadCount > 0)
+                    <span class="has-unread absolute top-[9px] right-[9px] w-2 h-2 bg-red-500 border-2 border-white rounded-full pointer-events-none"></span>
+                @endif
             </button>
         </div>
 

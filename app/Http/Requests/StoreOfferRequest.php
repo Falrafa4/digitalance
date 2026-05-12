@@ -26,7 +26,7 @@ class StoreOfferRequest extends FormRequest
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'offered_price' => 'required|decimal:0,2',
-            'deadline' => 'required|date'
+            'deadline' => 'required|date',
         ];
     }
 }

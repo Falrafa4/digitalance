@@ -17,20 +17,20 @@ class RoleMiddleware
     {
         $user = $request->user();
 
-        if (!$user) {
+        if (! $user) {
             return response()->json([
                 'status' => false,
                 'message' => 'Unauthenticated.',
             ], 401);
         }
 
-        if (!method_exists($user, 'getRole')) {
+        if (! method_exists($user, 'getRole')) {
             return response()->json([
-                'message' => 'Role method not defined.'
+                'message' => 'Role method not defined.',
             ], 500);
         }
 
-        if (!in_array($user->getRole(), $roles)) {
+        if (! in_array($user->getRole(), $roles)) {
             return response()->json([
                 'status' => false,
                 'message' => 'Forbidden. You do not have access.',

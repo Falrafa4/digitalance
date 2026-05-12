@@ -15,6 +15,7 @@ class ResultController extends Controller
     public function index()
     {
         $results = Result::with('order.service.freelancer')->latest()->paginate(12);
+
         return view('dashboard.admin.results', compact('results'));
     }
 
@@ -36,11 +37,11 @@ class ResultController extends Controller
         $order = Order::with('service')->findOrFail($orderId);
         $validated = $request->validated();
 
-        if (!$order->service || $order->service->freelancer_id !== $freelancer->id) {
+        if (! $order->service || $order->service->freelancer_id !== $freelancer->id) {
             abort(403, 'Anda tidak memiliki izin untuk mengirim hasil untuk order ini.');
         }
 
-        if (!$request->hasFile('file')) {
+        if (! $request->hasFile('file')) {
             return back()->with('error', 'File tidak ditemukan');
         }
 
@@ -48,8 +49,9 @@ class ResultController extends Controller
         $version = $validated['version'] ?? $validated['message'] ?? null;
         $note = $validated['note'] ?? '';
 
-        if (!$version) {
+        if (! $version) {
             Storage::disk('public')->delete($filePath);
+
             return back()->withErrors(['version' => 'Versi hasil wajib diisi.'])->withInput();
         }
 
@@ -75,11 +77,11 @@ class ResultController extends Controller
     public function show(Result $result)
     {
         $result = $result->load(['order.service.freelancer.skomda_student', 'order.client']);
-        
+
         if (auth('administrator')->check()) {
             return view('dashboard.admin.results-detail', compact('result'));
         }
-        
+
         return view('dashboard.freelancer.result-detail', compact('result'));
     }
 
@@ -87,12 +89,14 @@ class ResultController extends Controller
     {
         $validated = $request->validated();
         $result->update($validated);
+
         return redirect()->back()->with('success', 'Hasil kerja berhasil diperbarui');
     }
 
     public function destroy(Result $result)
     {
         $result->delete();
+
         return redirect()->route('admin.results.index')->with('success', 'Hasil kerja berhasil dihapus');
     }
 
@@ -100,7 +104,7 @@ class ResultController extends Controller
     public function clientIndex()
     {
         $client = auth('client')->user();
-        $results = Result::with('order.service.freelancer')
+        $results = Result::with(['order.service.freelancer.skomda_student', 'order.client'])
             ->whereHas('order', function ($query) use ($client) {
                 $query->where('client_id', $client->id);
             })->get();
@@ -110,9 +114,9 @@ class ResultController extends Controller
 
     public function clientShow(Result $result)
     {
-        $result = $result->load('order.service.freelancer');
+        $result = $result->load(['order.service.category', 'order.service.freelancer.skomda_student', 'order.client']);
 
-        if (!$result->order || $result->order->client_id !== auth('client')->id()) {
+        if (! $result->order || $result->order->client_id !== auth('client')->id()) {
             abort(403, 'Anda tidak memiliki izin untuk melihat hasil ini.');
         }
 

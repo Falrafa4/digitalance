@@ -12,14 +12,14 @@ class PortofolioController extends Controller
     public function index(\Illuminate\Http\Request $request)
     {
         $search = $request->query('q');
-        
+
         $query = Portofolio::with('service.freelancer.skomda_student');
 
         if ($search) {
             $query->where('title', 'like', "%{$search}%")
-                  ->orWhereHas('service.freelancer.skomda_student', function($sq) use ($search) {
-                      $sq->where('name', 'like', "%{$search}%");
-                  });
+                ->orWhereHas('service.freelancer.skomda_student', function ($sq) use ($search) {
+                    $sq->where('name', 'like', "%{$search}%");
+                });
         }
 
         $portofolios = $query->latest()->paginate(12)->withQueryString();
@@ -101,12 +101,14 @@ class PortofolioController extends Controller
         $portofolio = Portofolio::with('service.freelancer.skomda_student')->whereHas('service.freelancer', function ($query) use ($freelancer_id) {
             $query->where('id', $freelancer_id);
         })->get();
+
         return view('dashboard.client.portofolio', compact('portofolio'));
     }
 
     public function showFreelancerPortofolio(string $id)
     {
         $portofolio = Portofolio::with('service.freelancer.skomda_student')->findOrFail($id);
+
         return view('dashboard.client.portofolio', compact('portofolio'));
     }
 }

@@ -2,13 +2,18 @@
 @section('title', 'Hasil Pekerjaan | Digitalance')
 
 @section('content')
-<section class="animate-fadeUp">
-  <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
-    <div>
-      <h1 class="font-display text-[1.85rem] font-extrabold text-slate-900">Hasil Pekerjaan</h1>
-      <p class="text-slate-500 mt-1">Pantau hasil pekerjaan yang dikirim freelancer.</p>
+<div class="content-scroll flex-1 px-8 py-7 overflow-y-auto relative overflow-hidden">
+    {{-- Decorative Background Icon --}}
+    <div class="absolute -right-12 -top-12 w-64 h-64 opacity-[0.03] pointer-events-none rotate-12">
+        <i class="ri-task-line text-[250px]"></i>
     </div>
-  </div>
+
+    <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8 animate-fadeUp relative z-10">
+        <div>
+            <h1 class="font-display text-[2.1rem] font-extrabold text-slate-900">Hasil Pekerjaan</h1>
+            <p class="text-slate-500 text-[0.95rem] mt-1">Pantau hasil pekerjaan yang dikirim freelancer.</p>
+        </div>
+    </div>
 
   @if($results->isEmpty())
     @include('dashboard.client._ui.empty', [
@@ -35,7 +40,10 @@
               <p class="text-slate-500 text-[13px] mt-1">
                 Order #{{ $result->order_id }} — {{ $result->order->service->title ?? 'Service' }}
               </p>
-              <p class="text-slate-400 text-[12px] font-bold mt-2">
+              <p class="text-slate-400 text-[12px] font-bold mt-1">
+                oleh {{ $result->order->service->freelancer->skomda_student->name ?? 'Freelancer' }}
+              </p>
+              <p class="text-slate-400 text-[12px] font-bold mt-0.5">
                 {{ $result->created_at->format('d M Y, H:i') }}
               </p>
             </div>
@@ -51,6 +59,10 @@
           @endif
 
           <div class="flex gap-2 mt-4 pt-4 border-t border-slate-100">
+            <a href="{{ route('client.results.show', $result->id) }}"
+               class="flex-1 px-4 py-2.5 rounded-[12px] bg-slate-800 text-white font-bold text-[12.5px] hover:bg-black transition-all text-center flex items-center justify-center gap-2">
+              <i class="ri-eye-line"></i> Lihat Detail
+            </a>
             @if($result->file_url)
               <a href="{{ asset('storage/' . $result->file_url) }}" target="_blank"
                  class="flex-1 px-4 py-2.5 rounded-[12px] bg-[#0f766e] text-white font-bold text-[12.5px] hover:bg-[#0a5e58] transition-all text-center flex items-center justify-center gap-2">

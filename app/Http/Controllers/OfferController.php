@@ -4,9 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreOfferRequest;
 use App\Http\Requests\UpdateOfferRequest;
+use App\Models\Negotiation;
 use App\Models\Offer;
 use App\Models\Order;
-use App\Models\Negotiation;
 use Illuminate\Http\Request;
 
 class OfferController extends Controller
@@ -20,7 +20,7 @@ class OfferController extends Controller
 
         return view('dashboard.admin.offers', [
             'offers' => $offers,
-            'negotiations' => $negotiations
+            'negotiations' => $negotiations,
         ]);
     }
 
@@ -32,6 +32,7 @@ class OfferController extends Controller
             ->whereHas('order.client', function ($query) use ($client) {
                 $query->where('id', $client->id);
             })->get();
+
         return view('dashboard.client.offers', compact('offers'));
     }
 
@@ -57,6 +58,7 @@ class OfferController extends Controller
         }
 
         $offer->update(['status' => 'Accepted']);
+
         return redirect()->route('client.offers.index')->with('success', 'Penawaran berhasil disetujui');
     }
 
@@ -71,6 +73,7 @@ class OfferController extends Controller
         }
 
         $offer->update(['status' => 'Rejected']);
+
         return redirect()->route('client.offers.index')->with('success', 'Penawaran berhasil ditolak');
     }
 
@@ -82,6 +85,7 @@ class OfferController extends Controller
             ->whereHas('order.service.freelancer', function ($query) use ($freelancer) {
                 $query->where('id', $freelancer->id);
             })->get();
+
         return view('dashboard.freelancer.offers', compact('offers'));
     }
 
@@ -96,7 +100,7 @@ class OfferController extends Controller
             })->firstOrFail();
 
         Offer::create(array_merge($validatedData, [
-            'status' => 'Sent'
+            'status' => 'Sent',
         ]));
 
         return redirect()->route('freelancer.offers.index')->with('success', 'Penawaran berhasil dibuat');
@@ -113,6 +117,7 @@ class OfferController extends Controller
         }
 
         $offer->update($request->validated());
+
         return redirect()->route('freelancer.offers.index')->with('success', 'Penawaran berhasil diperbarui');
     }
 }

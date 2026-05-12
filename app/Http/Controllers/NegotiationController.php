@@ -17,6 +17,7 @@ class NegotiationController extends Controller
     public function index()
     {
         $negotiations = Negotiation::with('order.service.freelancer')->get();
+
         return view('dashboard.admin.negotiations', compact('negotiations'));
     }
 
@@ -40,13 +41,14 @@ class NegotiationController extends Controller
         $freelancer = auth('freelancer')->user();
         $order = Order::with('service')->find($request->order_id);
 
-        if (!$order) {
+        if (! $order) {
             if ($request->expectsJson()) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Order tidak ditemukan.',
                 ], 404);
             }
+
             return redirect()->back()->with('error', 'Order tidak ditemukan.');
         }
 
@@ -57,6 +59,7 @@ class NegotiationController extends Controller
                     'message' => 'Anda tidak memiliki izin untuk mengirim pesan di negosiasi ini.',
                 ], 403);
             }
+
             return redirect()->back()->with('error', 'Anda tidak memiliki izin untuk mengirim pesan di negosiasi ini.');
         }
 
@@ -65,7 +68,7 @@ class NegotiationController extends Controller
         $negotiation = Negotiation::create([
             'order_id' => $request->order_id,
             'sender' => 'freelancer',
-            'message' => $request->message
+            'message' => $request->message,
         ]);
 
         broadcast(new NegotiationSent($negotiation))->toOthers();
@@ -100,7 +103,7 @@ class NegotiationController extends Controller
         $client = auth('client')->user();
 
         $negotiations = Negotiation::with('order.service.freelancer.skomda_student')
-            ->whereHas('order', fn($q) => $q->where('client_id', $client->id))
+            ->whereHas('order', fn ($q) => $q->where('client_id', $client->id))
             ->get();
 
         return view('dashboard.client.messages', compact('negotiations'));
@@ -168,9 +171,9 @@ class NegotiationController extends Controller
             'description' => 'nullable|string|max:2000',
         ]);
 
-        $message = "Negosiasi harga: " . $validated['reason'] . 
-                   "\nHarga tawaran: Rp " . number_format($validated['new_price'], 0, ',', '.') . 
-                   "\nDeskripsi: " . ($validated['description'] ?? '-');
+        $message = 'Negosiasi harga: '.$validated['reason'].
+                   "\nHarga tawaran: Rp ".number_format($validated['new_price'], 0, ',', '.').
+                   "\nDeskripsi: ".($validated['description'] ?? '-');
 
         $negotiation = Negotiation::create([
             'order_id' => $offer->order_id,
@@ -195,7 +198,7 @@ class NegotiationController extends Controller
         }
 
         $negotiation->update([
-            'message' => $negotiation->message . "\n\n[SISTEM: Negosiasi harga diterima oleh Freelancer]",
+            'message' => $negotiation->message."\n\n[SISTEM: Negosiasi harga diterima oleh Freelancer]",
         ]);
 
         return redirect()->back()->with('success', 'Negosiasi diterima.');
@@ -213,7 +216,7 @@ class NegotiationController extends Controller
         }
 
         $negotiation->update([
-            'message' => $negotiation->message . "\n\n[SISTEM: Negosiasi harga ditolak oleh Freelancer]",
+            'message' => $negotiation->message."\n\n[SISTEM: Negosiasi harga ditolak oleh Freelancer]",
         ]);
 
         return redirect()->back()->with('success', 'Negosiasi ditolak.');

@@ -8,8 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class Review extends Model
 {
     use HasFactory;
+
     protected $fillable = ['order_id', 'rating', 'comment'];
-    
+
     public function order()
     {
         return $this->belongsTo(Order::class);

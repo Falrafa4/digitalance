@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Portofolio extends Model
 {
     use HasFactory;
+
     protected $fillable = ['service_id', 'title', 'description', 'media_url'];
 
     public function service()

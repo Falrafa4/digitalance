@@ -65,7 +65,7 @@
         <div class="mb-8">
             <h3 class="font-bold text-slate-900 mb-3 text-[15px]">Pesan / Pesan Klien</h3>
             <div class="bg-slate-50 rounded-[16px] p-5 border border-slate-100">
-                <p class="text-slate-700 text-[14px] leading-relaxed whitespace-pre-wrap">{{ $result->message ?: ($result->note ?: 'Tidak ada pesan atau instruksi.') }}</p>
+                <p class="text-slate-700 text-[14px] leading-relaxed whitespace-pre-wrap">{{ $result->version ?: ($result->note ?: 'Tidak ada versi atau instruksi.') }}</p>
             </div>
         </div>
 
@@ -98,7 +98,7 @@
             <h3 class="font-bold text-slate-900 mb-4 text-[15px]">Edit Catatan/Pesan</h3>
             <form action="{{ route('freelancer.results.update', $result->id) }}" method="POST">
                 @csrf @method('PUT')
-                <textarea name="message" rows="4" class="w-full border border-slate-200 rounded-xl px-4 py-3 text-[14px] focus:border-[#0f766e] focus:ring-2 focus:ring-[#0f766e]/20 outline-none mb-4 resize-none" placeholder="Masukkan pesan baru jika perlu...">{{ $result->message }}</textarea>
+                <textarea name="note" rows="4" class="w-full border border-slate-200 rounded-xl px-4 py-3 text-[14px] focus:border-[#0f766e] focus:ring-2 focus:ring-[#0f766e]/20 outline-none mb-4 resize-none" placeholder="Masukkan catatan baru jika perlu...">{{ $result->note }}</textarea>
                 <div class="flex justify-end">
                     <button type="submit" class="px-6 py-2.5 rounded-[12px] bg-[#0f766e] text-white font-bold text-[13.5px] hover:bg-[#0d6b63] transition-all shadow-teal-sm">
                         Simpan Perubahan

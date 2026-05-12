@@ -22,9 +22,9 @@ class StoreSkomdaStudentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'  => 'required|string|max:255',
+            'name' => 'required|string|max:255',
             'email' => 'required|email|unique:skomda_students,email',
-            'nis'   => 'required|string|max:9|unique:skomda_students,nis',
+            'nis' => 'required|string|max:9|unique:skomda_students,nis',
             'class' => 'required|string|max:255',
             'major' => 'required|in:SIJA,TJAT',
             'phone' => 'nullable|string|max:20',

@@ -3,11 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Api\UserUpdateRequest;
 use App\Http\Requests\Api\UserStoreRequest;
+use App\Http\Requests\Api\UserUpdateRequest;
 use App\Models\Client;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 
 class ClientControllerApi extends Controller
 {
@@ -19,9 +17,9 @@ class ClientControllerApi extends Controller
         $data = Client::all();
 
         return response()->json([
-            "status" => "success",
-            "message" => "Data client berhasil diambil",
-            "data" => $data
+            'status' => 'success',
+            'message' => 'Data client berhasil diambil',
+            'data' => $data,
         ]);
     }
 
@@ -32,10 +30,11 @@ class ClientControllerApi extends Controller
     {
         $validated = $request->validated();
         $client = Client::create($validated);
+
         return response()->json([
-            "status" => "success",
-            "message" => "Client berhasil ditambahkan",
-            "data" => $client
+            'status' => 'success',
+            'message' => 'Client berhasil ditambahkan',
+            'data' => $client,
         ], 201);
     }
 
@@ -45,10 +44,11 @@ class ClientControllerApi extends Controller
     public function show(string $id)
     {
         $client = Client::findOrFail($id);
+
         return response()->json([
-            "status" => "success",
-            "message" => "Data client berhasil diambil",
-            "data" => $client
+            'status' => 'success',
+            'message' => 'Data client berhasil diambil',
+            'data' => $client,
         ]);
     }
 
@@ -59,10 +59,11 @@ class ClientControllerApi extends Controller
     {
         $client = Client::findOrFail($id);
         $client->update($request->validated());
+
         return response()->json([
-            'status' => "success",
+            'status' => 'success',
             'message' => 'Akun client berhasil diperbarui',
-            'data' => $client
+            'data' => $client,
         ]);
     }
 
@@ -73,9 +74,10 @@ class ClientControllerApi extends Controller
     {
         $client = Client::findOrFail($id);
         $client->delete();
+
         return response()->json([
-            'status' => "success",
-            'message' => 'Akun client berhasil dihapus'
+            'status' => 'success',
+            'message' => 'Akun client berhasil dihapus',
         ]);
     }
 }

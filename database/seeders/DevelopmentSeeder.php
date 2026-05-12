@@ -22,7 +22,7 @@ use Illuminate\Database\Seeder;
 class DevelopmentSeeder extends Seeder
 {
     use WithoutModelEvents;
-    
+
     /**
      * Run the database seeds.
      */
@@ -45,16 +45,13 @@ class DevelopmentSeeder extends Seeder
             ]
         );
 
-
         // 2 - BASE USER DATA
         $students = SkomdaStudent::factory(50)->create();
         $clients = Client::factory(10)->create();
         User::factory(5)->create();
 
-
         // 3 - FREELANCER (DEPEND ON USER & STUDENT)
         $freelancers = Freelancer::factory(10)->create();
-
 
         // 4 - MASTER KATEGORI LAYANAN
         $categories = [
@@ -91,11 +88,9 @@ class DevelopmentSeeder extends Seeder
             );
         }
 
-
         // 5 - SERVICE + PORTOFOLIO
         $services = Service::factory(20)->create();
         Portofolio::factory(20)->create();
-
 
         // 6 - TRANSACTION FLOW
         $orders = Order::factory(30)->create();
@@ -103,7 +98,6 @@ class DevelopmentSeeder extends Seeder
         Negotiation::factory(10)->create();
         Transaction::factory(15)->create();
         Result::factory(15)->create();
-
 
         // 7 - REVIEW
         // Buat review hanya jika order belum punya review

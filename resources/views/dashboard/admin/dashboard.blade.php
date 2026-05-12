@@ -349,50 +349,6 @@
             }
         }
 
-        function initNotifDrawer() {
-            const btn = document.getElementById('notif-btn');
-            const drawer = document.getElementById('notif-drawer');
-            const panel = document.getElementById('notif-panel');
-            const backdrop = document.getElementById('notif-backdrop');
-            const closeBtn = document.getElementById('notif-close');
-
-            if (!btn || !drawer || !panel || !backdrop || !closeBtn) return;
-
-            const open = () => {
-                drawer.classList.remove('hidden');
-                drawer.setAttribute('aria-hidden', 'false');
-
-                requestAnimationFrame(() => {
-                    backdrop.classList.remove('opacity-0');
-                    panel.classList.remove('translate-x-full');
-                });
-
-                btn.classList.remove('has-unread');
-                document.body.style.overflow = 'hidden';
-            };
-
-            const close = () => {
-                backdrop.classList.add('opacity-0');
-                panel.classList.add('translate-x-full');
-
-                drawer.setAttribute('aria-hidden', 'true');
-
-                setTimeout(() => {
-                    drawer.classList.add('hidden');
-                    document.body.style.overflow = '';
-                }, 200);
-            };
-
-            btn.addEventListener('click', open);
-            closeBtn.addEventListener('click', close);
-            backdrop.addEventListener('click', close);
-
-            document.addEventListener('keydown', (e) => {
-                if (drawer.classList.contains('hidden')) return;
-                if (e.key === 'Escape') close();
-            });
-        }
-
         // Redundant definitions removed, using global openModal and closeModal
 
         window.openDisputeDetail = async function(id) {
@@ -651,13 +607,6 @@
             const flags = document.getElementById('page-flags');
             const hasUnreadMessages = flags ? flags.dataset.hasUnread === '1' : false;
 
-            // notif dot
-            const notifBtn = document.getElementById('notif-btn');
-            if (notifBtn) {
-                notifBtn.classList.toggle('has-unread', hasUnreadMessages);
-                notifBtn.addEventListener('click', () => notifBtn.classList.remove('has-unread'));
-            }
-
             // approve/reject delegation
             const verificationContainer = document.getElementById('verification-container');
             if (verificationContainer) {
@@ -674,8 +623,6 @@
                     if (action === 'reject') handleReject(id);
                 });
             }
-
-            initNotifDrawer();
         }
     </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

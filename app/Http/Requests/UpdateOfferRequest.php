@@ -26,7 +26,7 @@ class UpdateOfferRequest extends FormRequest
             'description' => 'nullable|string',
             'offered_price' => 'required|decimal:0,2',
             'deadline' => 'required|date',
-            'status' => 'required|in:Sent,Accepted,Rejected,Expired'
+            'status' => 'required|in:Sent,Accepted,Rejected,Expired',
         ];
     }
 }

@@ -12,6 +12,7 @@ class ServiceCategoryController extends Controller
     public function index()
     {
         $serviceCategories = ServiceCategory::paginate(50);
+
         return view('dashboard.admin.service_categories', compact('serviceCategories'));
     }
 
@@ -50,6 +51,7 @@ class ServiceCategoryController extends Controller
     public function freelancerIndex()
     {
         $serviceCategories = ServiceCategory::paginate(10);
+
         return view('dashboard.freelancer.service_categories', compact('serviceCategories'));
     }
 
@@ -57,6 +59,7 @@ class ServiceCategoryController extends Controller
     public function clientIndex()
     {
         $serviceCategories = ServiceCategory::all();
+
         return view('dashboard.client.service_categories', compact('serviceCategories'));
     }
 }
