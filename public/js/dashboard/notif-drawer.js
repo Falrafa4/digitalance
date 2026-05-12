@@ -25,8 +25,6 @@
       if (dot) dot.remove();
 
       document.body.style.overflow = 'hidden';
-
-      console.log('Opened notif for role:', getRole());
     };
 
     const close = () => {

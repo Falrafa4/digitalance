@@ -34,12 +34,12 @@
 
                 <div class="hero-anim glass-card rounded-3xl p-6 w-full">
                     <div class="flex gap-1 bg-slate-100 p-1 rounded-full w-fit mb-4">
-                        <button class="role-btn active px-5 py-2 rounded-full font-bold text-sm cursor-pointer border-none"
+                        <button class="role-btn active px-6 py-3 rounded-full font-bold text-sm cursor-pointer border-none"
                             data-role="client">
                             Client
                         </button>
                         <button
-                            class="role-btn px-5 py-2 rounded-full font-bold text-sm cursor-pointer border-none bg-transparent text-slate-500"
+                            class="role-btn px-6 py-3 rounded-full font-bold text-sm cursor-pointer border-none bg-transparent text-slate-500"
                             data-role="freelancer">
                             Freelancer
                         </button>
@@ -57,19 +57,19 @@
                             Search
                         </button>
                     </form>
-                    <div class="flex flex-wrap gap-2 items-center">
+                    <div class="flex flex-wrap gap-2.5 items-center">
                         <span class="text-xs font-semibold text-slate-400">Rekomendasi:</span>
                         <a href="{{ route('services.index', ['q' => 'Web Dev']) }}"
-                            class="search-tag text-xs font-bold px-3 py-1 bg-orange-500/10 text-orange-500 rounded-lg cursor-pointer hover:bg-orange-500/20 transition-all no-underline">#Web
+                            class="search-tag text-xs font-bold px-4 py-2.5 bg-orange-500/10 text-orange-500 rounded-lg cursor-pointer hover:bg-orange-500/20 transition-all no-underline">#Web
                             Dev</a>
                         <a href="{{ route('services.index', ['q' => 'Logo Design']) }}"
-                            class="search-tag text-xs font-bold px-3 py-1 bg-orange-500/10 text-orange-500 rounded-lg cursor-pointer hover:bg-orange-500/20 transition-all no-underline">#Logo
+                            class="search-tag text-xs font-bold px-4 py-2.5 bg-orange-500/10 text-orange-500 rounded-lg cursor-pointer hover:bg-orange-500/20 transition-all no-underline">#Logo
                             Design</a>
                         <a href="{{ route('services.index', ['q' => 'Video Editor']) }}"
-                            class="search-tag text-xs font-bold px-3 py-1 bg-orange-500/10 text-orange-500 rounded-lg cursor-pointer hover:bg-orange-500/20 transition-all no-underline">#Video
+                            class="search-tag text-xs font-bold px-4 py-2.5 bg-orange-500/10 text-orange-500 rounded-lg cursor-pointer hover:bg-orange-500/20 transition-all no-underline">#Video
                             Editor</a>
                         <a href="{{ route('services.index', ['q' => 'UI/UX']) }}"
-                            class="search-tag text-xs font-bold px-3 py-1 bg-orange-500/10 text-orange-500 rounded-lg cursor-pointer hover:bg-orange-500/20 transition-all no-underline">#UI/UX</a>
+                            class="search-tag text-xs font-bold px-4 py-2.5 bg-orange-500/10 text-orange-500 rounded-lg cursor-pointer hover:bg-orange-500/20 transition-all no-underline">#UI/UX</a>
                     </div>
                 </div>
             </div>
@@ -82,7 +82,7 @@
                     </div>
                     <div class="relative z-10 rounded-[2rem] p-3 bg-white/50 rotate-2 shadow-2xl">
                         <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1200"
-                            alt="Freelance Collaboration" class="w-full h-[440px] object-cover rounded-[1.5rem]" />
+                            alt="Freelance Collaboration" decoding="async" class="w-full h-[440px] object-cover rounded-[1.5rem]" />
                         <div
                             class="absolute bottom-8 left-8 bg-slate-900/88 backdrop-blur-xl border border-white/10 px-5 py-4 rounded-2xl text-white">
                             <p class="text-2xl font-bold leading-none mb-1">

@@ -140,6 +140,50 @@ class ClientController extends Controller
         return redirect()->route('client.profile')->with('success', 'Password berhasil diperbarui');
     }
 
+    public function updateClientPassword(Request $request, $id)
+    {
+        $request->validate([
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $client = Client::findOrFail($id);
+        $client->update([
+            'password' => Hash::make($request->password),
+        ]);
+
+        return redirect()->route('admin.clients.index')->with('success', 'Password ' . $client->name . ' berhasil diperbarui');
+    }
+
+    public function updateFreelancerPassword(Request $request, $id)
+    {
+        $request->validate([
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $freelancer = \App\Models\Freelancer::findOrFail($id);
+        $freelancer->update([
+            'password' => Hash::make($request->password),
+        ]);
+
+        return redirect()->route('admin.clients.index', ['role' => 'Freelancer'])
+            ->with('success', 'Password ' . ($freelancer->skomda_student->name ?? 'Freelancer') . ' berhasil diperbarui');
+    }
+
+    public function updateSkomdaPassword(Request $request, $id)
+    {
+        $request->validate([
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $skomdaStudent = \App\Models\SkomdaStudent::findOrFail($id);
+        $skomdaStudent->update([
+            'password' => Hash::make($request->password),
+        ]);
+
+        return redirect()->route('admin.clients.index', ['role' => 'Skomda Student'])
+            ->with('success', 'Password ' . $skomdaStudent->name . ' berhasil diperbarui');
+    }
+
     // ==========================================
     // FREELANCER ONLY
     // ==========================================

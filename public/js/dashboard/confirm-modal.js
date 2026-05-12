@@ -12,7 +12,7 @@
                     <i class="ri-error-warning-fill"></i>
                 </div>
                 <h3 class="font-display text-[1.15rem] font-extrabold text-slate-900 mb-2">Konfirmasi</h3>
-                <p class="text-slate-500 text-[13px] mb-6">${message}</p>
+                <p class="text-slate-500 text-[13px] mb-6">${window.DigitalanceUtils?.escapeHtml(message) || message}</p>
                 <div class="flex gap-3">
                     <button type="button" id="btn-confirm-cancel" class="flex-1 py-2.5 rounded-xl bg-slate-100 text-slate-600 font-bold text-[13px] transition hover:bg-slate-200">Batal</button>
                     <button type="button" id="btn-confirm-ok" class="flex-1 py-2.5 rounded-xl bg-teal-600 text-white font-bold text-[13px] transition hover:bg-teal-700 shadow-teal-sm">Yakin</button>

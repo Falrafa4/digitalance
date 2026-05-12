@@ -16,12 +16,7 @@
     const $ = (id) => document.getElementById(id);
 
     function formatRupiah(number) {
-        if (!number) return '-';
-        return new Intl.NumberFormat('id-ID', { 
-            style: 'currency', 
-            currency: 'IDR', 
-            minimumFractionDigits: 0 
-        }).format(number);
+        return window.DigitalanceUtils?.formatIdr(number) || '-';
     }
 
     function formatPriceRange(min, max) {
@@ -192,8 +187,9 @@
         setMeta(paginated.length, data.length);
 
         wrap.innerHTML = paginated.map(s => {
-            const fName = s.freelancer?.skomda_student?.name ?? s.freelancer?.name ?? 'Freelancer';
-            const catName = s.service_category?.name ?? s.category?.name ?? 'Kategori';
+            const fName = window.DigitalanceUtils?.escapeHtml(s.freelancer?.skomda_student?.name ?? s.freelancer?.name ?? 'Freelancer');
+            const catName = window.DigitalanceUtils?.escapeHtml(s.service_category?.name ?? s.category?.name ?? 'Kategori');
+            const title = window.DigitalanceUtils?.escapeHtml(s.title ?? '');
             const rawStatus = String(s.status || 'Draft').toLowerCase();
 
             return `
@@ -204,7 +200,7 @@
                     </div>
                     <div class="card-body">
                         <span class="cat-badge">${catName}</span>
-                        <h3 class="service-title" title="${s.title}">${s.title}</h3>
+                        <h3 class="service-title" title="${title}">${title}</h3>
                         
                         <div style="margin-top: 4px; display: flex; flex-direction: column; gap: 6px;">
                             <div class="card-info-row">
@@ -274,8 +270,10 @@
 
         if (!box) return;
 
-        const fName = s.freelancer?.skomda_student?.name ?? s.freelancer?.name ?? 'Freelancer';
-        const catName = s.service_category?.name ?? s.category?.name ?? 'Kategori';
+        const fName = window.DigitalanceUtils?.escapeHtml(s.freelancer?.skomda_student?.name ?? s.freelancer?.name ?? 'Freelancer');
+        const catName = window.DigitalanceUtils?.escapeHtml(s.service_category?.name ?? s.category?.name ?? 'Kategori');
+        const title = window.DigitalanceUtils?.escapeHtml(s.title ?? '');
+        const desc = window.DigitalanceUtils?.escapeHtml(s.description || '-');
         const rawStatus = String(s.status || 'Draft').toLowerCase();
 
         box.innerHTML = `
@@ -284,7 +282,7 @@
             </div>
             <div class="modal-body">
                 <span class="service-id" style="margin-bottom:8px; display:inline-block;">#${s.id}</span>
-                <h2 class="modal-name">${s.title}</h2>
+                <h2 class="modal-name">${title}</h2>
                 
                 <div class="modal-role-row">
                     <span class="status-pill status-${rawStatus} ${sBadge(s.status)}">${s.status}</span>
@@ -311,7 +309,7 @@
                 </div>
 
                 <p class="modal-section-title">Deskripsi Layanan</p>
-                <div class="desc-box">${s.description || '-'}</div>
+                <div class="desc-box">${desc}</div>
 
                 <div class="modal-actions-row" style="margin-top: 24px; display: flex; gap: 12px;">
                     ${s.status === 'Pending' ? `
@@ -448,7 +446,8 @@
         
         const deleteTextEl = $('delete-service-text');
         if (deleteTextEl) {
-            deleteTextEl.innerHTML = `Tindakan ini tidak dapat dibatalkan. Layanan <strong>#${s.id} - ${s.title}</strong> akan dihapus permanen.`;
+            const title = window.DigitalanceUtils?.escapeHtml(s.title ?? '');
+            deleteTextEl.innerHTML = `Tindakan ini tidak dapat dibatalkan. Layanan <strong>#${s.id} - ${title}</strong> akan dihapus permanen.`;
         }
         
         openModal('modal-delete-service');

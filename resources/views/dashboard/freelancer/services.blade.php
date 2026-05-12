@@ -5,14 +5,9 @@
     <div class="content-scroll flex-1 px-8 py-7 overflow-y-auto">
 
         <!-- Page Header -->
-        <div class="flex items-end justify-between mb-8 gap-4 flex-wrap animate-fadeUp">
-            <div>
-                <h1 class="font-display text-[2.1rem] font-extrabold text-slate-900">My Services</h1>
-                <p class="text-slate-500 text-[0.95rem] mt-1">
-                    Kelola daftar layanan yang kamu tawarkan di Digitalance.
-                </p>
-            </div>
-        </div>
+        <x-crud-header title="My Services" subtitle="Kelola daftar layanan yang kamu tawarkan di Digitalance."
+            actionUrl="{{ Route::has('freelancer.services.create') ? route('freelancer.services.create') : null }}"
+            actionLabel="Buat Layanan Baru" actionIcon="ri-add-line" />
 
         <!-- Filter Bar -->
         <div class="flex items-center justify-between gap-4 mb-4 flex-wrap animate-fadeUp-2">
@@ -35,7 +30,8 @@
             </div>
 
             <div class="relative">
-                <i class="ri-search-line absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[15px] pointer-events-none"></i>
+                <i
+                    class="ri-search-line absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[15px] pointer-events-none"></i>
                 <input type="text" id="service-search" placeholder="Cari judul, kategori, status…"
                     class="pl-9 pr-4 py-[9px] w-[280px] border-[1.5px] border-slate-200 rounded-[11px] text-[13px] font-semibold text-slate-700 bg-white outline-none transition-all duration-200 placeholder:font-normal placeholder:text-slate-400 focus:border-[#0f766e] focus:shadow-[0_0_0_3px_rgba(15,118,110,0.08)]" />
             </div>
@@ -51,6 +47,7 @@
     <script>
         window.__FREELANCER_SERVICES__ = {
             services: @json($services ?? []),
+            createUrl: @json(Route::has('freelancer.services.create') ? route('freelancer.services.create') : null),
             links: {
                 showPrefix: @json(rtrim(url('/freelancer/services'), '/') . '/'),
                 editSuffix: '/edit',
@@ -59,4 +56,3 @@
     </script>
     <script src="{{ asset('js/dashboard/freelancer/services.js') }}"></script>
 @endsection
-

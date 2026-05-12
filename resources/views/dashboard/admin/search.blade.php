@@ -40,6 +40,24 @@
                     <div class="w-10 h-10 rounded-xl bg-orange-50 text-orange-500 flex items-center justify-center text-xl shrink-0"><i class="ri-briefcase-4-line"></i></div>
                 @elseif($item->search_type === 'Order')
                     <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-500 flex items-center justify-center text-xl shrink-0"><i class="ri-shopping-cart-2-line"></i></div>
+                @elseif($item->search_type === 'Transaction')
+                    <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center text-xl shrink-0"><i class="ri-bank-card-line"></i></div>
+                @elseif($item->search_type === 'Menu')
+                    <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-500 flex items-center justify-center text-xl shrink-0"><i class="ri-menu-search-line"></i></div>
+                @elseif($item->search_type === 'Student')
+                    <div class="w-10 h-10 rounded-xl bg-cyan-50 text-cyan-500 flex items-center justify-center text-xl shrink-0"><i class="ri-user-location-line"></i></div>
+                @elseif($item->search_type === 'Category')
+                    <div class="w-10 h-10 rounded-xl bg-teal-50 text-teal-500 flex items-center justify-center text-xl shrink-0"><i class="ri-price-tag-3-line"></i></div>
+                @elseif($item->search_type === 'Portofolio')
+                    <div class="w-10 h-10 rounded-xl bg-sky-50 text-sky-500 flex items-center justify-center text-xl shrink-0"><i class="ri-gallery-line"></i></div>
+                @elseif($item->search_type === 'Offer')
+                    <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-500 flex items-center justify-center text-xl shrink-0"><i class="ri-hand-coin-line"></i></div>
+                @elseif($item->search_type === 'Result')
+                    <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-500 flex items-center justify-center text-xl shrink-0"><i class="ri-checkbox-circle-line"></i></div>
+                @elseif($item->search_type === 'Review')
+                    <div class="w-10 h-10 rounded-xl bg-yellow-50 text-yellow-500 flex items-center justify-center text-xl shrink-0"><i class="ri-star-line"></i></div>
+                @elseif($item->search_type === 'Chat')
+                    <div class="w-10 h-10 rounded-xl bg-pink-50 text-pink-500 flex items-center justify-center text-xl shrink-0"><i class="ri-chat-3-line"></i></div>
                 @else
                     <div class="w-10 h-10 rounded-xl bg-slate-50 text-slate-500 flex items-center justify-center text-xl shrink-0"><i class="ri-file-list-3-line"></i></div>
                 @endif
@@ -49,6 +67,15 @@
                         @elseif($item->search_type === 'Freelancer') bg-purple-100 text-purple-700 
                         @elseif($item->search_type === 'Service') bg-orange-100 text-orange-700 
                         @elseif($item->search_type === 'Order') bg-emerald-100 text-emerald-700 
+                        @elseif($item->search_type === 'Transaction') bg-blue-100 text-blue-700 
+                        @elseif($item->search_type === 'Menu') bg-indigo-100 text-indigo-700 
+                        @elseif($item->search_type === 'Student') bg-cyan-100 text-cyan-700 
+                        @elseif($item->search_type === 'Category') bg-teal-100 text-teal-700 
+                        @elseif($item->search_type === 'Portofolio') bg-sky-100 text-sky-700 
+                        @elseif($item->search_type === 'Offer') bg-amber-100 text-amber-700 
+                        @elseif($item->search_type === 'Result') bg-emerald-100 text-emerald-700 
+                        @elseif($item->search_type === 'Review') bg-yellow-100 text-yellow-700 
+                        @elseif($item->search_type === 'Chat') bg-pink-100 text-pink-700 
                         @else bg-slate-100 text-slate-700 @endif
                     ">{{ $item->search_type }}</span>
                     <h3 class="font-display font-bold text-slate-800 text-[14.5px] line-clamp-1" title="{{ $item->title ?? $item->name ?? 'Order' }}">
@@ -64,13 +91,35 @@
                 Bergabung: {{ $item->created_at->format('d M Y') }}
             @elseif($item->search_type === 'Freelancer')
                 Email: {{ $item->skomda_student->email ?? '-' }} <br/>
-                Bergabung: {{ $item->created_at->format('d M Y') }}
+                Major: {{ $item->skomda_student->major ?? '-' }}
+            @elseif($item->search_type === 'Student')
+                Email: {{ $item->email }} <br/>
+                NIS: {{ $item->nis }}
             @elseif($item->search_type === 'Service')
                 Harga: Rp {{ number_format($item->price ?? 0, 0, ',', '.') }}<br/>
                 Kategori: {{ $item->service_category->name ?? '-' }}
+            @elseif($item->search_type === 'Category')
+                Jumlah Layanan: {{ $item->services_count ?? 0 }}
+            @elseif($item->search_type === 'Portofolio')
+                Freelancer: {{ $item->freelancer->name ?? '-' }}
             @elseif($item->search_type === 'Order')
                 Status: {{ $item->status ?? 'Pending' }}<br/>
                 Klien: {{ $item->client->name ?? '-' }}
+            @elseif($item->search_type === 'Transaction')
+                Status: {{ $item->status }} <br/>
+                Tipe: {{ $item->type }}
+            @elseif($item->search_type === 'Offer')
+                Harga: Rp {{ number_format($item->offered_price ?? 0, 0, ',', '.') }}<br/>
+                Status: {{ $item->status }}
+            @elseif($item->search_type === 'Result')
+                Pesan: {{ $item->note ?? '-' }}
+            @elseif($item->search_type === 'Review')
+                Rating: {{ $item->rating }} ⭐<br/>
+                Komentar: {{ $item->comment }}
+            @elseif($item->search_type === 'Chat')
+                Pesan: {{ $item->message }}
+            @elseif($item->search_type === 'Menu')
+                Deskripsi: {{ $item->email }}
             @endif
         </div>
         

@@ -69,18 +69,7 @@ class FreelancerController extends Controller
     // =========================
     public function index(Request $request)
     {
-        $q = $request->query('q');
-        $query = Freelancer::with('skomda_student');
-
-        if ($q) {
-            $query->whereHas('skomda_student', function($sq) use ($q) {
-                $sq->where('name', 'like', "%{$q}%")
-                   ->orWhere('email', 'like', "%{$q}%");
-            });
-        }
-
-        $freelancers = $query->latest()->get();
-        return view('dashboard.admin.freelancers', compact('freelancers', 'q'));
+        return redirect()->route('admin.clients.index', ['role' => 'Freelancer']);
     }
 
     public function store(StoreFreelancerRequest $request)

@@ -12,8 +12,7 @@ class SkomdaStudentController extends Controller
     // ADMIN ONLY
     public function index()
     {
-        $skomdaStudents = SkomdaStudent::all();
-        return view('dashboard.admin.skomda_students', compact('skomdaStudents'));
+        return redirect()->route('admin.clients.index', ['role' => 'Skomda Student']);
     }
 
     public function store(StoreSkomdaStudentRequest $request)
@@ -24,13 +23,12 @@ class SkomdaStudentController extends Controller
             return response()->json(['message' => 'Akun siswa SMK Telkom Sidoarjo berhasil ditambahkan'], 201);
         }
 
-        return redirect()->route('admin.skomda-students.index')->with('success', 'Akun siswa SMK Telkom Sidoarjo berhasil ditambahkan');
+        return redirect()->route('admin.clients.index', ['role' => 'Skomda Student'])->with('success', 'Akun siswa SMK Telkom Sidoarjo berhasil ditambahkan');
     }
 
     public function show(string $id)
     {
-        $skomdaStudent = SkomdaStudent::findOrFail($id);
-        return view('dashboard.admin.skomda_students', compact('skomdaStudent'));
+        return redirect()->route('admin.clients.index', ['role' => 'Skomda Student']);
     }
 
     public function update(UpdateSkomdaStudentRequest $request, string $id)
@@ -42,7 +40,7 @@ class SkomdaStudentController extends Controller
             return response()->json(['message' => 'Akun siswa SMK Telkom Sidoarjo berhasil diperbarui'], 200);
         }
 
-        return redirect()->route('admin.skomda-students.index')->with('success', 'Akun siswa SMK Telkom Sidoarjo berhasil diperbarui');
+        return redirect()->route('admin.clients.index', ['role' => 'Skomda Student'])->with('success', 'Akun siswa SMK Telkom Sidoarjo berhasil diperbarui');
     }
 
     public function destroy(Request $request, string $id)
@@ -54,7 +52,7 @@ class SkomdaStudentController extends Controller
             return response()->json(['message' => 'Akun siswa SMK Telkom Sidoarjo berhasil dihapus'], 200);
         }
 
-        return redirect()->route('admin.skomda-students.index')->with('success', 'Akun siswa SMK Telkom Sidoarjo berhasil dihapus');
+        return redirect()->route('admin.clients.index', ['role' => 'Skomda Student'])->with('success', 'Akun siswa SMK Telkom Sidoarjo berhasil dihapus');
     }
 
     // FREELANCER ONLY

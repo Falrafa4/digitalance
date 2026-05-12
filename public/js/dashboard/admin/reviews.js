@@ -75,8 +75,10 @@
     wrap.innerHTML = data.map(r => {
       const date = r.created_at ? new Date(r.created_at).toLocaleDateString('id-ID') : '-';
       
-      const clientName = r.order?.client?.user?.name ?? r.order?.client?.name ?? r.client_name ?? 'Client ' + (r.order?.client_id ?? '-');
-      const serviceName = r.order?.service?.title ?? r.service_name ?? 'Service ' + (r.order?.service_id ?? '-');
+      const clientName = window.DigitalanceUtils?.escapeHtml(r.order?.client?.user?.name ?? r.order?.client?.name ?? r.client_name ?? 'Client ' + (r.order?.client_id ?? '-'));
+      const serviceName = window.DigitalanceUtils?.escapeHtml(r.order?.service?.title ?? r.service_name ?? 'Service ' + (r.order?.service_id ?? '-'));
+      const comment = window.DigitalanceUtils?.escapeHtml(r.comment || 'Tidak ada komentar');
+
       return `
       <div class="review-card animate-fadeUp">
         <div class="card-header">
@@ -92,7 +94,7 @@
             <strong>Client:</strong> ${clientName} <br>
             <strong>Service:</strong> ${serviceName}
           </div>
-          <div class="card-comment mt-2" title="${r.comment || '-'}">${r.comment || 'Tidak ada komentar'}</div>
+          <div class="card-comment mt-2" title="${comment}">${comment}</div>
         </div>
         <div class="card-footer">
           <div class="action-btns">
@@ -113,6 +115,10 @@
     const box = document.getElementById('modal-reviews-box');
     const date = r.created_at ? new Date(r.created_at).toLocaleString('id-ID') : '-';
 
+    const clientName = window.DigitalanceUtils?.escapeHtml(r.order?.client?.user?.name ?? r.order?.client?.name ?? r.client_name ?? '-');
+    const serviceName = window.DigitalanceUtils?.escapeHtml(r.order?.service?.title ?? r.service_name ?? '-');
+    const comment = window.DigitalanceUtils?.escapeHtml(r.comment || 'Tidak ada komentar yang ditinggalkan.');
+
     box.innerHTML = `
       <div class="modal-hero">
         <button class="modal-close" onclick="closeReviewModal()"><i class="ri-close-line"></i></button>
@@ -131,11 +137,11 @@
           </div>
           <div class="modal-info-row">
             <i class="ri-user-line"></i>
-            <div><span style="display:block;font-weight:700;color:var(--slate-800)">Client</span>${r.order?.client?.user?.name ?? r.order?.client?.name ?? r.client_name ?? '-'}</div>
+            <div><span style="display:block;font-weight:700;color:var(--slate-800)">Client</span>${clientName}</div>
           </div>
           <div class="modal-info-row">
             <i class="ri-tools-line"></i>
-            <div><span style="display:block;font-weight:700;color:var(--slate-800)">Service Used</span>${r.order?.service?.title ?? r.service_name ?? '-'}</div>
+            <div><span style="display:block;font-weight:700;color:var(--slate-800)">Service Used</span>${serviceName}</div>
           </div>
           <div class="modal-info-row">
             <i class="ri-star-line"></i>
@@ -148,7 +154,7 @@
         </div>
 
         <p class="modal-section-title">Komentar</p>
-        <div class="comment-box">${r.comment || 'Tidak ada komentar yang ditinggalkan.'}</div>
+        <div class="comment-box">${comment}</div>
 
         <div class="modal-action-group" style="margin-top: 24px;">
           <button class="modal-btn-delete" style="width: 100%; justify-content: center;" onclick="deleteReview('${r.id}'); closeReviewModal();">

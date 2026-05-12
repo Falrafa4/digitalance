@@ -95,6 +95,19 @@
             </div>
         </section>
 
+        {{-- LOADING SKELETON --}}
+        <template id="freelancer-stats-skeleton">
+            <div class="bg-white border border-slate-200 rounded-[18px] px-6 py-5">
+                <div class="flex items-center gap-4">
+                    <div class="skeleton w-[54px] h-[54px] rounded-[16px]"></div>
+                    <div class="flex-1">
+                        <div class="skeleton h-3 w-20 mb-2"></div>
+                        <div class="skeleton h-8 w-16"></div>
+                    </div>
+                </div>
+            </div>
+        </template>
+
         {{-- FILTER / SEARCH BAR --}}
         <section class="flex items-center justify-between gap-4 mb-5 flex-wrap animate-fadeUp-delay-2">
             <div class="flex gap-2 flex-wrap" id="freelancer-filter-tabs">

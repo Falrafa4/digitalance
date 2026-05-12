@@ -19,10 +19,10 @@
                 <p class="text-slate-500 italic font-medium leading-relaxed">
                     Platform freelance eksklusif untuk siswa/i SKOMDA. Connecting talent dengan opportunity.
                 </p>
-                <div class="flex items-center gap-2 mt-1">
+                <div class="flex items-center gap-3 mt-1">
                     <!-- Email -->
                     <a href="mailto:digitalance@skomda.ac.id"
-                        class="bg-white text-slate-500 hover:text-primary border border-slate-200 rounded-full w-10 h-10 flex items-center justify-center transition-colors"
+                        class="bg-white text-slate-500 hover:text-primary border border-slate-200 rounded-full w-11 h-11 flex items-center justify-center transition-colors"
                         aria-label="Email">
                         <!-- Icon Email -->
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
@@ -34,7 +34,7 @@
                     </a>
                     <!-- LinkedIn -->
                     <a href="https://www.linkedin.com/company/your-link" target="_blank"
-                        class="bg-white text-slate-500 hover:text-primary border border-slate-200 rounded-full w-10 h-10 flex items-center justify-center transition-colors"
+                        class="bg-white text-slate-500 hover:text-primary border border-slate-200 rounded-full w-11 h-11 flex items-center justify-center transition-colors"
                         aria-label="LinkedIn">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M19 0h-14c-2.76 0-5 2.24-5 5v14c0 2.76 2.24 5 5 5h14c2.76 0 5-2.24 5-5v-14c0-2.76-2.24-5-5-5zm-11 
@@ -45,7 +45,7 @@
                     </a>
                     <!-- Instagram -->
                     <a href="https://instagram.com/yourprofile" target="_blank"
-                        class="bg-white text-slate-500 hover:text-primary border border-slate-200 rounded-full w-10 h-10 flex items-center justify-center transition-colors"
+                        class="bg-white text-slate-500 hover:text-primary border border-slate-200 rounded-full w-11 h-11 flex items-center justify-center transition-colors"
                         aria-label="Instagram">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                             <path
@@ -59,11 +59,11 @@
                 <!-- Navigasi -->
                 <div>
                     <h4 class="font-display font-black text-xs text-slate-900 uppercase tracking-widest mb-3">Navigasi</h4>
-                    <ul class="flex flex-col gap-2">
-                        <li><a href="{{ route('home') }}#home" class="text-slate-700 font-semibold text-sm hover:text-primary transition-colors">Home</a></li>
-                        <li><a href="{{ route('home') }}#services" class="text-slate-700 font-semibold text-sm hover:text-primary transition-colors">Services</a></li>
-                        <li><a href="{{ route('home') }}#faq" class="text-slate-700 font-semibold text-sm hover:text-primary transition-colors">FAQ</a></li>
-                        <li><a href="/login" class="text-slate-700 font-semibold text-sm hover:text-primary transition-colors">Get Started</a></li>
+                    <ul class="flex flex-col gap-1">
+                        <li><a href="{{ route('home') }}#home" class="text-slate-700 font-semibold text-sm hover:text-primary transition-colors block py-1.5">Home</a></li>
+                        <li><a href="{{ route('home') }}#services" class="text-slate-700 font-semibold text-sm hover:text-primary transition-colors block py-1.5">Services</a></li>
+                        <li><a href="{{ route('home') }}#faq" class="text-slate-700 font-semibold text-sm hover:text-primary transition-colors block py-1.5">FAQ</a></li>
+                        <li><a href="/login" class="text-slate-700 font-semibold text-sm hover:text-primary transition-colors block py-1.5">Get Started</a></li>
                     </ul>
                 </div>
                 <!-- Legal -->
@@ -91,7 +91,7 @@
         <div
             class="bg-white rounded-2xl w-[95vw] max-w-2xl p-8 shadow-xl relative overflow-y-auto max-h-[85vh] flex flex-col">
             <button type="button" onclick="closePrivacyModal()"
-                class="absolute top-4 right-4 text-slate-400 hover:text-primary text-2xl outline-none"
+                class="absolute top-2 right-2 w-11 h-11 flex items-center justify-center text-slate-400 hover:text-primary text-2xl outline-none"
                 aria-label="Tutup"><span aria-hidden="true">&times;</span></button>
             <h2 class="font-display text-xl font-bold text-primary mb-2">Kebijakan Privasi</h2>
             <div class="text-slate-600 text-sm leading-relaxed space-y-4">
@@ -123,7 +123,7 @@
         <div
             class="bg-white rounded-2xl w-[95vw] max-w-2xl p-8 shadow-xl relative overflow-y-auto max-h-[85vh] flex flex-col">
             <button type="button" onclick="closeTnCModal()"
-                class="absolute top-4 right-4 text-slate-400 hover:text-primary text-2xl outline-none"
+                class="absolute top-2 right-2 w-11 h-11 flex items-center justify-center text-slate-400 hover:text-primary text-2xl outline-none"
                 aria-label="Tutup"><span aria-hidden="true">&times;</span></button>
             <h2 class="font-display text-xl font-bold text-primary mb-2">Syarat & Ketentuan</h2>
             <div class="text-slate-600 text-sm leading-relaxed space-y-4">
@@ -155,13 +155,17 @@
     <script>
         // Modal logic
         function openPrivacyModal() {
-            document.getElementById('privacy-modal').classList.remove('hidden');
+            const modal = document.getElementById('privacy-modal');
+            modal.classList.remove('hidden');
+            window.DigitalanceUtils.focusTrap(modal);
         }
         function closePrivacyModal() {
             document.getElementById('privacy-modal').classList.add('hidden');
         }
         function openTnCModal() {
-            document.getElementById('tnc-modal').classList.remove('hidden');
+            const modal = document.getElementById('tnc-modal');
+            modal.classList.remove('hidden');
+            window.DigitalanceUtils.focusTrap(modal);
         }
         function closeTnCModal() {
             document.getElementById('tnc-modal').classList.add('hidden');

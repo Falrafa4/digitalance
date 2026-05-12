@@ -7,19 +7,28 @@
     <h1 class="font-display text-[1.6rem] font-extrabold text-slate-900">Buat Order</h1>
     <p class="text-slate-500 mt-1">Isi brief kebutuhanmu.</p>
 
-    <form method="POST" action="{{ route('client.orders.store') }}" class="mt-5 space-y-3">
+    <form method="POST" action="{{ route('client.orders.store') }}" class="mt-5 space-y-3" x-data="{ isSubmitting: false }" @submit="isSubmitting = true">
       @csrf
       <input type="hidden" name="service_id" value="{{ $service->id }}"/>
 
       <textarea name="brief" rows="8"
-                class="w-full px-4 py-3 rounded-[14px] bg-slate-50 border border-slate-200"
-                placeholder="Tulis brief...">{{ old('brief') }}</textarea>
+                class="w-full px-4 py-3 rounded-[14px] bg-slate-50 border border-slate-200 focus:border-[#0f766e] outline-none transition-all
+                @error('brief') border-red-500 @enderror"
+                placeholder="Tulis brief..." aria-label="Brief detail">{{ old('brief') }}</textarea>
       @error('brief') <p class="text-red-600 text-[12px] font-bold">{{ $message }}</p> @enderror
 
-      <button class="px-6 py-3 rounded-[12px] bg-slate-900 text-white font-bold text-[13px] hover:bg-black transition-all">
-        Buat Order
+      <button type="submit" 
+              :disabled="isSubmitting"
+              class="px-6 py-3 rounded-[12px] bg-slate-900 text-white font-bold text-[13px] hover:bg-black transition-all disabled:opacity-50 flex items-center gap-2">
+        <template x-if="!isSubmitting">
+          <span>Buat Order</span>
+        </template>
+        <template x-if="isSubmitting">
+          <span><i class="ri-loader-4-line animate-spin"></i> Memproses...</span>
+        </template>
       </button>
     </form>
+
   </div>
 
   <div class="bg-white border border-slate-200 rounded-[18px] p-6">

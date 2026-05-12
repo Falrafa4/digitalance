@@ -94,11 +94,11 @@ class ServiceController extends Controller
         }
 
         if ($search) {
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                  ->orWhereHas('freelancer.skomda_student', function($fq) use ($search) {
-                      $fq->where('name', 'like', "%{$search}%");
-                  });
+                    ->orWhereHas('freelancer.skomda_student', function ($fq) use ($search) {
+                        $fq->where('name', 'like', "%{$search}%");
+                    });
             });
         }
 
@@ -154,14 +154,30 @@ class ServiceController extends Controller
     }
 
     /**
+     * Show create service form (FREELANCER ONLY)
+     */
+    public function create()
+    {
+        $categories = ServiceCategory::query()
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get();
+
+        return view('dashboard.freelancer.services.create', compact('categories'));
+    }
+
+    /**
      * Store New Service (FREELANCER ONLY)
      */
     public function store(StoreServiceRequest $request)
     {
         $freelancer = auth('freelancer')->user();
-        Service::create(array_merge($request->validated(), ['freelancer_id' => $freelancer->id]));
+        $service = Service::create(array_merge($request->validated(), [
+            'freelancer_id' => $freelancer->id,
+            'status' => 'Pending',
+        ]));
 
-        return redirect()->route('freelancer.services.index')->with('success', 'Layanan berhasil ditambahkan');
+        return redirect()->route('freelancer.services.show', $service->id)->with('success', 'Layanan berhasil ditambahkan');
     }
 
     /**
@@ -222,6 +238,18 @@ class ServiceController extends Controller
         return redirect()->route('freelancer.services.index')->with('success', 'Layanan berhasil dihapus');
     }
 
+    public function submit($id)
+    {
+        $freelancer = auth('freelancer')->user();
+        $service = Service::where('freelancer_id', $freelancer->id)
+            ->where('status', 'Draft')
+            ->findOrFail($id);
+
+        $service->update(['status' => 'Pending']);
+
+        return redirect()->route('freelancer.services.show', $id)->with('success', 'Layanan berhasil diajukan untuk tinjauan admin.');
+    }
+
     /**
      * Update Service Status (ADMIN ONLY)
      */
@@ -233,11 +261,31 @@ class ServiceController extends Controller
         ]);
 
         $service = Service::findOrFail($id);
+        $finalStatus = $request->status;
+
+        // Custom logic: Reject returns to Draft + Notification to Freelancer
+        if ($finalStatus === 'Rejected') {
+            $finalStatus = 'Draft';
+            
+            \App\Models\Notification::create([
+                'title' => 'Layanan Perlu Perbaikan',
+                'message' => "Layanan '{$service->title}' dikembalikan oleh admin. Alasan: " . ($request->reject_reason ?? 'Tidak ada alasan spesifik') . ". Silakan perbaiki dan ajukan kembali!",
+                'type' => 'warning',
+                'role' => 'freelancer',
+                'user_id' => $service->freelancer_id,
+                'link' => route('freelancer.services.edit', $service->id)
+            ]);
+        }
+
         $service->update([
-            'status' => $request->status,
+            'status' => $finalStatus,
             'reject_reason' => $request->status === 'Rejected' ? $request->reject_reason : null
         ]);
 
-        return redirect()->route('admin.services.index')->with('success', 'Status layanan berhasil diperbarui');
+        $msg = $request->status === 'Rejected' 
+            ? 'Layanan telah dikembalikan ke freelancer untuk diperbaiki.' 
+            : 'Status layanan berhasil diperbarui';
+
+        return redirect()->route('admin.services.index')->with('success', $msg);
     }
 }

@@ -14,7 +14,7 @@
                 {{ now()->format('l, d F Y') }} — Berikut ringkasan aktivitas platform hari ini.
             </p>
         </div>
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-3" id="dashboard-summary-cards">
             <div class="bg-white px-4 py-2 rounded-xl border border-slate-200 shadow-sm flex flex-col items-end">
                 <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Today's Orders</span>
                 <span class="text-lg font-black text-slate-900">{{ $todayOrders ?? 0 }}</span>
@@ -27,7 +27,7 @@
     </section>
 
     {{-- Advanced Metrics --}}
-    <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6 mb-10">
+    <section id="stats-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6 mb-10">
         {{-- Total Users --}}
         <div class="bg-white p-5 rounded-[22px] border border-slate-100 flex items-center gap-4 transition-all hover:shadow-lg hover:-translate-y-1">
             <div class="w-12 h-12 flex items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600 text-xl shadow-inner">
@@ -267,31 +267,8 @@
 
 @section('scripts')
     <script>
-        function showToast(message, type = 'success') {
-            const container = document.getElementById('toast-container');
-            if (!container) return;
-
-            const icon = type === 'success' ? 'ri-check-double-line' : 'ri-close-circle-line';
-            const toast = document.createElement('div');
-            toast.className = `toast toast-${type === 'success' ? 'success' : 'danger'}`;
-            toast.innerHTML = `
-                        <i class="toast-icon ${icon}"></i>
-                        <span>${message}</span>
-                        <button class="toast-close" type="button" aria-label="Close toast">
-                            <i class="ri-close-line"></i>
-                        </button>
-                    `;
-            toast.querySelector('.toast-close')?.addEventListener('click', () => dismissToast(toast));
-
-            container.appendChild(toast);
-            setTimeout(() => dismissToast(toast), 3500);
-        }
-
-        function dismissToast(toast) {
-            if (!toast || toast.classList.contains('toast-hide')) return;
-            toast.classList.add('toast-hide');
-            setTimeout(() => toast.remove(), 300);
-        }
+        // Using global window.showToast and window.openModal/closeModal instead
+        
 
         function setCardLoading(card, isLoading) {
             if (!card) return;
@@ -330,7 +307,7 @@
                 await postAction(verifyUrl);
 
                 card.classList.add('card-approved');
-                showToast(`${name} berhasil diverifikasi!`, 'success');
+                window.showToast(`${name} berhasil diverifikasi!`, 'success');
 
                 setTimeout(() => {
                     card.style.opacity = '0';
@@ -338,7 +315,7 @@
                     setTimeout(() => card.remove(), 300);
                 }, 800);
             } catch (error) {
-                showToast(error?.message || "Gagal memverifikasi. Coba lagi.", "danger");
+                window.showToast(error?.message || "Gagal memverifikasi. Coba lagi.", "danger");
                 setCardLoading(card, false);
             }
         }
@@ -359,7 +336,7 @@
                 await postAction(rejectUrl);
 
                 card.classList.add('card-rejected');
-                showToast("Verifikasi ditolak.", "danger");
+                window.showToast("Verifikasi ditolak.", "danger");
 
                 setTimeout(() => {
                     card.style.opacity = '0';
@@ -367,7 +344,7 @@
                     setTimeout(() => card.remove(), 400);
                 }, 800);
             } catch (error) {
-                showToast(error?.message || "Gagal menolak verifikasi. Coba lagi.", "danger");
+                window.showToast(error?.message || "Gagal menolak verifikasi. Coba lagi.", "danger");
                 setCardLoading(card, false);
             }
         }
@@ -416,28 +393,14 @@
             });
         }
 
-        function openModal(id) {
-            const el = document.getElementById(id);
-            if (el) {
-                el.classList.remove('opacity-0', 'pointer-events-none');
-                el.querySelector('.modal-box')?.classList.remove('scale-95');
-            }
-        }
-
-        function closeModal(id) {
-            const el = document.getElementById(id);
-            if (el) {
-                el.classList.add('opacity-0', 'pointer-events-none');
-                el.querySelector('.modal-box')?.classList.add('scale-95');
-            }
-        }
+        // Redundant definitions removed, using global openModal and closeModal
 
         window.openDisputeDetail = async function(id) {
             const overlay = document.getElementById('modal-dispute-overlay');
             const box = document.getElementById('modal-dispute-box');
             if (!overlay || !box) return;
 
-            openModal('modal-dispute-overlay');
+            window.openModal('modal-dispute-overlay');
 
             try {
                 const response = await fetch(`/admin/orders/${id}/dispute`);
@@ -456,7 +419,7 @@
                             <h2 class="text-white font-extrabold text-xl tracking-tight">Mediasi Dispute</h2>
                             <p class="text-white/80 text-[11px] font-bold uppercase tracking-wider">Order ID: #ORD-${order.id}</p>
                         </div>
-                        <button onclick="closeModal('modal-dispute-overlay')" class="w-10 h-10 bg-white/20 text-white rounded-full flex items-center justify-center hover:bg-white/30 transition">
+                        <button onclick="window.closeModal('modal-dispute-overlay')" class="w-10 h-10 bg-white/20 text-white rounded-full flex items-center justify-center hover:bg-white/30 transition">
                             <i class="ri-close-line text-xl"></i>
                         </button>
                     </div>
@@ -519,7 +482,7 @@
                     </div>
 
                     <div class="p-6 bg-slate-50 border-t border-slate-100 flex gap-3">
-                        <button onclick="closeModal('modal-dispute-overlay')" class="flex-1 py-3 bg-white border border-slate-200 text-slate-600 font-bold rounded-xl text-sm hover:bg-slate-100 transition-all">Tutup Detail</button>
+                        <button onclick="window.closeModal('modal-dispute-overlay')" class="flex-1 py-3 bg-white border border-slate-200 text-slate-600 font-bold rounded-xl text-sm hover:bg-slate-100 transition-all">Tutup Detail</button>
                         <a href="/admin/orders" class="flex-1 py-3 bg-[#0f766e] text-white text-center font-bold rounded-xl text-sm hover:bg-[#0a5e58] transition-all shadow-lg shadow-teal-sm">Kelola di Halaman Order</a>
                     </div>
                 `;
@@ -532,7 +495,7 @@
                         </div>
                         <h3 class="text-lg font-bold text-slate-900 mb-2">Gagal Memuat Data</h3>
                         <p class="text-slate-500 text-sm mb-6">${error.message}</p>
-                        <button onclick="closeModal('modal-dispute-overlay')" class="px-8 py-2.5 bg-slate-900 text-white font-bold rounded-xl text-sm">Tutup</button>
+                        <button onclick="window.closeModal('modal-dispute-overlay')" class="px-8 py-2.5 bg-slate-900 text-white font-bold rounded-xl text-sm">Tutup</button>
                     </div>
                 `;
             }
@@ -543,7 +506,7 @@
             const box = document.getElementById('modal-verify-box');
             if (!overlay || !box) return;
 
-            openModal('modal-verify-overlay');
+            window.openModal('modal-verify-overlay');
 
             try {
                 const response = await fetch(`/admin/freelancers/${id}/detail`, {
@@ -568,7 +531,7 @@
                             <h2 class="text-white font-extrabold text-xl tracking-tight">Detail Verifikasi</h2>
                             <p class="text-white/80 text-[11px] font-bold uppercase tracking-wider">Freelancer ID: #FREELANCER-${data.id}</p>
                         </div>
-                        <button onclick="closeModal('modal-verify-overlay')" class="w-10 h-10 bg-white/20 text-white rounded-full flex items-center justify-center hover:bg-white/30 transition">
+                        <button onclick="window.closeModal('modal-verify-overlay')" class="w-10 h-10 bg-white/20 text-white rounded-full flex items-center justify-center hover:bg-white/30 transition">
                             <i class="ri-close-line text-xl"></i>
                         </button>
                     </div>
@@ -631,7 +594,7 @@
                         </div>
                         <h3 class="text-lg font-bold text-slate-900 mb-2">Gagal Memuat Data</h3>
                         <p class="text-slate-500 text-sm mb-6">${error.message}</p>
-                        <button onclick="closeModal('modal-verify-overlay')" class="px-8 py-2.5 bg-slate-900 text-white font-bold rounded-xl text-sm">Tutup</button>
+                        <button onclick="window.closeModal('modal-verify-overlay')" class="px-8 py-2.5 bg-slate-900 text-white font-bold rounded-xl text-sm">Tutup</button>
                     </div>
                 `;
             }
@@ -654,7 +617,7 @@
                     setTimeout(() => card.remove(), 300);
                 }
                 window.showToast('Freelancer berhasil diverifikasi', 'success');
-                closeModal('modal-verify-overlay');
+                window.closeModal('modal-verify-overlay');
             } catch (error) {
                 window.showToast(error.message, 'error');
             }
@@ -677,7 +640,7 @@
                     setTimeout(() => card.remove(), 300);
                 }
                 window.showToast('Freelancer telah ditolak', 'info');
-                closeModal('modal-verify-overlay');
+                window.closeModal('modal-verify-overlay');
             } catch (error) {
                 window.showToast(error.message, 'error');
             }

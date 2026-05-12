@@ -56,9 +56,11 @@ function renderCards(data = portfoliosData) {
     const paginatedData = data.slice(startIndex, startIndex + itemsPerPage);
 
     wrap.innerHTML = paginatedData.map(p => {
-        const fName = p.service?.freelancer?.skomda_student?.name 
+        const fName = window.DigitalanceUtils?.escapeHtml(p.service?.freelancer?.skomda_student?.name 
                       ?? p.service?.freelancer?.name 
-                      ?? 'Freelancer';
+                      ?? 'Freelancer');
+        const title = window.DigitalanceUtils?.escapeHtml(p.title ?? '');
+        const desc = window.DigitalanceUtils?.escapeHtml(p.description ? p.description.slice(0, 75) + '...' : '-');
 
         const date = p.created_at ? new Date(p.created_at).toLocaleDateString('id-ID', {
             day: '2-digit',
@@ -81,10 +83,10 @@ function renderCards(data = portfoliosData) {
                 <div class="port-body">
                     <div class="port-id-row">
                         <span class="port-id">#${p.id}</span>
-                        <span class="port-srv-id"><i class="ri-tools-line"></i> #${p.service?.title ?? p.service_id ?? '-'}</span>
+                        <span class="port-srv-id"><i class="ri-tools-line"></i> #${window.DigitalanceUtils?.escapeHtml(p.service?.title ?? p.service_id ?? '-')}</span>
                     </div>
-                    <h3 class="port-title" title="${p.title}">${p.title}</h3>
-                    <p class="port-desc">${p.description ? p.description.slice(0, 75) + '...' : '-'}</p>
+                    <h3 class="port-title" title="${title}">${title}</h3>
+                    <p class="port-desc">${desc}</p>
                     <div class="port-meta-row">
                         <span class="port-freelancer"><i class="ri-user-line"></i> ${fName}</span>
                         <span class="port-date"><i class="ri-calendar-line"></i> ${date}</span>
@@ -145,9 +147,11 @@ function openPortModal(id) {
     const overlay = document.getElementById('modal-portofolios-overlay');
     const box = document.getElementById('modal-portofolios-box');
     
-    const fName = p.service?.freelancer?.skomda_student?.name 
+    const fName = window.DigitalanceUtils?.escapeHtml(p.service?.freelancer?.skomda_student?.name 
                   ?? p.service?.freelancer?.name 
-                  ?? 'Freelancer';
+                  ?? 'Freelancer');
+    const title = window.DigitalanceUtils?.escapeHtml(p.title ?? '');
+    const desc = window.DigitalanceUtils?.escapeHtml(p.description || 'Tidak ada deskripsi tersedia.');
 
     const imageUrl = p.media_url ? `${window.location.origin}/storage/${p.media_url}` : '';
 
@@ -164,7 +168,7 @@ function openPortModal(id) {
                 </span>
             </div>
             
-            <h2 class="text-xl font-bold text-slate-900 mb-6">${p.title}</h2>
+            <h2 class="text-xl font-bold text-slate-900 mb-6">${title}</h2>
 
             <div class="grid grid-cols-2 gap-4 mb-6">
                 <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
@@ -178,7 +182,7 @@ function openPortModal(id) {
             </div>
 
             <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Deskripsi Karya</p>
-            <div class="text-sm text-slate-600 leading-relaxed mb-6 bg-slate-50 p-4 rounded-xl border border-slate-100">${p.description || 'Tidak ada deskripsi tersedia.'}</div>
+            <div class="text-sm text-slate-600 leading-relaxed mb-6 bg-slate-50 p-4 rounded-xl border border-slate-100">${desc}</div>
 
             <div class="flex gap-2 border-t border-slate-100 pt-4">
                 <button class="flex-1 bg-slate-100 text-slate-700 py-2.5 rounded-xl font-bold text-sm hover:bg-slate-200 transition flex items-center justify-center gap-2" onclick="openEditPortModal('${p.id}')"><i class="ri-edit-line"></i> Edit</button>

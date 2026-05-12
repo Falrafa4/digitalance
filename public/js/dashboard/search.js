@@ -30,7 +30,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const filtered = menus.filter(m => m.name.toLowerCase().includes(q));
 
     if (!filtered.length) {
-      results.innerHTML = `<div class="px-4 py-2 text-sm text-slate-400">No results</div>`;
+      results.innerHTML = `<div class="px-4 py-3 text-sm text-slate-400 flex items-center gap-2">
+        <i class="ri-search-line"></i> Tidak ada menu yang cocok
+      </div>`;
     } else {
       results.innerHTML = filtered.map(m => `
         <a href="${m.url}" class="block px-4 py-2 text-sm hover:bg-slate-100">

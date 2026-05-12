@@ -11,7 +11,31 @@
     const numbers = root.querySelector('[data-pager-numbers]');
 
     let page = 1;
+    let isLoading = false;
     const totalPages = Math.max(1, Math.ceil(items.length / size));
+
+    function showPagerLoading() {
+      isLoading = true;
+      items.forEach((el, i) => {
+        const start = (page - 1) * size;
+        const end = start + size;
+        if (i >= start && i < end) {
+          el.style.opacity = '0.5';
+          el.style.pointerEvents = 'none';
+        }
+      });
+      if (prevBtn) prevBtn.disabled = true;
+      if (nextBtn) nextBtn.disabled = true;
+    }
+
+    function hidePagerLoading() {
+      isLoading = false;
+      items.forEach(el => {
+        el.style.opacity = '';
+        el.style.pointerEvents = '';
+      });
+      render();
+    }
 
     function render() {
       const start = (page - 1) * size;
@@ -22,8 +46,8 @@
       });
 
       if (info) info.textContent = `Page ${page} / ${totalPages}`;
-      if (prevBtn) prevBtn.disabled = page === 1;
-      if (nextBtn) nextBtn.disabled = page === totalPages;
+      if (prevBtn) prevBtn.disabled = page === 1 || isLoading;
+      if (nextBtn) nextBtn.disabled = page === totalPages || isLoading;
 
       if (numbers) {
         numbers.innerHTML = '';
@@ -41,14 +65,36 @@
             (p === page
               ? 'bg-slate-900 text-white border-slate-900'
               : 'bg-white text-slate-700 border-slate-200 hover:border-[#0f766e] hover:text-[#0f766e]');
-          b.addEventListener('click', () => { page = p; render(); });
+          b.addEventListener('click', () => {
+            showPagerLoading();
+            setTimeout(() => {
+              page = p;
+              hidePagerLoading();
+            }, 300);
+          });
           numbers.appendChild(b);
         }
       }
     }
 
-    if (prevBtn) prevBtn.addEventListener('click', () => { if (page > 1) { page--; render(); }});
-    if (nextBtn) nextBtn.addEventListener('click', () => { if (page < totalPages) { page++; render(); }});
+    if (prevBtn) prevBtn.addEventListener('click', () => {
+      if (page > 1 && !isLoading) {
+        showPagerLoading();
+        setTimeout(() => {
+          page--;
+          hidePagerLoading();
+        }, 300);
+      }
+    });
+    if (nextBtn) nextBtn.addEventListener('click', () => {
+      if (page < totalPages && !isLoading) {
+        showPagerLoading();
+        setTimeout(() => {
+          page++;
+          hidePagerLoading();
+        }, 300);
+      }
+    });
 
     render();
   }

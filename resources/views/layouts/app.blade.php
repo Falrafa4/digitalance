@@ -5,50 +5,64 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@yield('title')</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    {{-- Preconnect & dns-prefetch for performance --}}
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
-
-    @yield('styles')
-
-    <link
-        href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
-        rel="stylesheet" />
-
+    <link rel="dns-prefetch" href="https://cdn.tailwindcss.com" />
+    <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: {
-                        display: ["Sora", "sans-serif"],
-                        body: ["Plus Jakarta Sans", "sans-serif"],
-                    },
                     colors: {
-                        primary: "#0f766e",
-                        secondary: "#10b981",
-                        accent: "#f97316",
+                        primary: '#0f766e',
+                        secondary: '#10b981',
+                        accent: '#f97316',
                     },
-                },
-            },
-        };
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'Sora', 'sans-serif'],
+                        display: ['Sora', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'teal-sm': '0 4px 14px 0 rgba(15, 118, 110, 0.15)',
+                        'teal-md': '0 6px 20px rgba(15, 118, 110, 0.2)',
+                    }
+                }
+            }
+        }
     </script>
+    <script src="{{ asset('js/utils.js') }}" defer></script>
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
 
-
+    @yield('styles')
+    
+    <link
+        href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet" />
 </head>
 
+
 <body class="bg-slate-100 text-slate-900 overflow-x-hidden">
+    {{-- Skip to main content link for accessibility --}}
+    <a href="#main-content"
+       class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[9999] focus:px-4 focus:py-2 focus:bg-[#0f766e] focus:text-white focus:rounded-lg focus:font-bold focus:text-sm">
+        Skip to main content
+    </a>
+
     @yield('additional-header')
 
     <x-flash />
 
     <x-navbar />
 
-    @yield('content')
+    <main id="main-content" tabindex="-1" class="focus:outline-none">
+        @yield('content')
+    </main>
 
     <x-footer />
 
-    <script>
+    <script defer>
         (() => {
             "use strict";
 
