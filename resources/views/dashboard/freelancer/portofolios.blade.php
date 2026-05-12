@@ -27,7 +27,7 @@
                 <div class="bg-white border border-slate-200 rounded-[20px] overflow-hidden hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group">
                     <div class="h-[180px] w-full relative bg-slate-100">
                         @if($port->media_url)
-                            <img src="{{ asset('storage/' . $port->media_url) }}" alt="Portofolio" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/800x600?text=No+Image'">
+                            <img src="{{ asset('storage/' . $port->media_url) }}" alt="Portofolio" loading="lazy" decoding="async" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/800x600?text=No+Image'">
                         @else
                             <div class="w-full h-full flex items-center justify-center text-slate-300"><i class="ri-image-2-line text-4xl"></i></div>
                         @endif

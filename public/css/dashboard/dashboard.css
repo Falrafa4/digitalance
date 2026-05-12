@@ -354,6 +354,22 @@ textarea:focus-visible {
     outline-offset: 2px;
 }
 
+/* Legacy focus fallback for older browsers */
+a:focus,
+button:focus,
+input:focus,
+select:focus,
+textarea:focus {
+    outline: 2px solid #0f766e;
+    outline-offset: 2px;
+}
+
+/* Remove default focus for mouse users via :focus:not(:focus-visible) */
+a:focus:not(:focus-visible),
+button:focus:not(:focus-visible) {
+    outline: none;
+}
+
 /* Screen reader only class */
 .sr-only {
     position: absolute;
@@ -376,4 +392,35 @@ textarea:focus-visible {
     overflow: visible;
     clip: auto;
     white-space: normal;
+}
+
+/* Touch target sizing (min 44x44px for mobile) */
+.touch-target {
+    min-width: 44px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Reduce motion for vestibular disorders */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* High contrast mode adjustments */
+@media (prefers-contrast: high) {
+    .text-slate-400 {
+        color: #64748b !important;
+    }
+    .border-slate-200 {
+        border-color: #94a3b8 !important;
+    }
 }

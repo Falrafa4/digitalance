@@ -86,7 +86,7 @@
                     <div class="hero-wrap absolute inset-0 overflow-hidden">
                         <img id="heroImage"
                             src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&q=80&w=1000"
-                            alt="Workspace" class="hero-img w-full h-full object-cover" />
+                            alt="Workspace" loading="lazy" decoding="async" class="hero-img w-full h-full object-cover" />
                         <div class="absolute inset-0 z-10"
                             style="background:linear-gradient(to top,rgba(0,0,0,.88) 0%,rgba(0,0,0,.4) 50%,rgba(0,0,0,.04) 100%);">
                         </div>

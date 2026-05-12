@@ -36,29 +36,31 @@
                 </button>
             </div>
 
-            <button class="hamburger md:hidden flex flex-col gap-[5px] bg-transparent border-none cursor-pointer p-2"
+            <button class="hamburger md:hidden flex flex-col justify-center items-center gap-[6px] bg-transparent border-none cursor-pointer w-11 h-11 p-2"
                 id="hamburgerBtn" aria-label="Toggle menu">
-                <span></span><span></span><span></span>
+                <span class="w-6 h-0.5 bg-slate-800 rounded-full"></span>
+                <span class="w-6 h-0.5 bg-slate-800 rounded-full"></span>
+                <span class="w-6 h-0.5 bg-slate-800 rounded-full"></span>
             </button>
         </div>
 
         <div class="mobile-menu flex" id="mobileMenu">
-            <ul class="flex flex-col list-none gap-3 text-center p-0 m-0">
+            <ul class="flex flex-col list-none gap-2 text-center p-0 m-0 w-full">
                 <li>
                     <a href="#home"
-                        class="text-slate-800 no-underline font-semibold block py-1 hover:text-primary transition-colors">Home</a>
+                        class="text-slate-800 no-underline font-semibold block py-3.5 hover:text-primary transition-colors">Home</a>
                 </li>
                 <li>
                     <a href="#services"
-                        class="text-slate-800 no-underline font-semibold block py-1 hover:text-primary transition-colors">Services</a>
+                        class="text-slate-800 no-underline font-semibold block py-3.5 hover:text-primary transition-colors">Services</a>
                 </li>
                 <li>
                     <a href="#faq"
-                        class="text-slate-800 no-underline font-semibold block py-1 hover:text-primary transition-colors">FAQ</a>
+                        class="text-slate-800 no-underline font-semibold block py-3.5 hover:text-primary transition-colors">FAQ</a>
                 </li>
             </ul>
             <button onclick="location.href = 'login'"
-                class="gradient-bg text-white border-none px-6 py-3 rounded-full font-semibold cursor-pointer">
+                class="gradient-bg text-white border-none px-6 py-4 rounded-full font-bold cursor-pointer w-full mt-4">
                 Get Started
             </button>
         </div>

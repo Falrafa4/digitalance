@@ -47,8 +47,8 @@
             @foreach($portofolios as $p)
                 <div class="port-card bg-white rounded-[24px] border border-slate-100 overflow-hidden shadow-sm hover:shadow-xl hover:border-[#0f766e]/30 group cursor-pointer" onclick="window.openPortDetail({{ $p->id }})">
                     <div class="relative aspect-[4/3] overflow-hidden bg-slate-100">
-                        <img src="{{ $p->media_url ? asset('storage/' . $p->media_url) : 'https://placehold.co/800x600?text=Digitalance' }}" 
-                             class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                        <img src="{{ $p->media_url ? asset('storage/' . $p->media_url) : 'https://placehold.co/800x600?text=Digitalance' }}"
+                             loading="lazy" decoding="async" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                         <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-5">
                             <div class="port-overlay opacity-0 w-full">
                                 <span class="block text-white text-[13px] font-bold mb-1"><i class="ri-eye-line mr-1"></i> View Work Details</span>

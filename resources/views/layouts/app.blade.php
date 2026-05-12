@@ -5,6 +5,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@yield('title')</title>
+    {{-- Preconnect & dns-prefetch for performance --}}
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="dns-prefetch" href="https://cdn.tailwindcss.com" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -27,7 +31,7 @@
             }
         }
     </script>
-    <script src="{{ asset('js/utils.js') }}"></script>
+    <script src="{{ asset('js/utils.js') }}" defer></script>
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
 
@@ -40,17 +44,25 @@
 
 
 <body class="bg-slate-100 text-slate-900 overflow-x-hidden">
+    {{-- Skip to main content link for accessibility --}}
+    <a href="#main-content"
+       class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[9999] focus:px-4 focus:py-2 focus:bg-[#0f766e] focus:text-white focus:rounded-lg focus:font-bold focus:text-sm">
+        Skip to main content
+    </a>
+
     @yield('additional-header')
 
     <x-flash />
 
     <x-navbar />
 
-    @yield('content')
+    <main id="main-content" tabindex="-1" class="focus:outline-none">
+        @yield('content')
+    </main>
 
     <x-footer />
 
-    <script>
+    <script defer>
         (() => {
             "use strict";
 
