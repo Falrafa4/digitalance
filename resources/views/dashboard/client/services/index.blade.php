@@ -7,9 +7,13 @@
       actionUrl="{{ route('client.orders.index') }}" actionLabel="My Orders" actionIcon="ri-shopping-cart-line" />
 
     @if(empty($services) || count($services) === 0)
-      <x-crud-empty-state icon="ri-tools-line" title="No Services Available"
-        description="No services are currently available for browse." actionUrl="{{ route('client.dashboard') }}"
-        actionLabel="Back to Dashboard" />
+      <x-ui-empty-state
+        icon="ri-tools-line"
+        title="No Services Available"
+        description="No services are currently available for browse."
+        actionUrl="{{ route('client.dashboard') }}"
+        actionLabel="Back to Dashboard"
+      />
     @else
       <div data-client-pager data-page-size="9" class="space-y-4">
         <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5" data-pager-list>

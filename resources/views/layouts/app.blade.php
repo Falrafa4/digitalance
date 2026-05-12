@@ -4,10 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@yield('title')</title>
-    {{-- Preconnect & dns-prefetch for performance --}}
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<title>@yield('title')</title>
     <link rel="dns-prefetch" href="https://cdn.tailwindcss.com" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -34,14 +31,11 @@
     <script src="{{ asset('js/utils.js') }}" defer></script>
     <script src="{{ asset('js/dashboard/shared/footer.js') }}" defer></script>
     <script src="{{ asset('js/dashboard/shared/flash.js') }}" defer></script>
+    <x-fonts />
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
 
     @yield('styles')
-    
-    <link
-        href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
-        rel="stylesheet" />
 </head>
 
 

@@ -1,16 +1,6 @@
-@import url('_shared.css');
+/* Client Dashboard Overrides - Loaded after dashboard.css + _shared.css */
+/* Only role-specific styles here */
 
-    /* ── WELCOME ── */
-    .welcome { margin-bottom: 24px; }
-    .welcome h1 {
-      font-family: var(--font-display);
-      font-size: 2.1rem;
-      font-weight: 800;
-      color: var(--slate-900);
-    }
-    .welcome p { color: var(--slate-500); font-size: 0.95rem; margin-top: 4px; }
-
-/* ─── WELCOME & CTA ─── */
 .welcome {
   display: flex;
   justify-content: space-between;
@@ -59,35 +49,14 @@
   box-shadow: 0 15px 30px rgba(15, 118, 110, 0.35);
 }
 
-/* ─── STATS ─── */
 .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-bottom: 56px; }
-.stat-card {
-  background: var(--white);
-  padding: 32px;
-  border-radius: var(--radius-24);
-  border: 1px solid var(--slate-200);
-}
-.stat-label { color: var(--slate-500); font-size: 13px; font-weight: 700; text-transform: uppercase; margin-bottom: 12px; }
-.stat-value { font-family: var(--font-display); font-size: 2.2rem; font-weight: 800; }
 
-/* ─── PROJECT CARDS ─── */
 .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; }
 .section-title { font-family: var(--font-display); font-size: 1.6rem; font-weight: 800; }
 .btn-link { background: none; border: none; color: var(--primary); font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 14px; }
 
 .project-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 24px; }
-.project-card {
-  background: var(--white);
-  padding: 28px;
-  border-radius: var(--radius-24);
-  border: 1px solid var(--slate-200);
-  transition: 0.3s;
-  display: flex;
-  flex-direction: column;
-}
-.project-card:hover { transform: translateY(-6px); box-shadow: 0 20px 40px rgba(15, 118, 110, 0.06); border-color: var(--primary-light); }
 
-.badge { padding: 6px 14px; border-radius: 100px; font-size: 11px; font-weight: 700; align-self: flex-start; margin-bottom: 20px; }
 .badge-progress { background: #ccfbf1; color: #0f766e; }
 .badge-completed { background: #d1fae5; color: #065f46; }
 .badge-pending { background: #ffedd5; color: #9a3412; }
@@ -95,66 +64,3 @@
 .project-description { color: var(--slate-500); font-size: 13px; margin-bottom: 20px; }
 .project-footer { display: flex; align-items: center; justify-content: space-between; }
 .project-footer .btn { font-size: 12px; padding: 6px 12px; }
-
-/* ─── EMPTY STATE (Agar tidak blank saat kosong) ─── */
-.empty-state {
-  grid-column: 1 / -1; /* Agar lebar memenuhi seluruh grid */
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 60px 20px;
-  background: #ffffff;
-  border: 2px dashed var(--slate-200); /* Garis putus-putus */
-  border-radius: 24px;
-  margin-top: 10px;
-  text-align: center;
-}
-
-.empty-icon {
-  font-size: 48px;
-  color: var(--slate-400);
-  margin-bottom: 16px;
-  background: var(--bg-light);
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.empty-state h3 {
-  font-family: var(--font-display);
-  font-size: 1.2rem;
-  color: var(--slate-900);
-  margin-bottom: 8px;
-}
-
-.empty-state p {
-  color: var(--slate-500);
-  font-size: 14px;
-  max-width: 320px;
-  line-height: 1.5;
-  margin-bottom: 24px;
-}
-
-/* Tombol di dalam empty state */
-.btn-empty {
-  background: var(--teal-deep);
-  color: white;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 100px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: 0.3s;
-  font-family: var(--font-display);
-}
-
-.btn-empty:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(15, 118, 110, 0.2);
-}
-
-/* fadeUp moved to _shared.css */

@@ -2,12 +2,6 @@
 @section('title', 'User Management | Digitalance')
 @section('styles')
     <link rel="stylesheet" href="{{ asset('css/dashboard/admin/clients.css') }}">
-    <style>
-        .role-badge { px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider; }
-        .role-Client { background: #e0f2fe; color: #075985; }
-        .role-Freelancer { background: #f0fdfa; color: #0f766e; }
-        .role-SkomdaStudent { background: #f1f5f9; color: #475569; }
-    </style>
 @endsection
 
 @section('content')
@@ -80,9 +74,7 @@
                                 </div>
                             </td>
                             <td class="px-6 py-4">
-                                <span class="role-badge py-1 px-2.5 rounded-lg text-[10px] font-black uppercase tracking-wider role-{{ str_replace(' ', '', $user->role) }}">
-                                    {{ $user->role }}
-                                </span>
+                                <x-ui-status-badge :status="$user->role" />
                             </td>
                             <td class="px-6 py-4">
                                 <span class="text-[12px] text-slate-500 font-bold uppercase tracking-widest">{{ \Carbon\Carbon::parse($user->created_at)->format('d M Y') }}</span>
@@ -108,12 +100,8 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="4" class="px-6 py-24 text-center">
-                                <div class="w-16 h-16 bg-slate-50 rounded-[20px] flex items-center justify-center mx-auto mb-5 text-slate-200 text-3xl">
-                                    <i class="ri-user-search-line"></i>
-                                </div>
-                                <h3 class="text-slate-900 font-black text-lg">No Users Found</h3>
-                                <p class="text-slate-400 text-sm font-medium">Tidak ada pengguna yang ditemukan dengan kriteria ini.</p>
+                            <td colspan="4">
+                                <x-ui-empty-state icon="ri-user-search-line" title="No Users Found" description="Tidak ada pengguna yang ditemukan dengan kriteria ini." />
                             </td>
                         </tr>
                     @endforelse

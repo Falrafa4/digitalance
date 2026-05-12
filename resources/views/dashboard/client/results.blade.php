@@ -16,11 +16,11 @@
     </div>
 
   @if($results->isEmpty())
-    @include('dashboard.client._ui.empty', [
-      'icon' => 'ri-file-check-line',
-      'title' => 'Belum ada hasil',
-      'desc' => 'Hasil pekerjaan akan muncul di sini setelah freelancer mengirim hasil.'
-    ])
+    <x-ui-empty-state
+      icon="ri-file-check-line"
+      title="Belum ada hasil"
+      description="Hasil pekerjaan akan muncul di sini setelah freelancer mengirim hasil."
+    />
   @else
     <div class="space-y-4">
       @foreach($results as $result)

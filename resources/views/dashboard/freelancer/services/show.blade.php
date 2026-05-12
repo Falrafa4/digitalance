@@ -46,7 +46,7 @@
                     <p class="text-slate-500 text-sm">Kategori: <span
                             class="font-semibold">{{ $service->service_category->name ?? '-' }}</span></p>
                 </div>
-                <x-crud-status-badge :status="$service->status ?? 'Draft'" />
+                <x-ui-status-badge :status="$service->status ?? 'Draft'" />
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">

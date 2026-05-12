@@ -9,13 +9,13 @@
   </div>
 
   @if(empty($transactions) || count($transactions) === 0)
-    @include('dashboard.client._ui.empty', [
-      'icon' => 'ri-bank-card-line',
-      'title' => 'Belum ada transaksi',
-      'desc' => 'Transaksi akan muncul setelah ada pembayaran.',
-      'actionUrl' => route('client.orders.index'),
-      'actionLabel' => 'Ke Orders'
-    ])
+    <x-ui-empty-state
+      icon="ri-bank-card-line"
+      title="Belum ada transaksi"
+      description="Transaksi akan muncul setelah ada pembayaran."
+      actionUrl="{{ route('client.orders.index') }}"
+      actionLabel="Ke Orders"
+    />
   @else
     <div data-client-pager data-page-size="10" class="space-y-4">
       <div class="grid grid-cols-1 xl:grid-cols-2 gap-5" data-pager-list>
@@ -31,7 +31,7 @@
               </div>
 
               @if(isset($t->status))
-                <x-crud-status-badge :status="$t->status" border />
+                <x-ui-status-badge :status="$t->status" />
               @endif
             </div>
 

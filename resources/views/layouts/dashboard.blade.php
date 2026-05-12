@@ -8,12 +8,9 @@
 
     <title>@yield('title', 'Dashboard')</title>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Sora:wght@600;700;800&display=swap"
-        rel="stylesheet" />
-    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet" />
+    <x-fonts />
     <link rel="stylesheet" href="{{ asset('css/dashboard/dashboard.css') }}">
+    <x-dashboard-css />
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -94,200 +91,16 @@
     <script src="{{ asset('js/dashboard/confirm-modal.js') }}"></script>
     <script src="{{ asset('js/dashboard/search.js') }}"></script>
     <script src="{{ asset('js/dashboard/shared/notification-drawer.js') }}"></script>
+    <script src="{{ asset('js/dashboard/global.js') }}"></script>
 
+    {{-- Flash messages injected by controller or set inline --}}
     <script>
-        // Global JS Error Boundary
-        window.addEventListener('error', function(e) {
-            const msg = e.message || 'Unknown error';
-            const src = e.filename || '';
-            const line = e.lineno || 0;
-
-            // Ignore errors from third-party scripts
-            if (src && !src.includes(window.location.origin) && !src.includes('dashboard')) {
-                return;
-            }
-
-            // Log to console in development, silently fail in production
-            if (typeof console !== 'undefined') {
-                console.warn('[JS Error Boundary]', msg, 'at', src + ':' + line);
-            }
-
-            // Show toast for critical errors
-            if (msg && !msg.includes('ResizeObserver') && !msg.includes('Non-Error')) {
-                window.showToast?.('Terjadi kesalahan. Halaman mungkin perlu di-refresh.', 'danger');
-            }
-        });
-
-        // Global unhandled promise rejection handler
-        window.addEventListener('unhandledrejection', function(e) {
-            const reason = e.reason;
-            if (reason && typeof reason === 'object' && reason.message) {
-                if (typeof console !== 'undefined') {
-                    console.warn('[Unhandled Promise Rejection]', reason.message);
-                }
-            }
-            e.preventDefault();
-        });
-    </script>
-
-    <script>
-        // Global Toast / Slide-in Notification System
-        window.showToast = function (arg1, arg2, arg3) {
-            const container = document.getElementById('toast-container');
-            if (!container) return;
-
-            let message = '';
-            let type = 'success';
-
-            // Handle both (message, type) and (title, message, type) signatures
-            if (arg3 !== undefined) {
-                // (title, message, type)
-                message = arg1 ? `<strong>${arg1}</strong>: ${arg2}` : arg2;
-                type = arg3;
-            } else if (arg2 !== undefined) {
-                // (message, type)
-                message = arg1;
-                type = arg2;
-            } else {
-                // (message)
-                message = arg1;
-            }
-
-            if (type === 'error' || type === 'danger') type = 'danger';
-            if (type === 'welcome') type = 'success';
-
-            const toast = document.createElement('div');
-            toast.className = `toast toast-${type}`;
-
-            let icon = 'ri-checkbox-circle-fill';
-            if (type === 'danger') icon = 'ri-close-circle-fill';
-            else if (type === 'info') icon = 'ri-information-fill';
-
-            toast.innerHTML = `
-                <div class="toast-icon"><i class="${icon}"></i></div>
-                <div style="flex: 1; line-height: 1.4;">${message}</div>
-                <button class="toast-close" onclick="this.parentElement.remove()" aria-label="Tutup">
-                    <i class="ri-close-line"></i>
-                </button>
-            `;
-
-            toast.setAttribute('role', 'alert');
-            toast.setAttribute('aria-live', 'polite');
-            container.appendChild(toast);
-
-            // Auto remove after 5s
-            setTimeout(() => {
-                if (!document.body.contains(toast)) return;
-                toast.classList.add('toast-hide');
-                setTimeout(() => { if (document.body.contains(toast)) toast.remove() }, 300);
-            }, 5000);
-        };
-
-        // Standardized Modal System
-        window.openModal = function(id) {
-            const overlay = document.getElementById(id);
-            if (!overlay) return;
-            const box = overlay.querySelector('.modal-box') || overlay.querySelector('div > div');
-            
-            overlay.classList.remove('opacity-0', 'pointer-events-none');
-            if (box) {
-                box.classList.remove('scale-95');
-                box.classList.add('scale-100');
-            }
-        };
-
-        window.closeModal = function(id) {
-            const overlay = id ? document.getElementById(id) : document.querySelector('.overlay:not(.opacity-0), .modal-overlay:not(.opacity-0)');
-            if (!overlay) return;
-            const box = overlay.querySelector('.modal-box') || overlay.querySelector('div > div');
-            
-            overlay.classList.add('opacity-0', 'pointer-events-none');
-            if (box) {
-                box.classList.remove('scale-100');
-                box.classList.add('scale-95');
-            }
-        };
-
-        // Global Event Listeners
-        document.addEventListener('click', (e) => {
-            // Click outside to close modal
-            if (e.target.classList.contains('overlay') || e.target.classList.contains('modal-overlay')) {
-                window.closeModal(e.target.id);
-            }
-        });
-
-        document.addEventListener('submit', (e) => {
-            const form = e.target;
-            const btn = form.querySelector('button[type="submit"]');
-            if (btn && !btn.classList.contains('no-loader') && !btn.classList.contains('no-auto-loader')) {
-                const originalContent = btn.innerHTML;
-                btn.dataset.originalContent = originalContent;
-                btn.disabled = true;
-                btn.setAttribute('aria-busy', 'true');
-                btn.classList.add('btn-loading');
-
-                // Safety timeout - restore if form doesn't navigate
-                if (form.method.toUpperCase() === 'GET') return;
-                const timeoutKey = 'submit-timeout-' + btn.dataset.submitTimeoutId;
-                clearTimeout(window[timeoutKey]);
-                window[timeoutKey] = setTimeout(() => {
-                    if (btn.disabled && document.body.contains(btn)) {
-                        btn.disabled = false;
-                        btn.removeAttribute('aria-busy');
-                        btn.classList.remove('btn-loading');
-                        if (btn.dataset.originalContent) {
-                            btn.innerHTML = btn.dataset.originalContent;
-                        }
-                    }
-                }, 15000);
-            }
-        });
-
-        // AJAX form loading state
-        window.showAjaxLoading = function(btn) {
-            if (!btn) return;
-            const original = btn.innerHTML;
-            btn.dataset.ajaxOriginal = original;
-            btn.disabled = true;
-            btn.classList.add('btn-loading');
-        };
-
-        window.hideAjaxLoading = function(btn) {
-            if (!btn) return;
-            btn.disabled = false;
-            btn.classList.remove('btn-loading');
-            if (btn.dataset.ajaxOriginal) {
-                btn.innerHTML = btn.dataset.ajaxOriginal;
-            }
-        };
-
-        document.addEventListener('DOMContentLoaded', () => {
-            const WELCOME_KEY = 'digitalance_welcome_shown';
-            const wasShown = sessionStorage.getItem(WELCOME_KEY);
-
-            // Welcome Notification (once per session)
-            if (!wasShown) {
-                window.showToast('Selamat Datang!', 'Semoga harimu menyenangkan dan produktif.', 'welcome');
-                sessionStorage.setItem(WELCOME_KEY, 'true');
-            }
-
-            // Laravel Flash Messages
-            @if(session('success'))
-                window.showToast(@json(session('success')), 'success');
-            @endif
-            @if(session('error'))
-                window.showToast(@json(session('error')), 'danger');
-            @endif
-            @if(session('warning'))
-                window.showToast(@json(session('warning')), 'warning');
-            @endif
-            @if(session('info'))
-                window.showToast(@json(session('info')), 'info');
-            @endif
-            @if($errors->any())
-                window.showToast('Validation Error', @json($errors->first()), 'danger');
-            @endif
-        });
+        window.__FLASH_MESSAGES__ = [];
+        @if(session('success')) window.__FLASH_MESSAGES__.push({message: @json(session('success')), type: 'success'}); @endif
+        @if(session('error')) window.__FLASH_MESSAGES__.push({message: @json(session('error')), type: 'danger'}); @endif
+        @if(session('warning')) window.__FLASH_MESSAGES__.push({message: @json(session('warning')), type: 'warning'}); @endif
+        @if(session('info')) window.__FLASH_MESSAGES__.push({message: @json(session('info')), type: 'info'}); @endif
+        @if($errors->any()) window.__FLASH_MESSAGES__.push({message: @json($errors->first()), type: 'danger'}); @endif
     </script>
 
     @yield('scripts')

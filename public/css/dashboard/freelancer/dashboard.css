@@ -1,189 +1,117 @@
-@import url('_shared.css');
+/* Freelancer Dashboard Overrides - Loaded after dashboard.css + _shared.css */
+/* Only role-specific styles here */
 
-    /* ── WELCOME ── */
-    .welcome { margin-bottom: 24px; }
-    .welcome h1 {
-      font-family: var(--font-display);
-      font-size: 2.1rem;
-      font-weight: 800;
-      color: var(--slate-900);
-    }
-    .welcome p { color: var(--slate-500); font-size: 0.95rem; margin-top: 4px; }
+.stats-container {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 32px;
+}
 
-    /* ── STATS: 4 kotak terpisah ── */
-    .stats-container {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 16px;
-      margin-bottom: 32px;
-    }
+.stat-item {
+  background: var(--white);
+  border: 1.5px solid var(--slate-200);
+  border-radius: 20px;
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
 
-    .stat-item {
-      background: var(--white);
-      border: 1.5px solid var(--slate-200);
-      border-radius: 20px;
-      padding: 24px 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
+.stat-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(15, 118, 110, 0.08);
+  border-color: var(--primary-light);
+}
 
-    .stat-item:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 8px 24px rgba(15, 118, 110, 0.08);
-      border-color: var(--primary-light);
-    }
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+}
 
-    .stat-label {
-      font-size: 10.5px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.07em;
-      color: var(--slate-400);
-      margin-bottom: 8px;
-    }
+.section-title {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--slate-900);
+}
 
-    .stat-value {
-      font-family: var(--font-display);
-      font-size: 1.75rem;
-      font-weight: 800;
-      color: var(--slate-900);
-      line-height: 1;
-    }
+.btn-link {
+  background: none;
+  border: none;
+  color: var(--primary);
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12.5px;
+  font-family: var(--font-sans);
+  transition: gap 0.2s;
+}
 
-    /* ── SECTIONS ── */
-    .projects-section { margin-bottom: 32px; }
+.btn-link:hover { gap: 9px; }
 
-    .section-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 18px;
-    }
+.project-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 18px;
+}
 
-    .section-title {
-      font-family: var(--font-display);
-      font-size: 1.15rem;
-      font-weight: 700;
-      color: var(--slate-900);
-    }
+.badge-progress { background: #CCFBF1; color: #0F766E; }
+.badge-pending  { background: #FFEDD5; color: #9A3412; }
+.badge-new      { background: #E0F2FE; color: #0369A1; }
 
-    .btn-link {
-      background: none;
-      border: none;
-      color: var(--primary);
-      font-weight: 700;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      font-size: 12.5px;
-      font-family: var(--font-sans);
-      transition: gap 0.2s;
-    }
+.card-title-text {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: var(--slate-900);
+  line-height: 1.4;
+}
 
-    .btn-link:hover { gap: 9px; }
+.card-footer-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid #F1F5F9;
+  padding-top: 13px;
+  margin-top: auto;
+}
 
-    /* ── PROJECT CARDS ── */
-    .project-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 18px;
-    }
+.client-name { font-size: 12.5px; color: var(--slate-500); font-weight: 500; }
+.project-amount { font-weight: 800; color: var(--teal-deep); font-size: 14px; }
 
-    .project-card {
-      background: var(--white);
-      padding: 20px;
-      border-radius: 18px;
-      border: 1.5px solid var(--slate-200);
-      transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
-      display: flex;
-      flex-direction: column;
-    }
+.action-buttons { display: flex; gap: 18px; margin-bottom: 36px; }
 
-    .project-card:hover {
-      transform: translateY(-4px);
-      border-color: var(--primary-light);
-      box-shadow: 0 10px 26px rgba(15, 118, 110, 0.09);
-    }
+.btn-large {
+  flex: 1;
+  padding: 17px;
+  border-radius: 16px;
+  background: var(--white);
+  border: 2px solid var(--slate-200);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 14.5px;
+  color: var(--slate-500);
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
 
-    .badge {
-      padding: 4px 10px;
-      border-radius: 100px;
-      font-size: 10.5px;
-      font-weight: 700;
-      margin-bottom: 12px;
-      align-self: flex-start;
-    }
+.btn-large i { font-size: 16px; }
 
-    .badge-progress { background: #CCFBF1; color: #0F766E; }
-    .badge-pending  { background: #FFEDD5; color: #9A3412; }
-    .badge-new      { background: #E0F2FE; color: #0369A1; }
-
-    .card-title-text {
-      font-family: var(--font-display);
-      font-size: 0.95rem;
-      font-weight: 700;
-      margin-bottom: 16px;
-      color: var(--slate-900);
-      line-height: 1.4;
-    }
-
-    .card-footer-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-top: 1px solid #F1F5F9;
-      padding-top: 13px;
-      margin-top: auto;
-    }
-
-    .client-name { font-size: 12.5px; color: var(--slate-500); font-weight: 500; }
-    .project-amount { font-weight: 800; color: var(--teal-deep); font-size: 14px; }
-
-    /* ── ACTION BUTTONS ── */
-    .action-buttons { display: flex; gap: 18px; margin-bottom: 36px; }
-
-    .btn-large {
-      flex: 1;
-      padding: 17px;
-      border-radius: 16px;
-      background: var(--white);
-      border: 2px solid var(--slate-200);
-      font-family: var(--font-display);
-      font-weight: 700;
-      font-size: 14.5px;
-      color: var(--slate-500);
-      cursor: pointer;
-      transition: all 0.2s;
-      text-align: center;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-    }
-
-    .btn-large i { font-size: 16px; }
-
-    .btn-large:hover {
-      border-color: var(--primary);
-      color: var(--primary);
-      transform: translateY(-2px);
-    }
-
-    /* ── EMPTY STATE ── */
-    .empty-state {
-      grid-column: 1 / -1;
-      text-align: center;
-      padding: 36px;
-      border: 2px dashed var(--slate-200);
-      border-radius: 18px;
-      color: var(--slate-400);
-    }
-
-    .empty-state i { font-size: 30px; margin-bottom: 8px; display: block; }
-    .empty-state p { font-size: 13px; }
-
-    /* fadeUp moved to _shared.css */
+.btn-large:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  transform: translateY(-2px);
+}

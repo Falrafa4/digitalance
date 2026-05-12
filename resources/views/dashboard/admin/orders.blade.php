@@ -2,16 +2,6 @@
 @section('title', 'Order Management | Digitalance')
 @section('styles')
     <link rel="stylesheet" href="{{ asset('css/dashboard/admin/orders.css') }}">
-    <style>
-        .status-badge { px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider; }
-        .status-Pending { bg: #fef3c7; color: #92400e; }
-        .status-Negotiated { bg: #e0f2fe; color: #075985; }
-        .status-Paid { bg: #dcfce7; color: #166534; }
-        .status-InProgress { bg: #eef2ff; color: #3730a3; }
-        .status-Revision { bg: #ffedd5; color: #9a3412; }
-        .status-Completed { bg: #dcfce7; color: #15803d; }
-        .status-Cancelled { bg: #fee2e2; color: #991b1b; }
-    </style>
 @endsection
 
 @section('content')
@@ -92,9 +82,7 @@
                                 <span class="text-[13px] font-black text-slate-900">Rp{{ number_format($order->agreed_price ?? 0, 0, ',', '.') }}</span>
                             </td>
                             <td class="px-6 py-4">
-                                <span class="status-badge status-{{ str_replace(' ', '', $order->status) }}">
-                                    {{ $order->status }}
-                                </span>
+                                <x-ui-status-badge :status="$order->status" />
                             </td>
                             <td class="px-6 py-4">
                                 <span class="text-[12px] text-slate-500 font-medium">{{ $order->created_at->format('d M Y') }}</span>
@@ -115,12 +103,8 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-6 py-20 text-center">
-                                <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-300 text-2xl">
-                                    <i class="ri-file-list-3-line"></i>
-                                </div>
-                                <h3 class="text-slate-900 font-bold">No Orders Found</h3>
-                                <p class="text-slate-400 text-sm">Belum ada pesanan yang sesuai dengan filter ini.</p>
+                            <td colspan="6">
+                                <x-ui-empty-state icon="ri-file-list-3-line" title="No Orders Found" description="Belum ada pesanan yang sesuai dengan filter ini." />
                             </td>
                         </tr>
                     @endforelse

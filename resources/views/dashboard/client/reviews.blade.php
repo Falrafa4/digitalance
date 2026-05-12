@@ -11,13 +11,13 @@
   </div>
 
   @if($reviews->isEmpty())
-    @include('dashboard.client._ui.empty', [
-      'icon' => 'ri-star-line',
-      'title' => 'Belum ada review',
-      'desc' => 'Review akan muncul di sini setelah Anda memberikan rating pada order yang selesai.',
-      'actionUrl' => route('client.orders.index'),
-      'actionLabel' => 'Lihat Orders'
-    ])
+    <x-ui-empty-state
+      icon="ri-star-line"
+      title="Belum ada review"
+      description="Review akan muncul di sini setelah Anda memberikan rating pada order yang selesai."
+      actionUrl="{{ route('client.orders.index') }}"
+      actionLabel="Lihat Orders"
+    />
   @else
     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
       @foreach($reviews as $review)

@@ -16,13 +16,13 @@
   </div>
 
   @if(empty($orders) || count($orders) === 0)
-    @include('dashboard.client._ui.empty', [
-      'icon' => 'ri-file-list-3-line',
-      'title' => 'Belum ada order',
-      'desc' => 'Mulai order pertamamu dari katalog jasa.',
-      'actionUrl' => route('client.services.index'),
-      'actionLabel' => 'Browse Katalog'
-    ])
+    <x-ui-empty-state
+      icon="ri-file-list-3-line"
+      title="Belum ada order"
+      description="Mulai order pertamamu dari katalog jasa."
+      actionUrl="{{ route('client.services.index') }}"
+      actionLabel="Browse Katalog"
+    />
   @else
     <div data-client-pager data-page-size="8" class="space-y-4" x-data="{ loading: false }">
       <div class="grid grid-cols-1 xl:grid-cols-2 gap-5" data-pager-list>
@@ -39,7 +39,7 @@
                 </p>
               </div>
 
-              <x-crud-status-badge :status="$o->status ?? '-'" border />
+              <x-ui-status-badge :status="$o->status ?? '-'" />
             </div>
 
             <div class="flex gap-2 mt-4">

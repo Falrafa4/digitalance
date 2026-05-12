@@ -23,7 +23,7 @@
       </div>
 
       @if(isset($transaction->status))
-        <x-crud-status-badge :status="$transaction->status" border />
+        <x-ui-status-badge :status="$transaction->status" />
       @endif
     </div>
 

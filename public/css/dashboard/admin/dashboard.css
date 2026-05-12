@@ -1,7 +1,5 @@
-@import url('_shared.css');
+/* Admin Dashboard - Role overrides + page shared styles */
 
-
-/* ─── WELCOME ─── */
 .welcome {
   display: flex;
   justify-content: space-between;
@@ -291,6 +289,3 @@
 /* ─── BLOB DECORATION ─── */
 .blob { position: absolute; filter: blur(100px); z-index: -1; opacity: 0.3; pointer-events: none; }
 .blob-1 { top: 0; right: 0; width: 400px; height: 400px; background: var(--primary-light); }
-
-
-/* fadeUp moved to _shared.css */

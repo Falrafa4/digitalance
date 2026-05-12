@@ -1,4 +1,4 @@
-@import url('_shared.css');
+/* Admin Transactions - Page-specific styles (shared CSS loaded via dashboard.css) */
 
 .nav-scroll { flex: 1; overflow-y: auto; scrollbar-width: none; }
 .nav-scroll::-webkit-scrollbar { display: none; }

@@ -1,40 +1,34 @@
-{{-- Standardized CRUD List Page Header --}}
+{{-- Universal Page Header Component --}}
 @props([
-    'title' => 'Resource',
+    'title' => '',
     'subtitle' => '',
     'count' => null,
-    'countLabel' => 'Total',
+    'countLabel' => null,
     'actionUrl' => null,
-    'actionLabel' => 'Create New',
-    'actionIcon' => 'ri-add-line',
+    'actionLabel' => null,
+    'actionIcon' => 'ri-arrow-right-line',
 ])
 
-<div class="mb-8">
-    <div class="flex items-end justify-between gap-4 mb-8">
-        <div>
-            <h1 class="font-display text-[2.1rem] font-extrabold">{{ $title }}</h1>
-            @if ($subtitle)
-                <p class="text-slate-500">{{ $subtitle }}</p>
+<div class="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4 mb-8 animate-fadeUp">
+    <div class="min-w-0 flex-1">
+        <h1 class="font-display text-[1.85rem] sm:text-[2.1rem] font-extrabold text-slate-900 leading-tight">
+            {{ $title }}
+            @if($subtitle)
+                <span class="block text-[0.95rem] font-normal text-slate-500 mt-1">{{ $subtitle }}</span>
             @endif
-        </div>
-
-        <div class="flex items-center gap-4">
-            @if ($count !== null)
-                <div class="bg-slate-50 border border-slate-200 rounded-lg px-4 py-3">
-                    <p class="text-xs font-semibold text-slate-500 mb-1">{{ $countLabel }}</p>
-                    <p class="text-2xl font-bold text-[#0f766e]">{{ $count }}</p>
-                </div>
-            @endif
-
-            @if ($actionUrl)
-                <a href="{{ $actionUrl }}"
-                   class="inline-flex items-center gap-2 px-4 py-3 rounded-lg bg-[#0f766e] text-white font-semibold hover:bg-teal-800 transition-colors whitespace-nowrap">
-                    <i class="text-lg {{ $actionIcon }}"></i>
-                    {{ $actionLabel }}
-                </a>
-            @endif
-        </div>
+        </h1>
+        @if($count !== null && $countLabel)
+            <div class="mt-3 flex items-center gap-2">
+                <span class="px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full text-[12px] font-bold">{{ $count }}</span>
+                <span class="text-[12px] text-slate-500 font-semibold">{{ $countLabel }}</span>
+            </div>
+        @endif
     </div>
 
-    {{ $slot }}
+    @if($actionUrl && $actionLabel)
+        <a href="{{ $actionUrl }}"
+           class="px-5 py-2.5 bg-[#0f766e] text-white font-bold text-[13px] rounded-[12px] shadow-teal-sm hover:bg-[#0a5e58] transition-all flex items-center gap-2 shrink-0">
+            {{ $actionLabel }} <i class="{{ $actionIcon }}"></i>
+        </a>
+    @endif
 </div>

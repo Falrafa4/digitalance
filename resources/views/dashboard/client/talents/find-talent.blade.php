@@ -17,11 +17,11 @@
   </div>
 
   @if(empty($freelancers) || count($freelancers) === 0)
-    @include('dashboard.client._ui.empty', [
-      'icon' => 'ri-user-search-line',
-      'title' => 'Belum ada freelancer',
-      'desc' => 'Data freelancer belum tersedia.'
-    ])
+    <x-ui-empty-state
+      icon="ri-user-search-line"
+      title="Belum ada freelancer"
+      description="Data freelancer belum tersedia."
+    />
   @else
     <div data-client-pager data-page-size="9" class="space-y-4">
       <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5" data-pager-list>

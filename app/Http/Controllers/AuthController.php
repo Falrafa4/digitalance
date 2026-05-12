@@ -52,7 +52,7 @@ class AuthController extends Controller
             'status' => 'Pending',
         ]);
 
-        return redirect('/login')->with('success', 'Registrasi freelancer berhasil. Password awal adalah NIS Anda.');
+        return redirect('/login')->with('success', 'Registrasi freelancer berhasil. Silakan login.');
     }
 
     /**

@@ -9,13 +9,13 @@
   </div>
 
   @if(empty($orders) || count($orders) === 0)
-    @include('dashboard.client._ui.empty', [
-      'icon' => 'ri-history-line',
-      'title' => 'Belum ada history',
-      'desc' => 'Order yang selesai/dibatalkan akan muncul di sini.',
-      'actionUrl' => route('client.services.index'),
-      'actionLabel' => 'Cari Jasa'
-    ])
+    <x-ui-empty-state
+      icon="ri-history-line"
+      title="Belum ada history"
+      description="Order yang selesai/dibatalkan akan muncul di sini."
+      actionUrl="{{ route('client.services.index') }}"
+      actionLabel="Cari Jasa"
+    />
   @else
     <div data-client-pager data-page-size="8" class="space-y-4">
       <div class="grid grid-cols-1 xl:grid-cols-2 gap-5" data-pager-list>
@@ -31,7 +31,7 @@
                   Agreed: Rp {{ number_format((float)($o->agreed_price ?? 0), 0, ',', '.') }}
                 </p>
               </div>
-              <x-crud-status-badge :status="$o->status ?? '-'" border />
+              <x-ui-status-badge :status="$o->status ?? '-'" />
             </div>
 
             <div class="flex gap-2 mt-4">

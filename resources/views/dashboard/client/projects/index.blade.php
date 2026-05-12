@@ -17,13 +17,13 @@
   </div>
 
   @if(empty($projects) || count($projects) === 0)
-    @include('dashboard.client._ui.empty', [
-      'icon' => 'ri-briefcase-4-line',
-      'title' => 'Belum ada project aktif',
-      'desc' => 'Project muncul ketika kamu punya order yang sedang diproses.',
-      'actionUrl' => route('client.services.index'),
-      'actionLabel' => 'Cari Jasa'
-    ])
+    <x-ui-empty-state
+      icon="ri-briefcase-4-line"
+      title="Belum ada project aktif"
+      description="Project muncul ketika kamu punya order yang sedang diproses."
+      actionUrl="{{ route('client.services.index') }}"
+      actionLabel="Cari Jasa"
+    />
   @else
     <div data-client-pager data-page-size="8" class="space-y-4">
       <div class="grid grid-cols-1 xl:grid-cols-2 gap-5" data-pager-list>
@@ -34,7 +34,7 @@
                 <p class="font-extrabold text-slate-900">Order #{{ $p->id }}</p>
                 <p class="text-slate-500 text-[13px] mt-1 truncate">{{ $p->service->title ?? '-' }}</p>
               </div>
-              <x-crud-status-badge :status="$p->status ?? '-'" border />
+              <x-ui-status-badge :status="$p->status ?? '-'" />
             </div>
 
             <div class="mt-4 flex gap-2">
