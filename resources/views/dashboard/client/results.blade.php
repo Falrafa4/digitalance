@@ -16,7 +16,7 @@
     </div>
 
   @if($results->isEmpty())
-    <x-ui-empty-state
+    <x-ui.empty-state
       icon="ri-file-check-line"
       title="Belum ada hasil"
       description="Hasil pekerjaan akan muncul di sini setelah freelancer mengirim hasil."

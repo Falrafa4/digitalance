@@ -62,7 +62,7 @@
                             class="w-12 h-12 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400 text-xl border border-slate-100">
                             <i class="ri-tools-line"></i>
                         </div>
-                        <x-ui-status-badge :status="$s->status" />
+                        <x-ui.status-badge :status="$s->status" />
                     </div>
 
                     <h3 class="font-display font-black text-slate-900 text-lg mb-2 leading-tight truncate">{{ $s->title }}
@@ -98,7 +98,7 @@
             {{ $services->links() }}
         </div>
     @else
-        <x-ui-empty-state icon="ri-tools-line" title="No Services Found" description="No services match your search criteria." />
+        <x-ui.empty-state icon="ri-tools-line" title="No Services Found" description="No services match your search criteria." />
     @endif
 @endsection
 

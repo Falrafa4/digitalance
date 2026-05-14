@@ -30,7 +30,7 @@
         </div>
 
         @if(empty($services) || count($services) === 0)
-          <x-ui-empty-state
+          <x-ui.empty-state
             icon="ri-tools-line"
             title="Belum ada layanan"
             description="Freelancer ini belum punya layanan."
@@ -44,7 +44,7 @@
                   <p class="font-extrabold text-slate-900 truncate">{{ $s->title ?? 'Service' }}</p>
                   <p class="text-slate-500 text-[13px] mt-1">Kategori: <span class="font-bold">{{ $s->service_category->name ?? '-' }}</span></p>
                   <div class="mt-3">
-                    <x-ui-status-badge :status="$s->status ?? 'Approved'" />
+                    <x-ui.status-badge :status="$s->status ?? 'Approved'" />
                   </div>
                 </a>
               @endforeach

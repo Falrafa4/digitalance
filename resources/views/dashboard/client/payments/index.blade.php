@@ -9,7 +9,7 @@
   </div>
 
   @if(empty($transactions) || count($transactions) === 0)
-    <x-ui-empty-state
+    <x-ui.empty-state
       icon="ri-bank-card-line"
       title="Belum ada transaksi"
       description="Transaksi akan muncul setelah ada pembayaran."
@@ -31,7 +31,7 @@
               </div>
 
               @if(isset($t->status))
-                <x-ui-status-badge :status="$t->status" />
+                <x-ui.status-badge :status="$t->status" />
               @endif
             </div>
 

@@ -82,7 +82,7 @@
                                 <span class="text-[13px] font-black text-slate-900">Rp{{ number_format($order->agreed_price ?? 0, 0, ',', '.') }}</span>
                             </td>
                             <td class="px-6 py-4">
-                                <x-ui-status-badge :status="$order->status" />
+                                <x-ui.status-badge :status="$order->status" />
                             </td>
                             <td class="px-6 py-4">
                                 <span class="text-[12px] text-slate-500 font-medium">{{ $order->created_at->format('d M Y') }}</span>
@@ -104,7 +104,7 @@
                     @empty
                         <tr>
                             <td colspan="6">
-                                <x-ui-empty-state icon="ri-file-list-3-line" title="No Orders Found" description="Belum ada pesanan yang sesuai dengan filter ini." />
+                                <x-ui.empty-state icon="ri-file-list-3-line" title="No Orders Found" description="Belum ada pesanan yang sesuai dengan filter ini." />
                             </td>
                         </tr>
                     @endforelse

@@ -74,7 +74,7 @@
                                 </div>
                             </td>
                             <td class="px-6 py-4">
-                                <x-ui-status-badge :status="$user->role" />
+                                <x-ui.status-badge :status="$user->role" />
                             </td>
                             <td class="px-6 py-4">
                                 <span class="text-[12px] text-slate-500 font-bold uppercase tracking-widest">{{ \Carbon\Carbon::parse($user->created_at)->format('d M Y') }}</span>
@@ -101,7 +101,7 @@
                     @empty
                         <tr>
                             <td colspan="4">
-                                <x-ui-empty-state icon="ri-user-search-line" title="No Users Found" description="Tidak ada pengguna yang ditemukan dengan kriteria ini." />
+                                <x-ui.empty-state icon="ri-user-search-line" title="No Users Found" description="Tidak ada pengguna yang ditemukan dengan kriteria ini." />
                             </td>
                         </tr>
                     @endforelse

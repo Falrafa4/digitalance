@@ -15,7 +15,7 @@
               Kategori: <span class="font-bold">{{ $service->service_category->name ?? '-' }}</span>
             </p>
           </div>
-          <x-ui-status-badge :status="$service->status ?? 'Approved'" />
+          <x-ui.status-badge :status="$service->status ?? 'Approved'" />
         </div>
 
         <p class="text-slate-600 mt-4 leading-relaxed text-[14px]">

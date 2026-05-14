@@ -9,7 +9,7 @@
   </div>
 
   @if(empty($orders) || count($orders) === 0)
-    <x-ui-empty-state
+    <x-ui.empty-state
       icon="ri-history-line"
       title="Belum ada history"
       description="Order yang selesai/dibatalkan akan muncul di sini."
@@ -31,7 +31,7 @@
                   Agreed: Rp {{ number_format((float)($o->agreed_price ?? 0), 0, ',', '.') }}
                 </p>
               </div>
-              <x-ui-status-badge :status="$o->status ?? '-'" />
+              <x-ui.status-badge :status="$o->status ?? '-'" />
             </div>
 
             <div class="flex gap-2 mt-4">

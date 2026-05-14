@@ -16,7 +16,7 @@
   </div>
 
   @if(empty($orders) || count($orders) === 0)
-    <x-ui-empty-state
+    <x-ui.empty-state
       icon="ri-file-list-3-line"
       title="Belum ada order"
       description="Mulai order pertamamu dari katalog jasa."
@@ -39,7 +39,7 @@
                 </p>
               </div>
 
-              <x-ui-status-badge :status="$o->status ?? '-'" />
+              <x-ui.status-badge :status="$o->status ?? '-'" />
             </div>
 
             <div class="flex gap-2 mt-4">

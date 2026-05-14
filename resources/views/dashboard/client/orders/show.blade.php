@@ -31,7 +31,7 @@
           </div>
 
           <div class="flex flex-wrap items-center gap-2">
-            <x-ui-status-badge :status="$order->status ?? '-'" />
+            <x-ui.status-badge :status="$order->status ?? '-'" />
             <span class="px-3 py-1 rounded-full text-[12px] font-extrabold bg-white text-slate-700 border border-slate-200">
               Agreed: Rp {{ number_format((float)($order->agreed_price ?? 0), 0, ',', '.') }}
             </span>
@@ -226,7 +226,7 @@
               <p class="text-slate-700 mt-2 text-[13.5px] whitespace-pre-line">{{ $n->message ?? '-' }}</p>
             </div>
           @empty
-            <x-ui-empty-state
+            <x-ui.empty-state
               icon="ri-message-3-line"
               title="Belum ada pesan"
               description="Mulai diskusi dengan mengirim pesan di bawah."

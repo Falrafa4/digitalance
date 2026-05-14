@@ -17,7 +17,7 @@
   </div>
 
   @if(empty($projects) || count($projects) === 0)
-    <x-ui-empty-state
+    <x-ui.empty-state
       icon="ri-briefcase-4-line"
       title="Belum ada project aktif"
       description="Project muncul ketika kamu punya order yang sedang diproses."
@@ -34,7 +34,7 @@
                 <p class="font-extrabold text-slate-900">Order #{{ $p->id }}</p>
                 <p class="text-slate-500 text-[13px] mt-1 truncate">{{ $p->service->title ?? '-' }}</p>
               </div>
-              <x-ui-status-badge :status="$p->status ?? '-'" />
+              <x-ui.status-badge :status="$p->status ?? '-'" />
             </div>
 
             <div class="mt-4 flex gap-2">

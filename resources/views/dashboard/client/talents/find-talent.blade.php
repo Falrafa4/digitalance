@@ -17,7 +17,7 @@
   </div>
 
   @if(empty($freelancers) || count($freelancers) === 0)
-    <x-ui-empty-state
+    <x-ui.empty-state
       icon="ri-user-search-line"
       title="Belum ada freelancer"
       description="Data freelancer belum tersedia."

@@ -11,7 +11,7 @@
   </div>
 
   @if($reviews->isEmpty())
-    <x-ui-empty-state
+    <x-ui.empty-state
       icon="ri-star-line"
       title="Belum ada review"
       description="Review akan muncul di sini setelah Anda memberikan rating pada order yang selesai."

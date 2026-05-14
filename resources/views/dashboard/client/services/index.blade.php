@@ -7,7 +7,7 @@
       actionUrl="{{ route('client.orders.index') }}" actionLabel="My Orders" actionIcon="ri-shopping-cart-line" />
 
     @if(empty($services) || count($services) === 0)
-      <x-ui-empty-state
+      <x-ui.empty-state
         icon="ri-tools-line"
         title="No Services Available"
         description="No services are currently available for browse."
