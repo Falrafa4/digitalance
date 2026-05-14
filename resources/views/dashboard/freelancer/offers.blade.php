@@ -50,7 +50,7 @@
                         </div>
                         <div>
                             <p class="text-[11px] font-bold text-slate-400 uppercase">Klien</p>
-                            <p class="text-[13px] font-bold text-slate-800">{{ $offer->order->client->user->name ?? $offer->order->client->name ?? 'Klien' }}</p>
+                            <p class="text-[13px] font-bold text-slate-800">{{ $offer->order->client->name ?? 'Klien' }}</p>
                         </div>
                     </div>
 

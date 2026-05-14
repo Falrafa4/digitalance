@@ -271,7 +271,16 @@ class DashboardController extends Controller
 
     public function settings()
     {
-        return view('dashboard.admin.settings');
+        if (auth('administrator')->check()) {
+            return view('dashboard.admin.settings');
+        }
+        if (auth('client')->check()) {
+            return view('dashboard.client.settings');
+        }
+        if (auth('freelancer')->check()) {
+            return view('dashboard.freelancer.settings');
+        }
+        abort(403);
     }
 
     public function search(\Illuminate\Http\Request $request)

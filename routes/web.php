@@ -243,6 +243,7 @@ Route::middleware('auth:freelancer')->prefix('freelancer')->name('freelancer.')-
     Route::get('/', [DashboardController::class, 'freelancer'])->name('dashboard');
     // Alias URL (optional): /freelancer/dashboard -> same dashboard page
     Route::get('/dashboard', [DashboardController::class, 'freelancer'])->name('dashboard-alias');
+    Route::get('/settings', [DashboardController::class, 'settings'])->name('settings');
     Route::get('/profile', [FreelancerController::class, 'profile'])->name('profile');
     Route::get('/search', [DashboardController::class, 'freelancerSearch'])->name('search');
     Route::post('/profile', [FreelancerController::class, 'updateProfile'])->name('profile.update');

@@ -29,7 +29,7 @@
                     if($isLog) continue;
 
                     $order = $latestMsg->order;
-                    $clientName = $order->client->user->name ?? $order->client->name ?? 'Klien';
+                    $clientName = $order->client->name ?? 'Klien';
                     $latestFromClient = $thread->where('sender', 'client')->sortByDesc('created_at')->first();
                     $hasFreelancerResponse = $latestFromClient 
                         ? $thread->where('sender', 'freelancer')->where('created_at', '>', $latestFromClient->created_at)->count() > 0 

@@ -9,19 +9,24 @@
 
     // ─── Error Boundary ───────────────────────────────────────
     window.addEventListener('error', function(e) {
-        var msg = e.message || 'Unknown error';
+        var msg = (e.message || e.reason?.message || 'Unknown error').toLowerCase();
         var src = e.filename || '';
-        var line = e.lineno || 0;
+
+        // Ignore ResizeObserver loop limit errors (harmless browser warnings)
+        if (msg.includes('resizeobserver') || msg.includes('loop limit')) return;
+        
+        // Ignore extension-related errors
+        if (src.includes('extension://') || src.includes('moz-extension://')) return;
 
         if (src && !src.includes(window.location.origin) && !src.includes('dashboard')) {
             return;
         }
 
         if (typeof console !== 'undefined') {
-            console.warn('[JS Error Boundary]', msg, 'at', src + ':' + line);
+            console.warn('[JS Error Boundary]', msg, 'at', src);
         }
 
-        if (msg && !msg.includes('ResizeObserver') && !msg.includes('Non-Error')) {
+        if (msg && !msg.includes('non-error')) {
             window.showToast?.('Terjadi kesalahan. Halaman mungkin perlu di-refresh.', 'danger');
         }
     });

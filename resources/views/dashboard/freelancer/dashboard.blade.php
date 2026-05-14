@@ -31,7 +31,7 @@
                         <p class="text-indigo-700/70 text-[13px] font-medium mt-0.5">Segera respon untuk menjaga performa dan kepercayaan klien.</p>
                     </div>
                 </div>
-                <a href="{{ route('freelancer.orders.show', $pendingOrder['id'] ?? $pendingOrder->id) }}" 
+                <a href="{{ route('freelancer.orders.show', $pendingOrder['id']) }}" 
                    class="w-full sm:w-auto px-6 py-3 bg-indigo-600 text-white rounded-xl font-bold text-[13px] hover:bg-indigo-700 transition-all shadow-md shadow-indigo-100 text-center">
                     Detail Order <i class="ri-arrow-right-line ml-1.5"></i>
                 </a>

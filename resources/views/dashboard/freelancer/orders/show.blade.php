@@ -184,11 +184,11 @@
                             <div>
                                 <label
                                     class="block text-[0.65rem] font-black text-slate-400 uppercase tracking-widest mb-3 text-center md:text-left">Harga
-                                    Dari Client</label>
+                                    Dari Client (Min)</label>
                                 <div
                                     class="px-6 py-5 bg-slate-50 border border-slate-200 rounded-2xl text-slate-500 font-bold flex items-center justify-center md:justify-start gap-2">
                                     <span class="text-slate-400 font-medium">Rp</span>
-                                    <span class="text-2xl">{{ number_format($order->service->price ?? 0, 0, ',', '.') }}</span>
+                                    <span class="text-2xl">{{ number_format($order->service->price_min ?? 0, 0, ',', '.') }}</span>
                                 </div>
                             </div>
 
@@ -199,9 +199,9 @@
                                 <div class="relative group">
                                     <span
                                         class="absolute left-6 top-1/2 -translate-y-1/2 text-emerald-600 font-black text-xl">Rp</span>
-                                    <input type="number" name="agreed_price" id="agreed_price" required
+                                    <input type="number" name="agreed_price" id="agreed_price" required step="0.01"
                                         class="w-full pl-16 pr-6 py-5 bg-white border-2 border-emerald-100 rounded-2xl focus:border-emerald-500 focus:ring-8 focus:ring-emerald-500/10 outline-none transition-all font-black text-slate-900 text-2xl shadow-inner text-center md:text-left"
-                                        value="{{ old('agreed_price', $order->agreed_price ?? ($order->service->price ?? 0)) }}">
+                                        value="{{ old('agreed_price', number_format((float)($order->agreed_price ?? $order->service->price_min ?? 0), 2, '.', '')) }}">
                                 </div>
                             </div>
                         </div>
@@ -261,9 +261,9 @@
                                 <label for="agreed_price" class="block text-[10px] font-black text-teal-600 uppercase tracking-widest mb-2">Harga Kesepakatan Baru (ACC)</label>
                                 <div class="relative">
                                     <span class="absolute left-4 top-1/2 -translate-y-1/2 text-teal-600 font-bold">Rp</span>
-                                    <input type="number" name="agreed_price" id="agreed_price" required
+                                    <input type="number" name="agreed_price" id="agreed_price" required step="0.01"
                                         class="w-full pl-12 pr-4 py-4 bg-white border-2 border-teal-100 rounded-xl focus:border-teal-500 outline-none font-bold text-slate-900 shadow-sm"
-                                        value="{{ old('agreed_price', $order->agreed_price ?? ($order->service->price ?? 0)) }}">
+                                        value="{{ old('agreed_price', number_format((float)($order->agreed_price ?? $order->service->price_min ?? 0), 2, '.', '')) }}">
                                 </div>
                             </div>
                         </div>
@@ -427,9 +427,9 @@
                                 </span>
                             </div>
                             @if($nego->sender == 'client' && $order->status != 'Completed')
-                                <a href="{{ route('freelancer.negotiations.show', $nego->order_id) }}"
+                                <a href="{{ route('freelancer.negotiations.index') }}"
                                    class="px-3 py-1.5 rounded-lg bg-[#0f766e]/10 text-[#0f766e] text-[10px] font-bold hover:bg-[#0f766e]/20 transition-colors flex items-center gap-1">
-                                    <i class="ri-reply-line"></i> Buka & Respond
+                                    <i class="ri-reply-line"></i> Buka Pesan
                                 </a>
                             @endif
                         </div>
