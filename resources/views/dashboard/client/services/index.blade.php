@@ -81,6 +81,6 @@
       </div>
     @endif
 
-    @include('dashboard.client._ui.client-pager')
+    
   </section>
 @endsection

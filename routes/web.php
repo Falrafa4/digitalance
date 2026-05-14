@@ -113,6 +113,11 @@ Route::middleware('auth:administrator')->prefix('admin')->name('admin.')->group(
     Route::delete('/skomda-students/{skomda_student}', [SkomdaStudentController::class, 'destroy'])->name('skomda-students.destroy');
     Route::put('/skomda-students/{skomda_student}/password', [ClientController::class, 'updateSkomdaPassword'])->name('skomda-students.password');
 
+    // Results (CRUD)
+    Route::get('/results', [ResultController::class, 'index'])->name('results.index');
+    Route::get('/results/{result}', [ResultController::class, 'show'])->name('results.show');
+    Route::delete('/results/{result}', [ResultController::class, 'destroy'])->name('results.destroy');
+
     // Services (CRUD)
     Route::get('/services', [ServiceController::class, 'index'])->name('services.index');
     Route::post('/services/{id}/status', [ServiceController::class, 'updateStatus'])->name('services.updateStatus');

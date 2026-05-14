@@ -61,7 +61,7 @@
       </div>
     </div>
 
-    @include('dashboard.client._ui.client-pager')
+    
   @endif
 </section>
 @endsection

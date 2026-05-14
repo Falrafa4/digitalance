@@ -1,6 +1,25 @@
 @extends('layouts.dashboard')
 @section('title', 'Lowongan Kerja | Digitalance')
 
+@php
+$lokkersJson = $lokkers->map(function($l) {
+    return [
+        'id' => $l->id,
+        'title' => $l->title,
+        'description' => $l->description,
+        'status' => $l->status,
+        'category' => $l->category ? $l->category->name : null,
+        'client_name' => $l->client->name ?? 'Client',
+        'budget_min' => $l->budget_min,
+        'budget_max' => $l->budget_max,
+        'deadline' => $l->deadline ? \Carbon\Carbon::parse($l->deadline)->format('d M Y') : null,
+        'created_at' => $l->created_at->diffForHumans(),
+        'has_applied' => $l->hasApplied,
+        'my_status' => $l->myApplication ? $l->myApplication->status : null,
+    ];
+})->values()->all();
+@endphp
+
 @section('content')
 <div class="content-scroll flex-1 px-8 py-7 overflow-y-auto">
     <div class="mb-8 animate-fadeUp">
@@ -108,10 +127,10 @@
                             {{ $loker->created_at->diffForHumans() }}
                         </span>
                         <div class="flex items-center gap-2">
-                            <a href="{{ route('freelancer.loker.show', $loker->id) }}"
+                            <button type="button" onclick="openDetailModal({{ $loker->id }})"
                                 class="px-4 py-2 rounded-[11px] border border-slate-200 text-slate-600 font-bold text-[12px] hover:bg-slate-50 transition-all">
                                 Detail
-                            </a>
+                            </button>
                             @if(!$loker->hasApplied)
                                 <button type="button" onclick="openApplyModal({{ $loker->id }})"
                                     class="px-4 py-2 rounded-[11px] bg-[#0f766e] text-white font-bold text-[12px] hover:bg-[#0a5e58] transition-all">
@@ -169,8 +188,102 @@
     @endif
 @endforeach
 
+@section('modals')
+<div class="fixed inset-0 z-[100] bg-slate-900/40 backdrop-blur-sm flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300" id="detail-loker-overlay">
+    <div class="bg-white rounded-[24px] w-full max-w-[560px] max-h-[85vh] shadow-2xl overflow-hidden transform scale-95 transition-all duration-300" id="detail-loker-box">
+    </div>
+</div>
+@endsection
+
 @push('scripts')
 <script>
+window.__LOKKERS_JSON__ = @json($lokkersJson);
+
+function formatRupiah(val) {
+    if (!val) return '';
+    return 'Rp ' + Number(val).toLocaleString('id-ID');
+}
+
+function openDetailModal(id) {
+    const loker = window.__LOKKERS_JSON__.find(l => l.id === id);
+    if (!loker) return;
+
+    let budgetText = '';
+    if (loker.budget_min && loker.budget_max) {
+        budgetText = formatRupiah(loker.budget_min) + ' - ' + formatRupiah(loker.budget_max);
+    } else if (loker.budget_min) {
+        budgetText = 'Min ' + formatRupiah(loker.budget_min);
+    } else if (loker.budget_max) {
+        budgetText = 'Maks ' + formatRupiah(loker.budget_max);
+    }
+
+    let statusBadge = '';
+    if (loker.has_applied) {
+        const label = loker.my_status === 'Approved' ? 'Diterima' : (loker.my_status === 'Rejected' ? 'Ditolak' : 'Menunggu');
+        statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-indigo-100 text-indigo-700 uppercase tracking-wider">${label}</span>`;
+    }
+
+    let actionHtml = '';
+    if (!loker.has_applied) {
+        actionHtml = `
+            <div class="flex justify-end gap-3 pt-4 border-t border-slate-100">
+                <button type="button" onclick="closeDetailModal()"
+                    class="px-5 py-2.5 rounded-[12px] border border-slate-200 text-slate-600 font-bold text-[13px] hover:bg-slate-50 transition-all">
+                    Tutup
+                </button>
+                <button type="button" onclick="closeDetailModal(); openApplyModal(${loker.id});"
+                    class="px-6 py-2.5 rounded-[12px] bg-[#0f766e] text-white font-bold text-[13px] hover:bg-[#0a5e58] transition-all shadow-sm">
+                    <i class="ri-send-plane-fill mr-1"></i> Lamar Sekarang
+                </button>
+            </div>`;
+    } else {
+        actionHtml = `
+            <div class="flex justify-end pt-4 border-t border-slate-100">
+                <button type="button" onclick="closeDetailModal()"
+                    class="px-5 py-2.5 rounded-[12px] border border-slate-200 text-slate-600 font-bold text-[13px] hover:bg-slate-50 transition-all">
+                    Tutup
+                </button>
+            </div>`;
+    }
+
+    const box = document.getElementById('detail-loker-box');
+    box.innerHTML = `
+        <div class="p-6 border-b border-slate-100">
+            <div class="flex items-center gap-2 mb-2 flex-wrap">
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider ${loker.status === 'Open' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'}">
+                    ${loker.status}
+                </span>
+                ${loker.category ? `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-50 text-blue-600 uppercase tracking-wider">${loker.category}</span>` : ''}
+                ${statusBadge}
+            </div>
+            <h2 class="text-[1.25rem] font-black text-slate-900 leading-tight">${loker.title}</h2>
+        </div>
+        <div class="p-6 overflow-y-auto max-h-[calc(85vh-200px)]">
+            <div class="flex flex-wrap gap-4 mb-4 text-[13px] text-slate-600">
+                <span class="flex items-center gap-1.5 font-bold"><i class="ri-user-line text-slate-400"></i> ${loker.client_name}</span>
+                ${budgetText ? `<span class="flex items-center gap-1.5 font-bold text-[#0f766e]"><i class="ri-money-rupee-circle-line"></i> ${budgetText}</span>` : ''}
+                ${loker.deadline ? `<span class="flex items-center gap-1.5 font-semibold"><i class="ri-calendar-line text-slate-400"></i> Batas: ${loker.deadline}</span>` : ''}
+                <span class="flex items-center gap-1.5 font-semibold"><i class="ri-time-line text-slate-400"></i> ${loker.created_at}</span>
+            </div>
+            <div class="border-t border-slate-100 pt-4">
+                <h3 class="text-[11px] font-extrabold text-slate-500 uppercase tracking-[.1em] mb-2">Deskripsi</h3>
+                <p class="text-[13.5px] text-slate-700 leading-relaxed whitespace-pre-line">${loker.description}</p>
+            </div>
+            ${actionHtml}
+        </div>
+    `;
+
+    document.getElementById('detail-loker-overlay').classList.remove('opacity-0', 'pointer-events-none');
+}
+
+function closeDetailModal() {
+    document.getElementById('detail-loker-overlay').classList.add('opacity-0', 'pointer-events-none');
+}
+
+document.addEventListener('click', function(e) {
+    if (e.target.id === 'detail-loker-overlay') closeDetailModal();
+});
+
 function openApplyModal(id) {
     document.getElementById('apply-modal-' + id).classList.remove('hidden');
     document.getElementById('apply-modal-' + id).classList.add('flex');

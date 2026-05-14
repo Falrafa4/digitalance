@@ -177,4 +177,53 @@
         });
     });
 
+// ─── Client-side Pager ──────────────────────────────────────
+    document.querySelectorAll('[data-client-pager]').forEach(function (container) {
+        var list = container.querySelector('[data-pager-list]');
+        var items = list ? Array.from(list.querySelectorAll('[data-pager-item]')) : [];
+        var pageSize = parseInt(container.dataset.pageSize) || 8;
+        var currentPage = 1;
+        var totalPages = Math.max(1, Math.ceil(items.length / pageSize));
+
+        function showPage(page) {
+            currentPage = Math.max(1, Math.min(page, totalPages));
+            var start = (currentPage - 1) * pageSize;
+            var end = start + pageSize;
+            items.forEach(function (item, i) {
+                item.style.display = (i >= start && i < end) ? '' : 'none';
+            });
+            updateControls();
+        }
+
+        function updateControls() {
+            var info = container.querySelector('[data-pager-info]');
+            if (info) {
+                var start = items.length > 0 ? (currentPage - 1) * pageSize + 1 : 0;
+                var end = Math.min(currentPage * pageSize, items.length);
+                info.textContent = items.length > 0 ? 'Showing ' + start + '-' + end + ' of ' + items.length : 'No items';
+            }
+            var prev = container.querySelector('[data-pager-prev]');
+            var next = container.querySelector('[data-pager-next]');
+            if (prev) prev.disabled = currentPage <= 1;
+            if (next) next.disabled = currentPage >= totalPages;
+            var numbers = container.querySelector('[data-pager-numbers]');
+            if (numbers) {
+                numbers.innerHTML = '';
+                for (var i = 1; i <= totalPages; i++) {
+                    var btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'w-9 h-9 rounded-[10px] font-bold text-[12px] transition-all ' +
+                        (i === currentPage ? 'bg-slate-900 text-white' : 'bg-white border border-slate-200 text-slate-700 hover:border-[#0f766e] hover:text-[#0f766e]');
+                    btn.textContent = i;
+                    btn.onclick = (function (p) { return function () { showPage(p); }; })(i);
+                    numbers.appendChild(btn);
+                }
+            }
+        }
+
+        container.querySelector('[data-pager-prev]')?.addEventListener('click', function () { showPage(currentPage - 1); });
+        container.querySelector('[data-pager-next]')?.addEventListener('click', function () { showPage(currentPage + 1); });
+        showPage(1);
+    });
+
 })();

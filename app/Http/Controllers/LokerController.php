@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Loker;
 use App\Models\LokerApplication;
+use App\Models\Notification;
 use App\Models\ServiceCategory;
 use Illuminate\Http\Request;
 
@@ -102,6 +103,15 @@ class LokerController extends Controller
         $application->update(['status' => 'Approved']);
         $application->loker->update(['status' => 'Closed']);
 
+        Notification::create([
+            'title' => 'Lamaran Disetujui',
+            'message' => 'Client telah menyetujui lamaranmu untuk: ' . $application->loker->title,
+            'type' => 'success',
+            'role' => 'freelancer',
+            'user_id' => $application->freelancer_id,
+            'link' => '/freelancer/loker/my/applications',
+        ]);
+
         return back()->with('success', 'Lamaran freelancer berhasil disetujui!');
     }
 
@@ -111,6 +121,15 @@ class LokerController extends Controller
         abort_unless($application->loker->client_id === $client->id, 403);
 
         $application->update(['status' => 'Rejected']);
+
+        Notification::create([
+            'title' => 'Lamaran Ditolak',
+            'message' => 'Maaf, lamaranmu untuk: ' . $application->loker->title . ' tidak disetujui.',
+            'type' => 'warning',
+            'role' => 'freelancer',
+            'user_id' => $application->freelancer_id,
+            'link' => '/freelancer/loker/my/applications',
+        ]);
 
         return back()->with('success', 'Lamaran freelancer ditolak.');
     }
@@ -189,6 +208,15 @@ class LokerController extends Controller
             'proposal' => $validated['proposal'],
             'proposed_price' => $validated['proposed_price'] ?? null,
             'status' => 'Pending',
+        ]);
+
+        Notification::create([
+            'title' => 'Lamaran Baru',
+            'message' => $freelancer->skomda_student->name . ' melamar: ' . $loker->title,
+            'type' => 'success',
+            'role' => 'client',
+            'user_id' => $loker->client_id,
+            'link' => '/client/loker',
         ]);
 
         return redirect()->route('freelancer.loker.index')->with('success', 'Lamaran berhasil dikirim!');
