@@ -186,7 +186,7 @@
                 <div class="mt-6 bg-white border border-slate-200 rounded-[18px] p-5">
                     <p class="text-[12px] font-extrabold text-slate-400 uppercase tracking-[.12em]">Quick Actions</p>
                     <div class="mt-4 flex flex-col gap-2.5">
-                        <a href="{{ route('client.services.index') }}"
+                        <a href="{{ route('client.talents.index') }}"
                            class="flex items-center justify-between px-4 py-3 rounded-[14px] bg-slate-50 border border-slate-200 hover:border-[#0f766e] transition-all">
                             <span class="font-bold text-[13px] text-slate-800">Find Talent</span>
                             <i class="ri-arrow-right-line text-slate-400" aria-hidden="true"></i>
