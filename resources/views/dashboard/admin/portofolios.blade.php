@@ -53,7 +53,7 @@
                             <div class="port-overlay opacity-0 w-full">
                                 <span class="block text-white text-[13px] font-bold mb-1"><i class="ri-eye-line mr-1"></i> View Work Details</span>
                                 <div class="flex items-center gap-2">
-                                    <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(p.service?.freelancer?.skomda_student?.name || 'F')}&background=0f766e&color=fff" class="w-5 h-5 rounded-full" />
+                                    <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(p.service?.freelancer?.skomda_student?.name || p.service?.freelancer?.skomda_student?.email || 'Freelancer')}&background=0f766e&color=fff" class="w-5 h-5 rounded-full" />
                                     <span class="text-white/80 text-[11px] font-medium">{{ $p->service->freelancer->skomda_student->name ?? 'Freelancer' }}</span>
                                 </div>
                             </div>
@@ -151,7 +151,7 @@
                     <div class="p-7">
                         <div class="grid grid-cols-2 gap-3.5 mb-7">
                             <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-100 flex items-center gap-3">
-                                <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(p.service?.freelancer?.skomda_student?.name || 'F')}&background=0f766e&color=fff" class="w-9 h-9 rounded-xl" />
+                                <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(p.service?.freelancer?.skomda_student?.name || p.service?.freelancer?.skomda_student?.email || 'Freelancer')}&background=0f766e&color=fff" class="w-9 h-9 rounded-xl" />
                                 <div class="min-w-0">
                                     <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Freelancer</p>
                                     <p class="text-[12px] font-black text-slate-800 truncate">${p.service?.freelancer?.skomda_student?.name || 'N/A'}</p>

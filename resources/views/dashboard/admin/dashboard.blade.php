@@ -87,11 +87,17 @@
             <div class="flex items-center justify-between mb-8">
                 <div>
                     <h2 class="font-display text-[1.4rem] font-extrabold text-slate-900">Platform Revenue</h2>
-                    <p class="text-slate-500 text-xs">Visualisasi pendapatan platform (10% fee) dalam 6 bulan terakhir.</p>
+                    <p class="text-slate-500 text-xs">Visualisasi pendapatan platform (10% fee).</p>
                 </div>
-                <div class="flex items-center gap-2">
-                    <span class="w-3 h-3 rounded-full bg-[#0f766e]"></span>
-                    <span class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Revenue Growth</span>
+                <div class="flex items-center gap-3">
+                    <div class="flex bg-slate-100 rounded-lg p-1">
+                        <button type="button" onclick="switchChartView('weekly')" id="chart-weekly-btn" class="px-3 py-1.5 rounded-md text-xs font-bold text-slate-500 hover:text-[#0f766e] transition-all">Mingguan</button>
+                        <button type="button" onclick="switchChartView('monthly')" id="chart-monthly-btn" class="px-3 py-1.5 rounded-md text-xs font-bold bg-white text-[#0f766e] shadow-sm transition-all">Bulanan</button>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full bg-[#0f766e]"></span>
+                        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Revenue Growth</span>
+                    </div>
                 </div>
             </div>
             <div class="h-[320px] w-full">
@@ -260,7 +266,10 @@
 @section('scripts')
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        window.__DASHBOARD_CHART_DATA__ = @json($monthlyTurnover);
+        window.__DASHBOARD_CHART_DATA__ = {
+            monthly: @json($monthlyTurnover),
+            weekly: @json($weeklyTurnover)
+        };
     </script>
     <script src="{{ asset('js/dashboard/admin/dashboard.js') }}"></script>
 @endsection

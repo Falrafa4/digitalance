@@ -220,7 +220,7 @@
                             <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100 mb-6">
                                 <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Service Provider</span>
                                 <div class="flex items-center gap-4">
-                                    <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(s.freelancer?.skomda_student?.name || 'F')}&background=0f766e&color=fff" class="w-11 h-11 rounded-xl shadow-sm" />
+                                    <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(s.freelancer?.skomda_student?.name || s.freelancer?.skomda_student?.email || 'Freelancer')}&background=0f766e&color=fff" class="w-11 h-11 rounded-xl shadow-sm" />
                                     <div>
                                         <p class="text-[14px] font-black text-slate-800">${s.freelancer?.skomda_student?.name || 'N/A'}</p>
                                         <p class="text-[11px] font-bold text-slate-400 uppercase tracking-tight">${s.freelancer?.skomda_student?.major || 'Freelancer'}</p>

@@ -869,4 +869,41 @@
             </div>
         </div>
     </section>
+
+    @if($showLogoutModal ?? false)
+    <div id="logout-confirm-modal" class="fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"></div>
+        <div class="relative bg-white rounded-[24px] w-full max-w-md p-8 shadow-2xl transform transition-all">
+            <div class="text-center">
+                <div class="w-16 h-16 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-5">
+                    <i class="ri-logout-box-line text-3xl text-amber-500"></i>
+                </div>
+                <h3 class="font-display text-xl font-extrabold text-slate-900 mb-2">Kembali ke Landing Page?</h3>
+                <p class="text-slate-500 text-sm leading-relaxed mb-6">
+                    Kamu saat ini sedang login sebagai 
+                    <span class="font-bold text-slate-700">
+                        @if(($userRole ?? '') === 'admin') Administrator
+                        @elseif(($userRole ?? '') === 'client') Client
+                        @elseif(($userRole ?? '') === 'freelancer') Freelancer
+                        @else User
+                        @endif
+                    </span>. 
+                    <br>Kembali ke landing page akan melakukan logout, lanjutkan atau tidak?
+                </p>
+                <div class="flex gap-3">
+                    <button onclick="window.location.href='{{ route('dashboard') }}'" 
+                            class="flex-1 py-3 rounded-[14px] bg-slate-100 text-slate-700 font-bold text-sm hover:bg-slate-200 transition-all">
+                        Batal & Dashboard
+                    </button>
+                    <form action="{{ route('logout') }}" method="POST" class="flex-1">
+                        @csrf
+                        <button type="submit" class="w-full py-3 rounded-[14px] bg-amber-500 text-white font-bold text-sm hover:bg-amber-600 transition-all shadow-lg shadow-amber-200">
+                            Ya, Logout
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
 @endsection

@@ -54,6 +54,18 @@ class DashboardController extends Controller
             ->orderBy('month')
             ->get();
 
+        // Weekly Revenue Chart Data (last 12 weeks)
+        $weeklyTurnover = Transaction::where('status', 'Paid')
+            ->selectRaw('SUM(amount * 0.10) as total, YEARWEEK(created_at, 1) as yearweek, DATE_FORMAT(created_at, "%Y-%m-%d") as week_start')
+            ->where('created_at', '>=', now()->subWeeks(12))
+            ->groupBy('yearweek', 'week_start')
+            ->orderBy('yearweek')
+            ->get()
+            ->map(function ($item) {
+                $item->week_label = \Carbon\Carbon::parse($item->week_start)->format('d M');
+                return $item;
+            });
+
         return view('dashboard.admin.dashboard', compact(
             'totalUsers',
             'totalClients',
@@ -68,7 +80,8 @@ class DashboardController extends Controller
             'recentTransactions',
             'todayOrders',
             'todayRevenue',
-            'monthlyTurnover'
+            'monthlyTurnover',
+            'weeklyTurnover'
         ));
     }
 

@@ -10,19 +10,21 @@ class PageController
 {
     public function home()
     {
+        $showLogoutModal = false;
+        $userRole = null;
+
         if (auth('administrator')->check()) {
-            return redirect()->route('admin.dashboard');
+            $showLogoutModal = true;
+            $userRole = 'admin';
+        } elseif (auth('client')->check()) {
+            $showLogoutModal = true;
+            $userRole = 'client';
+        } elseif (auth('freelancer')->check()) {
+            $showLogoutModal = true;
+            $userRole = 'freelancer';
         }
 
-        if (auth('client')->check()) {
-            return redirect()->route('client.dashboard');
-        }
-
-        if (auth('freelancer')->check()) {
-            return redirect()->route('freelancer.dashboard');
-        }
-
-        return view('public.home');
+        return view('public.home', compact('showLogoutModal', 'userRole'));
     }
 
     public function login()

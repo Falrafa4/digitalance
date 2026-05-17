@@ -217,46 +217,75 @@
         }
     };
 
+    var chartInstance = null;
+    var currentView = 'monthly';
+
     function initChart() {
         var ctx = document.getElementById('performanceChart');
         if (!ctx) return;
         if (typeof Chart === 'undefined') return;
 
-        var chartData = window.__DASHBOARD_CHART_DATA__ || [];
+        updateChart(ctx, currentView);
+    }
+
+    function updateChart(ctx, view) {
+        var chartData = window.__DASHBOARD_CHART_DATA__ || {};
+        var data = view === 'weekly' ? (chartData.weekly || []) : (chartData.monthly || []);
         var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         var labels = [];
         var totals = [];
 
-        if (chartData && chartData.length > 0) {
-            labels = chartData.map(function (d) { return months[d.month - 1] + ' ' + d.year; });
-            totals = chartData.map(function (d) { return parseFloat(d.total); });
+        if (view === 'weekly' && data.length > 0) {
+            labels = data.map(function (d) { return d.week_label; });
+            totals = data.map(function (d) { return parseFloat(d.total); });
+        } else if (view === 'monthly' && data.length > 0) {
+            labels = data.map(function (d) { return months[d.month - 1] + ' ' + d.year; });
+            totals = data.map(function (d) { return parseFloat(d.total); });
         }
 
         if (labels.length === 0) {
             var now = new Date();
-            for (var i = 5; i >= 0; i--) {
-                var d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-                labels.push(months[d.getMonth()] + ' ' + d.getFullYear());
+            var periods = view === 'weekly' ? 12 : 6;
+            for (var i = periods - 1; i >= 0; i--) {
+                if (view === 'weekly') {
+                    var d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - (i * 7));
+                    labels.push(d.getDate() + ' ' + months[d.getMonth()]);
+                } else {
+                    var d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                    labels.push(months[d.getMonth()] + ' ' + d.getFullYear());
+                }
                 totals.push(0);
             }
         }
 
-        new Chart(ctx, {
+        if (chartInstance) {
+            chartInstance.destroy();
+        }
+
+        chartInstance = new Chart(ctx, {
             type: 'line',
             data: {
                 labels: labels,
                 datasets: [{
-                    label: 'Platform Revenue',
+                    label: view === 'weekly' ? 'Revenue Mingguan' : 'Revenue Bulanan',
                     data: totals,
                     borderColor: '#0f766e',
-                    backgroundColor: 'rgba(15, 118, 110, 0.05)',
-                    borderWidth: 4,
+                    backgroundColor: function(context) {
+                        var chart = context.chart;
+                        var {ctx, chartArea} = chart;
+                        if (!chartArea) return 'rgba(15, 118, 110, 0.05)';
+                        var gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
+                        gradient.addColorStop(0, 'rgba(15, 118, 110, 0)');
+                        gradient.addColorStop(1, 'rgba(15, 118, 110, 0.15)');
+                        return gradient;
+                    },
+                    borderWidth: 3,
                     pointBackgroundColor: '#fff',
                     pointBorderColor: '#0f766e',
                     pointBorderWidth: 2,
-                    pointRadius: 6,
-                    pointHoverRadius: 8,
-                    tension: 0.4,
+                    pointRadius: 5,
+                    pointHoverRadius: 7,
+                    tension: 0.35,
                     fill: true
                 }]
             },
@@ -296,8 +325,10 @@
                     x: {
                         grid: { display: false, drawBorder: false },
                         ticks: {
-                            font: { size: 11, family: 'Plus Jakarta Sans', weight: 'bold' },
-                            color: '#64748b'
+                            font: { size: 10, family: 'Plus Jakarta Sans', weight: 'bold' },
+                            color: '#64748b',
+                            maxRotation: 45,
+                            minRotation: 0
                         }
                     }
                 }
@@ -305,9 +336,33 @@
         });
     }
 
+    window.switchChartView = function(view) {
+        currentView = view;
+        var ctx = document.getElementById('performanceChart');
+        var weeklyBtn = document.getElementById('chart-weekly-btn');
+        var monthlyBtn = document.getElementById('chart-monthly-btn');
+
+        if (view === 'weekly') {
+            weeklyBtn.classList.add('bg-white', 'text-[#0f766e]', 'shadow-sm');
+            weeklyBtn.classList.remove('text-slate-500');
+            monthlyBtn.classList.remove('bg-white', 'text-[#0f766e]', 'shadow-sm');
+            monthlyBtn.classList.add('text-slate-500');
+        } else {
+            monthlyBtn.classList.add('bg-white', 'text-[#0f766e]', 'shadow-sm');
+            monthlyBtn.classList.remove('text-slate-500');
+            weeklyBtn.classList.remove('bg-white', 'text-[#0f766e]', 'shadow-sm');
+            weeklyBtn.classList.add('text-slate-500');
+        }
+
+        if (ctx) {
+            updateChart(ctx, view);
+        }
+    };
+
     function init() {
         initAdminDashboard();
         setTimeout(initChart, 100);
+        window.switchChartView = switchChartView;
     }
 
     if (document.readyState === 'loading') {
