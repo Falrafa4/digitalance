@@ -159,7 +159,7 @@
                             <div class="flex items-center justify-between mb-4">
                                 <div class="flex items-center gap-3.5">
                                     <img class="w-11 h-11 rounded-xl object-cover border-2 border-slate-50 shadow-sm" alt="Avatar"
-                                        src="https://ui-avatars.com/api/?name={{ urlencode($v->skomda_student->name ?? 'F') }}&background=0f766e&color=fff" />
+                                        src="https://ui-avatars.com/api/?name={{ urlencode($v->skomda_student->name ?? $v->skomda_student->email ?? 'User') }}&background=0f766e&color=fff" />
                                     <div class="min-w-0">
                                         <span class="font-bold text-[14px] text-slate-900 user-name block truncate">{{ $v->skomda_student->name ?? 'Freelancer' }}</span>
                                         <p class="text-[11px] text-slate-400 font-medium uppercase tracking-tight">{{ $v->skomda_student->major ?? 'Siswa Skomda' }}</p>

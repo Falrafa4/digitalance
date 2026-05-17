@@ -552,6 +552,30 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    // LOGIN FORM LOADING STATE
+    const loginForm = document.getElementById('loginForm');
+    if (loginForm) {
+        const loginSubmitBtn = loginForm.querySelector('button[type="submit"]');
+        loginForm.addEventListener('submit', function() {
+            if (loginSubmitBtn) {
+                loginSubmitBtn.disabled = true;
+                loginSubmitBtn.innerHTML = '<svg class="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" stroke-opacity="0.25"/><path d="M12 2a10 10 0 0 1 10 10"/></svg> Memproses...';
+                loginSubmitBtn.classList.add('opacity-75', 'cursor-not-allowed');
+            }
+        });
+    }
+
+    // REGISTER FORM LOADING STATE
+    if (registerForm) {
+        registerForm.addEventListener('submit', function() {
+            if (registerSubmitBtn) {
+                registerSubmitBtn.disabled = true;
+                registerSubmitBtn.innerHTML = '<svg class="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" stroke-opacity="0.25"/><path d="M12 2a10 10 0 0 1 10 10"/></svg> Memproses...';
+                registerSubmitBtn.classList.add('opacity-75', 'cursor-not-allowed');
+            }
+        });
+    }
+
     // INIT panel logic
     let initMode = "login";
     let initRole = "client";

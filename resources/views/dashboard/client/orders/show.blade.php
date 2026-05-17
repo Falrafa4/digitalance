@@ -260,7 +260,7 @@
           @endforelse
         </div>
 
-        <form action="{{ route('client.messages.send') }}" class="mt-5 flex flex-col sm:flex-row gap-3">
+        <form action="{{ route('client.messages.send') }}" method="POST" class="mt-5 flex flex-col sm:flex-row gap-3">
           @csrf
           <input type="hidden" name="order_id" value="{{ $order->id }}"/>
           <input type="text" name="message" class="flex-1 px-4 py-2.5 rounded-[12px] bg-slate-50 border border-slate-200 focus:border-[#0f766e] outline-none" placeholder="Tulis pesan...">

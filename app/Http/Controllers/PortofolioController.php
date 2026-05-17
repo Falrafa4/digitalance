@@ -39,7 +39,22 @@ class PortofolioController extends Controller
 
     public function store(StorePortofolioRequest $request)
     {
-        Portofolio::create($request->validated());
+        $validated = $request->validated();
+        $freelancer = auth('freelancer')->user();
+
+        $service = \App\Models\Service::where('id', $validated['service_id'])
+            ->where('freelancer_id', $freelancer->id)
+            ->first();
+
+        if (! $service) {
+            return redirect()->route('freelancer.portofolios.index')->with('error', 'Layanan tidak ditemukan atau bukan milik Anda.');
+        }
+
+        if ($request->hasFile('media_file')) {
+            $validated['media_url'] = $request->file('media_file')->store('portofolios', 'public');
+        }
+
+        Portofolio::create($validated);
 
         return redirect()->route('freelancer.portofolios.index')->with('success', 'Portofolio berhasil ditambahkan');
     }

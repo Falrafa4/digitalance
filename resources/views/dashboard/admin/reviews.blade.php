@@ -60,7 +60,7 @@
                 <div class="bg-white border border-slate-200 rounded-[24px] p-6 hover:shadow-lg transition-all duration-300">
                     <div class="flex items-start justify-between mb-5">
                         <div class="flex items-center gap-3.5">
-                            <img src="https://ui-avatars.com/api/?name={{ urlencode($review->order->client->name ?? 'C') }}&background=0f766e&color=fff" class="w-11 h-11 rounded-xl shadow-sm" />
+                            <img src="https://ui-avatars.com/api/?name={{ urlencode($review->order->client->name ?? $review->order->client->email ?? 'User') }}&background=0f766e&color=fff" class="w-11 h-11 rounded-xl shadow-sm" />
                             <div>
                                 <h3 class="font-bold text-slate-900 text-[14.5px]">{{ $review->order->client->name ?? 'Client' }}</h3>
                                 <p class="text-slate-400 text-[11px] font-bold uppercase tracking-wider mt-0.5">Order #{{ $review->order_id }}</p>

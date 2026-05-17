@@ -23,9 +23,10 @@ class StorePortofolioRequest extends FormRequest
     {
         return [
             'service_id' => 'required|exists:services,id',
-            'title' => 'required|string',
-            'description' => 'required|string',
-            'media_url' => 'required|url',
+            'title' => 'required|string|max:255',
+            'description' => 'required|string|max:2000',
+            'media_url' => 'nullable|url',
+            'media_file' => 'nullable|file|mimes:jpeg,png,jpg,gif,webp|max:5120',
         ];
     }
 }

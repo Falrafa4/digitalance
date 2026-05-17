@@ -80,8 +80,6 @@ class AuthController extends Controller
             $query->where('email', $credentials['email']);
         })->first();
 
-        // dd($freelancer);
-
         if ($freelancer && Hash::check($credentials['password'], $freelancer->password)) {
             Auth::guard('freelancer')->login($freelancer);
             $request->session()->regenerate();
@@ -90,10 +88,20 @@ class AuthController extends Controller
                 ->with('success', 'Login sebagai freelancer berhasil');
         }
 
+        $clientExists = Client::where('email', $credentials['email'])->exists();
+        $adminExists = \App\Models\Administrator::where('email', $credentials['email'])->exists();
+
+        if ($clientExists || $adminExists || $freelancer) {
+            return back()
+                ->withErrors(['email' => 'Password yang kamu masukkan salah. Silakan coba lagi.'])
+                ->withInput()
+                ->with('error', 'Password salah');
+        }
+
         return back()
-            ->withErrors(['email' => 'Email atau Password salah, atau akun belum terdaftar!'])
+            ->withErrors(['email' => 'Email tidak ditemukan. Silakan daftar terlebih dahulu.'])
             ->withInput()
-            ->with('error', 'Login gagal');
+            ->with('error', 'Akun tidak terdaftar');
     }
 
     public function logout(Request $request)

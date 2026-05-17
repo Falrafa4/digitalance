@@ -23,8 +23,8 @@
                 </div>
                 <div class="flex items-center gap-3 bg-white p-2 rounded-2xl border border-slate-200">
                     <div class="flex -space-x-2">
-                        <img src="https://ui-avatars.com/api/?name={{ urlencode($result->order->client->name ?? 'C') }}&background=6366f1&color=fff" class="w-8 h-8 rounded-full border-2 border-white" title="Client" />
-                        <img src="https://ui-avatars.com/api/?name={{ urlencode($result->order->service->freelancer->skomda_student->name ?? 'F') }}&background=0f766e&color=fff" class="w-8 h-8 rounded-full border-2 border-white" title="Freelancer" />
+                        <img src="https://ui-avatars.com/api/?name={{ urlencode($result->order->client->name ?? $result->order->client->email ?? 'User') }}&background=6366f1&color=fff" class="w-8 h-8 rounded-full border-2 border-white" title="Client" />
+                        <img src="https://ui-avatars.com/api/?name={{ urlencode($result->order->service->freelancer->skomda_student->name ?? $result->order->service->freelancer->skomda_student->email ?? 'User') }}&background=0f766e&color=fff" class="w-8 h-8 rounded-full border-2 border-white" title="Freelancer" />
                     </div>
                     <div class="pr-2">
                         <span class="text-[11px] font-bold text-slate-400 uppercase">Collaboration</span>

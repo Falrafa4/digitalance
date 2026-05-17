@@ -10,6 +10,18 @@ class PageController
 {
     public function home()
     {
+        if (auth('administrator')->check()) {
+            return redirect()->route('admin.dashboard');
+        }
+
+        if (auth('client')->check()) {
+            return redirect()->route('client.dashboard');
+        }
+
+        if (auth('freelancer')->check()) {
+            return redirect()->route('freelancer.dashboard');
+        }
+
         return view('public.home');
     }
 

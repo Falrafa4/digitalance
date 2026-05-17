@@ -69,7 +69,7 @@
                     </h3>
 
                     <div class="flex items-center gap-2 mb-6">
-                        <img src="https://ui-avatars.com/api/?name={{ urlencode($s->freelancer->skomda_student->name ?? 'F') }}&background=0f766e&color=fff"
+                        <img src="https://ui-avatars.com/api/?name={{ urlencode($s->freelancer->skomda_student->name ?? $s->freelancer->skomda_student->email ?? 'User') }}&background=0f766e&color=fff"
                             class="w-6 h-6 rounded-lg" />
                         <span
                             class="text-xs font-semibold text-slate-500">{{ $s->freelancer->skomda_student->name ?? 'Freelancer' }}</span>

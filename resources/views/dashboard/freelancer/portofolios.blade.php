@@ -75,11 +75,22 @@
                 <label class="block text-[13px] font-bold text-slate-700 mb-1.5">Deskripsi</label>
                 <textarea name="description" rows="3" class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-[14px] focus:border-[#0f766e] outline-none resize-none"></textarea>
             </div>
-            <!-- Untuk gambar, disesuaikan backend. Asumsikan name="media_url" bisa upload file jika controller dukung, tapi Request nya mungkin butuh file. Cek Dulu, kita biarkan text / file standar -->
             <div>
-                <label class="block text-[13px] font-bold text-slate-700 mb-1.5">Gambar / Media (URL)</label>
-                <input type="text" name="media_url" placeholder="Masukkan URL gambar atau tinggalkan kosong" class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-[14px] focus:border-[#0f766e] outline-none">
-                <span class="text-xs text-slate-400 mt-1 block">Catatan: Ganti dengan input type="file" jika backend mendukung upload media.</span>
+                <label class="block text-[13px] font-bold text-slate-700 mb-1.5">Gambar / Media</label>
+                <div id="portofolio-dropzone" class="border-2 border-dashed border-slate-300 rounded-xl p-6 text-center hover:border-[#0f766e] hover:bg-teal-50/30 transition-all cursor-pointer">
+                    <input type="file" name="media_file" id="media_file_input" accept="image/*" class="hidden">
+                    <input type="hidden" name="media_url" id="media_url_hidden">
+                    <div id="dropzone-placeholder">
+                        <i class="ri-image-add-line text-3xl text-slate-400 mb-2"></i>
+                        <p class="text-slate-500 text-sm font-medium">Drag & drop atau <span class="text-[#0f766e] font-bold">klik untuk upload</span></p>
+                        <p class="text-slate-400 text-xs mt-1">PNG, JPG, GIF, WebP (Maks. 5MB)</p>
+                    </div>
+                    <div id="dropzone-preview" class="hidden">
+                        <img id="dropzone-preview-img" src="" alt="Preview" class="max-h-40 mx-auto rounded-lg mb-2">
+                        <p id="dropzone-filename" class="text-sm text-slate-600 font-medium"></p>
+                        <button type="button" onclick="clearPortofolioFile()" class="text-xs text-red-500 font-bold mt-1 hover:underline">Hapus</button>
+                    </div>
+                </div>
             </div>
             <div class="flex gap-3 pt-4">
                 <button type="button" onclick="document.getElementById('modal-add').classList.remove('open', 'opacity-100'); document.getElementById('modal-add').classList.add('hidden')" class="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-slate-700 font-bold text-sm hover:bg-slate-50 transition-colors">Batal</button>
@@ -138,5 +149,74 @@
         const overlay = document.getElementById('modal-delete-port-overlay');
         overlay.classList.add('opacity-0', 'pointer-events-none');
     };
+
+    // Portofolio file upload handling
+    (function() {
+        const dropzone = document.getElementById('portofolio-dropzone');
+        const fileInput = document.getElementById('media_file_input');
+        const preview = document.getElementById('dropzone-preview');
+        const previewImg = document.getElementById('dropzone-preview-img');
+        const filename = document.getElementById('dropzone-filename');
+        const placeholder = document.getElementById('dropzone-placeholder');
+
+        if (!dropzone || !fileInput) return;
+
+        dropzone.addEventListener('click', function(e) {
+            if (e.target.tagName !== 'BUTTON') {
+                fileInput.click();
+            }
+        });
+
+        fileInput.addEventListener('change', function() {
+            handleFile(this.files[0]);
+        });
+
+        dropzone.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            dropzone.classList.add('border-[#0f766e]', 'bg-teal-50/30');
+        });
+
+        dropzone.addEventListener('dragleave', function() {
+            dropzone.classList.remove('border-[#0f766e]', 'bg-teal-50/30');
+        });
+
+        dropzone.addEventListener('drop', function(e) {
+            e.preventDefault();
+            dropzone.classList.remove('border-[#0f766e]', 'bg-teal-50/30');
+            if (e.dataTransfer.files.length) {
+                fileInput.files = e.dataTransfer.files;
+                handleFile(e.dataTransfer.files[0]);
+            }
+        });
+
+        function handleFile(file) {
+            if (!file) return;
+            if (!file.type.startsWith('image/')) {
+                window.showToast?.('Hanya file gambar yang diperbolehkan.', 'warning');
+                return;
+            }
+            if (file.size > 5 * 1024 * 1024) {
+                window.showToast?.('Ukuran file maksimal 5MB.', 'warning');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewImg.src = e.target.result;
+                filename.textContent = file.name;
+                placeholder.classList.add('hidden');
+                preview.classList.remove('hidden');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        window.clearPortofolioFile = function() {
+            fileInput.value = '';
+            previewImg.src = '';
+            filename.textContent = '';
+            placeholder.classList.remove('hidden');
+            preview.classList.add('hidden');
+        };
+    })();
 </script>
 @endsection

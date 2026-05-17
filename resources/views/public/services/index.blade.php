@@ -109,13 +109,47 @@
             </div>
 
             @if($services->isEmpty())
-                <div class="bg-white rounded-[1.75rem] border border-dashed border-slate-300 p-10 text-center">
-                    <h3 class="font-extrabold text-xl text-slate-900">Belum ada layanan yang cocok</h3>
-                    <p class="text-slate-500 mt-2">Coba ubah kata kunci atau pilih kategori lain.</p>
-                    <a href="{{ route('services.index') }}"
-                        class="inline-flex items-center justify-center mt-6 px-6 py-3 rounded-2xl bg-slate-900 text-white font-bold hover:bg-black transition-all">
-                        Reset Filter
-                    </a>
+                <div class="bg-white rounded-[1.75rem] border border-dashed border-slate-300 p-12 text-center">
+                    <div class="w-20 h-20 rounded-full bg-slate-50 flex items-center justify-center mx-auto mb-5 text-slate-300 text-[42px]">
+                        <i class="ri-search-line"></i>
+                    </div>
+                    <h3 class="font-extrabold text-xl text-slate-900 mb-2">
+                        @if($search || $categoryId)
+                            Tidak ada layanan yang cocok
+                        @else
+                            Belum ada layanan tersedia
+                        @endif
+                    </h3>
+                    <p class="text-slate-500 mt-2 max-w-md mx-auto">
+                        @if($search || $categoryId)
+                            Coba ubah kata kunci atau pilih kategori lain untuk menemukan layanan yang kamu cari.
+                        @else
+                            Layanan akan muncul di sini setelah freelancer membuat dan admin menyetujui layanan mereka.
+                        @endif
+                    </p>
+                    <div class="flex flex-wrap gap-3 justify-center mt-6">
+                        @if($search || $categoryId)
+                            <a href="{{ route('services.index') }}"
+                                class="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-slate-900 text-white font-bold hover:bg-black transition-all">
+                                <i class="ri-refresh-line"></i> Reset Filter
+                            </a>
+                        @endif
+                        <a href="{{ route('home') }}#join"
+                            class="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-emerald-500 text-white font-bold hover:bg-emerald-600 transition-all">
+                            <i class="ri-add-line"></i> Mulai Freelance
+                        </a>
+                    </div>
+                    @if($search)
+                        <div class="mt-6 pt-6 border-t border-slate-100">
+                            <p class="text-sm text-slate-400 mb-3">Pencarian populer:</p>
+                            <div class="flex flex-wrap gap-2 justify-center">
+                                <a href="{{ route('services.index', ['q' => 'Web Dev']) }}" class="px-3 py-1.5 rounded-full bg-slate-100 text-slate-600 text-xs font-bold hover:bg-slate-200 transition-all">#Web Dev</a>
+                                <a href="{{ route('services.index', ['q' => 'Logo Design']) }}" class="px-3 py-1.5 rounded-full bg-slate-100 text-slate-600 text-xs font-bold hover:bg-slate-200 transition-all">#Logo Design</a>
+                                <a href="{{ route('services.index', ['q' => 'Video Editor']) }}" class="px-3 py-1.5 rounded-full bg-slate-100 text-slate-600 text-xs font-bold hover:bg-slate-200 transition-all">#Video Editor</a>
+                                <a href="{{ route('services.index', ['q' => 'UI/UX']) }}" class="px-3 py-1.5 rounded-full bg-slate-100 text-slate-600 text-xs font-bold hover:bg-slate-200 transition-all">#UI/UX</a>
+                            </div>
+                        </div>
+                    @endif
                 </div>
             @else
                 <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
