@@ -46,13 +46,18 @@
         ?? Auth::guard('freelancer')->user();
     $notifRole = Auth::guard('administrator')->check() ? 'admin' : (Auth::guard('client')->check() ? 'client' : (Auth::guard('freelancer')->check() ? 'freelancer' : null));
 
-    \App\Models\Notification::where('created_at', '<', now()->subDays(30))->delete();
+    \App\Models\Notification::where('created_at', '<', now()->subDays(30))
+        ->where('is_kept', false)
+        ->delete();
 
     $notifNotifications = $notifRole
         ? \App\Models\Notification::where('role', $notifRole)
             ->where(function ($q) use ($notifUser) {
-                $q->where('user_id', $notifUser->id)
-                    ->orWhereNull('user_id');
+                $q->where('user_id', $notifUser->id);
+            })
+            ->where(function ($q) {
+                $q->where('is_read', false)
+                    ->orWhere('is_kept', true);
             })
             ->latest()
             ->take(30)
@@ -81,6 +86,9 @@
     </div>
 
     @yield('modals')
+
+    <!-- Flash Component -->
+    <x-flash />
 
     <!-- Toast Container -->
     <div id="toast-container" role="region" aria-label="Notifications" aria-live="polite"></div>

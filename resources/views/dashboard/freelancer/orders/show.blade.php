@@ -199,9 +199,9 @@
                                 <div class="relative group">
                                     <span
                                         class="absolute left-6 top-1/2 -translate-y-1/2 text-emerald-600 font-black text-xl">Rp</span>
-                                    <input type="number" name="agreed_price" id="agreed_price" required step="0.01"
+                                    <input type="number" name="agreed_price" id="agreed_price" required step="1"
                                         class="w-full pl-16 pr-6 py-5 bg-white border-2 border-emerald-100 rounded-2xl focus:border-emerald-500 focus:ring-8 focus:ring-emerald-500/10 outline-none transition-all font-black text-slate-900 text-2xl shadow-inner text-center md:text-left"
-                                        value="{{ old('agreed_price', number_format((float)($order->agreed_price ?? $order->service->price_min ?? 0), 2, '.', '')) }}">
+                                        value="{{ old('agreed_price', (int)($order->agreed_price ?? $order->service->price_min ?? 0)) }}">
                                 </div>
                             </div>
                         </div>
@@ -261,9 +261,9 @@
                                 <label for="agreed_price" class="block text-[10px] font-black text-teal-600 uppercase tracking-widest mb-2">Harga Kesepakatan Baru (ACC)</label>
                                 <div class="relative">
                                     <span class="absolute left-4 top-1/2 -translate-y-1/2 text-teal-600 font-bold">Rp</span>
-                                    <input type="number" name="agreed_price" id="agreed_price" required step="0.01"
+                                    <input type="number" name="agreed_price" id="agreed_price" required step="1"
                                         class="w-full pl-12 pr-4 py-4 bg-white border-2 border-teal-100 rounded-xl focus:border-teal-500 outline-none font-bold text-slate-900 shadow-sm"
-                                        value="{{ old('agreed_price', number_format((float)($order->agreed_price ?? $order->service->price_min ?? 0), 2, '.', '')) }}">
+                                        value="{{ old('agreed_price', (int)($order->agreed_price ?? $order->service->price_min ?? 0)) }}">
                                 </div>
                             </div>
                         </div>
@@ -361,6 +361,34 @@
         <!-- DETAIL KONTEN ORDER -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div class="lg:col-span-2 space-y-6">
+                @if($order->attachments->count() > 0)
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-8">
+                    <h4 class="text-[0.65rem] font-black text-slate-400 uppercase tracking-widest mb-6 flex items-center gap-2">
+                        <i class="ri-attachment-2 text-lg"></i>
+                        Lampiran dari Client ({{ $order->attachments->count() }})
+                    </h4>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                        @foreach($order->attachments as $att)
+                            <div class="group relative rounded-xl border border-slate-200 overflow-hidden bg-slate-50">
+                                @if(in_array($att->mime_type, ['image/jpeg', 'image/png', 'image/gif', 'image/webp']))
+                                    <a href="{{ asset('storage/'.$att->file_path) }}" target="_blank" class="block">
+                                        <img src="{{ asset('storage/'.$att->file_path) }}" alt="{{ $att->file_name }}" class="w-full h-32 object-cover group-hover:opacity-90 transition-opacity">
+                                    </a>
+                                @else
+                                    <a href="{{ asset('storage/'.$att->file_path) }}" target="_blank" class="flex flex-col items-center justify-center h-32 p-3 text-center">
+                                        <i class="ri-file-line text-3xl text-slate-400 mb-2"></i>
+                                        <span class="text-[10px] text-slate-500 font-medium truncate w-full">{{ $att->file_name }}</span>
+                                    </a>
+                                @endif
+                                <div class="px-2 py-1.5 bg-white border-t border-slate-100">
+                                    <a href="{{ asset('storage/'.$att->file_path) }}" target="_blank" class="text-[10px] font-bold text-[#0f766e] hover:underline truncate block">{{ $att->file_name }}</a>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+                @endif
+
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-8">
                     <h4
                         class="text-[0.65rem] font-black text-slate-400 uppercase tracking-widest mb-6 flex items-center gap-2">

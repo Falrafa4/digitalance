@@ -6,7 +6,7 @@
         {{-- HERO / GREETING --}}
         <section class="mb-9">
             <h1 class="font-display text-[2.6rem] sm:text-[3.1rem] font-extrabold text-slate-900 leading-tight">
-                Hi, {{ Auth::user()->name ?? 'Freelancer' }}!
+                Hi, {{ optional(Auth::guard('freelancer')->user()?->skomda_student)->name ?? Auth::guard('freelancer')->user()?->email ?? 'Freelancer' }}!
                 <span class="inline-block align-middle">👋</span>
             </h1>
             <p class="text-slate-500 text-[1.02rem] mt-2">
@@ -15,10 +15,11 @@
         </section>
 
         {{-- QUICK ALERT FOR PENDING ORDERS --}}
-        @php
-            $latestOrders = $dashboardData['latestOrders'] ?? $data['latestOrders'] ?? [];
-            $pendingOrder = collect($latestOrders)->where('status', 'Pending')->first();
-        @endphp
+    @php
+        $dashboardSource = $dashboardData ?? $data ?? [];
+        $latestOrders = $dashboardSource['latestOrders'] ?? [];
+        $pendingOrder = collect($latestOrders)->where('status', 'Pending')->first();
+    @endphp
 
         @if($pendingOrder)
             <div class="mb-8 p-4.5 rounded-[22px] bg-indigo-50 border border-indigo-100 flex flex-col sm:flex-row items-center justify-between gap-4 animate-fadeUp shadow-sm">
@@ -206,14 +207,78 @@
 
 @section('scripts')
     <script>
-        // Controller should pass: $dashboardData (preferred) or $data
-        // We also inject some route links so JS doesn't hardcode URLs.
         window.__FREELANCER_DASHBOARD__ = Object.assign({
             links: {
                 ordersIndex: @json(route('freelancer.orders.index')),
                 orderShowPrefix: @json(rtrim(url('/freelancer/orders'), '/') . '/'),
             }
-        }, @json($dashboardData ?? $data ?? []));
+        }, @json($dashboardSource));
+
+        @php
+            $freelancer = Auth::guard('freelancer')->user();
+            $isNewFreelancer = $freelancer && $freelancer->status === 'Approved' && now()->diffInHours($freelancer->created_at) < 48;
+        @endphp
+        window.__SHOW_ONBOARDING__ = @json($isNewFreelancer);
     </script>
     <script src="{{ asset('js/dashboard/freelancer/dashboard.js') }}"></script>
+@endsection
+
+@section('modals')
+    {{-- Onboarding Modal for New Freelancers --}}
+    <div id="onboarding-overlay" class="fixed inset-0 z-[9999] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 {{ !$isNewFreelancer ? 'hidden' : '' }}">
+        <div class="bg-white rounded-[28px] w-full max-w-lg shadow-2xl overflow-hidden">
+            <div class="relative h-20 bg-gradient-to-r from-[#0f766e] to-[#10b981] flex items-center px-8">
+                <div class="flex-1">
+                    <h2 class="text-white font-black text-xl">Selamat Datang, {{ $freelancer->skomda_student->name ?? 'Freelancer' }}! 🎉</h2>
+                    <p class="text-white/80 text-[11px] font-bold uppercase tracking-wider">Panduan Memulai Freelancer</p>
+                </div>
+            </div>
+            <div class="p-8 max-h-[60vh] overflow-y-auto">
+                <div class="space-y-6">
+                    <div class="flex gap-4">
+                        <div class="w-10 h-10 rounded-xl bg-teal-50 text-[#0f766e] flex items-center justify-center flex-shrink-0 font-black text-sm">1</div>
+                        <div>
+                            <h3 class="font-bold text-slate-900 text-sm mb-1">Buat Layanan (Service)</h3>
+                            <p class="text-slate-500 text-xs leading-relaxed">Buat jasa yang kamu tawarkan. Isi deskripsi, harga, dan kategori dengan jelas. Admin akan mereview sebelum ditampilkan ke publik.</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0 font-black text-sm">2</div>
+                        <div>
+                            <h3 class="font-bold text-slate-900 text-sm mb-1">Respon Order dengan Cepat</h3>
+                            <p class="text-slate-500 text-xs leading-relaxed">Saat ada order masuk, segera ACC atau tolak. Jika ACC, kirim penawaran harga. Respon cepat meningkatkan reputasimu.</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center flex-shrink-0 font-black text-sm">3</div>
+                        <div>
+                            <h3 class="font-bold text-slate-900 text-sm mb-1">Kerjakan & Kirim Hasil</h3>
+                            <p class="text-slate-500 text-xs leading-relaxed">Setelah order Paid, kerjakan dan upload hasil kerja via tombol "Kirim Hasil". Client akan review sebelum order selesai.</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center flex-shrink-0 font-black text-sm">4</div>
+                        <div>
+                            <h3 class="font-bold text-slate-900 text-sm mb-1">Penting: Aturan Wajib</h3>
+                            <p class="text-slate-500 text-xs leading-relaxed">Jangan menelantarkan order. Selalu komunikasi via chat jika ada kendala. Pelanggaran bisa berakibat suspend akun.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-8 p-4 bg-amber-50 rounded-xl border border-amber-100">
+                    <p class="text-[11px] text-amber-800 font-bold leading-relaxed">
+                        <i class="ri-information-line mr-1"></i>
+                        Dengan menutup panduan ini, kamu menyetujui seluruh aturan dan ketentuan platform Digitalance.
+                    </p>
+                </div>
+            </div>
+            <div class="p-6 bg-slate-50 border-t border-slate-100 flex gap-3">
+                <a href="{{ route('freelancer.services.create') }}" class="flex-1 py-3 bg-white border border-slate-200 text-slate-600 font-bold rounded-xl text-sm hover:bg-slate-100 transition-all text-center">
+                    Buat Service Pertama
+                </a>
+                <button onclick="closeOnboarding()" class="flex-1 py-3 bg-[#0f766e] text-white font-bold rounded-xl text-sm hover:bg-[#0a5e58] transition-all shadow-lg shadow-teal-sm">
+                    Saya Mengerti, Mulai!
+                </button>
+            </div>
+        </div>
+    </div>
 @endsection

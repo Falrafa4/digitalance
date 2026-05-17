@@ -14,9 +14,11 @@ class Order extends Model
         'service_id',
         'client_id',
         'freelancer_id',
+        'loker_application_id',
         'brief',
         'status',
         'agreed_price',
+        'deadline',
     ];
 
     public function service()
@@ -33,6 +35,11 @@ class Order extends Model
     public function freelancer()
     {
         return $this->belongsTo(Freelancer::class);
+    }
+
+    public function lokerApplication()
+    {
+        return $this->belongsTo(LokerApplication::class);
     }
 
     public function offers()
@@ -58,5 +65,10 @@ class Order extends Model
     public function review()
     {
         return $this->hasOne(Review::class);
+    }
+
+    public function attachments()
+    {
+        return $this->hasMany(OrderAttachment::class);
     }
 }

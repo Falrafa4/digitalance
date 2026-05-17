@@ -26,7 +26,11 @@
             </a>
             <h1 class="font-display text-[1.65rem] font-extrabold text-slate-900 mt-2">Order #{{ $order->id }}</h1>
             <p class="text-slate-500 mt-1 text-[13.5px]">
-              Jasa: <span class="font-bold">{{ $order->service->title ?? '-' }}</span>
+              @if($order->lokerApplication)
+                <span class="font-bold text-indigo-600">Lowongan: {{ $order->brief ? \Illuminate\Support\Str::limit($order->brief, 50) : '-' }}</span>
+              @else
+                Jasa: <span class="font-bold">{{ $order->service->title ?? '-' }}</span>
+              @endif
             </p>
           </div>
 
@@ -96,39 +100,36 @@
         </div>
       </div>
 
-      {{-- ACTION BUTTONS --}}
-      @if($order->status === 'Negotiated' && $order->agreed_price)
-      <div x-data="{ showNego: false, showReject: false, isSubmitting: false }" class="bg-white border border-slate-200 rounded-[18px] p-6">
+      {{-- ACTION: Pending (from loker approval) --}}
+      @if($order->status === 'Pending' && $order->lokerApplication && $order->agreed_price)
+      <div x-data="{ isSubmitting: false }" class="bg-white border border-slate-200 rounded-[18px] p-6">
         <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>
-            <h3 class="font-display font-extrabold text-slate-900 text-[1.1rem]">Harga Disepakati</h3>
+            <h3 class="font-display font-extrabold text-slate-900 text-[1.1rem]">Harga Fluancer</h3>
             <p class="text-2xl font-black text-[#0f766e] mt-1">Rp {{ number_format($order->agreed_price, 0, ',', '.') }}</p>
+            <p class="text-[12px] text-slate-500 mt-1">Dari lamaran lowongan: {{ optional($order->lokerApplication->freelancer->skomda_student)->name ?? 'Freelancer' }}</p>
           </div>
           <div class="flex flex-col sm:flex-row gap-3">
-            <button @click="showNego = true" class="px-5 py-3 rounded-[12px] bg-amber-50 border border-amber-200 text-amber-700 font-bold text-[13px] hover:bg-amber-100 transition-all" aria-label="Buka modal negosiasi">
-              <i class="ri-chat-history-line mr-1"></i> Negosiasi
-            </button>
-            <form action="{{ route('client.orders.reject', $order->id) }}" method="POST" @submit="if(!showReject){ showReject = true; return false; } return true;">
+            <form action="{{ route('client.orders.reject', $order->id) }}" method="POST">
               @csrf
-              <input type="hidden" name="reason" id="rejectReason" value="">
-              <button type="submit" class="px-5 py-3 rounded-[12px] bg-white border border-red-200 text-red-600 font-bold text-[13px] hover:bg-red-50 transition-all" aria-label="Tolak pesanan">
+              <button type="submit" class="px-5 py-3 rounded-[12px] bg-white border border-red-200 text-red-600 font-bold text-[13px] hover:bg-red-50 transition-all">
                 <i class="ri-close-line mr-1"></i> Tolak
               </button>
             </form>
             <form action="{{ route('client.orders.accept', $order->id) }}" method="POST" @submit="isSubmitting = true">
               @csrf
-              <button type="submit" :disabled="isSubmitting" onclick="return confirm('Terima pesanan dan lanjut ke pembayaran?')" 
+              <button type="submit" :disabled="isSubmitting" onclick="return confirm('Terima dan lanjut ke pembayaran?')"
                       class="px-5 py-3 rounded-[12px] bg-[#0f766e] text-white font-bold text-[13px] hover:bg-[#0a5e58] transition-all disabled:opacity-50">
-                <template x-if="!isSubmitting">
-                  <span><i class="ri-check-line mr-1"></i> Lanjut ke Pembayaran</span>
-                </template>
-                <template x-if="isSubmitting">
-                  <span><i class="ri-loader-4-line animate-spin mr-1"></i> Memproses...</span>
-                </template>
+                <i class="ri-check-line mr-1"></i> Terima & Bayar
               </button>
             </form>
           </div>
         </div>
+      </div>
+      @endif
+
+      @if($order->status === 'Negotiated' && $order->agreed_price)
+      <div x-data="{ showNego: false, showReject: false, isSubmitting: false }" class="bg-white border border-slate-200 rounded-[18px] p-6">
 
         {{-- Modal Negosiasi --}}
         <div x-show="showNego" x-init="$watch('showNego', value => { if(value) { $nextTick(() => window.DigitalanceUtils.focusTrap($el)) } })" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
@@ -188,8 +189,33 @@
         <h2 class="font-display font-extrabold text-slate-900 text-[1.25rem]">Brief</h2>
         <p class="text-slate-600 text-[14px] mt-3 whitespace-pre-line">{{ $order->brief ?? '-' }}</p>
 
+        @if($order->attachments->count() > 0)
         <div class="mt-6 pt-5 border-t border-slate-100">
-          <p class="text-slate-400 text-[12px] font-extrabold uppercase tracking-widest mb-2">Upload Attachment (MVP)</p>
+          <p class="text-slate-400 text-[12px] font-extrabold uppercase tracking-widest mb-3">Lampiran ({{ $order->attachments->count() }})</p>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            @foreach($order->attachments as $att)
+              <div class="rounded-xl border border-slate-200 overflow-hidden bg-slate-50">
+                @if(in_array($att->mime_type, ['image/jpeg', 'image/png', 'image/gif', 'image/webp']))
+                  <a href="{{ asset('storage/'.$att->file_path) }}" target="_blank">
+                    <img src="{{ asset('storage/'.$att->file_path) }}" alt="{{ $att->file_name }}" class="w-full h-28 object-cover hover:opacity-90 transition-opacity">
+                  </a>
+                @else
+                  <a href="{{ asset('storage/'.$att->file_path) }}" target="_blank" class="flex flex-col items-center justify-center h-28 p-2 text-center">
+                    <i class="ri-file-line text-2xl text-slate-400 mb-1"></i>
+                    <span class="text-[9px] text-slate-500 truncate w-full">{{ $att->file_name }}</span>
+                  </a>
+                @endif
+                <div class="px-2 py-1 bg-white border-t border-slate-100">
+                  <a href="{{ asset('storage/'.$att->file_path) }}" target="_blank" class="text-[9px] font-bold text-[#0f766e] hover:underline truncate block">{{ $att->file_name }}</a>
+                </div>
+              </div>
+            @endforeach
+          </div>
+        </div>
+        @endif
+
+        <div class="mt-6 pt-5 border-t border-slate-100">
+          <p class="text-slate-400 text-[12px] font-extrabold uppercase tracking-widest mb-2">Upload Attachment</p>
           <form method="POST" action="{{ route('client.orders.attachments.store', $order->id) }}" enctype="multipart/form-data"
                 class="flex flex-col sm:flex-row gap-3">
             @csrf
@@ -309,23 +335,40 @@
       <div class="bg-white border border-slate-200 rounded-[18px] p-6">
         <h3 class="font-display font-extrabold text-slate-900 text-[1.2rem]">Freelancer</h3>
         <div class="flex items-center gap-3 mt-4">
-          <div class="w-12 h-12 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400">
+          <div class="w-12 h-12 rounded-2xl bg-[#0f766e]/10 border border-[#0f766e]/20 flex items-center justify-center text-[#0f766e]">
             <i class="ri-user-3-line text-[20px]"></i>
           </div>
           <div class="min-w-0">
             <p class="font-bold text-slate-900 text-[14px] truncate">
-              {{ optional(optional($order->service->freelancer)->skomda_student)->name ?? 'Freelancer' }}
+              @if($order->freelancer)
+                {{ optional($order->freelancer->skomda_student)->name ?? 'Freelancer' }}
+              @else
+                {{ optional(optional($order->service->freelancer)->skomda_student)->name ?? 'Freelancer' }}
+              @endif
             </p>
-            <p class="text-slate-500 text-[12px] font-bold">Verified Professional</p>
+            <p class="text-slate-500 text-[12px] font-bold">
+              @if($order->lokerApplication)
+                <span class="text-indigo-600">Dari Lamaran Lowongan</span>
+              @else
+                Verified Professional
+              @endif
+            </p>
           </div>
         </div>
 
         <div class="mt-6 pt-5 border-t border-slate-100 space-y-3">
-          <a href="{{ route('client.talents.show', $order->service->freelancer_id) }}" 
-             class="block w-full px-4 py-3 rounded-[12px] bg-slate-50 border border-slate-200 text-slate-700 font-bold text-[12.5px] hover:border-[#0f766e] hover:text-[#0f766e] transition-all text-center">
-            Lihat Profil
-          </a>
-          <a href="{{ route('client.messages.index') }}" 
+          @if($order->freelancer)
+            <a href="{{ route('client.talents.show', $order->freelancer_id) }}"
+               class="block w-full px-4 py-3 rounded-[12px] bg-slate-50 border border-slate-200 text-slate-700 font-bold text-[12.5px] hover:border-[#0f766e] hover:text-[#0f766e] transition-all text-center">
+              Lihat Profil
+            </a>
+          @elseif($order->service?->freelancer_id)
+            <a href="{{ route('client.talents.show', $order->service->freelancer_id) }}"
+               class="block w-full px-4 py-3 rounded-[12px] bg-slate-50 border border-slate-200 text-slate-700 font-bold text-[12.5px] hover:border-[#0f766e] hover:text-[#0f766e] transition-all text-center">
+              Lihat Profil
+            </a>
+          @endif
+          <a href="{{ route('client.messages.index') }}"
              class="block w-full px-4 py-3 rounded-[12px] bg-[#0f766e] text-white font-bold text-[12.5px] hover:bg-[#0a5e58] transition-all text-center">
             Chat Freelancer
           </a>

@@ -94,14 +94,6 @@ class DashboardController extends Controller
             ->where('status', 'Completed')
             ->count();
 
-        $totalSpent = $allOrders
-            ->where('status', '!=', 'Cancelled')
-            ->sum('agreed_price');
-
-        $completedProjects = $allOrders
-            ->where('status', 'Completed')
-            ->count();
-
         $projects = Order::with('service')
             ->where('client_id', $user->id)
             ->latest()
@@ -225,48 +217,57 @@ class DashboardController extends Controller
     public function verifyFreelancer($id)
     {
         $freelancer = Freelancer::with('skomda_student')->findOrFail($id);
-        $freelancer->update(['status' => 'Approved']);
+        $freelancer->update(['status' => 'Approved', 'reject_reason' => null]);
 
-        \App\Models\Notification::create([
-            'title' => 'Akun Diverifikasi',
-            'message' => 'Selamat, akun freelancer kamu telah disetujui oleh admin!',
-            'type' => 'success',
-            'role' => 'freelancer',
-            'user_id' => $freelancer->id,
-            'link' => '/freelancer/profile',
-        ]);
+        $exists = \App\Models\Notification::where('role', 'freelancer')
+            ->where('user_id', $freelancer->id)
+            ->where('title', 'Akun Diverifikasi')
+            ->where('is_read', false)
+            ->exists();
+
+        if (! $exists) {
+            \App\Models\Notification::create([
+                'title' => 'Akun Diverifikasi',
+                'message' => 'Selamat, akun freelancer kamu telah disetujui oleh admin!',
+                'type' => 'success',
+                'role' => 'freelancer',
+                'user_id' => $freelancer->id,
+                'link' => '/freelancer/profile',
+            ]);
+        }
 
         return response()->json(['message' => 'Success']);
     }
 
-    public function rejectFreelancer($id)
+    public function rejectFreelancer($id, \Illuminate\Http\Request $request)
     {
         $freelancer = Freelancer::with('skomda_student')->findOrFail($id);
-        $freelancer->update(['status' => 'Rejected']);
 
-        \App\Models\Notification::create([
-            'title' => 'Verifikasi Ditolak',
-            'message' => 'Maaf, pengajuan akun freelancer kamu belum dapat kami setujui saat ini.',
-            'type' => 'danger',
-            'role' => 'freelancer',
-            'user_id' => $freelancer->id,
-            'link' => '/freelancer/profile',
+        $reason = $request->input('reason', 'Tidak ada alasan spesifik');
+
+        $freelancer->update([
+            'status' => 'Rejected',
+            'reject_reason' => $reason,
         ]);
 
+        $exists = \App\Models\Notification::where('role', 'freelancer')
+            ->where('user_id', $freelancer->id)
+            ->where('title', 'Verifikasi Ditolak')
+            ->where('is_read', false)
+            ->exists();
+
+        if (! $exists) {
+            \App\Models\Notification::create([
+                'title' => 'Verifikasi Ditolak',
+                'message' => 'Maaf, pengajuan akun freelancer kamu belum dapat kami setujui. Alasan: '.$reason,
+                'type' => 'danger',
+                'role' => 'freelancer',
+                'user_id' => $freelancer->id,
+                'link' => '/freelancer/profile',
+            ]);
+        }
+
         return response()->json(['message' => 'Success']);
-    }
-
-    public function user()
-    {
-        $clients = Client::latest()->get();
-        $freelancers = Freelancer::with('skomda_student')->latest()->get();
-        $skomdaStudents = SkomdaStudent::latest()->get();
-
-        return view('admin.admin-user', compact(
-            'clients',
-            'freelancers',
-            'skomdaStudents'
-        ));
     }
 
     public function settings()
@@ -480,10 +481,11 @@ class DashboardController extends Controller
             $fuzzy = '%'.str_replace(' ', '%', $q).'%';
 
             // Search Talents (Freelancers)
-            $freelancers = Freelancer::whereHas('skomda_student', function ($query) use ($fuzzy) {
-                $query->where('name', 'like', $fuzzy)
-                    ->orWhere('major', 'like', $fuzzy);
-            })
+            $freelancers = Freelancer::where('status', 'Approved')
+                ->whereHas('skomda_student', function ($query) use ($fuzzy) {
+                    $query->where('name', 'like', $fuzzy)
+                        ->orWhere('major', 'like', $fuzzy);
+                })
                 ->get()->map(function ($item) {
                     $item->search_type = 'Talent';
                     $item->search_url = route('client.talents.show', $item->id);

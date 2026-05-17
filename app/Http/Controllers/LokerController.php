@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Loker;
 use App\Models\LokerApplication;
 use App\Models\Notification;
+use App\Models\Order;
 use App\Models\ServiceCategory;
 use Illuminate\Http\Request;
 
@@ -103,16 +104,26 @@ class LokerController extends Controller
         $application->update(['status' => 'Approved']);
         $application->loker->update(['status' => 'Closed']);
 
+        Order::create([
+            'service_id' => null,
+            'client_id' => $client->id,
+            'freelancer_id' => $application->freelancer_id,
+            'loker_application_id' => $application->id,
+            'brief' => $application->loker->title . ' - ' . $application->loker->description,
+            'status' => 'Pending',
+            'agreed_price' => $application->proposed_price,
+        ]);
+
         Notification::create([
             'title' => 'Lamaran Disetujui',
-            'message' => 'Client telah menyetujui lamaranmu untuk: ' . $application->loker->title,
+            'message' => 'Client telah menyetujui lamaranmu untuk: ' . $application->loker->title . '. Order sudah dibuat, tunggu konfirmasi pembayaran.',
             'type' => 'success',
             'role' => 'freelancer',
             'user_id' => $application->freelancer_id,
-            'link' => '/freelancer/loker/my/applications',
+            'link' => '/freelancer/orders',
         ]);
 
-        return back()->with('success', 'Lamaran freelancer berhasil disetujui!');
+        return back()->with('success', 'Lamaran disetujui! Order telah dibuat untuk freelancer.');
     }
 
     public function rejectApplication(LokerApplication $application)

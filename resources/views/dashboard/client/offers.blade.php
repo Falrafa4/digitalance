@@ -46,7 +46,7 @@
                         </div>
                         <div>
                             <p class="text-[11px] font-bold text-slate-400 uppercase">Freelancer</p>
-                            <p class="text-[13px] font-bold text-slate-800">{{ $offer->order->service->freelancer->user->name ?? $offer->order->service->freelancer->name ?? 'Freelancer' }}</p>
+                            <p class="text-[13px] font-bold text-slate-800">{{ $offer->order->service->freelancer->skomda_student->name ?? $offer->order->service->freelancer->name ?? 'Freelancer' }}</p>
                         </div>
                     </div>
 

@@ -14,7 +14,7 @@ class TransactionController extends Controller
     {
         $transactions = Transaction::with([
             'order.client',
-        ])->latest()->get();
+        ])->latest()->paginate(15);
 
         return view('dashboard.admin.transactions', compact('transactions'));
     }
@@ -35,9 +35,14 @@ class TransactionController extends Controller
 
     public function showTransactionByOrderId(string $orderId)
     {
+        $freelancer = auth('freelancer')->user();
+
         $transaction = Transaction::with('order.service.freelancer')
-            ->whereHas('order', function ($query) use ($orderId) {
-                $query->where('id', $orderId);
+            ->whereHas('order', function ($query) use ($orderId, $freelancer) {
+                $query->where('id', $orderId)
+                    ->whereHas('service', function ($q) use ($freelancer) {
+                        $q->where('freelancer_id', $freelancer->id);
+                    });
             })
             ->firstOrFail();
 

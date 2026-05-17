@@ -1,6 +1,6 @@
 @php
-    $dbNotifications = $notifNotifications ?? collect();
-    $unreadCount = $notifUnreadCount ?? 0;
+    $dbNotifications = isset($notifNotifications) ? $notifNotifications : collect();
+    $unreadCount = isset($notifUnreadCount) ? $notifUnreadCount : 0;
 @endphp
 
 {{-- Slide-in Notification Drawer --}}
@@ -56,40 +56,55 @@
                     @endif
                     data-id="{{ $n->id }}">
 
-                    <div class="flex items-start gap-3">
-                        <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0
-                            @if ($n->type === 'success' || $n->type === 'approved') bg-emerald-100 text-emerald-600
-                            @elseif ($n->type === 'danger' || $n->type === 'rejected') bg-red-100 text-red-500
-                            @elseif ($n->type === 'warning') bg-amber-100 text-amber-600
-                            @else bg-blue-100 text-blue-600 @endif">
-                            @if ($n->type === 'success' || $n->type === 'approved')
-                                <i class="ri-checkbox-circle-fill text-lg"></i>
-                            @elseif ($n->type === 'danger' || $n->type === 'rejected')
-                                <i class="ri-error-warning-fill text-lg"></i>
-                            @elseif ($n->type === 'warning')
-                                <i class="ri-alert-fill text-lg"></i>
+            <div class="flex items-start gap-3">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0
+                    @if ($n->type === 'success' || $n->type === 'approved') bg-emerald-100 text-emerald-600
+                    @elseif ($n->type === 'danger' || $n->type === 'rejected') bg-red-100 text-red-500
+                    @elseif ($n->type === 'warning') bg-amber-100 text-amber-600
+                    @else bg-blue-100 text-blue-600 @endif">
+                    @if ($n->type === 'success' || $n->type === 'approved')
+                        <i class="ri-checkbox-circle-fill text-lg"></i>
+                    @elseif ($n->type === 'danger' || $n->type === 'rejected')
+                        <i class="ri-error-warning-fill text-lg"></i>
+                    @elseif ($n->type === 'warning')
+                        <i class="ri-alert-fill text-lg"></i>
+                    @else
+                        <i class="ri-information-fill text-lg"></i>
+                    @endif
+                </div>
+
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-start justify-between gap-2">
+                        <p class="font-bold text-[13px] text-slate-900 leading-tight">
+                            {{ $n->title }}
+                        </p>
+                        <div class="flex items-center gap-1 flex-shrink-0">
+                            @if ($n->is_kept)
+                                <button onclick="event.stopPropagation(); toggleNotificationKeep({{ $n->id }}, this)"
+                                    class="w-6 h-6 rounded-md flex items-center justify-center text-amber-500 hover:bg-amber-50 transition-all"
+                                    title="Lepas notifikasi">
+                                    <i class="ri-bookmark-fill text-sm"></i>
+                                </button>
                             @else
-                                <i class="ri-information-fill text-lg"></i>
+                                <button onclick="event.stopPropagation(); toggleNotificationKeep({{ $n->id }}, this)"
+                                    class="w-6 h-6 rounded-md flex items-center justify-center text-slate-300 hover:bg-slate-50 hover:text-amber-500 transition-all"
+                                    title="Simpan notifikasi">
+                                    <i class="ri-bookmark-line text-sm"></i>
+                                </button>
+                            @endif
+                            @if (!$n->is_read)
+                                <span class="w-2 h-2 rounded-full bg-teal-500 flex-shrink-0 mt-1.5"></span>
                             @endif
                         </div>
-
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-start justify-between gap-2">
-                                <p class="font-bold text-[13px] text-slate-900 leading-tight">
-                                    {{ $n->title }}
-                                </p>
-                                @if (!$n->is_read)
-                                    <span class="w-2 h-2 rounded-full bg-teal-500 flex-shrink-0 mt-1.5"></span>
-                                @endif
-                            </div>
-                            <p class="text-[12px] text-slate-500 mt-1 leading-relaxed line-clamp-2">
-                                {{ $n->message }}
-                            </p>
-                            <span class="text-[10px] text-slate-400 font-semibold mt-2 block">
-                                {{ $n->created_at->diffForHumans() }}
-                            </span>
-                        </div>
                     </div>
+                    <p class="text-[12px] text-slate-500 mt-1 leading-relaxed line-clamp-2">
+                        {{ $n->message }}
+                    </p>
+                    <span class="text-[10px] text-slate-400 font-semibold mt-2 block">
+                        {{ $n->created_at->diffForHumans() }}
+                    </span>
+                </div>
+            </div>
                 </div>
             @endforeach
         @else

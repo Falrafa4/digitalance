@@ -12,15 +12,15 @@
             <div>
                 <div class="flex items-center gap-2 mb-2">
                     <i class="ri-price-tag-3-line text-2xl text-teal-600"></i>
-                    <h1 class="text-2xl font-bold text-gray-800">Offers & Negotiations</h1>
+                    <h1 class="text-2xl font-bold text-slate-800">Offers & Negotiations</h1>
                 </div>
-                <p class="text-gray-600">Pantau tawaran jasa masuk dan log pesan negosiasi antar pengguna secara real-time.
+                <p class="text-slate-600">Pantau tawaran jasa masuk dan log pesan negosiasi antar pengguna secara real-time.
                 </p>
             </div>
             <div class="relative w-full md:w-64">
-                <i class="ri-search-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                <i class="ri-search-line absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
                 <input type="text" id="global-search-input" onkeyup="handleSearch()" placeholder="Cari ID atau Nama..."
-                    class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent">
+                    class="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent">
             </div>
         </div>
     </div>

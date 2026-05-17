@@ -49,16 +49,20 @@ Route::middleware('auth:administrator,client,freelancer')->group(function () {
 
         if ($role && $user) {
             \App\Models\Notification::where('role', $role)
-                ->where(function ($q) use ($user) {
-                    $q->where('user_id', $user->id)
-                        ->orWhereNull('user_id');
-                })
+                ->where('user_id', $user->id)
                 ->where('is_read', false)
                 ->update(['is_read' => true]);
         }
 
         return response()->json(['success' => true]);
     })->name('notifications.mark-all-read');
+
+    Route::post('/notifications/{notification}/keep', function (\App\Models\Notification $notification) {
+        $request = request();
+        $request->validate(['is_kept' => 'boolean']);
+        $notification->update(['is_kept' => $request->is_kept]);
+        return response()->json(['success' => true]);
+    })->name('notifications.keep');
 });
 
 // ── ADMIN ────────────────────────────────────────────────
@@ -147,10 +151,6 @@ Route::middleware('auth:administrator')->prefix('admin')->name('admin.')->group(
 
     // Transactions (CRUD)
     Route::get('/transactions', [TransactionController::class, 'index'])->name('transactions.index');
-
-    // Results (CRUD)
-    Route::get('/results', [ResultController::class, 'index'])->name('results.index');
-    Route::get('/results/{result}', [ResultController::class, 'show'])->name('results.show');
 
     // Reviews (CRUD)
     Route::get('/reviews', [ReviewController::class, 'index'])->name('reviews.index');

@@ -51,7 +51,7 @@
 
               <div class="flex items-center justify-between mt-4 pt-4 border-t border-slate-100">
                 <button type="button"
-                  onclick="navigator.clipboard.writeText(@json(route('client.services.show', $s->id))); alert('Link copied!')"
+                  onclick="navigator.clipboard.writeText(@json(route('client.services.show', $s->id))); window.showToast('Link copied!', 'success')"
                   class="text-slate-500 hover:text-slate-900 text-[12.5px] font-bold transition-all">
                   <i class="ri-share-line mr-1"></i> Share
                 </button>

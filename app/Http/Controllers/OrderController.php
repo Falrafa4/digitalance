@@ -100,12 +100,13 @@ class OrderController extends Controller
 
         $order->load([
             'service.freelancer.skomda_student',
-            'service.service_category', // kalau masih kepakai di view lama
+            'service.service_category',
             'negotiations',
             'offers',
             'transactions',
             'results',
             'review',
+            'attachments',
         ]);
 
         return view('dashboard.client.orders.show', compact('order'));
@@ -157,10 +158,17 @@ class OrderController extends Controller
             'file' => 'required|file|max:5120',
         ]);
 
-        $path = $request->file('file')->store('order-attachments', 'public');
+        $file = $request->file('file');
+        $path = $file->store('order-attachments', 'public');
 
-        $order->brief = trim(($order->brief ?? '')."\n\nAttachment: ".$path);
-        $order->save();
+        \App\Models\OrderAttachment::create([
+            'order_id' => $order->id,
+            'file_path' => $path,
+            'file_name' => $file->getClientOriginalName(),
+            'mime_type' => $file->getMimeType(),
+            'file_size' => $file->getSize(),
+            'uploaded_by' => 'client',
+        ]);
 
         return back()->with('success', 'Attachment berhasil diupload');
     }
@@ -213,10 +221,9 @@ class OrderController extends Controller
     {
         $freelancer = auth('freelancer')->user();
 
-        // Cek akses: Pesanan harus milik service yang dikelola freelancer ini
         abort_unless($order->service->freelancer_id === $freelancer->id, 403);
 
-        $order->load(['service.service_category', 'client', 'negotiations', 'offers', 'transactions', 'results', 'review']);
+        $order->load(['service.service_category', 'client', 'negotiations', 'offers', 'transactions', 'results', 'review', 'attachments']);
 
         return view('dashboard.freelancer.orders.show', compact('order'));
     }
@@ -325,8 +332,8 @@ class OrderController extends Controller
         $client = auth('client')->user();
         abort_unless($order->client_id === $client->id, 403);
 
-        if ($order->status !== 'Negotiated') {
-            return redirect()->back()->with('error', 'Order tidak dalam status negosiasi.');
+        if (!in_array($order->status, ['Pending', 'Negotiated'])) {
+            return redirect()->back()->with('error', 'Order tidak dapat diterima.');
         }
 
         if (! $order->agreed_price) {
@@ -341,11 +348,11 @@ class OrderController extends Controller
         $client = auth('client')->user();
         abort_unless($order->client_id === $client->id, 403);
 
-        if ($order->status !== 'Negotiated') {
-            return redirect()->route('client.orders.show', $order->id)->with('error', 'Order tidak dalam status negosiasi.');
+        if (!in_array($order->status, ['Pending', 'Negotiated'])) {
+            return redirect()->route('client.orders.show', $order->id)->with('error', 'Pembayaran tidak dapat diproses.');
         }
 
-        $order->load(['service.freelancer.skomda_student', 'service.service_category']);
+        $order->load(['service.freelancer.skomda_student', 'service.service_category', 'freelancer.skomda_student']);
 
         return view('dashboard.client.orders.checkout', compact('order'));
     }
@@ -355,7 +362,7 @@ class OrderController extends Controller
         $client = auth('client')->user();
         abort_unless($order->client_id === $client->id, 403);
 
-        if ($order->status !== 'Negotiated') {
+        if (!in_array($order->status, ['Pending', 'Negotiated'])) {
             return redirect()->route('client.orders.show', $order->id)->with('error', 'Pembayaran tidak dapat diproses.');
         }
 
@@ -436,6 +443,10 @@ class OrderController extends Controller
             'sender' => 'client',
             'message' => 'Negosiasi harga: '.$validated['reason']."\n\nHarga tawaran: Rp ".number_format($validated['new_price'], 0, ',', '.')."\n\nDetail: ".($validated['description'] ?? '-'),
         ]);
+
+        if ($order->status === 'Pending') {
+            $order->update(['status' => 'Negotiated']);
+        }
 
         return redirect()->back()->with('success', 'Negosiasi berhasil dikirim ke freelancer.');
     }

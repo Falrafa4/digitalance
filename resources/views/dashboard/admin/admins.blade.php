@@ -6,7 +6,7 @@
 @endsection
 
 @section('content')
-    <div class="content-scroll flex-1 px-8 py-7 overflow-y-auto">
+    <div class="flex-1">
         <div class="flex items-end justify-between mb-8 gap-4 flex-wrap animate-fadeUp">
             <div>
                 <h1 class="font-display text-[2.1rem] font-extrabold text-slate-900">Admin Management</h1>

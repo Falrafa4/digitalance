@@ -10,7 +10,7 @@ class Freelancer extends Authenticatable
 {
     use HasApiTokens, HasFactory;
 
-    protected $fillable = ['student_id', 'bio', 'password', 'status'];
+    protected $fillable = ['student_id', 'bio', 'password', 'status', 'reject_reason'];
 
     protected $hidden = ['password'];
 

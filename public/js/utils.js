@@ -86,6 +86,38 @@ window.DigitalanceUtils = {
     },
 
     /**
+     * Format currency to Rupiah string
+     */
+    formatRupiah: function(value) {
+        if (value === null || value === undefined || value === '') return 'Rp 0';
+        var num = typeof value === 'string' ? parseFloat(value.replace(/[^0-9]/g, '')) : value;
+        if (isNaN(num)) return 'Rp 0';
+        return 'Rp ' + num.toLocaleString('id-ID');
+    },
+
+    /**
+     * Open modal by overlay ID
+     */
+    openModal: function(overlayId) {
+        var overlay = document.getElementById(overlayId);
+        if (!overlay) return;
+        overlay.classList.remove('opacity-0', 'pointer-events-none');
+        var box = overlay.querySelector('.modal-box, aside, [role="dialog"]');
+        if (box) box.classList.remove('scale-95');
+    },
+
+    /**
+     * Close modal by overlay ID
+     */
+    closeModal: function(overlayId) {
+        var overlay = document.getElementById(overlayId);
+        if (!overlay) return;
+        overlay.classList.add('opacity-0', 'pointer-events-none');
+        var box = overlay.querySelector('.modal-box, aside, [role="dialog"]');
+        if (box) box.classList.add('scale-95');
+    },
+
+    /**
      * Get CSRF token from meta tag or hidden input
      */
     getCsrfToken: function() {
@@ -144,3 +176,6 @@ window.DigitalanceUtils = {
         }
     }
 };
+
+// Backward compatibility alias
+window.DashboardUtils = window.DigitalanceUtils;

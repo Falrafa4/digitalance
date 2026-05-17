@@ -127,10 +127,12 @@
                                            class="px-4 py-2.5 rounded-[12px] bg-slate-900 text-white font-bold text-[12.5px] hover:bg-black transition-all">
                                             Detail
                                         </a>
+                                        @if($o->service_id && $o->service)
                                         <a href="{{ route('client.services.show', $o->service_id) }}"
                                            class="px-4 py-2.5 rounded-[12px] bg-white border-[1.5px] border-slate-200 text-slate-700 font-bold text-[12.5px] hover:border-[#0f766e] hover:text-[#0f766e] transition-all">
                                             Lihat Jasa
                                         </a>
+                                        @endif
                                     </div>
                                 </div>
                             @endforeach

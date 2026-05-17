@@ -1,3 +1,6 @@
+@php
+use Illuminate\Support\Str;
+@endphp
 @extends('layouts.dashboard')
 @section('title', 'Orders')
 
@@ -30,12 +33,25 @@
           <div data-pager-item class="bg-white border border-slate-200 rounded-[18px] p-5 hover:shadow-lg transition-all">
             <div class="flex items-start justify-between gap-4">
               <div class="min-w-0">
-                <p class="font-extrabold text-slate-900">Order #{{ $o->id }}</p>
+                <div class="flex items-center gap-2 mb-1">
+                  @if($o->lokerApplication)
+                    <span class="px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-indigo-100 text-indigo-700 uppercase tracking-wider">Lowongan</span>
+                  @endif
+                  <p class="font-extrabold text-slate-900">Order #{{ $o->id }}</p>
+                </div>
                 <p class="text-slate-500 text-[13px] mt-1 truncate">
-                  {{ $o->service->title ?? '-' }}
+                  @if($o->lokerApplication)
+                    {{ optional($o->freelancer->skomda_student)->name ?? 'Freelancer' }} - {{ Str::limit($o->brief, 40) }}
+                  @else
+                    {{ $o->service->title ?? '-' }}
+                  @endif
                 </p>
                 <p class="text-slate-400 text-[12px] font-bold mt-2">
-                  Agreed: {{ $o->agreed_price ? 'Rp ' . number_format((float) $o->agreed_price, 0, ',', '.') : 'Belum disepakati' }}
+                  @if($o->agreed_price)
+                    Rp {{ number_format((float) $o->agreed_price, 0, ',', '.') }}
+                  @else
+                    Belum disepakati
+                  @endif
                 </p>
               </div>
 
@@ -47,11 +63,13 @@
                  class="flex-1 px-4 py-2.5 rounded-[12px] bg-slate-900 text-white font-bold text-[12.5px] hover:bg-black transition-all text-center">
                 Detail
               </a>
-              <a href="{{ route('client.services.show', $o->service_id) }}"
-                 class="flex-1 px-4 py-2.5 rounded-[12px] bg-white border border-slate-200 text-slate-700 font-bold text-[12.5px]
-                        hover:border-[#0f766e] hover:text-[#0f766e] transition-all text-center">
-                Lihat Jasa
-              </a>
+              @if(!$o->lokerApplication)
+                <a href="{{ route('client.services.show', $o->service_id) }}"
+                   class="flex-1 px-4 py-2.5 rounded-[12px] bg-white border border-slate-200 text-slate-700 font-bold text-[12.5px]
+                          hover:border-[#0f766e] hover:text-[#0f766e] transition-all text-center">
+                  Lihat Jasa
+                </a>
+              @endif
             </div>
           </div>
         @endforeach
@@ -66,8 +84,6 @@
         </div>
       </div>
     </div>
-
-    
   @endif
 </section>
 @endsection

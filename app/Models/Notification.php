@@ -17,9 +17,11 @@ class Notification extends Model
         'user_id',
         'link',
         'is_read',
+        'is_kept',
     ];
 
     protected $casts = [
         'is_read' => 'boolean',
+        'is_kept' => 'boolean',
     ];
 }

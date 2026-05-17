@@ -7,7 +7,7 @@
     <section class="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4 mb-8 animate-fadeUp">
         <div class="min-w-0 flex-1">
             <h1 class="font-display text-[1.85rem] sm:text-[2.1rem] font-extrabold text-slate-900 leading-tight">
-                Selamat datang, {{ Auth::user()->name }}!
+                Selamat datang, {{ Auth::guard('administrator')->user()->name ?? 'Admin' }}!
                 <span class="inline-block">👋</span>
             </h1>
             <p class="text-slate-500 text-[0.95rem] mt-1">

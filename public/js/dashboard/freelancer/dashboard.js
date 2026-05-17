@@ -126,7 +126,7 @@
     const client = j?.client_name ?? j?.client?.name ?? j?.company ?? '—';
     const status = j?.status ?? 'New';
     const budget = j?.budget ?? j?.amount ?? j?.price ?? null;
-    const href = j?.href || j?.url || (id ? `${links.jobShowPrefix || '/freelancer/orders/'}${id}` : null);
+    const href = j?.href || j?.url || (id ? `${links.jobShowPrefix || '/freelancer/offers/'}${id}` : null);
     return { id, title, client, status, budget, href };
   }
 
@@ -237,7 +237,6 @@
   }
 
   function init() {
-    // Keep notif dot behavior consistent with other pages if controller provides it
     const notifBtn = $('notif-btn');
     const hasUnread = Boolean(page.hasUnread || page.has_unread || page.unread || false);
     if (notifBtn) {
@@ -257,7 +256,17 @@
         refresh();
       });
     });
+
+    if (window.__SHOW_ONBOARDING__) {
+      const overlay = $('onboarding-overlay');
+      if (overlay) overlay.classList.remove('hidden');
+    }
   }
+
+  window.closeOnboarding = function() {
+    const overlay = $('onboarding-overlay');
+    if (overlay) overlay.classList.add('hidden');
+  };
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();

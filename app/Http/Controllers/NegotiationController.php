@@ -63,12 +63,12 @@ class NegotiationController extends Controller
             return redirect()->back()->with('error', 'Anda tidak memiliki izin untuk mengirim pesan di negosiasi ini.');
         }
 
-        $request->validated();
+        $validated = $request->validated();
 
         $negotiation = Negotiation::create([
-            'order_id' => $request->order_id,
+            'order_id' => $validated['order_id'],
             'sender' => 'freelancer',
-            'message' => $request->message,
+            'message' => $validated['message'],
         ]);
 
         broadcast(new NegotiationSent($negotiation))->toOthers();

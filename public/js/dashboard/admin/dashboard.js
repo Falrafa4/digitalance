@@ -62,11 +62,29 @@
         var url = (container?.dataset.rejectUrl || '').replace('__ID__', id);
         if (!url) return;
 
-        if (!(await customConfirm('Yakin ingin menolak verifikasi ini?'))) return;
+        var reason = prompt('Masukkan alasan penolakan:');
+        if (reason === null) return;
+        reason = reason.trim();
+        if (!reason) {
+            window.showToast('Alasan penolakan wajib diisi.', 'warning');
+            return;
+        }
 
         setCardLoading(card, true);
         try {
-            await postAction(url);
+            var res = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ reason: reason })
+            });
+            var data = null;
+            try { data = await res.json(); } catch (e) { }
+            if (!res.ok) throw new Error(data?.message || 'Request gagal. Coba lagi.');
+
             card.classList.add('card-rejected');
             window.showToast('Verifikasi ditolak.', 'danger');
             setTimeout(function () {

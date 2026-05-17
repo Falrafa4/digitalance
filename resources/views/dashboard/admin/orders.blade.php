@@ -271,12 +271,6 @@
             box.classList.add('scale-95');
         };
 
-        window.confirmDeleteOrder = async function(id) {
-            if (await window.customConfirm(`Yakin ingin menghapus Order #ORD-${id}? Tindakan ini tidak dapat dibatalkan.`)) {
-                document.getElementById(`delete-order-${id}`).submit();
-            }
-        };
-
         window.openDeleteOrder = async function(id) {
             if (await window.customConfirm(`Yakin ingin menghapus Order #ORD-${id} secara permanen?`)) {
                 const form = document.createElement('form');

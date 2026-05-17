@@ -57,7 +57,7 @@ class ResultController extends Controller
 
         try {
             DB::transaction(function () use ($order, $filePath, $note, $version) {
-                $order->update(['status' => 'Completed']);
+                $order->update(['status' => 'Sent']);
 
                 Result::create([
                     'order_id' => $order->id,
@@ -71,7 +71,7 @@ class ResultController extends Controller
             throw $e;
         }
 
-        return redirect()->back()->with('success', 'Hasil kerja berhasil dikirim');
+        return redirect()->back()->with('success', 'Hasil kerja berhasil dikirim. Menunggu review client.');
     }
 
     public function show(Result $result)
@@ -82,7 +82,15 @@ class ResultController extends Controller
             return view('dashboard.admin.results-detail', compact('result'));
         }
 
-        return view('dashboard.freelancer.result-detail', compact('result'));
+        if (auth('freelancer')->check()) {
+            $freelancer = auth('freelancer')->user();
+            if ($result->order->service->freelancer_id !== $freelancer->id) {
+                abort(403, 'Anda tidak memiliki izin untuk melihat hasil ini.');
+            }
+            return view('dashboard.freelancer.result-detail', compact('result'));
+        }
+
+        abort(403, 'Unauthorized');
     }
 
     public function update(UpdateResultRequest $request, Result $result)

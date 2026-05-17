@@ -16,16 +16,10 @@
     }
 
     $role = ($segment === 'admin') ? 'admin' : ($segment === 'client' ? 'client' : ($segment === 'freelancer' ? 'freelancer' : null));
-    $notifUnreadCount = 0;
-
-    if ($role && $user) {
-        $notifUnreadCount = \App\Models\Notification::where('role', $role)
-            ->where(function ($q) use ($user) {
-                $q->where('user_id', $user->id)
-                    ->orWhereNull('user_id');
-            })
-            ->where('is_read', false)
-            ->count();
+    // Gunakan variable dari layout ($notifUnreadCount sudah dihitung di layouts/dashboard.blade.php)
+    // Fallback jika header dipakai di luar layout
+    if (!isset($notifUnreadCount)) {
+        $notifUnreadCount = 0;
     }
 @endphp
 
