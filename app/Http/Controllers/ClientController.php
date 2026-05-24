@@ -6,9 +6,9 @@ use App\Http\Requests\StoreClientRequest;
 use App\Http\Requests\UpdateClientPasswordRequest;
 use App\Http\Requests\UpdateClientProfileRequest;
 use App\Models\Client;
-use App\Models\Freelancer;
 use App\Models\SkomdaStudent;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class ClientController extends Controller
@@ -20,31 +20,42 @@ class ClientController extends Controller
      */
     public function index(Request $request)
     {
-        $q = $request->query('q');
+        $q = trim($request->query('q', ''));
         $role = $request->query('role', 'all');
 
-        $clientsQuery = Client::query()->select('id', 'name', 'email', 'phone', \DB::raw("'Client' as role"), \DB::raw("'Active' as status"), 'created_at');
-        $skomdaQuery = SkomdaStudent::query()->select('id', 'name', 'email', 'phone', \DB::raw("'Skomda Student' as role"), \DB::raw("'Active' as status"), 'created_at');
-        // For freelancer, we need to join or select carefully.
-        $freelancersQuery = Freelancer::join('skomda_students', 'freelancers.student_id', '=', 'skomda_students.id')
-            ->select('freelancers.id', 'skomda_students.name', 'skomda_students.email', 'skomda_students.phone', \DB::raw("'Freelancer' as role"), 'freelancers.status', 'freelancers.created_at');
+        $clientsQuery = Client::query()->select('id', 'name', 'email', 'phone', DB::raw("'Client' as role"), DB::raw("'Active' as status"), 'created_at');
+        $skomdaQuery = SkomdaStudent::query()->select('id', 'name', 'email', 'phone', DB::raw("'Skomda Student' as role"), DB::raw("'Active' as status"), 'created_at');
+        // Use the query builder so Freelancer::getNameAttribute() does not override the joined student name.
+        $freelancersQuery = DB::table('freelancers')
+            ->join('skomda_students', 'freelancers.student_id', '=', 'skomda_students.id')
+            ->select('freelancers.id', 'skomda_students.name', 'skomda_students.email', 'skomda_students.phone', DB::raw("'Freelancer' as role"), 'freelancers.status', 'freelancers.created_at');
 
-        if ($q) {
-            $clientsQuery->where(fn ($query) => $query->where('name', 'like', "%{$q}%")->orWhere('email', 'like', "%{$q}%"));
-            $skomdaQuery->where(fn ($query) => $query->where('name', 'like', "%{$q}%")->orWhere('email', 'like', "%{$q}%")->orWhere('nis', 'like', "%{$q}%"));
-            $freelancersQuery->where(fn ($query) => $query->where('skomda_students.name', 'like', "%{$q}%")->orWhere('skomda_students.email', 'like', "%{$q}%"));
+        if ($q !== '') {
+            $clientsQuery->where(fn($query) => $query
+                ->where('name', 'like', "%{$q}%")
+                ->orWhere('email', 'like', "%{$q}%"));
+
+            $skomdaQuery->where(fn($query) => $query
+                ->where('name', 'like', "%{$q}%")
+                ->orWhere('email', 'like', "%{$q}%")
+                ->orWhere('nis', 'like', "%{$q}%"));
+
+            $freelancersQuery->where(fn($query) => $query
+                ->where('skomda_students.name', 'like', "%{$q}%")
+                ->orWhere('skomda_students.email', 'like', "%{$q}%")
+                ->orWhere('skomda_students.nis', 'like', "%{$q}%"));
         }
 
         if ($role === 'Client') {
             $users = $clientsQuery->latest()->paginate(12)->withQueryString();
         } elseif ($role === 'Freelancer') {
-            $users = $freelancersQuery->latest('freelancers.created_at')->paginate(12)->withQueryString();
+            $users = $freelancersQuery->orderByDesc('freelancers.created_at')->paginate(12)->withQueryString();
         } elseif ($role === 'Skomda Student') {
             $users = $skomdaQuery->latest()->paginate(12)->withQueryString();
         } else {
             // Combined using Union
             $combined = $clientsQuery->union($skomdaQuery)->union($freelancersQuery);
-            $users = \DB::table(\DB::raw("({$combined->toSql()}) as combined"))
+            $users = DB::table(DB::raw("({$combined->toSql()}) as combined"))
                 ->mergeBindings($combined->getQuery())
                 ->orderBy('created_at', 'desc')
                 ->paginate(12)
@@ -162,7 +173,7 @@ class ClientController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        return redirect()->route('admin.clients.index')->with('success', 'Password '.$client->name.' berhasil diperbarui');
+        return redirect()->route('admin.clients.index')->with('success', 'Password ' . $client->name . ' berhasil diperbarui');
     }
 
     public function updateFreelancerPassword(Request $request, $id)
@@ -177,7 +188,7 @@ class ClientController extends Controller
         ]);
 
         return redirect()->route('admin.clients.index', ['role' => 'Freelancer'])
-            ->with('success', 'Password '.($freelancer->skomda_student->name ?? 'Freelancer').' berhasil diperbarui');
+            ->with('success', 'Password ' . ($freelancer->skomda_student->name ?? 'Freelancer') . ' berhasil diperbarui');
     }
 
     public function updateSkomdaPassword(Request $request, $id)
@@ -192,7 +203,7 @@ class ClientController extends Controller
         ]);
 
         return redirect()->route('admin.clients.index', ['role' => 'Skomda Student'])
-            ->with('success', 'Password '.$skomdaStudent->name.' berhasil diperbarui');
+            ->with('success', 'Password ' . $skomdaStudent->name . ' berhasil diperbarui');
     }
 
     // ==========================================
