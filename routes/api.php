@@ -7,6 +7,7 @@
 // use App\Http\Controllers\ServiceCategoryController;
 // use App\Http\Controllers\ServiceController;
 // use App\Http\Controllers\SkomdaStudentController;
+use App\Http\Controllers\Api\AuthControllerApi;
 use App\Http\Controllers\Api\ClientControllerApi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -23,6 +24,14 @@ Route::get('/test', function () {
 });
 
 Route::prefix('v1')->group(function() {
+    Route::prefix('auth')->group(function () {
+        Route::post('/register/client', [AuthControllerApi::class, 'registerClient']);
+        Route::post('/register/freelancer', [AuthControllerApi::class, 'registerFreelancer']);
+        Route::post('/login', [AuthControllerApi::class, 'login'])->middleware('throttle:5,1');
+        Route::post('/logout', [AuthControllerApi::class, 'logout'])->middleware('auth:sanctum');
+        Route::get('/me', [AuthControllerApi::class, 'me'])->middleware('auth:sanctum');
+    });
+    
     Route::middleware('auth:sanctum', 'role:administrator')->group(function () {
         Route::apiResource('clients', ClientControllerApi::class);
         Route::put('/freelancers/{id}/password', [ClientControllerApi::class, 'updateFreelancerPassword']);
