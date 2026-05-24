@@ -116,6 +116,7 @@ Digitalance dibuat untuk:
 - `laravel/sanctum`
 - `laravel/reverb`
 - `dedoc/scramble`
+- `phpoffice/phpspreadsheet`
 
 ---
 
@@ -195,6 +196,14 @@ DB_PASSWORD=
 
 ### 7. Jalankan Migrasi dan Seeder
 
+Seeder data siswa membaca file Excel lokal dari:
+
+```text
+database/seeders/data/siswa.xlsx
+```
+
+Pastikan file tersebut tersedia sebelum menjalankan seeder. File `.xlsx` pada folder tersebut tidak disimpan di repository.
+
 ```bash
 php artisan migrate --seed
 ```
@@ -248,6 +257,8 @@ Setelah menjalankan:
 ```bash
 php artisan migrate --seed
 ```
+
+Data `SkomdaStudent` akan diimpor dari file Excel lokal `database/seeders/data/siswa.xlsx`.
 
 Akun berikut dapat digunakan:
 

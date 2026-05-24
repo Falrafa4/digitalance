@@ -12,8 +12,10 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         if (app()->environment('production')) {
+            $this->call(SkomdaStudentSeeder::class);
             $this->call(ProductionSeeder::class);
         } else {
+            $this->call(SkomdaStudentSeeder::class);
             $this->call(DevelopmentSeeder::class);
         }
     }

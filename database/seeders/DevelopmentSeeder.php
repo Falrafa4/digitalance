@@ -46,7 +46,7 @@ class DevelopmentSeeder extends Seeder
         );
 
         // 2 - BASE USER DATA
-        $students = SkomdaStudent::factory(50)->create();
+        // $students = SkomdaStudent::factory(50)->create();
         $clients = Client::factory(10)->create();
         User::factory(5)->create();
 
