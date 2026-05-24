@@ -11,24 +11,40 @@ jobs:
 
     steps:
       - name: Deploy to VPS
-        uses: appleboy/ssh-action@master
+        uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USERNAME }}
           key: ${{ secrets.VPS_SSH_KEY }}
           port: ${{ secrets.VPS_PORT }}
+          command_timeout: 20m
           
           script: |
+            set -Eeuo pipefail
+
             cd /var/www/digitalance
-            git pull origin main
-            composer install --no-dev --optimize-autoloader
+
+            echo "== Clear generated Laravel cache files =="
+            rm -f bootstrap/cache/*.php
+
+            echo "== Sync latest code =="
+            git fetch origin main
+            git reset --hard origin/main
+
+            echo "== Install dependencies =="
+            composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction
+
+            echo "== Clear Laravel cache =="
+            php artisan optimize:clear
+
+            echo "== Run migration =="
             php artisan migrate --force
 
-            php artisan config:cache
-            php artisan route:cache
-            php artisan view:cache
+            echo "== Optimize Laravel =="
             php artisan optimize
 
-            whoami
-            sudo -l
-            sudo systemctl restart nginx
+            echo "== Fix permission =="
+            chmod -R ug+rw storage bootstrap/cache
+
+            echo "== Restart services =="
+            sudo systemctl reload nginx
