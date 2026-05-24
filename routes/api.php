@@ -22,11 +22,24 @@ Route::get('/test', function () {
     ]);
 });
 
-Route::get('/clients', [ClientControllerApi::class, 'index']);
-Route::post('/clients', [ClientControllerApi::class, 'store']);
-Route::get('/clients/{id}', [ClientControllerApi::class, 'show']);
-Route::put('/clients/{id}', [ClientControllerApi::class, 'update']);
-Route::delete('/clients/{id}', [ClientControllerApi::class, 'destroy']);
+Route::prefix('v1')->group(function() {
+    Route::middleware('auth:sanctum', 'role:administrator')->group(function () {
+        Route::apiResource('clients', ClientControllerApi::class);
+        Route::put('/freelancers/{id}/password', [ClientControllerApi::class, 'updateFreelancerPassword']);
+        Route::put('/skomda-students/{id}/password', [ClientControllerApi::class, 'updateSkomdaPassword']);
+        Route::put('/clients/{id}/password', [ClientControllerApi::class, 'updateClientPassword']);
+    });
+
+    Route::middleware('auth:sanctum', 'role:freelancer')->group(function () {
+        Route::get('/freelancers/clients', [ClientControllerApi::class, 'freelancerIndex']);
+    });
+
+    Route::middleware('auth:sanctum', 'role:client')->group(function () {
+        Route::get('/clients/profile', [ClientControllerApi::class, 'profile']);
+        Route::put('/clients/profile', [ClientControllerApi::class, 'updateProfile']);
+        Route::put('/clients/password', [ClientControllerApi::class, 'updatePassword']);
+    });
+});
 
 // Route::prefix('auth')->group(function () {
 //     Route::post('/register-client', [AuthController::class, 'register_client']);
