@@ -21,7 +21,7 @@
                 </div>
             </div>
             <button id="btn-add-user" class="px-6 py-3.5 bg-[#0f766e] text-white font-black text-[13px] rounded-2xl shadow-teal-md hover:bg-[#0a5e58] transition-all flex items-center gap-2">
-                <i class="ri-user-add-line"></i> Add New User
+                <i class="ri-user-add-line"></i> Tambah User
             </button>
         </div>
     </div>
@@ -30,12 +30,12 @@
         <div class="flex gap-2 flex-wrap">
              <a href="{{ route('admin.clients.index', ['role' => 'all']) }}" 
                class="px-[18px] py-2 rounded-full border-[1.5px] font-bold text-[12.5px] transition-all {{ $role === 'all' ? 'border-[#0f766e] bg-[#0f766e] text-white shadow-teal-sm' : 'border-slate-200 bg-white text-slate-500 hover:border-[#0f766e]' }}">
-                All Users
+                Semua User
             </a>
-            @foreach(['Client', 'Freelancer', 'Skomda Student'] as $r)
+            @foreach(['Client', 'Freelancer', 'Siswa Skomda'] as $r)
                 <a href="{{ route('admin.clients.index', ['role' => $r]) }}" 
                    class="px-[18px] py-2 rounded-full border-[1.5px] font-bold text-[12.5px] transition-all {{ $role === $r ? 'border-[#0f766e] bg-[#0f766e] text-white shadow-teal-sm' : 'border-slate-200 bg-white text-slate-500 hover:border-[#0f766e]' }}">
-                    {{ $r }}s
+                    {{ $r }}
                 </a>
             @endforeach
         </div>
@@ -136,7 +136,7 @@
              <div class="p-7">
                 <div class="flex justify-between items-center mb-8">
                     <div>
-                        <h2 class="text-[1.5rem] font-black text-slate-900">Add New User</h2>
+                        <h2 class="text-[1.5rem] font-black text-slate-900">Tambah User Baru</h2>
                         <p class="text-slate-400 text-sm font-medium mt-1">Daftarkan pengguna baru ke platform.</p>
                     </div>
                     <button onclick="window.closeAddModal()" class="w-10 h-10 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center hover:bg-red-50 hover:text-red-500 transition">
@@ -145,11 +145,11 @@
                 </div>
                 
                 <div class="mb-8">
-                    <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3">Select User Role</label>
+                    <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3">Pilih Peran User</label>
                     <div class="grid grid-cols-3 gap-3">
                         <button type="button" onclick="window.setAddRole('Client')" id="role-btn-Client" class="role-selector py-3 rounded-2xl border-2 border-slate-100 font-black text-[11px] uppercase tracking-wider text-slate-400 hover:border-[#0f766e] hover:text-[#0f766e] transition-all active">Client</button>
                         <button type="button" onclick="window.setAddRole('Freelancer')" id="role-btn-Freelancer" class="role-selector py-3 rounded-2xl border-2 border-slate-100 font-black text-[11px] uppercase tracking-wider text-slate-400 hover:border-[#0f766e] hover:text-[#0f766e] transition-all">Freelancer</button>
-                        <button type="button" onclick="window.setAddRole('Skomda Student')" id="role-btn-Student" class="role-selector py-3 rounded-2xl border-2 border-slate-100 font-black text-[11px] uppercase tracking-wider text-slate-400 hover:border-[#0f766e] hover:text-[#0f766e] transition-all">Student</button>
+                        <button type="button" onclick="window.setAddRole('Skomda Student')" id="role-btn-Student" class="role-selector py-3 rounded-2xl border-2 border-slate-100 font-black text-[11px] uppercase tracking-wider text-slate-400 hover:border-[#0f766e] hover:text-[#0f766e] transition-all">Siswa</button>
                     </div>
                 </div>
 
@@ -160,28 +160,28 @@
                     <div id="fields-common" class="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-4">
                         <!-- Client & Common Fields -->
                         <div class="field-group" id="group-name">
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Full Name</label>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Nama Lengkap</label>
                             <input type="text" name="name" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700" placeholder="e.g. Budi Santoso">
                         </div>
 
                         <div class="field-group" id="group-email">
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Email Address</label>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Alamat Email</label>
                             <input type="email" name="email" id="input-email" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700" placeholder="name@example.com">
                         </div>
 
                         <div class="field-group" id="group-phone">
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Phone Number</label>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Nomor Telepon</label>
                             <input type="text" name="phone" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700" placeholder="+62...">
                         </div>
 
                         <div class="field-group" id="group-password">
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Initial Password</label>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Kata Sandi</label>
                             <input type="password" name="password" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700" placeholder="Min. 8 characters">
                         </div>
 
                         <!-- Freelancer specific: Select Student -->
                         <div class="field-group hidden" id="group-student">
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Select Skomda Student <span class="text-red-400">*</span></label>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Pilih Siswa <span class="text-red-400">*</span></label>
                             <select name="student_id" id="select-student" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700 appearance-none">
                                 <option value="" selected disabled>Pilih Siswa...</option>
                                 @foreach($skomdaAll as $s)
@@ -191,16 +191,16 @@
                         </div>
 
                         <div class="field-group hidden md:col-span-2" id="group-bio">
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Short Bio</label>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Bio</label>
                             <textarea name="bio" rows="2" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700 resize-none" placeholder="Freelancer bio..."></textarea>
                         </div>
 
                         <!-- Student specific fields - Split into 2 columns -->
                         <div class="hidden md:col-span-2" id="group-student-fields">
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2.5">Student Information</label>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2.5">Informasi Siswa</label>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-3.5">
                                 <div>
-                                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Full Name <span class="text-red-400">*</span></label>
+                                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Nama Lengkap <span class="text-red-400">*</span></label>
                                     <input type="text" name="name" id="input-student-name" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700" placeholder="Nama Lengkap">
                                 </div>
                                 <div>
@@ -208,18 +208,18 @@
                                     <input type="text" name="nis" id="input-student-nis" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700" placeholder="123456789">
                                 </div>
                                 <div>
-                                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Class <span class="text-red-400">*</span></label>
+                                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Kelas <span class="text-red-400">*</span></label>
                                     <input type="text" name="class" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700" placeholder="XI SIJA 1">
                                 </div>
                                 <div>
-                                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Major <span class="text-red-400">*</span></label>
+                                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Jurusan <span class="text-red-400">*</span></label>
                                     <select name="major" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700 appearance-none">
                                         <option value="SIJA">SIJA</option>
                                         <option value="TJAT">TJAT</option>
                                     </select>
                                 </div>
                                 <div class="md:col-span-2">
-                                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Phone</label>
+                                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Nomor Telepon <span class="text-red-400">*</span></label>
                                     <input type="text" name="phone" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700" placeholder="+62...">
                                 </div>
                                 <div class="md:col-span-2 mt-1">
@@ -539,25 +539,35 @@
             const groupBio = document.getElementById('group-bio');
             const groupStudentFields = document.getElementById('group-student-fields');
 
-            // Hide all specific fields first
-            [groupName, groupEmail, groupPhone, groupPassword, groupStudent, groupBio, groupStudentFields].forEach(el => {
-                if (el) el.classList.add('hidden');
+            const setGroupActive = function(group, isActive) {
+                if (! group) return;
+
+                group.classList.toggle('hidden', ! isActive);
+                group.querySelectorAll('input, select, textarea').forEach(field => {
+                    field.disabled = ! isActive;
+                });
+            };
+
+            // Hidden form fields are still submitted by the browser unless disabled.
+            // This modal has duplicate names across roles, so disable inactive groups.
+            [groupName, groupEmail, groupPhone, groupPassword, groupStudent, groupBio, groupStudentFields].forEach(group => {
+                setGroupActive(group, false);
             });
 
             if (role === 'Client') {
                 form.action = "{{ route('admin.clients.store') }}";
-                groupName.classList.remove('hidden');
-                groupEmail.classList.remove('hidden');
-                groupPhone.classList.remove('hidden');
-                groupPassword.classList.remove('hidden');
+                setGroupActive(groupName, true);
+                setGroupActive(groupEmail, true);
+                setGroupActive(groupPhone, true);
+                setGroupActive(groupPassword, true);
             } else if (role === 'Freelancer') {
                 form.action = "{{ route('admin.freelancers.store') }}";
-                groupPassword.classList.remove('hidden');
-                groupStudent.classList.remove('hidden');
-                groupBio.classList.remove('hidden');
+                setGroupActive(groupPassword, true);
+                setGroupActive(groupStudent, true);
+                setGroupActive(groupBio, true);
             } else if (role === 'Skomda Student') {
                 form.action = "{{ route('admin.skomda-students.store') }}";
-                groupStudentFields.classList.remove('hidden');
+                setGroupActive(groupStudentFields, true);
             }
         };
 

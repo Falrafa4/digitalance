@@ -89,7 +89,7 @@ Route::middleware('auth:administrator')->prefix('admin')->name('admin.')->group(
     Route::put('/admins/{administrator}/password', [AdministratorController::class, 'updateAdminPassword'])->name('admins.password');
 
     // Clients (CRUD)
-    Route::get('/clients', [ClientController::class, 'index'])->name('clients.index');
+    Route::get('/users', [ClientController::class, 'index'])->name('clients.index');
     Route::post('/clients', [ClientController::class, 'store'])->name('clients.store');
     Route::get('/clients/{client}', [ClientController::class, 'show'])->name('clients.show');
     Route::put('/clients/{client}', [ClientController::class, 'update'])->name('clients.update');
