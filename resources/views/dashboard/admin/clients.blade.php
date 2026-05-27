@@ -182,12 +182,12 @@
                         <!-- Freelancer specific: Select Student -->
                         <div class="field-group hidden" id="group-student">
                             <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Pilih Siswa <span class="text-red-400">*</span></label>
-                            <select name="student_id" id="select-student" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700 appearance-none">
-                                <option value="" selected disabled>Pilih Siswa...</option>
-                                @foreach($skomdaAll as $s)
-                                    <option value="{{ $s->id }}" data-name="{{ $s->name }}" data-nis="{{ $s->nis }}">{{ $s->name }} ({{ $s->nis }})</option>
-                                @endforeach
-                            </select>
+                            <div class="relative" id="student-combobox">
+                                <input type="text" id="student-search-input" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700" placeholder="Cari nama atau NIS..." autocomplete="off">
+                                <input type="hidden" name="student_id" id="student-id-input">
+                                <div id="student-search-list" class="hidden absolute z-[120] mt-2 w-full max-h-56 overflow-y-auto rounded-2xl border border-slate-200 bg-white shadow-2xl shadow-slate-200/60 p-1.5"></div>
+                            </div>
+                            <p class="text-[9px] text-slate-400 mt-1.5">Pilih siswa dari daftar agar ID siswa tersimpan.</p>
                         </div>
 
                         <div class="field-group hidden md:col-span-2" id="group-bio">
@@ -248,6 +248,7 @@
 @section('scripts')
     <script>
         window.__USERS_DATA__ = @json($users->items());
+        window.__SKOMDA_STUDENTS__ = @json($skomdaAll);
 
         window.openUserModal = function(role, id) {
             const u = window.__USERS_DATA__.find(x => x.id == id && x.role == role);
@@ -371,7 +372,10 @@
         };
 
         window.closeUserModal = () => window.closeModal('modal-user-overlay');
-        window.openAddModal = () => window.openModal('modal-add-overlay');
+        window.openAddModal = function() {
+            window.resetStudentCombobox?.();
+            window.openModal('modal-add-overlay');
+        };
         window.closeAddModal = () => window.closeModal('modal-add-overlay');
 
         window.openUserDetail = function(role, id) {
@@ -514,6 +518,100 @@
 
         window.closePasswordModal = () => window.closeModal('modal-password-overlay');
 
+        const studentCombobox = document.getElementById('student-combobox');
+        const studentSearchInput = document.getElementById('student-search-input');
+        const studentIdInput = document.getElementById('student-id-input');
+        const studentSearchList = document.getElementById('student-search-list');
+        const skomdaStudents = (window.__SKOMDA_STUDENTS__ || []).map(student => ({
+            id: String(student.id),
+            name: student.name || '',
+            nis: student.nis || '',
+        }));
+
+        const closeStudentList = function() {
+            studentSearchList?.classList.add('hidden');
+        };
+
+        const selectStudent = function(student) {
+            if (! studentSearchInput || ! studentIdInput) return;
+
+            studentSearchInput.value = `${student.name} (${student.nis})`;
+            studentIdInput.value = student.id;
+            closeStudentList();
+        };
+
+        const renderStudentList = function(query = '') {
+            if (! studentSearchList) return;
+
+            const normalizedQuery = query.trim().toLowerCase();
+            const matches = skomdaStudents
+                .filter(student => {
+                    if (! normalizedQuery) return true;
+
+                    return student.name.toLowerCase().includes(normalizedQuery)
+                        || student.nis.toLowerCase().includes(normalizedQuery);
+                })
+                .slice(0, 8);
+
+            studentSearchList.innerHTML = '';
+
+            if (matches.length === 0) {
+                const empty = document.createElement('div');
+                empty.className = 'px-4 py-3 text-[12px] font-bold text-slate-400';
+                empty.textContent = 'Siswa tidak ditemukan';
+                studentSearchList.appendChild(empty);
+            } else {
+                matches.forEach(student => {
+                    const item = document.createElement('button');
+                    item.type = 'button';
+                    item.className = 'w-full px-4 py-3 rounded-xl text-left hover:bg-teal-50 focus:bg-teal-50 focus:outline-none transition-colors';
+                    item.addEventListener('click', () => selectStudent(student));
+
+                    const name = document.createElement('div');
+                    name.className = 'text-[12.5px] font-black text-slate-800';
+                    name.textContent = student.name;
+
+                    const nis = document.createElement('div');
+                    nis.className = 'text-[10px] font-bold text-slate-400 mt-0.5';
+                    nis.textContent = `NIS ${student.nis}`;
+
+                    item.append(name, nis);
+                    studentSearchList.appendChild(item);
+                });
+            }
+
+            studentSearchList.classList.remove('hidden');
+        };
+
+        window.resetStudentCombobox = function() {
+            if (studentSearchInput) studentSearchInput.value = '';
+            if (studentIdInput) studentIdInput.value = '';
+            closeStudentList();
+        };
+
+        studentSearchInput?.addEventListener('focus', () => {
+            if (studentSearchInput.disabled) return;
+            renderStudentList(studentSearchInput.value);
+        });
+
+        studentSearchInput?.addEventListener('input', () => {
+            if (studentIdInput) studentIdInput.value = '';
+            renderStudentList(studentSearchInput.value);
+        });
+
+        studentSearchInput?.addEventListener('keydown', event => {
+            if (event.key === 'Escape') {
+                closeStudentList();
+                studentSearchInput.blur();
+            }
+        });
+
+        document.addEventListener('click', event => {
+            if (! studentCombobox?.contains(event.target)) {
+                closeStudentList();
+            }
+        });
+
         window.setAddRole = function(role) {
             // Update UI
             document.querySelectorAll('.role-selector').forEach(btn => {
@@ -556,17 +654,20 @@
 
             if (role === 'Client') {
                 form.action = "{{ route('admin.clients.store') }}";
+                window.resetStudentCombobox?.();
                 setGroupActive(groupName, true);
                 setGroupActive(groupEmail, true);
                 setGroupActive(groupPhone, true);
                 setGroupActive(groupPassword, true);
             } else if (role === 'Freelancer') {
                 form.action = "{{ route('admin.freelancers.store') }}";
+                window.resetStudentCombobox?.();
                 setGroupActive(groupPassword, true);
                 setGroupActive(groupStudent, true);
                 setGroupActive(groupBio, true);
             } else if (role === 'Skomda Student') {
                 form.action = "{{ route('admin.skomda-students.store') }}";
+                window.resetStudentCombobox?.();
                 setGroupActive(groupStudentFields, true);
             }
         };
