@@ -37,17 +37,28 @@ class AuthController extends Controller
         /** @var array{student_id:int|string, password:string} $validated */
         $validated = $request->validated();
 
+        // 1. Validasi ganda sebelum create untuk mencegah DB constraint bypass
+        $isExists = Freelancer::where('student_id', $validated['student_id'])->exists();
+        if ($isExists) {
+            return back()->withErrors(['student_id' => 'Akun freelancer untuk siswa ini sudah terdaftar. Silakan login.'])->withInput();
+        }
+
         $student = SkomdaStudent::where('id', $validated['student_id'])->first();
 
         if (!$student) {
             return back()->withErrors(['student_id' => 'Siswa dengan ID Student tersebut tidak ditemukan'])->withInput();
         }
 
-        $student->freelancer()->create([
-            'student_id' => $validated['student_id'],
-            'password' => Hash::make($validated['password']),
-            'status' => 'Pending',
-        ]);
+        // 2. Bungkus dalam try-catch agar jika terjadi anomali DB tetap kembali ke form (bukan crash 500)
+        try {
+            $student->freelancer()->create([
+                'student_id' => $validated['student_id'],
+                'password' => Hash::make($validated['password']),
+                'status' => 'Pending',
+            ]);
+        } catch (\Exception $e) {
+            return back()->withErrors(['student_id' => 'Gagal mendaftarkan freelancer karena masalah internal database.'])->withInput();
+        }
 
         return redirect('/login')->with('success', 'Registrasi freelancer berhasil. Silakan login.');
     }

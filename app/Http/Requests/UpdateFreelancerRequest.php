@@ -21,15 +21,15 @@ class UpdateFreelancerRequest extends FormRequest
      */
     public function rules(): array
     {
-        $freelancer = $this->route('freelancer');
-        $id = is_object($freelancer) ? $freelancer->id : $freelancer;
+        $isFreelancer = auth('freelancer')->check();
 
         return [
             'bio' => 'nullable|string',
-            'status' => 'required|in:Pending,Approved,Suspended,Rejected',
+            'status' => $isFreelancer ? 'nullable|in:Pending,Approved,Suspended,Rejected' : 'required|in:Pending,Approved,Suspended,Rejected',
             'name' => 'nullable|string|max:255',
             'email' => 'nullable|email',
             'phone' => 'nullable|string|max:20',
+            'password' => 'nullable|string|min:6', // Tambahkan antisipasi update password langsung
         ];
     }
 }

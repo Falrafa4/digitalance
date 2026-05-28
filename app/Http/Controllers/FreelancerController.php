@@ -35,11 +35,35 @@ class FreelancerController extends Controller
     {
         /** @var Freelancer $freelancer */
         $freelancer = auth('freelancer')->user();
-        /** @var array{bio?:string|null} $validated */
+        
         $validated = $request->validated();
-        $freelancer->update([
+        
+        $freelancerData = [
             'bio' => $validated['bio'] ?? $freelancer->bio,
-        ]);
+        ];
+
+        if (!empty($validated['password'])) {
+            $freelancerData['password'] = Hash::make($validated['password']);
+        }
+
+        $freelancer->update($freelancerData);
+
+        if ($freelancer->skomda_student) {
+            $studentData = [];
+            if (isset($validated['name'])) {
+                $studentData['name'] = $validated['name'];
+            }
+            if (isset($validated['email'])) {
+                $studentData['email'] = $validated['email'];
+            }
+            if (isset($validated['phone'])) {
+                $studentData['phone'] = $validated['phone'];
+            }
+
+            if (!empty($studentData)) {
+                $freelancer->skomda_student->update($studentData);
+            }
+        }
 
         return redirect()->route('freelancer.profile')->with('success', 'Profil berhasil diperbarui');
     }
