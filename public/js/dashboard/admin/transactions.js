@@ -11,11 +11,8 @@
     let trxData = Array.isArray(page.data) ? page.data : (page.data?.data || []);
 
     let currentPage = 1;
-    let itemsPerPage = 10;
+    let itemsPerPage = 15;
     let reportTargetId = null;
-
-    window.openModal = openModal;
-    window.closeModal = closeModal;
 
     // RENDER STATS
     function renderStats() {
@@ -177,6 +174,9 @@
         `;
         openModal('modal-detail-trx');
     };
+
+    window.showTransactionDetail = window.openTrxModal;
+    window.closeModal = closeModal;
 
     // REPORT FAKE
     window.openReportModal = function(id) {

@@ -43,7 +43,7 @@ use Illuminate\Support\Str;
                   @if($o->lokerApplication)
                     {{ optional($o->freelancer->skomda_student)->name ?? 'Freelancer' }} - {{ Str::limit($o->brief, 40) }}
                   @else
-                    {{ $o->service->title ?? '-' }}
+                    {{ $o->service?->title ?? '-' }}
                   @endif
                 </p>
                 <p class="text-slate-400 text-[12px] font-bold mt-2">

@@ -188,7 +188,7 @@
                                 <div
                                     class="px-6 py-5 bg-slate-50 border border-slate-200 rounded-2xl text-slate-500 font-bold flex items-center justify-center md:justify-start gap-2">
                                     <span class="text-slate-400 font-medium">Rp</span>
-                                    <span class="text-2xl">{{ number_format($order->service->price_min ?? 0, 0, ',', '.') }}</span>
+                                    <span class="text-2xl">{{ number_format($order->agreed_price ?? $order->service?->price_min ?? 0, 0, ',', '.') }}</span>
                                 </div>
                             </div>
 
@@ -201,7 +201,7 @@
                                         class="absolute left-6 top-1/2 -translate-y-1/2 text-emerald-600 font-black text-xl">Rp</span>
                                     <input type="number" name="agreed_price" id="agreed_price" required step="1"
                                         class="w-full pl-16 pr-6 py-5 bg-white border-2 border-emerald-100 rounded-2xl focus:border-emerald-500 focus:ring-8 focus:ring-emerald-500/10 outline-none transition-all font-black text-slate-900 text-2xl shadow-inner text-center md:text-left"
-                                        value="{{ old('agreed_price', (int)($order->agreed_price ?? $order->service->price_min ?? 0)) }}">
+                                        value="{{ old('agreed_price', (int)($order->agreed_price ?? $order->service?->price_min ?? 0)) }}">
                                 </div>
                             </div>
                         </div>
@@ -254,7 +254,7 @@
                             <div>
                                 <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Harga Saat Ini</label>
                                 <div class="px-5 py-4 bg-slate-50 border border-slate-200 rounded-xl text-slate-500 font-bold">
-                                    Rp {{ number_format($order->agreed_price ?? $order->service->price ?? 0, 0, ',', '.') }}
+                                    Rp {{ number_format($order->agreed_price ?? $order->service?->price_min ?? 0, 0, ',', '.') }}
                                 </div>
                             </div>
                             <div>
@@ -263,7 +263,7 @@
                                     <span class="absolute left-4 top-1/2 -translate-y-1/2 text-teal-600 font-bold">Rp</span>
                                     <input type="number" name="agreed_price" id="agreed_price" required step="1"
                                         class="w-full pl-12 pr-4 py-4 bg-white border-2 border-teal-100 rounded-xl focus:border-teal-500 outline-none font-bold text-slate-900 shadow-sm"
-                                        value="{{ old('agreed_price', (int)($order->agreed_price ?? $order->service->price_min ?? 0)) }}">
+                                        value="{{ old('agreed_price', (int)($order->agreed_price ?? $order->service?->price_min ?? 0)) }}">
                                 </div>
                             </div>
                         </div>
@@ -420,7 +420,7 @@
                         <div class="flex justify-between">
                             <span class="text-slate-400 font-medium">Kategori</span>
                             <span
-                                class="font-bold text-slate-700">{{ $order->service->service_category->name ?? '-' }}</span>
+                                class="font-bold text-slate-700">{{ $order->service?->service_category?->name ?? $order->lokerApplication?->loker?->category?->name ?? 'Custom Project' }}</span>
                         </div>
                         <div class="flex justify-between">
                             <span class="text-slate-400 font-medium">Tanggal Masuk</span>

@@ -166,6 +166,20 @@ window.DigitalanceUtils = {
     },
 
     /**
+     * DOM selector helper (single element)
+     */
+    $: function(id) {
+        return document.getElementById(id);
+    },
+
+    /**
+     * DOM selector helper (multiple elements)
+     */
+    $$: function(sel) {
+        return document.querySelectorAll(sel);
+    },
+
+    /**
      * DOM ready helper
      */
     ready: function(fn) {

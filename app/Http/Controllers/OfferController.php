@@ -15,7 +15,7 @@ class OfferController extends Controller
     public function index()
     {
         // Mengambil data dengan Eager Loading agar tidak berat
-        $offers = Offer::with(['order.service.freelancer', 'order.client'])->latest()->paginate(12);
+        $offers = Offer::with(['order.service.freelancer.skomda_student', 'order.client'])->latest()->paginate(12);
         $negotiations = Negotiation::with(['order.client', 'order.service.freelancer'])->latest()->get();
 
         return view('dashboard.admin.offers', [

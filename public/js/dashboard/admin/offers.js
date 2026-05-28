@@ -162,7 +162,7 @@ function renderOffers() {
                 <td class="px-6 py-4 text-sm font-bold text-gray-700">#OFF-${offer.id}</td>
                 <td class="px-6 py-4">
                     <div class="text-sm font-semibold text-gray-800">${offer.order?.client?.name || 'User'}</div>
-                    <div class="text-[10px] text-gray-400 uppercase font-medium">To: ${offer.order?.service?.freelancer?.name || 'Freelancer'}</div>
+                    <div class="text-[10px] text-gray-400 uppercase font-medium">To: ${offer.order?.service?.freelancer?.skomda_student?.name || 'Freelancer'}</div>
                 </td>
                 <td class="px-6 py-4 text-sm text-gray-600">${offer.order?.service?.title || 'N/A'}</td>
                 <td class="px-6 py-4 text-sm font-bold text-teal-600">Rp ${Number(offer.offered_price || 0).toLocaleString('id-ID')}</td>
@@ -353,7 +353,7 @@ function openOfferModal(id) {
             <div class="space-y-4">
                 <div>
                     <span class="text-xs text-gray-400 uppercase font-bold">Client ⮕ Freelancer</span>
-                    <p class="font-semibold text-gray-800">${o.order?.client?.name || 'N/A'} ⮕ ${o.order?.service?.freelancer?.name || 'N/A'}</p>
+                    <p class="font-semibold text-gray-800">${o.order?.client?.name || 'N/A'} ⮕ ${o.order?.service?.freelancer?.skomda_student?.name || 'N/A'}</p>
                 </div>
                 <div>
                     <span class="text-xs text-gray-400 uppercase font-bold">Pesan Tambahan</span>

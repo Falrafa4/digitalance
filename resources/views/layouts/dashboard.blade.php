@@ -53,13 +53,7 @@
 
     $notifNotifications = $notifRole
         ? \App\Models\Notification::where('role', $notifRole)
-            ->where(function ($q) use ($notifUser) {
-                $q->where('user_id', $notifUser->id);
-            })
-            ->where(function ($q) {
-                $q->where('is_read', false)
-                    ->orWhere('is_kept', true);
-            })
+            ->where('user_id', $notifUser->id)
             ->latest()
             ->take(30)
             ->get()

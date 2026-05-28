@@ -29,10 +29,12 @@ class OrderFactory extends Factory
 
         $status = fake()->randomElement(['Pending', 'Negotiated', 'Paid', 'In Progress', 'Revision', 'Completed', 'Cancelled']);
         $agreedPrice = in_array($status, ['Pending', 'Cancelled'], true) ? null : fake()->numberBetween(500000, 4000000);
+        $service = Service::inRandomOrder()->first();
 
         return [
-            'service_id' => Service::inRandomOrder()->first()->id,
+            'service_id' => $service->id,
             'client_id' => Client::inRandomOrder()->first()->id,
+            'freelancer_id' => $service->freelancer_id,
             'brief' => fake()->randomElement($briefTemplates),
             'status' => $status,
             'agreed_price' => $agreedPrice,

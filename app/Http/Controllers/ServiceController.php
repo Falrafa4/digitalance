@@ -41,13 +41,13 @@ class ServiceController extends Controller
 
         if ($search !== '') {
             $servicesQuery->where(function ($query) use ($search) {
-                $query->where('title', 'like', '%'.$search.'%')
-                    ->orWhere('description', 'like', '%'.$search.'%')
+                $query->where('title', 'like', '%' . $search . '%')
+                    ->orWhere('description', 'like', '%' . $search . '%')
                     ->orWhereHas('category', function ($categoryQuery) use ($search) {
-                        $categoryQuery->where('name', 'like', '%'.$search.'%');
+                        $categoryQuery->where('name', 'like', '%' . $search . '%');
                     })
                     ->orWhereHas('freelancer.skomda_student', function ($freelancerQuery) use ($search) {
-                        $freelancerQuery->where('name', 'like', '%'.$search.'%');
+                        $freelancerQuery->where('name', 'like', '%' . $search . '%');
                     });
             });
         }
@@ -197,7 +197,7 @@ class ServiceController extends Controller
             'service_category:id,name',
         ])->where('id', $id)->first();
 
-        if (! $service) {
+        if (!$service) {
             return redirect()->route('freelancer.services.index')->with('error', 'Layanan tidak ditemukan');
         }
 
@@ -277,7 +277,7 @@ class ServiceController extends Controller
 
             \App\Models\Notification::create([
                 'title' => 'Layanan Perlu Perbaikan',
-                'message' => "Layanan '{$service->title}' dikembalikan oleh admin. Alasan: ".($request->reject_reason ?? 'Tidak ada alasan spesifik').'. Silakan perbaiki dan ajukan kembali!',
+                'message' => "Layanan '{$service->title}' dikembalikan oleh admin. Alasan: " . ($request->reject_reason ?? 'Tidak ada alasan spesifik') . '. Silakan perbaiki dan ajukan kembali!',
                 'type' => 'warning',
                 'role' => 'freelancer',
                 'user_id' => $service->freelancer_id,
@@ -289,6 +289,17 @@ class ServiceController extends Controller
             'status' => $finalStatus,
             'reject_reason' => $request->status === 'Rejected' ? $request->reject_reason : null,
         ]);
+
+        if ($request->status === 'Approved') {
+            \App\Models\Notification::create([
+                'title' => 'Layanan Disetujui',
+                'message' => "Layanan '{$service->title}' telah disetujui admin dan sudah tampil di katalog layanan.",
+                'type' => 'approved',
+                'role' => 'freelancer',
+                'user_id' => $service->freelancer_id,
+                'link' => route('freelancer.services.show', $service->id),
+            ]);
+        }
 
         $msg = $request->status === 'Rejected'
             ? 'Layanan telah dikembalikan ke freelancer untuk diperbaiki.'

@@ -70,6 +70,7 @@ class OrderController extends Controller
 
         Order::create([
             ...$validated,
+            'freelancer_id' => $service->freelancer_id,
             'status' => $validated['status'] ?? 'Pending',
         ]);
 
@@ -141,6 +142,7 @@ class OrderController extends Controller
         $order = Order::create([
             'service_id' => $service->id,
             'client_id' => $client->id,
+            'freelancer_id' => $service->freelancer_id,
             'brief' => $validated['brief'],
             'status' => 'Pending',
             'agreed_price' => null,
@@ -221,7 +223,7 @@ class OrderController extends Controller
     {
         $freelancer = auth('freelancer')->user();
 
-        abort_unless($order->service->freelancer_id === $freelancer->id, 403);
+        abort_unless(($order->freelancer_id ?? $order->service?->freelancer_id) === $freelancer->id, 403);
 
         $order->load(['service.service_category', 'client', 'negotiations', 'offers', 'transactions', 'results', 'review', 'attachments']);
 
@@ -236,7 +238,7 @@ class OrderController extends Controller
 
         // Cek akses
         $freelancer = auth('freelancer')->user();
-        abort_unless($order->service->freelancer_id === $freelancer->id, 403);
+        abort_unless(($order->freelancer_id ?? $order->service?->freelancer_id) === $freelancer->id, 403);
 
         $order->update($validated);
 
@@ -254,7 +256,7 @@ class OrderController extends Controller
 
         // Cek akses
         $freelancer = auth('freelancer')->user();
-        abort_unless($order->service->freelancer_id === $freelancer->id, 403);
+        abort_unless(($order->freelancer_id ?? $order->service?->freelancer_id) === $freelancer->id, 403);
 
         $order->update([
             'agreed_price' => $validated['agreed_price'],
@@ -267,7 +269,7 @@ class OrderController extends Controller
     public function freelancerAccept(Request $request, Order $order)
     {
         $freelancer = auth('freelancer')->user();
-        abort_unless($order->service->freelancer_id === $freelancer->id, 403);
+        abort_unless(($order->freelancer_id ?? $order->service?->freelancer_id) === $freelancer->id, 403);
 
         $validated = $request->validate([
             'agreed_price' => 'required|numeric|min:0',
@@ -295,7 +297,7 @@ class OrderController extends Controller
         $freelancer = auth('freelancer')->user();
 
         // Cek akses: Pesanan harus milik service yang dikelola freelancer ini
-        abort_unless($order->service->freelancer_id === $freelancer->id, 403);
+        abort_unless(($order->freelancer_id ?? $order->service?->freelancer_id) === $freelancer->id, 403);
 
         $request->validate([
             'reason' => 'required|string',
@@ -505,7 +507,7 @@ class OrderController extends Controller
     public function freelancerApproveRevision(Order $order)
     {
         $freelancer = auth('freelancer')->user();
-        abort_unless($order->service->freelancer_id === $freelancer->id, 403);
+        abort_unless(($order->freelancer_id ?? $order->service?->freelancer_id) === $freelancer->id, 403);
 
         if ($order->status !== 'Revision') {
             return redirect()->back()->with('error', 'Order bukan dalam status revisi.');
@@ -527,7 +529,7 @@ class OrderController extends Controller
     public function freelancerRejectRevision(Request $request, Order $order)
     {
         $freelancer = auth('freelancer')->user();
-        abort_unless($order->service->freelancer_id === $freelancer->id, 403);
+        abort_unless(($order->freelancer_id ?? $order->service?->freelancer_id) === $freelancer->id, 403);
 
         $request->validate(['reason' => 'required|string|max:500']);
 
