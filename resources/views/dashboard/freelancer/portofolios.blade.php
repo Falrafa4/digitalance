@@ -51,7 +51,6 @@
     @endif
 </div>
 
-<!-- Modal Add -->
 <div id="modal-add" class="fixed inset-0 z-[100] flex items-center justify-center hidden opacity-0 transition-all duration-200">
     <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onclick="this.parentElement.classList.remove('open', 'opacity-100'); this.parentElement.classList.add('hidden')"></div>
     <div class="bg-white rounded-[24px] w-full max-w-lg p-6 relative shadow-2xl scale-95 transition-transform duration-200 mx-4">
@@ -100,7 +99,38 @@
     </div>
 </div>
 
-<!-- Delete Confirmation Modal -->
+<div id="modal-edit" class="fixed inset-0 z-[100] flex items-center justify-center hidden opacity-0 transition-all duration-200">
+    <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onclick="closeEditModal()"></div>
+    <div class="bg-white rounded-[24px] w-full max-w-lg p-6 relative shadow-2xl scale-95 transition-transform duration-200 mx-4">
+        <h2 class="font-display font-extrabold text-[1.4rem] text-slate-900 mb-6">Edit Portofolio</h2>
+        <form action="" method="POST" class="space-y-4" id="form-edit-portofolio">
+            @csrf
+            @method('PUT')
+            <div>
+                <label class="block text-[13px] font-bold text-slate-700 mb-1.5">Judul Portofolio</label>
+                <input type="text" name="title" id="edit-title" required class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-[14px] focus:border-[#0f766e] focus:ring-2 focus:ring-[#0f766e]/20 outline-none">
+            </div>
+            <div>
+                <label class="block text-[13px] font-bold text-slate-700 mb-1.5">Layanan / Service Terkait</label>
+                <select name="service_id" id="edit-service-id" required class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-[14px] focus:border-[#0f766e] outline-none">
+                    <option value="" disabled>Pilih Layanan</option>
+                    @foreach($services as $svc)
+                        <option value="{{ $svc->id }}">{{ $svc->title }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div>
+                <label class="block text-[13px] font-bold text-slate-700 mb-1.5">Deskripsi</label>
+                <textarea name="description" id="edit-description" rows="3" class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-[14px] focus:border-[#0f766e] outline-none resize-none"></textarea>
+            </div>
+            <div class="flex gap-3 pt-4">
+                <button type="button" onclick="closeEditModal()" class="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-slate-700 font-bold text-sm hover:bg-slate-50 transition-colors">Batal</button>
+                <button type="submit" class="flex-1 px-4 py-2.5 rounded-xl bg-[#0f766e] text-white font-bold text-sm hover:bg-[#0d6b63] transition-colors shadow-teal-sm">Simpan Perubahan</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <div class="fixed inset-0 z-[200] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300" id="modal-delete-port-overlay">
     <div class="bg-white rounded-[24px] w-full max-w-[400px] shadow-2xl overflow-hidden transform scale-95 transition-all duration-300">
         <div class="px-8 pt-8 pb-6 text-center">
@@ -117,14 +147,33 @@
     </div>
 </div>
 
-<!-- Add simple script to handle modal visibility -->
 <style>
-    #modal-add.open { display: flex; opacity: 1; }
-    #modal-add.open > div:last-child { transform: scale(1); }
+    #modal-add.open, #modal-edit.open { display: flex; opacity: 1; }
+    #modal-add.open > div:last-child, #modal-edit.open > div:last-child { transform: scale(1); }
 </style>
+
 <script>
     function openEditModal(id, title, desc, service_id) {
-        alert('Fitur edit portofolio (ID: ' + id + ') belum sepenuhnya dibuatkan modal di Phase 3 ini. Silakan arahkan ke halaman edit atau buat modal edit serupa modal Add.');
+        const modal = document.getElementById('modal-edit');
+        const form = document.getElementById('form-edit-portofolio');
+        
+        // Pasang action URL secara dinamis sesuai ID portofolio
+        form.action = '/freelancer/portofolios/' + id;
+        
+        // Isi value input field modal edit dengan data yang di-pass
+        document.getElementById('edit-title').value = title;
+        document.getElementById('edit-service-id').value = service_id;
+        document.getElementById('edit-description').value = desc;
+        
+        // Tampilkan modal
+        modal.classList.remove('hidden');
+        setTimeout(() => modal.classList.add('open'), 10);
+    }
+
+    function closeEditModal() {
+        const modal = document.getElementById('modal-edit');
+        modal.classList.remove('open');
+        setTimeout(() => modal.classList.add('hidden'), 200);
     }
 
     window.openPortDeleteModal = function(id) {

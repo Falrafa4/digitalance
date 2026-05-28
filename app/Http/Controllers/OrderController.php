@@ -127,7 +127,6 @@ class OrderController extends Controller
     public function storePage(Request $request)
     {
         $client = $request->user('client');
-
         $validated = $request->validate([
             'service_id' => 'required|integer|exists:services,id',
             'brief' => 'required|string',
@@ -146,6 +145,16 @@ class OrderController extends Controller
             'brief' => $validated['brief'],
             'status' => 'Pending',
             'agreed_price' => null,
+        ]);
+
+        // NOTIFIKASI: Beritahu Freelancer bahwa ada pesanan masuk
+        \App\Models\Notification::create([
+            'title' => 'Pesanan Baru Masuk',
+            'message' => "Klien mengajukan pesanan baru untuk layanan '{$service->title}'. Silakan periksa detail pesanan.",
+            'type' => 'info',
+            'role' => 'freelancer',
+            'user_id' => $service->freelancer_id,
+            'link' => route('freelancer.orders.show', $order->id),
         ]);
 
         return redirect()->route('client.orders.show', $order->id)->with('success', 'Order berhasil dibuat');
@@ -281,7 +290,6 @@ class OrderController extends Controller
             'status' => 'Negotiated',
         ]);
 
-        // Opsional: Jika ada sistem pesan, simpan catatan sebagai pesan negosiasi
         if ($request->filled('note')) {
             $order->negotiations()->create([
                 'sender' => 'freelancer',
@@ -289,14 +297,22 @@ class OrderController extends Controller
             ]);
         }
 
+        // NOTIFIKASI: Beritahu Klien tentang harga negosiasi baru dari Freelancer
+        \App\Models\Notification::create([
+            'title' => 'Tawaran Harga dari Freelancer',
+            'message' => "Freelancer mengajukan kesepakatan harga baru sebesar Rp " . number_format($validated['agreed_price'], 0, ',', '.') . ". Silakan lakukan checkout pembayaran.",
+            'type' => 'warning',
+            'role' => 'client',
+            'user_id' => $order->client_id,
+            'link' => route('client.orders.show', $order->id),
+        ]);
+
         return redirect()->route('freelancer.orders.show', $order->id)->with('success', 'Pesanan diterima dengan penawaran baru');
     }
 
     public function freelancerReject(Request $request, Order $order)
     {
         $freelancer = auth('freelancer')->user();
-
-        // Cek akses: Pesanan harus milik service yang dikelola freelancer ini
         abort_unless(($order->freelancer_id ?? $order->service?->freelancer_id) === $freelancer->id, 403);
 
         $request->validate([
@@ -306,6 +322,16 @@ class OrderController extends Controller
         $order->update([
             'status' => 'Cancelled',
             'brief' => $order->brief . "\n\nRejection Reason: " . $request->reason,
+        ]);
+
+        // NOTIFIKASI: Informasikan ke Klien bahwa pesanan dibatalkan/ditolak oleh Freelancer
+        \App\Models\Notification::create([
+            'title' => 'Pesanan Ditolak Freelancer',
+            'message' => "Freelancer menolak pesanan Anda. Alasan: '{$request->reason}'",
+            'type' => 'danger',
+            'role' => 'client',
+            'user_id' => $order->client_id,
+            'link' => route('client.orders.show', $order->id),
         ]);
 
         return redirect()->route('freelancer.orders.index')->with('success', 'Pesanan telah ditolak');
@@ -402,12 +428,25 @@ class OrderController extends Controller
             'va_bri' => 'BRI Virtual Account',
         ];
 
+        // 1. Sistem mencatat transaksi ke database
         $order->transactions()->create([
             'order_id' => $order->id,
             'amount' => $total,
             'type' => 'Full',
             'status' => 'Paid',
         ]);
+
+        // ─── DI SINI PENEMPATAN NOTIFIKASINYA ───
+        // 2. Kirim Notifikasi real-time agar dibaca sistem polling header freelancer
+        \App\Models\Notification::create([
+            'title' => 'Pembayaran Pesanan Diterima',
+            'message' => "Klien telah melunasi pembayaran untuk pesanan '{$order->service->title}'. Status berubah menjadi 'Paid'. Silakan mulai pengerjaan project.",
+            'type' => 'success',
+            'role' => 'freelancer',
+            'user_id' => $order->freelancer_id,
+            'link' => route('freelancer.orders.show', $order->id),
+        ]);
+        // ────────────────────────────────────────
 
         $methodLabel = $paymentMethodLabels[$request->payment_method] ?? 'QRIS';
 
@@ -466,6 +505,16 @@ class OrderController extends Controller
             $order->update(['status' => 'Negotiated']);
         }
 
+        // NOTIFIKASI: Beritahu Freelancer bahwa Klien meminta negosiasi harga baru
+        \App\Models\Notification::create([
+            'title' => 'Permintaan Negosiasi Klien',
+            'message' => "Klien mengajukan tawaran harga baru sebesar Rp " . number_format($validated['new_price'], 0, ',', '.') . ".",
+            'type' => 'warning',
+            'role' => 'freelancer',
+            'user_id' => $order->freelancer_id,
+            'link' => route('freelancer.orders.show', $order->id),
+        ]);
+
         return redirect()->back()->with('success', 'Negosiasi berhasil dikirim ke freelancer.');
     }
 
@@ -493,6 +542,16 @@ class OrderController extends Controller
 
         $order->update(['status' => 'Revision']);
 
+        // NOTIFIKASI: Beritahu Freelancer bahwa hasilnya perlu direvisi kembali
+        \App\Models\Notification::create([
+            'title' => 'Permintaan Revisi dari Klien',
+            'message' => "Klien meminta perbaikan/revisi hasil kerja untuk project '{$order->service->title}'. Alasan: {$validated['reason']}",
+            'type' => 'warning',
+            'role' => 'freelancer',
+            'user_id' => $order->freelancer_id,
+            'link' => route('freelancer.orders.show', $order->id),
+        ]);
+
         return redirect()->back()->with('success', 'Permintaan revisi berhasil dikirim.');
     }
 
@@ -514,13 +573,23 @@ class OrderController extends Controller
 
         $order->update(['status' => 'Completed']);
 
+        // NOTIFIKASI: Beritahu Freelancer bahwa project dinyatakan selesai sukses oleh Klien
+        \App\Models\Notification::create([
+            'title' => 'Project Diterima & Selesai',
+            'message' => "Selamat! Klien telah menerima hasil pekerjaan Anda untuk project '{$order->service->title}'. Status pesanan: Completed.",
+            'type' => 'success',
+            'role' => 'freelancer',
+            'user_id' => $order->freelancer_id,
+            'link' => route('freelancer.orders.show', $order->id),
+        ]);
+
         return redirect()->back()->with('success', 'Hasil pekerjaan berhasil diterima. Terima kasih!');
     }
 
     // =========================
     // FREELANCER: Approve Revision
     // =========================
-    public function freelancerApproveRevision(Order $order)
+   public function freelancerApproveRevision(Order $order)
     {
         $freelancer = auth('freelancer')->user();
         abort_unless(($order->freelancer_id ?? $order->service?->freelancer_id) === $freelancer->id, 403);
@@ -536,6 +605,16 @@ class OrderController extends Controller
             'message' => '[REVISION APPROVED] Revisi telah disetujui dan akan segera dikerjakan.',
         ]);
 
+        // NOTIFIKASI: Informasikan ke Klien bahwa Freelancer sedang mengerjakan revisinya
+        \App\Models\Notification::create([
+            'title' => 'Permintaan Revisi Disetujui',
+            'message' => "Freelancer menyetujui pengerjaan revisi Anda. Pekerjaan kembali berstatus 'In Progress'.",
+            'type' => 'success',
+            'role' => 'client',
+            'user_id' => $order->client_id,
+            'link' => route('client.orders.show', $order->id),
+        ]);
+
         return redirect()->back()->with('success', 'Revisi disetujui. Pengerjaan revisi dimulai.');
     }
 
@@ -546,7 +625,6 @@ class OrderController extends Controller
     {
         $freelancer = auth('freelancer')->user();
         abort_unless(($order->freelancer_id ?? $order->service?->freelancer_id) === $freelancer->id, 403);
-
         $request->validate(['reason' => 'required|string|max:500']);
 
         if ($order->status !== 'Revision') {
@@ -558,6 +636,16 @@ class OrderController extends Controller
         $order->negotiations()->create([
             'sender' => 'freelancer',
             'message' => '[REVISION REJECTED] Revisi ditolak. Alasan: ' . $request->reason,
+        ]);
+
+        // NOTIFIKASI: Beritahu Klien bahwa Freelancer tidak menyetujui revisi dan mengembalikan status ke Selesai
+        \App\Models\Notification::create([
+            'title' => 'Permintaan Revisi Ditolak',
+            'message' => "Freelancer menolak permintaan revisi Anda. Alasan: '{$request->reason}'. Status kembali ke Completed.",
+            'type' => 'danger',
+            'role' => 'client',
+            'user_id' => $order->client_id,
+            'link' => route('client.orders.show', $order->id),
         ]);
 
         return redirect()->back()->with('error', 'Revisi ditolak.');
