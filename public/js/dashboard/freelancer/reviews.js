@@ -1,5 +1,6 @@
 (() => {
-  const page = window.__FREELANCER_REVIEWS__ || {};
+  const pageDataEl = document.getElementById('freelancer-reviews-data');
+  const page = pageDataEl ? JSON.parse(pageDataEl.textContent || '{}') : (window.__FREELANCER_REVIEWS__ || {});
   const reviewsRaw = Array.isArray(page.reviews) ? page.reviews : [];
   const links = page.links || {};
 

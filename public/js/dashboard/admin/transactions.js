@@ -7,11 +7,11 @@
     const openModal = (id) => U.openModal(id);
     const closeModal = (id) => U.closeModal(id);
 
-    const page = window.__TRANSACTIONS_PAGE__ || {};
+    const pageDataEl = document.getElementById('transactions-page-data');
+    const page = pageDataEl ? JSON.parse(pageDataEl.textContent || '{}') : (window.__TRANSACTIONS_PAGE__ || {});
     let trxData = Array.isArray(page.data) ? page.data : (page.data?.data || []);
+    const trxStats = page.stats || {};
 
-    let currentPage = 1;
-    let itemsPerPage = 15;
     let reportTargetId = null;
 
     // RENDER STATS
@@ -19,14 +19,10 @@
         const row = $('stats-row');
         if (!row) return;
 
-        const total = trxData.length;
-        const totalRevenue = trxData
-            .filter(t => String(t.status).toLowerCase() === 'paid' && String(t.type).toLowerCase() !== 'refund')
-            .reduce((sum, t) => sum + (Number(t.amount) || 0), 0);
-        const pendingCount = trxData.filter(t => String(t.status).toLowerCase() === 'pending').length;
-        const totalRefund = trxData
-            .filter(t => String(t.type).toLowerCase() === 'refund' && String(t.status).toLowerCase() === 'paid')
-            .reduce((sum, t) => sum + (Number(t.amount) || 0), 0);
+        const total = Number(trxStats.total) || 0;
+        const totalRevenue = Number(trxStats.revenue) || 0;
+        const pendingCount = Number(trxStats.pending) || 0;
+        const totalRefund = Number(trxStats.refund) || 0;
 
         row.innerHTML = `
             <div class="bg-white border border-slate-200 rounded-2xl px-5 py-[18px] flex items-center gap-3.5 transition-all duration-200 hover:shadow-md hover:-translate-y-px">
@@ -63,12 +59,7 @@
         tableEl.style.display = 'table';
         emptyEl.style.display = 'none';
 
-        const totalPages = Math.ceil(data.length / itemsPerPage);
-        if (currentPage > totalPages && totalPages > 0) currentPage = totalPages;
-        const startIndex = (currentPage - 1) * itemsPerPage;
-        const paginatedData = data.slice(startIndex, startIndex + itemsPerPage);
-
-        tbody.innerHTML = paginatedData.map(t => {
+        tbody.innerHTML = data.map(t => {
             const rawStatus = String(t.status || 'pending').toLowerCase();
             const date = t.created_at ? new Date(t.created_at).toLocaleDateString('id-ID') : '-';
 
@@ -88,43 +79,7 @@
                 </tr>
             `;
         }).join('');
-
-        renderPaginationControls(totalPages);
     }
-
-    function renderPaginationControls(totalPages) {
-        let wrap = $('pagination-wrap');
-        if (!wrap) {
-            wrap = document.createElement('div');
-            wrap.id = 'pagination-wrap';
-            wrap.className = 'flex justify-end gap-2 mt-4 px-6';
-            $('trx-table').parentNode.appendChild(wrap);
-        }
-        
-        if (totalPages <= 1) {
-            wrap.innerHTML = '';
-            return;
-        }
-
-        let html = '';
-        html += `<button class="px-3 py-1 rounded border border-slate-200 bg-white text-sm hover:bg-slate-50 disabled:opacity-50" ${currentPage === 1 ? 'disabled' : ''} onclick="window.changeTrxPage(${currentPage - 1})">Prev</button>`;
-        
-        for (let i = 1; i <= totalPages; i++) {
-            if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
-                html += `<button class="px-3 py-1 rounded border ${i === currentPage ? 'bg-[#0f766e] text-white border-[#0f766e]' : 'border-slate-200 bg-white hover:bg-slate-50'} text-sm" onclick="window.changeTrxPage(${i})">${i}</button>`;
-            } else if (i === currentPage - 2 || i === currentPage + 2) {
-                html += `<span class="px-2 py-1 text-slate-400">...</span>`;
-            }
-        }
-
-        html += `<button class="px-3 py-1 rounded border border-slate-200 bg-white text-sm hover:bg-slate-50 disabled:opacity-50" ${currentPage === totalPages ? 'disabled' : ''} onclick="window.changeTrxPage(${currentPage + 1})">Next</button>`;
-        wrap.innerHTML = html;
-    }
-
-    window.changeTrxPage = function(page) {
-        currentPage = page;
-        refreshGrid();
-    };
 
     // OPEN DETAIL MODAL
     window.openTrxModal = function(id) {
@@ -212,43 +167,19 @@
     });
 
     function refreshGrid() {
-        const active = document.querySelector('.filter-tab.active');
-        const f = active ? active.dataset.filter.toLowerCase() : 'all';
-        const q = ($('trx-search-input')?.value || '').toLowerCase();
-
-        let res = trxData;
-        if (f !== 'all') res = res.filter(t => String(t.status).toLowerCase() === f);
-        if (q) {
-            res = res.filter(t => 
-                String(t.id).toLowerCase().includes(q) || 
-                String(t.order_id || '').toLowerCase().includes(q)
-            );
-        }
-        renderTable(res);
-    }
-
-    function initFilters() {
-        document.querySelectorAll('.filter-tab').forEach(tab => {
-            tab.addEventListener('click', () => {
-                document.querySelectorAll('.filter-tab').forEach(t => {
-                    t.classList.remove('active', 'bg-[#0f766e]', 'text-white', 'border-[#0f766e]', 'shadow-teal-sm');
-                    t.classList.add('border-slate-200', 'bg-white', 'text-slate-500');
-                });
-                tab.classList.add('active', 'bg-[#0f766e]', 'text-white', 'border-[#0f766e]', 'shadow-teal-sm');
-                tab.classList.remove('border-slate-200', 'bg-white', 'text-slate-500');
-                currentPage = 1;
-                refreshGrid();
-            });
-        });
+        renderTable(trxData);
     }
 
     function init() {
         U.setupOverlayListeners();
         renderStats();
         refreshGrid();
-        initFilters();
 
-        $('trx-search-input')?.addEventListener('input', () => { currentPage = 1; refreshGrid(); });
+        $('trx-tbody')?.addEventListener('click', function (event) {
+            const button = event.target.closest('[data-trx-id]');
+            if (!button) return;
+            window.openTrxModal(button.dataset.trxId);
+        });
     }
 
     U.ready(init);

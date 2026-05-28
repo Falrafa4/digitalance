@@ -81,7 +81,8 @@
               <div class="rounded-[16px] border border-rose-100 bg-rose-50 p-4">
                 <p class="font-extrabold text-rose-700">Order dibatalkan</p>
                 <p class="text-rose-600 text-[13px] mt-1">Status terakhir:
-                  {{ \Illuminate\Support\Str::headline($order->status) }}</p>
+                  {{ \Illuminate\Support\Str::headline($order->status) }}
+                </p>
               </div>
             @else
               <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
@@ -111,6 +112,26 @@
               </div>
             @endif
           </div>
+
+          @php
+            $nextAction = match ($order->status) {
+              'Pending' => 'Tunggu freelancer memberi harga atau kirim negosiasi jika perlu.',
+              'Negotiated' => 'Terima harga untuk lanjut ke pembayaran, atau kirim negosiasi baru.',
+              'Paid' => 'Freelancer mulai mengerjakan pesanan.',
+              'In Progress' => $order->results->count() > 0
+              ? 'Freelancer sudah mengirim hasil. Kamu bisa menerima hasil atau ajukan revisi.'
+              : 'Tunggu freelancer mengirim hasil kerja.',
+              'Revision' => 'Freelancer sedang meninjau permintaan revisi kamu.',
+              'Completed' => $order->review ? 'Order selesai dan sudah direview.' : 'Order selesai. Kamu masih bisa memberi review.',
+              'Cancelled' => 'Order ini sudah dibatalkan.',
+              default => 'Pantau perkembangan order dari panel ini.',
+            };
+          @endphp
+
+          <div class="mt-5 rounded-[16px] border border-slate-200 bg-slate-50 p-4">
+            <p class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest mb-1">Langkah Berikutnya</p>
+            <p class="text-[13px] text-slate-700 leading-relaxed">{{ $nextAction }}</p>
+          </div>
         </div>
 
         {{-- ACTION: Pending (from loker approval) --}}
@@ -122,7 +143,8 @@
                 <p class="text-2xl font-black text-[#0f766e] mt-1">Rp {{ number_format($order->agreed_price, 0, ',', '.') }}
                 </p>
                 <p class="text-[12px] text-slate-500 mt-1">Dari lamaran lowongan:
-                  {{ optional($order->lokerApplication->freelancer->skomda_student)->name ?? 'Freelancer' }}</p>
+                  {{ optional($order->lokerApplication->freelancer->skomda_student)->name ?? 'Freelancer' }}
+                </p>
               </div>
               <div class="flex flex-col sm:flex-row gap-3">
                 <form action="{{ route('client.orders.reject', $order->id) }}" method="POST">
@@ -277,7 +299,7 @@
               <p class="text-slate-500 text-[13.5px] mt-1">Diskusi detail, nego harga, revisi, dll.</p>
             </div>
             <a href="{{ route('client.messages.index') }}" class="px-4 py-2.5 rounded-[12px] bg-white border border-slate-200 text-slate-700 font-bold text-[12.5px]
-                      hover:border-[#0f766e] hover:text-[#0f766e] transition-all">
+                        hover:border-[#0f766e] hover:text-[#0f766e] transition-all">
               Inbox
             </a>
           </div>

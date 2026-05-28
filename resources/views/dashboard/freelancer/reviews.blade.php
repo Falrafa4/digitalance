@@ -38,7 +38,8 @@
             </div>
 
             <div class="relative">
-                <i class="ri-search-line absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[15px] pointer-events-none"></i>
+                <i
+                    class="ri-search-line absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[15px] pointer-events-none"></i>
                 <input type="text" id="review-search" placeholder="Cari order id, service, komentar…"
                     class="pl-9 pr-4 py-[9px] w-[300px] border-[1.5px] border-slate-200 rounded-[11px] text-[13px] font-semibold text-slate-700 bg-white outline-none transition-all duration-200 placeholder:font-normal placeholder:text-slate-400 focus:border-[#0f766e] focus:shadow-[0_0_0_3px_rgba(15,118,110,0.08)]" />
             </div>
@@ -51,14 +52,11 @@
 @endsection
 
 @section('scripts')
-    <script>
-        window.__FREELANCER_REVIEWS__ = {
-            reviews: @json($reviews ?? []),
-            links: {
-                detailPrefix: @json(rtrim(url('/freelancer/reviews/order'), '/') . '/'),
-            }
-        };
-    </script>
+    <script type="application/json" id="freelancer-reviews-data">{!! json_encode([
+        'reviews' => $reviews ?? [],
+        'links' => [
+            'detailPrefix' => rtrim(url('/freelancer/reviews/order'), '/') . '/',
+        ],
+    ], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) !!}</script>
     <script src="{{ asset('js/dashboard/freelancer/reviews.js') }}"></script>
 @endsection
-

@@ -41,7 +41,7 @@ class OrderController extends Controller
         // Data for dropdowns in Add Order modal (if still needed)
         $clients = \App\Models\Client::orderBy('name')->get();
         $freelancers = \App\Models\Freelancer::with('skomda_student')->get();
-        $services = \App\Models\Service::where('status', 'Approved')->orderBy('title')->get();
+        $services = Service::where('status', 'Approved')->orderBy('title')->get();
 
         return view('dashboard.admin.orders', compact('orders', 'clients', 'freelancers', 'services'));
     }
@@ -305,7 +305,7 @@ class OrderController extends Controller
 
         $order->update([
             'status' => 'Cancelled',
-            'brief' => $order->brief."\n\nRejection Reason: ".$request->reason,
+            'brief' => $order->brief . "\n\nRejection Reason: " . $request->reason,
         ]);
 
         return redirect()->route('freelancer.orders.index')->with('success', 'Pesanan telah ditolak');
@@ -338,7 +338,7 @@ class OrderController extends Controller
             return redirect()->back()->with('error', 'Order tidak dapat diterima.');
         }
 
-        if (! $order->agreed_price) {
+        if (!$order->agreed_price) {
             return redirect()->back()->with('error', 'Belum ada harga yang disepakati.');
         }
 
@@ -363,13 +363,22 @@ class OrderController extends Controller
     {
         $client = auth('client')->user();
         abort_unless($order->client_id === $client->id, 403);
+        $expectsJson = $request->expectsJson();
 
         if (!in_array($order->status, ['Pending', 'Negotiated'])) {
+            if ($expectsJson) {
+                return response()->json(['message' => 'Pembayaran tidak dapat diproses.'], 422);
+            }
+
             return redirect()->route('client.orders.show', $order->id)->with('error', 'Pembayaran tidak dapat diproses.');
         }
 
         // Idempotency: prevent double payment
         if ($order->transactions()->where('status', 'Paid')->exists()) {
+            if ($expectsJson) {
+                return response()->json(['message' => 'Pembayaran sudah pernah dilakukan.'], 409);
+            }
+
             return redirect()->route('client.orders.show', $order->id)->with('warning', 'Pembayaran sudah pernah dilakukan.');
         }
 
@@ -402,7 +411,14 @@ class OrderController extends Controller
 
         $methodLabel = $paymentMethodLabels[$request->payment_method] ?? 'QRIS';
 
-        return redirect()->route('client.orders.show', $order->id)->with('success', 'Pembayaran sebesar Rp '.number_format($total, 0, ',', '.').' via '.$methodLabel.' berhasil!');
+        if ($expectsJson) {
+            return response()->json([
+                'message' => 'Pembayaran sebesar Rp ' . number_format($total, 0, ',', '.') . ' via ' . $methodLabel . ' berhasil!',
+                'redirect' => route('client.orders.show', $order->id),
+            ]);
+        }
+
+        return redirect()->route('client.orders.show', $order->id)->with('success', 'Pembayaran sebesar Rp ' . number_format($total, 0, ',', '.') . ' via ' . $methodLabel . ' berhasil!');
     }
 
     // =========================
@@ -421,7 +437,7 @@ class OrderController extends Controller
 
         $order->negotiations()->create([
             'sender' => 'client',
-            'message' => 'Order ditolak. Alasan: '.$request->reason,
+            'message' => 'Order ditolak. Alasan: ' . $request->reason,
         ]);
 
         return redirect()->route('client.orders.index')->with('success', 'Order telah ditolak.');
@@ -443,7 +459,7 @@ class OrderController extends Controller
 
         $order->negotiations()->create([
             'sender' => 'client',
-            'message' => 'Negosiasi harga: '.$validated['reason']."\n\nHarga tawaran: Rp ".number_format($validated['new_price'], 0, ',', '.')."\n\nDetail: ".($validated['description'] ?? '-'),
+            'message' => 'Negosiasi harga: ' . $validated['reason'] . "\n\nHarga tawaran: Rp " . number_format($validated['new_price'], 0, ',', '.') . "\n\nDetail: " . ($validated['description'] ?? '-'),
         ]);
 
         if ($order->status === 'Pending') {
@@ -461,7 +477,7 @@ class OrderController extends Controller
         $client = auth('client')->user();
         abort_unless($order->client_id === $client->id, 403);
 
-        if (! in_array($order->status, ['In Progress', 'Completed'])) {
+        if (!in_array($order->status, ['In Progress', 'Completed'])) {
             return redirect()->back()->with('error', 'Revision hanya bisa diminta pada pekerjaan yang sedang berlangsung atau sudah selesai.');
         }
 
@@ -472,7 +488,7 @@ class OrderController extends Controller
 
         $order->negotiations()->create([
             'sender' => 'client',
-            'message' => 'Permintaan Revisi: '.$validated['reason']."\n\nDetail: ".($validated['description'] ?? '-'),
+            'message' => 'Permintaan Revisi: ' . $validated['reason'] . "\n\nDetail: " . ($validated['description'] ?? '-'),
         ]);
 
         $order->update(['status' => 'Revision']);
@@ -541,7 +557,7 @@ class OrderController extends Controller
 
         $order->negotiations()->create([
             'sender' => 'freelancer',
-            'message' => '[REVISION REJECTED] Revisi ditolak. Alasan: '.$request->reason,
+            'message' => '[REVISION REJECTED] Revisi ditolak. Alasan: ' . $request->reason,
         ]);
 
         return redirect()->back()->with('error', 'Revisi ditolak.');

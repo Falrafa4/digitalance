@@ -5,6 +5,17 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @property-read int $id
+ * @property int|null $service_id
+ * @property int|null $client_id
+ * @property int|null $freelancer_id
+ * @property int|null $loker_application_id
+ * @property string|null $brief
+ * @property string|null $status
+ * @property float|int|null $agreed_price
+ * @property string|null $deadline
+ */
 class Order extends Model
 {
     use HasFactory;

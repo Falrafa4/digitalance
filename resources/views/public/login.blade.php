@@ -37,7 +37,32 @@
 
 @media (max-width: 767px) {
     .auth-overlay {display: none;}
-    #loginPanel, #registerPanel {width: 100%; left: 0;}
+    main {
+        align-items: flex-start;
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+    }
+    #authContainer {
+        height: auto !important;
+        min-height: unset !important;
+        overflow: visible;
+        border-radius: 22px;
+    }
+    #authContainer > div.relative.w-full.h-full {
+        height: auto !important;
+        pointer-events: auto;
+    }
+    .panel {
+        position: relative;
+        inset: auto;
+        min-height: unset;
+        height: auto;
+    }
+    #loginPanel, #registerPanel {
+        width: 100%;
+        left: 0;
+        right: 0;
+    }
 }
 
 #overlayToggle {

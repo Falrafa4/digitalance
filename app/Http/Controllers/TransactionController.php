@@ -10,13 +10,42 @@ use Illuminate\Http\Request;
 class TransactionController extends Controller
 {
     // ADMIN ONLY
-    public function index()
+    public function index(Request $request)
     {
-        $transactions = Transaction::with([
-            'order.client',
-        ])->latest()->paginate(15);
+        $status = strtolower(trim((string) $request->query('status', 'all')));
+        $search = trim((string) $request->query('q', ''));
 
-        return view('dashboard.admin.transactions', compact('transactions'));
+        $baseQuery = Transaction::with(['order.client']);
+
+        if ($status !== 'all' && in_array($status, ['paid', 'pending', 'failed', 'refund'], true)) {
+            $baseQuery->whereRaw('LOWER(status) = ?', [$status]);
+        }
+
+        if ($search !== '') {
+            $baseQuery->where(function ($query) use ($search) {
+                $query->where('id', 'like', '%' . $search . '%')
+                    ->orWhere('order_id', 'like', '%' . $search . '%');
+            });
+        }
+
+        $transactions = (clone $baseQuery)->latest()->paginate(15)->withQueryString();
+
+        $transactionStats = [
+            'total' => (clone $baseQuery)->count(),
+            'paid' => (clone $baseQuery)->whereRaw('LOWER(status) = ?', ['paid'])->count(),
+            'pending' => (clone $baseQuery)->whereRaw('LOWER(status) = ?', ['pending'])->count(),
+            'failed' => (clone $baseQuery)->whereRaw('LOWER(status) = ?', ['failed'])->count(),
+            'revenue' => (float) (clone $baseQuery)
+                ->whereRaw('LOWER(status) = ?', ['paid'])
+                ->whereRaw('LOWER(type) <> ?', ['refund'])
+                ->sum('amount'),
+            'refund' => (float) (clone $baseQuery)
+                ->whereRaw('LOWER(type) = ?', ['refund'])
+                ->whereRaw('LOWER(status) = ?', ['paid'])
+                ->sum('amount'),
+        ];
+
+        return view('dashboard.admin.transactions', compact('transactions', 'transactionStats', 'status', 'search'));
     }
 
     // FREELANCER ONLY
@@ -55,7 +84,7 @@ class TransactionController extends Controller
         $client = auth('client')->user();
 
         $transactions = Transaction::with('order.service')
-            ->whereHas('order', fn ($q) => $q->where('client_id', $client->id))
+            ->whereHas('order', fn($q) => $q->where('client_id', $client->id))
             ->latest()
             ->get();
 
@@ -77,13 +106,13 @@ class TransactionController extends Controller
 
     public function store(StoreTransactionRequest $request)
     {
-        $request->validated();
+        $validated = $request->validated();
 
         $transaction = Transaction::create([
-            'order_id' => $request->order_id,
-            'amount' => $request->amount,
-            'type' => $request->type,
-            'status' => $request->status ?? 'Pending',
+            'order_id' => $validated['order_id'],
+            'amount' => $validated['amount'],
+            'type' => $validated['type'],
+            'status' => $validated['status'] ?? 'Pending',
         ]);
 
         return redirect()->back()->with('success', 'Transaksi berhasil dibuat');
