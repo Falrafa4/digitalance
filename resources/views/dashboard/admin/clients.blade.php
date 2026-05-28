@@ -64,9 +64,17 @@
                         <tr class="hover:bg-slate-50/50 transition-colors group">
                             <td class="px-6 py-4">
                                 <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-500 font-bold text-sm group-hover:bg-[#0f766e] group-hover:text-white transition-all">
-                                        {{ substr($user->name, 0, 1) }}
-                                    </div>
+                                    @if($user->profile_photo)
+                                        <img
+                                            src="{{ asset('storage/' . $user->profile_photo) }}"
+                                            class="w-10 h-10 rounded-xl object-cover border border-slate-200 shadow-sm"
+                                            alt="{{ $user->name }}"
+                                        >
+                                    @else
+                                        <div class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-500 font-bold text-sm group-hover:bg-[#0f766e] group-hover:text-white transition-all">
+                                            {{ strtoupper(substr($user->name, 0, 1)) }}
+                                        </div>
+                                    @endif
                                     <div class="flex flex-col">
                                         <span class="text-[13.5px] font-black text-slate-900">{{ $user->name }}</span>
                                         <span class="text-[11px] text-slate-400 font-bold tracking-tight">{{ $user->email }}</span>
@@ -406,9 +414,17 @@
                     <div class="px-8 pb-8 -mt-8 relative z-10">
                         <div class="flex items-end gap-5 mb-8">
                             <div class="w-24 h-24 rounded-[28px] bg-white p-1.5 shadow-xl">
-                                <div class="w-full h-full rounded-[22px] bg-slate-100 flex items-center justify-center text-slate-400 font-black text-3xl">
-                                    ${u.name ? u.name.charAt(0) : '?'}
-                                </div>
+                                ${u.profile_photo ? `
+                                    <img
+                                        src="{{ asset('storage') }}/${u.profile_photo}"
+                                        class="w-full h-full rounded-[22px] object-cover"
+                                        alt="${u.name}"
+                                    >
+                                ` : `
+                                    <div class="w-full h-full rounded-[22px] bg-slate-100 flex items-center justify-center text-slate-400 font-black text-3xl">
+                                        ${u.name ? u.name.charAt(0) : '?'}
+                                    </div>
+                                `}
                             </div>
                             <div class="pb-2">
                                 <h3 class="text-[1.5rem] font-black text-slate-900 leading-tight">${u.name}</h3>
