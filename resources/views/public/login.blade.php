@@ -404,14 +404,20 @@
 @endsection
 
 @section('scripts')
-<div id="loginPageData"
-    data-service-categories='{{ e(json_encode($categories ?? [])) }}'
-    data-skomda-students='{{ e(json_encode($students ?? [])) }}'
-    data-has-registration-errors='{{ $errors->any() ? 'true' : 'false' }}'
-    data-registration-errors='{{ e(json_encode($errors->getMessages())) }}'
-    data-old-role='{{ e(old('student_id') ? 'freelancer' : (old('name') ? 'client' : '')) }}'
-    data-panel-show-mode='{{ e(session('login_error') ? 'login' : ((session('register_error') || $errors->any()) ? 'register' : '')) }}'
-    hidden>
-</div>
+@php
+    $oldRole = old('student_id') ? 'freelancer' : (old('name') ? 'client' : '');
+    $panelShowMode = session('login_error') ? 'login' : ((session('register_error') || $errors->any()) ? 'register' : '');
+    $loginPageData = [
+        'serviceCategories' => $categories ?? [],
+        'skomdaStudents' => $students ?? [],
+        'hasRegistrationErrors' => $errors->any(),
+        'registrationErrors' => $errors->getMessages(),
+        'oldRole' => $oldRole,
+        'panelShowMode' => $panelShowMode,
+    ];
+@endphp
+<script id="loginPageData" type="application/json">
+    @json($loginPageData)
+</script>
 <script src="{{ asset('js/sign-in.js') }}"></script>
 @endsection

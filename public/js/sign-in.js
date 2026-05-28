@@ -8,24 +8,37 @@ document.addEventListener("DOMContentLoaded", () => {
     // VALIDATION STATE
     const validationErrors = {};
 
+    const defaultLoginPageData = {
+        serviceCategories: [],
+        skomdaStudents: [],
+        hasRegistrationErrors: false,
+        registrationErrors: {},
+        oldRole: null,
+        panelShowMode: "",
+    };
+
     const loginPageDataEl = document.getElementById("loginPageData");
-    const loginPageData = loginPageDataEl
-        ? {
-              serviceCategories: JSON.parse(loginPageDataEl.dataset.serviceCategories || "[]"),
-              skomdaStudents: JSON.parse(loginPageDataEl.dataset.skomdaStudents || "[]"),
-              hasRegistrationErrors: String(loginPageDataEl.dataset.hasRegistrationErrors || "false") === "true",
-              registrationErrors: JSON.parse(loginPageDataEl.dataset.registrationErrors || "{}"),
-              oldRole: loginPageDataEl.dataset.oldRole || null,
-              panelShowMode: loginPageDataEl.dataset.panelShowMode || "",
-          }
-        : {
-              serviceCategories: [],
-              skomdaStudents: [],
-              hasRegistrationErrors: false,
-              registrationErrors: {},
-              oldRole: null,
-              panelShowMode: "",
-          };
+    let loginPageData = defaultLoginPageData;
+
+    if (loginPageDataEl?.type === "application/json") {
+        try {
+            loginPageData = {
+                ...defaultLoginPageData,
+                ...JSON.parse(loginPageDataEl.textContent || "{}"),
+            };
+        } catch (error) {
+            console.error("Invalid login page data JSON", error);
+        }
+    } else if (loginPageDataEl) {
+        loginPageData = {
+            serviceCategories: JSON.parse(loginPageDataEl.dataset.serviceCategories || "[]"),
+            skomdaStudents: JSON.parse(loginPageDataEl.dataset.skomdaStudents || "[]"),
+            hasRegistrationErrors: String(loginPageDataEl.dataset.hasRegistrationErrors || "false") === "true",
+            registrationErrors: JSON.parse(loginPageDataEl.dataset.registrationErrors || "{}"),
+            oldRole: loginPageDataEl.dataset.oldRole || null,
+            panelShowMode: loginPageDataEl.dataset.panelShowMode || "",
+        };
+    }
 
     window.serviceCategories = loginPageData.serviceCategories;
     window.skomdaStudents = loginPageData.skomdaStudents;
