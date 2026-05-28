@@ -118,6 +118,35 @@ window.DigitalanceUtils = {
     },
 
     /**
+     * Attach generic overlay click and Escape key modal handlers once.
+     */
+    setupOverlayListeners: function() {
+        if (this._overlayListenersReady) return;
+        this._overlayListenersReady = true;
+
+        document.addEventListener('click', function(e) {
+            var overlay = e.target.closest('.overlay, .modal-overlay');
+            if (!overlay || e.target !== overlay) return;
+            window.DigitalanceUtils.closeModal(overlay.id);
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key !== 'Escape') return;
+
+            var openOverlay = Array.from(document.querySelectorAll('.overlay, .modal-overlay'))
+                .reverse()
+                .find(function(overlay) {
+                    return !overlay.classList.contains('opacity-0')
+                        && !overlay.classList.contains('pointer-events-none');
+                });
+
+            if (openOverlay) {
+                window.DigitalanceUtils.closeModal(openOverlay.id);
+            }
+        });
+    },
+
+    /**
      * Get CSRF token from meta tag or hidden input
      */
     getCsrfToken: function() {

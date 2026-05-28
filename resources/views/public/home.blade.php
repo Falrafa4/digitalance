@@ -891,7 +891,7 @@
                     <br>Kembali ke landing page akan melakukan logout, lanjutkan atau tidak?
                 </p>
                 <div class="flex gap-3">
-                    <button onclick="window.location.href='{{ route('dashboard') }}'" 
+                    <button onclick="window.location.href='@if(($userRole ?? '') === 'admin') {{ route('admin.dashboard') }} @elseif(($userRole ?? '') === 'client') {{ route('client.dashboard') }} @elseif(($userRole ?? '') === 'freelancer') {{ route('freelancer.dashboard') }} @else {{ route('home') }} @endif'" 
                             class="flex-1 py-3 rounded-[14px] bg-slate-100 text-slate-700 font-bold text-sm hover:bg-slate-200 transition-all">
                         Batal & Dashboard
                     </button>

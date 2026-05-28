@@ -53,10 +53,10 @@
             <table class="w-full text-left border-collapse">
                 <thead>
                     <tr class="bg-slate-50/50 border-b border-slate-100">
-                        <th class="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">User Details</th>
-                        <th class="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">Role Type</th>
-                        <th class="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">Joined Date</th>
-                        <th class="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest text-center">Actions</th>
+                        <th class="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">Detail Pengguna</th>
+                        <th class="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">Role</th>
+                        <th class="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">Tanggal Bergabung</th>
+                        <th class="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest text-center">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-50">
