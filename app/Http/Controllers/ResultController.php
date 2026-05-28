@@ -37,11 +37,11 @@ class ResultController extends Controller
         $order = Order::with('service')->findOrFail($orderId);
         $validated = $request->validated();
 
-        if (! $order->service || $order->service->freelancer_id !== $freelancer->id) {
+        if (!$order->service || $order->service->freelancer_id !== $freelancer->id) {
             abort(403, 'Anda tidak memiliki izin untuk mengirim hasil untuk order ini.');
         }
 
-        if (! $request->hasFile('file')) {
+        if (!$request->hasFile('file')) {
             return back()->with('error', 'File tidak ditemukan');
         }
 
@@ -49,7 +49,7 @@ class ResultController extends Controller
         $version = $validated['version'] ?? $validated['message'] ?? null;
         $note = $validated['note'] ?? '';
 
-        if (! $version) {
+        if (!$version) {
             Storage::disk('public')->delete($filePath);
 
             return back()->withErrors(['version' => 'Versi hasil wajib diisi.'])->withInput();
@@ -57,7 +57,7 @@ class ResultController extends Controller
 
         try {
             DB::transaction(function () use ($order, $filePath, $note, $version) {
-                $order->update(['status' => 'Sent']);
+                $order->update(['status' => 'In Progress']);
 
                 Result::create([
                     'order_id' => $order->id,
@@ -124,7 +124,7 @@ class ResultController extends Controller
     {
         $result = $result->load(['order.service.category', 'order.service.freelancer.skomda_student', 'order.client']);
 
-        if (! $result->order || $result->order->client_id !== auth('client')->id()) {
+        if (!$result->order || $result->order->client_id !== auth('client')->id()) {
             abort(403, 'Anda tidak memiliki izin untuk melihat hasil ini.');
         }
 

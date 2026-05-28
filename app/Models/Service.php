@@ -5,6 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @property int $id
+ * @property int|null $freelancer_id
+ * @property string|null $status
+ * @property string|null $title
+ */
 class Service extends Model
 {
     use HasFactory;

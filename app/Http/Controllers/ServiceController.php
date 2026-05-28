@@ -15,8 +15,8 @@ class ServiceController extends Controller
      */
     public function publicIndex(Request $request)
     {
-        $search = trim((string) $request->query('q', ''));
         $categoryId = $request->query('category');
+        $search = trim((string) $request->query('q', ''));
 
         $categories = ServiceCategory::query()
             ->where('is_active', true)
@@ -246,7 +246,7 @@ class ServiceController extends Controller
         return redirect()->route('freelancer.services.index')->with('success', 'Layanan berhasil dihapus');
     }
 
-    public function submit($id)
+    public function submit(int $id)
     {
         $freelancer = auth('freelancer')->user();
         $service = Service::where('freelancer_id', $freelancer->id)
@@ -261,7 +261,7 @@ class ServiceController extends Controller
     /**
      * Update Service Status (ADMIN ONLY)
      */
-    public function updateStatus(Request $request, $id)
+    public function updateStatus(Request $request, int $id)
     {
         $request->validate([
             'status' => 'required|in:Draft,Pending,Approved,Rejected',

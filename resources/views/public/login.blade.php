@@ -276,6 +276,7 @@
                                             placeholder="Ketik nama / NIS..." autocomplete="off" />
                                         <datalist id="studentList">
                                             @foreach(($students ?? []) as $s)
+                                                @php /** @var \App\Models\SkomdaStudent $s */ @endphp
                                                 <option value="{{ $s->name }} ({{ $s->nis }})" data-id="{{ $s->id }}"
                                                     data-nis="{{ $s->nis }}" data-email="{{ $s->email }}"></option>
                                             @endforeach
@@ -378,13 +379,14 @@
 @endsection
 
 @section('scripts')
-<script>
-window.serviceCategories = {!! json_encode($categories ?? []) !!};
-window.skomdaStudents = {!! json_encode($students ?? []) !!};
-window.hasRegistrationErrors = {{ $errors->any() ? 'true' : 'false' }};
-window.registrationErrors = {!! json_encode($errors->getMessages()) !!};
-window.oldRole = {!! json_encode(old('student_id') ? 'freelancer' : (old('name') ? 'client' : null)) !!};
-window.panelShowMode = @if(session('login_error')) 'login' @elseif(session('register_error') || $errors->any()) 'register' @else '' @endif;
-</script>
+<div id="loginPageData"
+    data-service-categories='{{ e(json_encode($categories ?? [])) }}'
+    data-skomda-students='{{ e(json_encode($students ?? [])) }}'
+    data-has-registration-errors='{{ $errors->any() ? 'true' : 'false' }}'
+    data-registration-errors='{{ e(json_encode($errors->getMessages())) }}'
+    data-old-role='{{ e(old('student_id') ? 'freelancer' : (old('name') ? 'client' : '')) }}'
+    data-panel-show-mode='{{ e(session('login_error') ? 'login' : ((session('register_error') || $errors->any()) ? 'register' : '')) }}'
+    hidden>
+</div>
 <script src="{{ asset('js/sign-in.js') }}"></script>
 @endsection

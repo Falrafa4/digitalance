@@ -6,6 +6,15 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Sanctum\HasApiTokens;
 
+/**
+ * @property int $id
+ * @property string|null $bio
+ * @property string|null $status
+ * @property int|null $student_id
+ * @property string|null $password
+ * @property string|null $email
+ * @property string|null $name
+ */
 class Freelancer extends Authenticatable
 {
     use HasApiTokens, HasFactory;

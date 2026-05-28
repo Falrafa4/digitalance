@@ -8,6 +8,32 @@ document.addEventListener("DOMContentLoaded", () => {
     // VALIDATION STATE
     const validationErrors = {};
 
+    const loginPageDataEl = document.getElementById("loginPageData");
+    const loginPageData = loginPageDataEl
+        ? {
+              serviceCategories: JSON.parse(loginPageDataEl.dataset.serviceCategories || "[]"),
+              skomdaStudents: JSON.parse(loginPageDataEl.dataset.skomdaStudents || "[]"),
+              hasRegistrationErrors: String(loginPageDataEl.dataset.hasRegistrationErrors || "false") === "true",
+              registrationErrors: JSON.parse(loginPageDataEl.dataset.registrationErrors || "{}"),
+              oldRole: loginPageDataEl.dataset.oldRole || null,
+              panelShowMode: loginPageDataEl.dataset.panelShowMode || "",
+          }
+        : {
+              serviceCategories: [],
+              skomdaStudents: [],
+              hasRegistrationErrors: false,
+              registrationErrors: {},
+              oldRole: null,
+              panelShowMode: "",
+          };
+
+    window.serviceCategories = loginPageData.serviceCategories;
+    window.skomdaStudents = loginPageData.skomdaStudents;
+    window.hasRegistrationErrors = loginPageData.hasRegistrationErrors;
+    window.registrationErrors = loginPageData.registrationErrors;
+    window.oldRole = loginPageData.oldRole;
+    window.panelShowMode = loginPageData.panelShowMode;
+
     // DATA KATEGORI DIAMBIL DARI BACKEND
     let availableCategories = [];
     if (window.serviceCategories && Array.isArray(window.serviceCategories)) {

@@ -22,7 +22,7 @@ class RegisterFreelancerRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'student_id' => 'required|exists:skomda_students,id',
+            'student_id' => 'required|exists:skomda_students,id|unique:freelancers,student_id',
             'password' => 'required|string',
         ];
     }
@@ -32,6 +32,7 @@ class RegisterFreelancerRequest extends FormRequest
         return [
             'student_id.required' => 'Student ID wajib dipilih.',
             'student_id.exists' => 'Student ID tidak ditemukan. Pilih dari dropdown siswa.',
+            'student_id.unique' => 'Akun freelancer untuk siswa ini sudah terdaftar. Silakan login.',
         ];
     }
 }

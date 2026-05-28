@@ -17,6 +17,7 @@ class FreelancerController extends Controller
     // =========================
     public function profile()
     {
+        /** @var Freelancer $freelancer */
         $freelancer = auth('freelancer')->user();
 
         $freelancer->load('skomda_student');
@@ -32,21 +33,29 @@ class FreelancerController extends Controller
 
     public function updateProfile(UpdateFreelancerRequest $request)
     {
+        /** @var Freelancer $freelancer */
         $freelancer = auth('freelancer')->user();
-        $freelancer->update($request->only(['name', 'email', 'phone']));
+        /** @var array{bio?:string|null} $validated */
+        $validated = $request->validated();
+        $freelancer->update([
+            'bio' => $validated['bio'] ?? $freelancer->bio,
+        ]);
 
         return redirect()->route('freelancer.profile')->with('success', 'Profil berhasil diperbarui');
     }
 
     public function updatePassword(UpdateFreelancerPasswordRequest $request)
     {
+        /** @var Freelancer $freelancer */
         $freelancer = auth('freelancer')->user();
+        /** @var array{current_password:string, password:string} $validated */
+        $validated = $request->validated();
 
-        if (! Hash::check($request->current_password, $freelancer->password)) {
+        if (!Hash::check($validated['current_password'], $freelancer->password)) {
             return redirect()->route('freelancer.profile')->with('error', 'Password lama salah');
         }
 
-        $freelancer->password = Hash::make($request->password);
+        $freelancer->password = Hash::make($validated['password']);
         $freelancer->save();
 
         return redirect()->route('freelancer.profile')->with('success', 'Password berhasil diperbarui');
@@ -54,9 +63,10 @@ class FreelancerController extends Controller
 
     public function deleteAccount(Request $request)
     {
+        /** @var Freelancer $freelancer */
         $freelancer = auth('freelancer')->user();
 
-        if (! Hash::check($request->password, $freelancer->password)) {
+        if (!Hash::check($request->password, $freelancer->password)) {
             return redirect()->route('freelancer.profile')->with('error', 'Password salah');
         }
 
@@ -124,7 +134,7 @@ class FreelancerController extends Controller
                 $studentData['phone'] = $validated['phone'];
             }
 
-            if (! empty($studentData)) {
+            if (!empty($studentData)) {
                 $freelancer->skomda_student->update($studentData);
             }
         }
@@ -148,7 +158,7 @@ class FreelancerController extends Controller
         return redirect()->route('admin.freelancers.index')->with('success', 'Akun freelancer berhasil dihapus');
     }
 
-    public function verify($id)
+    public function verify(int $id)
     {
         $freelancer = Freelancer::findOrFail($id);
         $freelancer->update([
@@ -159,7 +169,7 @@ class FreelancerController extends Controller
             ->with('success', 'Freelancer berhasil diverifikasi');
     }
 
-    public function suspend($id)
+    public function suspend(int $id)
     {
         $freelancer = Freelancer::findOrFail($id);
         $freelancer->update([
@@ -170,7 +180,7 @@ class FreelancerController extends Controller
             ->with('success', 'Freelancer berhasil disuspend');
     }
 
-    public function unsuspend($id)
+    public function unsuspend(int $id)
     {
         $freelancer = Freelancer::findOrFail($id);
         $freelancer->update([

@@ -34,21 +34,18 @@ class AuthController extends Controller
 
     public function registerFreelancer(RegisterFreelancerRequest $request)
     {
-        $request->validated();
+        /** @var array{student_id:int|string, password:string} $validated */
+        $validated = $request->validated();
 
-        $student = SkomdaStudent::where('id', $request->student_id)->first();
+        $student = SkomdaStudent::where('id', $validated['student_id'])->first();
 
-        if (! $student) {
-            return back()->withErrors(['id' => 'Siswa dengan ID Student tersebut tidak ditemukan'])->withInput();
-        }
-
-        if ($student->freelancer) {
-            return back()->withErrors(['id' => 'Akun freelancer untuk ID Student ini sudah terdaftar. Silakan login.'])->withInput();
+        if (!$student) {
+            return back()->withErrors(['student_id' => 'Siswa dengan ID Student tersebut tidak ditemukan'])->withInput();
         }
 
         $student->freelancer()->create([
-            'student_id' => $request->student_id,
-            'password' => Hash::make($request->password),
+            'student_id' => $validated['student_id'],
+            'password' => Hash::make($validated['password']),
             'status' => 'Pending',
         ]);
 
