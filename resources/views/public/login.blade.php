@@ -78,18 +78,10 @@
     position: fixed; inset: 0; pointer-events: none; z-index: 999; opacity: .03;
     background-image: url("data:image/svg+xml,%3Csvg width='64' height='64' viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise' x='0' y='0'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='64' height='64' filter='url(%23noise)'/%3E%3C/svg%3E");
 }
-        .notify-error {
-            display: flex; gap: .7rem; align-items: flex-start; margin-bottom: 1.1rem;
-            background: #fef2f2; border: 1px solid #fecaca; color: #b91c1c;
-            padding: .80rem .98rem; border-radius: .9rem; font-size: .95em;
-            font-weight: 700; box-shadow: 0 1px 6px 0 rgba(220,38,38,.05);}
-        .notify-error svg { min-width: 1.2em; margin-top: 2px;}
-        .notify-error .notify-texts { display: flex; flex-direction: column; gap: 1px;}
-        .notify-error strong { color: #b91c1c; font-weight: 800; font-size: 1em;}
-        .input-error { border-color: #ef4444 !important; box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1); }
-        .req-item.met { color: #22c55e; }
-        .req-item.met .req-check { color: #22c55e; }
-        .req-check { font-size: 10px; }
+         .input-error { border-color: #ef4444 !important; box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1); }
+         .req-item.met { color: #22c55e; }
+         .req-item.met .req-check { color: #22c55e; }
+         .req-check { font-size: 10px; }
     </style>
 @endsection
 
@@ -152,15 +144,9 @@
                             <h2 class="text-[1.4rem] font-extrabold text-slate-900 mb-0.5">Masuk ke Akun Anda</h2>
                             <p class="text-slate-500 text-[0.78rem]">Silakan masukkan email dan password Anda</p>
                         </div>
-                        @if(session('login_error'))
-                            <div class="notify-error">
-                                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                                <div class="notify-texts">
-                                    <strong>Login Gagal</strong>
-                                    <span>{{ session('login_error') }}</span>
-                                </div>
-                            </div>
-                        @endif
+
+                        {{-- Alert handled by global flash component --}}
+
                         <form id="loginForm" method="POST" action="{{ route('login-process') }}" class="flex flex-col gap-3">
                             @csrf
                             <div>
@@ -169,9 +155,9 @@
                                     <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" /></svg>
                                     <input type="email" name="email" placeholder="nama@email.com"
                                            value="{{ old('email') }}" required class="inp w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-[0.86rem] text-slate-900 transition-all" />
-                                </div>
-                            </div>
-                            <div id="registerPasswordWrapper">
+                                  </div>
+                              </div>
+                              <div id="registerPasswordWrapper">
                                 <label class="block text-[0.55rem] font-extrabold text-slate-400 uppercase tracking-wide mb-1 ml-1">Password</label>
                                 <div class="relative">
                                     <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none"
@@ -199,6 +185,7 @@
                         </form>
                     </div>
                 </div>
+
                 {{-- REGISTER PANEL --}}
                 <div id="registerPanel" class="panel panel-hidden overflow-y-auto flex items-center justify-center">
                     <div class="w-full px-8 sm:px-12 py-4" style="pointer-events:auto;">
@@ -211,26 +198,9 @@
                             <h2 class="text-[1.4rem] font-extrabold text-slate-900 mb-0.5">Daftar ke Digitalance</h2>
                             <p class="text-slate-500 text-[0.78rem]">Bergabunglah dengan jaringan elite digital.</p>
                         </div>
-                        @if(session('register_error'))
-                            <div class="notify-error">
-                                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                                <div class="notify-texts">
-                                    <strong>Registrasi Gagal</strong>
-                                    <span>{{ session('register_error') }}</span>
-                                </div>
-                            </div>
-                        @endif
-                        @if($errors->any())
-                            <div class="notify-error">
-                                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                                <div class="notify-texts">
-                                    <strong>Registrasi Error</strong>
-                                    @foreach ($errors->all() as $err)
-                                        <span>{{ $err }}</span>
-                                    @endforeach
-                                </div>
-                            </div>
-                        @endif
+
+                        {{-- Alert handled by global flash component --}}
+
                         <div class="relative inline-flex p-1 bg-slate-100 rounded-full border border-slate-200 mb-1.5" id="roleToggleContainer">
                             <div id="roleSlider"
                                 class="absolute top-1 left-1 bg-white rounded-full shadow-sm transition-transform duration-300"
@@ -257,9 +227,6 @@
                                                 stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
                                             <input type="text" name="name" placeholder="John" value="{{ old('name') }}"
                                                 class="inp w-full pl-10 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-[0.86rem] transition-all" />
-                                        @error('name')
-                                            <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
-                                        @enderror
                                         </div>
                                     </div>
                                     <div>
@@ -284,9 +251,6 @@
                                         <input type="email" name="email" placeholder="john@digitalance.io"
                                             value="{{ old('email') }}"
                                             class="inp w-full pl-10 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-[0.86rem] transition-all" />
-                                    @error('email')
-                                        <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
-                                    @enderror
                                     </div>
                                 </div>
                             </div>
@@ -302,16 +266,15 @@
                                         <datalist id="studentList">
                                             @foreach(($students ?? []) as $s)
                                                 @php /** @var \App\Models\SkomdaStudent $s */ @endphp
-                                                <option value="{{ $s->name }} ({{ $s->nis }})" data-id="{{ $s->id }}"
-                                                    data-nis="{{ $s->nis }}" data-email="{{ $s->email }}"></option>
+                                                @if($s)
+                                                <option value="{{ $s->name ?? '' }} ({{ $s->nis ?? '' }})" data-id="{{ $s->id ?? '' }}"
+                                                    data-nis="{{ $s->nis ?? '' }}" data-email="{{ $s->email ?? '' }}"></option>
+                                                @endif
                                             @endforeach
                                         </datalist>
                                     </div>
                                     <input type="hidden" id="studentIdInput" name="student_id" value="{{ old('student_id') }}" />
                                     <input type="hidden" id="nisInput" name="nis" value="{{ old('nis') }}" />
-                                    @error('student_id')
-                                        <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
-                                    @enderror
                                 </div>
                                 <div class="mt-1.5">
                                     <label class="block text-[0.55rem] font-extrabold text-slate-400 uppercase tracking-wide mb-1 ml-1">Email Siswa</label>
@@ -351,9 +314,6 @@
                                         stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
                                     <input id="registerPasswordField" type="password" name="password" placeholder="Isi dengan password kuat" required
                                         class="inp w-full pl-10 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-[0.86rem] transition-all" />
-                                @error('password')
-                                    <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
-                                @enderror
                                 </div>
                                 <div class="mt-1">
                                     <div class="flex items-center gap-2 mb-1">

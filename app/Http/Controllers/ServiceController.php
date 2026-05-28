@@ -295,7 +295,7 @@ class ServiceController extends Controller
             \App\Models\Notification::create([
                 'title' => 'Layanan Disetujui',
                 'message' => "Layanan '{$service->title}' telah disetujui admin dan sudah tampil di katalog layanan.",
-                'type' => 'success', // PERBAIKAN: Diubah dari 'approved' ke 'success' agar CSS/Icon Drawer terbaca sempurna
+                'type' => 'success',
                 'role' => 'freelancer',
                 'user_id' => $service->freelancer_id,
                 'link' => route('freelancer.services.show', $service->id),

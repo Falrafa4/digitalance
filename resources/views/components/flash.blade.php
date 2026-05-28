@@ -34,7 +34,10 @@
         </div>
     @endif
 
-    @if(session('error'))
+    @php
+        $unifiedError = session('login_error') ?? session('register_error') ?? session('error');
+    @endphp
+    @if($unifiedError)
         <div data-flash="error"
             class="group max-w-sm flex items-start gap-3 px-5 py-4 rounded-2xl shadow-xl shadow-red-500/10 border border-red-200/60 bg-gradient-to-r from-red-50 to-white backdrop-blur-sm pointer-events-auto"
             role="alert">
@@ -42,7 +45,7 @@
                 <i class="ri-error-warning-line text-[16px]"></i>
             </div>
             <div class="flex-1 min-w-0">
-                <p class="text-[13px] font-bold text-red-800 leading-snug">{{ session('error') }}</p>
+                <p class="text-[13px] font-bold text-red-800 leading-snug">{{ $unifiedError }}</p>
             </div>
             <button type="button" aria-label="Tutup" onclick="this.closest('[data-flash]').remove()"
                 class="w-7 h-7 rounded-lg flex items-center justify-center text-red-400 hover:text-red-700 hover:bg-red-100/50 transition-all flex-shrink-0 opacity-0 group-hover:opacity-100">

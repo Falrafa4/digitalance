@@ -610,4 +610,49 @@ class DashboardController extends Controller
 
         return view('dashboard.admin.search', compact('results', 'q')); // Reuse the same search view
     }
+
+    /**
+     * PERBAIKAN TASK 6: Aksi eksekusi Admin untuk menyelesaikan dispute secara tuntas
+     */
+    public function resolveDispute(\Illuminate\Http\Request $request, $id)
+    {
+        $order = Order::findOrFail($id);
+        
+        $request->validate([
+            'status_decision' => 'required|in:Completed,Cancelled',
+        ]);
+
+        $decision = $request->input('status_decision'); 
+
+        // Update status order berdasarkan keputusan peninjauan admin
+        $order->update([
+            'status' => $decision
+        ]);
+
+        $textStatus = $decision === 'Completed' ? 'Dinyatakan Selesai (Dana diteruskan ke Freelancer)' : 'Dibatalkan (Dana dikembalikan ke Klien)';
+        $notifType = $decision === 'Completed' ? 'success' : 'danger';
+
+        // Kirim Notifikasi otomatis ke Client
+        \App\Models\Notification::create([
+            'title' => 'Keputusan Dispute Admin',
+            'message' => "Admin telah meninjau dan menyelesaikan dispute untuk pesanan #{$order->id}. Keputusan: Pesanan {$textStatus}.",
+            'type' => $notifType,
+            'role' => 'client',
+            'user_id' => $order->client_id,
+            'link' => route('client.orders.show', $order->id),
+        ]);
+
+        // Kirim Notifikasi otomatis ke Freelancer
+        \App\Models\Notification::create([
+            'title' => 'Keputusan Dispute Admin',
+            'message' => "Admin telah meninjau dan menyelesaikan dispute untuk proyek #{$order->id}. Keputusan: Pesanan {$textStatus}.",
+            'type' => $notifType,
+            'role' => 'freelancer',
+            'user_id' => $order->freelancer_id,
+            'link' => route('freelancer.orders.show', $order->id),
+        ]);
+
+        // Kembali ke halaman sebelumnya membawa session flash success (bukan alert JS)
+        return redirect()->back()->with('success', "Dispute berhasil diselesaikan. Status pesanan kini menjadi {$decision}.");
+    }
 }
