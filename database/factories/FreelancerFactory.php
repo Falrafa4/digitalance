@@ -27,6 +27,7 @@ class FreelancerFactory extends Factory
         return [
             'student_id' => \App\Models\SkomdaStudent::inRandomOrder()->first()->id,
             'bio' => fake()->randomElement($bios),
+            'profile_photo' => 'profiles/placeholder.webp',
             'password' => bcrypt('password'), // Default password
             'status' => fake()->randomElement(['Pending', 'Approved', 'Approved', 'Suspended']),
         ];

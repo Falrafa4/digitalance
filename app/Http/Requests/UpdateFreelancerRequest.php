@@ -29,7 +29,7 @@ class UpdateFreelancerRequest extends FormRequest
             'name' => 'nullable|string|max:255',
             'email' => 'nullable|email',
             'phone' => 'nullable|string|max:20',
-            'password' => 'nullable|string|min:6', // Tambahkan antisipasi update password langsung
+            'profile_photo' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:5120',
         ];
     }
 }

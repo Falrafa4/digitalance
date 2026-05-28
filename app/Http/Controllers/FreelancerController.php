@@ -9,9 +9,12 @@ use App\Models\Freelancer;
 use App\Models\Service;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class FreelancerController extends Controller
 {
+    private const DEFAULT_PROFILE_PHOTO = 'profiles/placeholder.webp';
+
     // =========================
     // FREELANCER ONLY
     // =========================
@@ -65,6 +68,22 @@ class FreelancerController extends Controller
             }
         }
 
+        if ($profilePhoto = $this->storeProfilePhoto($request)) {
+            $this->deleteProfilePhoto($freelancer->profile_photo);
+            $validated['profile_photo'] = $profilePhoto;
+        }
+
+        $freelancerData = [];
+        foreach (['bio', 'profile_photo'] as $field) {
+            if (array_key_exists($field, $validated)) {
+                $freelancerData[$field] = $validated[$field];
+            }
+        }
+
+        if (! empty($freelancerData)) {
+            $freelancer->update($freelancerData);
+        }
+
         return redirect()->route('freelancer.profile')->with('success', 'Profil berhasil diperbarui');
     }
 
@@ -94,6 +113,7 @@ class FreelancerController extends Controller
             return redirect()->route('freelancer.profile')->with('error', 'Password salah');
         }
 
+        $this->deleteProfilePhoto($freelancer->profile_photo);
         $freelancer->delete();
 
         return redirect()->route('home')->with('success', 'Akun freelancer berhasil dihapus');
@@ -111,6 +131,7 @@ class FreelancerController extends Controller
     {
         $data = $request->validated();
         $data['password'] = Hash::make($data['password']);
+        $data['profile_photo'] = $this->storeProfilePhoto($request) ?? self::DEFAULT_PROFILE_PHOTO;
 
         Freelancer::create($data);
 
@@ -139,11 +160,22 @@ class FreelancerController extends Controller
     {
         $validated = $request->validated();
 
+        if ($profilePhoto = $this->storeProfilePhoto($request)) {
+            $this->deleteProfilePhoto($freelancer->profile_photo);
+            $validated['profile_photo'] = $profilePhoto;
+        }
+
         // Update Freelancer fields
-        $freelancer->update([
-            'bio' => $validated['bio'] ?? $freelancer->bio,
-            'status' => $validated['status'] ?? $freelancer->status,
-        ]);
+        $freelancerData = [];
+        foreach (['bio', 'status', 'profile_photo'] as $field) {
+            if (array_key_exists($field, $validated)) {
+                $freelancerData[$field] = $validated[$field];
+            }
+        }
+
+        if (! empty($freelancerData)) {
+            $freelancer->update($freelancerData);
+        }
 
         // Update linked SkomdaStudent fields
         if ($freelancer->skomda_student) {
@@ -173,6 +205,7 @@ class FreelancerController extends Controller
     public function destroy(Request $request, string $id)
     {
         $freelancer = Freelancer::findOrFail($id);
+        $this->deleteProfilePhoto($freelancer->profile_photo);
         $freelancer->delete();
 
         if ($request->expectsJson()) {
@@ -253,5 +286,23 @@ class FreelancerController extends Controller
             ->get();
 
         return view('dashboard.client.talents.talent-show', compact('freelancer', 'services'));
+    }
+
+    private function storeProfilePhoto(Request $request): ?string
+    {
+        if (! $request->hasFile('profile_photo')) {
+            return null;
+        }
+
+        return $request->file('profile_photo')->store('profiles', 'public');
+    }
+
+    private function deleteProfilePhoto(?string $path): void
+    {
+        if (! $path || $path === self::DEFAULT_PROFILE_PHOTO) {
+            return;
+        }
+
+        Storage::disk('public')->delete($path);
     }
 }

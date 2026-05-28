@@ -28,6 +28,7 @@ class ClientFactory extends Factory
             'email' => fake()->unique()->lexify($emailHandle.'@'.fake()->randomElement($domains)),
             'password' => bcrypt('password'), // Default password for clients
             'phone' => '+628'.fake()->numerify('##########'),
+            'profile_photo' => 'profiles/placeholder.webp',
         ];
     }
 }

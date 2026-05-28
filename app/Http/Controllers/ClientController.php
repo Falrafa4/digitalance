@@ -10,9 +10,12 @@ use App\Models\SkomdaStudent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class ClientController extends Controller
 {
+    private const DEFAULT_PROFILE_PHOTO = 'profiles/placeholder.webp';
+
     // ADMIN ONLY (CRUD & MANAGEMENT)
 
     /**
@@ -23,12 +26,12 @@ class ClientController extends Controller
         $q = trim($request->query('q', ''));
         $role = $request->query('role', 'all');
 
-        $clientsQuery = Client::query()->select('id', 'name', 'email', 'phone', DB::raw("'Client' as role"), DB::raw("'Active' as status"), 'created_at');
-        $skomdaQuery = SkomdaStudent::query()->select('id', 'name', 'email', 'phone', DB::raw("'Skomda Student' as role"), DB::raw("'Active' as status"), 'created_at');
+        $clientsQuery = Client::query()->select('id', 'name', 'email', 'phone', 'profile_photo', DB::raw("'Client' as role"), DB::raw("'Active' as status"), 'created_at');
+        $skomdaQuery = SkomdaStudent::query()->select('id', 'name', 'email', 'phone', DB::raw('NULL as profile_photo'), DB::raw("'Skomda Student' as role"), DB::raw("'Active' as status"), 'created_at');
         // Use the query builder so Freelancer::getNameAttribute() does not override the joined student name.
         $freelancersQuery = DB::table('freelancers')
             ->join('skomda_students', 'freelancers.student_id', '=', 'skomda_students.id')
-            ->select('freelancers.id', 'skomda_students.name', 'skomda_students.email', 'skomda_students.phone', DB::raw("'Freelancer' as role"), 'freelancers.status', 'freelancers.created_at');
+            ->select('freelancers.id', 'skomda_students.name', 'skomda_students.email', 'skomda_students.phone', 'freelancers.profile_photo', DB::raw("'Freelancer' as role"), 'freelancers.status', 'freelancers.created_at');
 
         if ($q !== '') {
             $clientsQuery->where(fn($query) => $query
@@ -77,6 +80,8 @@ class ClientController extends Controller
     {
         $validated = $request->validated();
         $validated['password'] = Hash::make($validated['password']);
+        $validated['profile_photo'] = $this->storeProfilePhoto($request) ?? self::DEFAULT_PROFILE_PHOTO;
+
         Client::create($validated);
 
         if ($request->expectsJson()) {
@@ -95,7 +100,14 @@ class ClientController extends Controller
 
     public function update(UpdateClientProfileRequest $request, Client $client)
     {
-        $client->update($request->validated());
+        $validated = $request->validated();
+
+        if ($profilePhoto = $this->storeProfilePhoto($request)) {
+            $this->deleteProfilePhoto($client->profile_photo);
+            $validated['profile_photo'] = $profilePhoto;
+        }
+
+        $client->update($validated);
 
         if ($request->expectsJson()) {
             return response()->json(['message' => 'Akun client berhasil diperbarui'], 200);
@@ -106,6 +118,7 @@ class ClientController extends Controller
 
     public function destroy(Request $request, Client $client)
     {
+        $this->deleteProfilePhoto($client->profile_photo);
         $client->delete();
 
         if ($request->expectsJson()) {
@@ -141,7 +154,14 @@ class ClientController extends Controller
     {
         /** @var Client $client */
         $client = auth('client')->user();
-        $client->update($request->validated());
+        $validated = $request->validated();
+
+        if ($profilePhoto = $this->storeProfilePhoto($request)) {
+            $this->deleteProfilePhoto($client->profile_photo);
+            $validated['profile_photo'] = $profilePhoto;
+        }
+
+        $client->update($validated);
 
         return redirect()->route('client.profile')->with('success', 'Profil berhasil diperbarui');
     }
@@ -215,5 +235,23 @@ class ClientController extends Controller
         $clients = Client::all();
 
         return view('dashboard.freelancer.clients', compact('clients'));
+    }
+
+    private function storeProfilePhoto(Request $request): ?string
+    {
+        if (! $request->hasFile('profile_photo')) {
+            return null;
+        }
+
+        return $request->file('profile_photo')->store('profiles', 'public');
+    }
+
+    private function deleteProfilePhoto(?string $path): void
+    {
+        if (! $path || $path === self::DEFAULT_PROFILE_PHOTO) {
+            return;
+        }
+
+        Storage::disk('public')->delete($path);
     }
 }

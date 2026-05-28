@@ -21,12 +21,14 @@ class UpdateClientProfileRequest extends FormRequest
      */
     public function rules(): array
     {
-        $client = $this->route('client');
+        $client = $this->route('client') ?? $this->user('client');
+        $clientId = is_object($client) ? $client->id : $client;
 
         return [
             'name' => 'required|string',
-            'email' => 'required|email|unique:clients,email,'.$client->id,
+            'email' => 'required|email|unique:clients,email'.($clientId ? ','.$clientId : ''),
             'phone' => 'required|string',
+            'profile_photo' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:5120',
         ];
     }
 }

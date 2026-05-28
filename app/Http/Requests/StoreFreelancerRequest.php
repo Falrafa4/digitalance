@@ -25,6 +25,7 @@ class StoreFreelancerRequest extends FormRequest
             'student_id' => 'required|exists:skomda_students,id|unique:freelancers,student_id',
             'password' => 'required|string|min:6',
             'bio' => 'nullable|string|max:500',
+            'profile_photo' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:5120',
         ];
     }
 }

@@ -17,7 +17,7 @@
                 <div class="bg-white rounded-[18px] border border-slate-200 p-6 flex flex-col items-center text-center animate-fadeUp">
                     <div class="relative mb-4">
                         <img
-                            src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&background=0f766e&color=fff&size=128"
+                            src="{{ $user->profile_photo ? asset('storage/' . $user->profile_photo) : 'https://ui-avatars.com/api/?name=' . urlencode($user->name) . '&background=0f766e&color=fff&size=128' }}"
                             class="w-24 h-24 rounded-[18px] object-cover border-4 border-white shadow-teal-md"
                             alt="{{ $user->name }}"
                         />
@@ -47,9 +47,17 @@
                         </div>
                     @endif
 
-                    <form action="{{ route('client.profile.update') }}" method="POST">
+                    <form action="{{ route('client.profile.update') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
+                        <div class="flex flex-col gap-1.5 mb-4">
+                            <label class="text-[11px] font-bold text-slate-500 uppercase tracking-[.1em]">Foto Profil</label>
+                            <input type="file" name="profile_photo" accept="image/jpeg,image/png,image/webp"
+                                class="py-[10px] px-[13px] bg-slate-50 border-[1.5px] border-slate-200 rounded-[11px] text-[13.5px] outline-none transition-all duration-200 file:mr-4 file:rounded-[9px] file:border-0 file:bg-[#0f766e] file:px-4 file:py-2 file:text-[12px] file:font-bold file:text-white hover:file:bg-[#0a5e58] focus:border-[#0f766e] focus:bg-white focus:shadow-[0_0_0_3px_rgba(15,118,110,0.08)] @error('profile_photo') border-red-400 @enderror" />
+                            <p class="text-[10px] text-slate-400 mt-0.5">Format JPG, PNG, atau WEBP. Maksimal 5 MB.</p>
+                            @error('profile_photo')<p class="text-[11px] text-red-500 mt-0.5">{{ $message }}</p>@enderror
+                        </div>
+
                         <div class="flex flex-col gap-1.5 mb-4">
                             <label class="text-[11px] font-bold text-slate-500 uppercase tracking-[.1em]">Nama Lengkap</label>
                             <input type="text" name="name" value="{{ old('name', $user->name) }}" required
