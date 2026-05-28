@@ -155,6 +155,7 @@ class ServiceController extends Controller
         $freelancer = auth('freelancer')->user();
 
         $services = Service::with('service_category:id,name')
+            ->select(['id', 'freelancer_id', 'service_category_id', 'title', 'price', 'status', 'description', 'created_at'])
             ->where('freelancer_id', $freelancer->id)
             ->get();
 

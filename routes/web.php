@@ -314,8 +314,8 @@ Route::middleware('auth:freelancer')->prefix('freelancer')->name('freelancer.')-
     Route::patch('/orders/{id}/price', [OrderController::class, 'updateAgreedPrice'])->name('orders.updateAgreedPrice');
     Route::post('/orders/{order}/accept', [OrderController::class, 'freelancerAccept'])->name('orders.accept');
     Route::post('/orders/{order}/reject', [OrderController::class, 'freelancerReject'])->name('orders.reject');
-    Route::post('/orders/{order}/revision/approve', [OrderController::class, 'freelancerApproveRevision'])->name('freelancer.orders.revision.approve');
-    Route::post('/orders/{order}/revision/reject', [OrderController::class, 'freelancerRejectRevision'])->name('freelancer.orders.revision.reject');
+    Route::post('/orders/{order}/revision/approve', [OrderController::class, 'freelancerApproveRevision'])->name('orders.revision.approve');
+    Route::post('/orders/{order}/revision/reject', [OrderController::class, 'freelancerRejectRevision'])->name('orders.revision.reject');
 
     // crud review
     Route::get('/reviews', [ReviewController::class, 'freelancerIndex'])->name('reviews.index');

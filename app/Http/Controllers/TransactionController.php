@@ -15,12 +15,13 @@ class TransactionController extends Controller
         $status = strtolower(trim((string) $request->query('status', 'all')));
         $search = trim((string) $request->query('q', ''));
 
-        $baseQuery = Transaction::with(['order.client']);
+        // PERBAIKAN: Tambahkan order.service ke dalam eager loading
+        $baseQuery = Transaction::with(['order.client', 'order.service']);
 
         if ($status !== 'all' && in_array($status, ['paid', 'pending', 'failed', 'refund'], true)) {
             $baseQuery->whereRaw('LOWER(status) = ?', [$status]);
         }
-
+        
         if ($search !== '') {
             $baseQuery->where(function ($query) use ($search) {
                 $query->where('id', 'like', '%' . $search . '%')
