@@ -6,78 +6,76 @@
     <style>
         @keyframes popIn { from {transform: scale(0.8);opacity:0;} to {transform: scale(1);opacity:1;}}
         .tag-item {animation: popIn 0.15s ease forwards;}
-        .hero-img {transition: transform 1s ease, opacity 0.4s ease;}
-        .hero-img.fade-out { opacity: 0;}
+        .hero-img {transition: transform 1s ease, opacity 0.4s ease;}\n        .hero-img.fade-out { opacity: 0;}
         .hero-wrap:hover .hero-img {transform: scale(1.05);}
         .panel {position:absolute;inset:0;transition: opacity 0.45s, visibility 0.45s;}
         .panel-hidden {opacity:0; visibility:hidden; pointer-events:none;}
         .panel-visible {opacity:1;visibility:visible;pointer-events:auto;}
         #authContainer {position:relative;overflow:hidden;}
         .auth-overlay {
-    position: absolute;
-    top: 0; left: 0; height: 100%; z-index: 10;
-    width: 50%;
-    transition: transform 0.7s cubic-bezier(.4,0,.2,1);
-    will-change: transform;
-    pointer-events: none;
-    /* Pastikan display:block di layar >=768px (biar ga jadi inline) */
-    display: block;
-}
+            position: absolute;
+            top: 0; left: 0; height: 100%; z-index: 10;
+            width: 50%;
+            transition: transform 0.7s cubic-bezier(.4,0,.2,1);
+            will-change: transform;
+            pointer-events: none;
+            display: block;
+        }
 
-@media (min-width: 768px) {
-    .auth-overlay { /* Sudah benar sliding effect */
-        transform: translateX(0%);
-    }
-    .auth-overlay.register-mode {
-        transform: translateX(100%);
-    }
-    #loginPanel {width: 50%;left: 50%;}
-    #registerPanel {width: 50%;left: 0;}
-}
+        @media (min-width: 768px) {
+            .auth-overlay {
+                transform: translateX(0%);
+            }
+            .auth-overlay.register-mode {
+                transform: translateX(100%);
+            }
+            #loginPanel {width: 50%;left: 50%;}
+            #registerPanel {width: 50%;left: 0;}
+        }
 
-@media (max-width: 767px) {
-    .auth-overlay {display: none;}
-    main {
-        align-items: flex-start;
-        padding-top: 1rem;
-        padding-bottom: 1rem;
-    }
-    #authContainer {
-        height: auto !important;
-        min-height: unset !important;
-        overflow: visible;
-        border-radius: 22px;
-    }
-    #authContainer > div.relative.w-full.h-full {
-        height: auto !important;
-        pointer-events: auto;
-    }
-    .panel {
-        position: relative;
-        inset: auto;
-        min-height: unset;
-        height: auto;
-    }
-    #loginPanel, #registerPanel {
-        width: 100%;
-        left: 0;
-        right: 0;
-    }
-}
+        @media (max-width: 767px) {
+            .auth-overlay {display: none;}
+            main {
+                align-items: flex-start;
+                padding-top: 1rem;
+                padding-bottom: 1rem;
+            }
+            #authContainer {
+                height: auto !important;
+                min-height: unset !important;
+                overflow: visible;
+                border-radius: 22px;
+            }
+            #authContainer > div.relative.w-full.h-full {
+                height: auto !important;
+                pointer-events: auto;
+            }
+            .panel {
+                position: relative;
+                inset: auto;
+                min-height: unset;
+                height: auto;
+            }
+            #loginPanel, #registerPanel {
+                width: 100%;
+                left: 0;
+                right: 0;
+            }
+        }
 
-#overlayToggle {
-    position: relative; z-index: 100!important; pointer-events: auto!important;
-}
-#roleSlider {
-    transition: transform 0.35s;
-}
-.inp:focus {
-    outline: none; border-color: #0F766E; box-shadow: 0 0 0 3px rgba(15,118,110,0.1);
-}
-.grain {
-    position: fixed; inset: 0; pointer-events: none; z-index: 999; opacity: .03;
-    background-image: url("data:image/svg+xml,%3Csvg width='64' height='64' viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise' x='0' y='0'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='64' height='64' filter='url(%23noise)'/%3E%3C/svg%3E");
-}
+        #overlayToggle {
+            position: relative; z-index: 100!important; pointer-events: auto!important;
+        }
+        #roleSlider {
+            transition: transform 0.35s;
+        }
+        .inp:focus {
+            outline: none; border-color: #0F766E; box-shadow: 0 0 0 3px rgba(15,118,110,0.1);
+        }
+        .grain {
+            position: fixed; inset: 0; pointer-events: none; z-index: 999; opacity: .03;
+            background-image: url("data:image/svg+xml,%3Csvg width='64' height='64' viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise' x='0' y='0'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='64' height='64' filter='url(%23noise)'/%3E%3C/svg%3E");
+        }
          .input-error { border-color: #ef4444 !important; box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1); }
          .req-item.met { color: #22c55e; }
          .req-item.met .req-check { color: #22c55e; }
@@ -136,7 +134,7 @@
             <div class="relative w-full h-full" style="pointer-events:none;">
                 {{-- LOGIN PANEL --}}
                 <div id="loginPanel" class="panel panel-visible overflow-y-auto flex items-center justify-center">
-                    <div class="w-full px-8 sm:px-12 py-6" style="pointer-events:auto;">
+                    <div class="w-full max-w-sm mx-auto px-5 sm:px-12 py-6" style="pointer-events:auto;">
                         <div class="mb-3">
                             <div class="w-8 h-8 bg-slate-100 rounded-xl flex items-center justify-center text-teal-700 mb-2 border border-slate-200">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" /><line x1="2" y1="12" x2="22" y2="12" /><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" /></svg>
@@ -145,8 +143,6 @@
                             <p class="text-slate-500 text-[0.78rem]">Silakan masukkan email dan password Anda</p>
                         </div>
 
-                        {{-- Alert handled by global flash component --}}
-
                         <form id="loginForm" method="POST" action="{{ route('login-process') }}" class="flex flex-col gap-3">
                             @csrf
                             <div>
@@ -154,7 +150,7 @@
                                 <div class="relative">
                                     <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" /></svg>
                                     <input type="email" name="email" placeholder="nama@email.com"
-                                           value="{{ old('email') }}" required class="inp w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-[0.86rem] text-slate-900 transition-all" />
+                                           value="{{ old('email') }}" required class="inp w-full sm:px-4 px-3 pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-[0.86rem] text-slate-900 transition-all" />
                                   </div>
                               </div>
                               <div id="registerPasswordWrapper">
@@ -164,31 +160,31 @@
                                          width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                          stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
                                     <input id="registerPasswordInput" type="password" name="password" placeholder="••••••••"
-                                           class="inp w-full pl-10 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-[0.86rem] transition-all" />
+                                           class="inp w-full sm:px-4 px-3 pl-10 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-[0.86rem] transition-all" />
                                 </div>
                             </div>
-                            <button type="submit" class="w-full py-3 bg-slate-900 text-white font-bold rounded-xl text-[0.88rem] mt-2 flex items-center justify-center gap-2 hover:bg-black hover:-translate-y-0.5 transition-all shadow-md cursor-pointer">
+                            <button type="submit" class="w-full sm:px-4 px-3 py-3 bg-slate-900 text-white font-bold rounded-xl text-[0.88rem] mt-2 flex items-center justify-center gap-2 hover:bg-black hover:-translate-y-0.5 transition-all shadow-md cursor-pointer">
                                 Masuk
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6" /></svg>
                             </button>
                             <div class="mt-2 text-center">
-    <span class="text-sm font-medium text-slate-800">
-        Belum punya akun?
-        <button
-            type="button"
-            class="mobile-toggle align-baseline text-sm text-teal-700 font-bold hover:underline px-0 py-0 bg-transparent border-none focus:outline-none"
-            style="background: none; box-shadow: none;">
-            Daftar
-        </button>
-    </span>
-</div>
+                                <span class="text-sm font-medium text-slate-800">
+                                    Belum punya akun?
+                                    <button
+                                        type="button"
+                                        class="mobile-toggle align-baseline text-sm text-teal-700 font-bold hover:underline px-0 py-0 bg-transparent border-none focus:outline-none"
+                                        style="background: none; box-shadow: none;">
+                                        Daftar
+                                    </button>
+                                </span>
+                            </div>
                         </form>
                     </div>
                 </div>
 
                 {{-- REGISTER PANEL --}}
                 <div id="registerPanel" class="panel panel-hidden overflow-y-auto flex items-center justify-center">
-                    <div class="w-full px-8 sm:px-12 py-4" style="pointer-events:auto;">
+                    <div class="w-full max-w-sm mx-auto px-5 sm:px-12 py-4" style="pointer-events:auto;">
                          <div class="mb-1.5">
                             <div class="inline-flex items-center gap-1.5 mb-1 text-teal-700 text-[0.55rem] font-extrabold uppercase tracking-widest">
                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -198,8 +194,6 @@
                             <h2 class="text-[1.4rem] font-extrabold text-slate-900 mb-0.5">Daftar ke Digitalance</h2>
                             <p class="text-slate-500 text-[0.78rem]">Bergabunglah dengan jaringan elite digital.</p>
                         </div>
-
-                        {{-- Alert handled by global flash component --}}
 
                         <div class="relative inline-flex p-1 bg-slate-100 rounded-full border border-slate-200 mb-1.5" id="roleToggleContainer">
                             <div id="roleSlider"
@@ -226,7 +220,7 @@
                                                 width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                                 stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
                                             <input type="text" name="name" placeholder="John" value="{{ old('name') }}"
-                                                class="inp w-full pl-10 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-[0.86rem] transition-all" />
+                                                class="inp w-full sm:px-4 px-3 pl-10 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-[0.86rem] transition-all" />
                                         </div>
                                     </div>
                                     <div>
@@ -237,7 +231,7 @@
                                                 width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                                 stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" /></svg>
                                             <input type="text" name="phone" placeholder="0812..." value="{{ old('phone') }}"
-                                                class="inp w-full pl-10 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-[0.86rem] transition-all" />
+                                                class="inp w-full sm:px-4 px-3 pl-10 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-[0.86rem] transition-all" />
                                         </div>
                                     </div>
                                 </div>
@@ -250,7 +244,7 @@
                                             stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" /></svg>
                                         <input type="email" name="email" placeholder="john@digitalance.io"
                                             value="{{ old('email') }}"
-                                            class="inp w-full pl-10 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-[0.86rem] transition-all" />
+                                            class="inp w-full sm:px-4 px-3 pl-10 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-[0.86rem] transition-all" />
                                     </div>
                                 </div>
                             </div>
@@ -261,7 +255,7 @@
                                     <div class="relative">
                                         <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z" /><path d="M8 8h8" /><path d="M8 12h8" /><path d="M8 16h6" /></svg>
                                         <input id="studentSelect" name="student_display" list="studentList"
-                                            class="inp w-full pl-10 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-[0.86rem] transition-all"
+                                            class="inp w-full sm:px-4 px-3 pl-10 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-[0.86rem] transition-all"
                                             placeholder="Ketik nama / NIS..." autocomplete="off" />
                                         <datalist id="studentList">
                                             @foreach(($students ?? []) as $s)
@@ -283,7 +277,7 @@
                                             width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                             stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" /></svg>
                                         <input type="text" id="studentEmail" value="" placeholder="Email siswa" readonly tabindex="-1"
-                                            class="inp w-full pl-10 pr-3 py-2 bg-slate-100 border border-slate-200 rounded-xl text-[0.86rem] transition-all text-slate-600" />
+                                            class="inp w-full sm:px-4 px-3 pl-10 pr-3 py-2 bg-slate-100 border border-slate-200 rounded-xl text-[0.86rem] transition-all text-slate-600" />
                                     </div>
                                     <p class="text-[0.62rem] text-slate-400 mt-0.5 ml-1">
                                         Gunakan email ini untuk login setelah registrasi.
@@ -313,7 +307,7 @@
                                         width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                         stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
                                     <input id="registerPasswordField" type="password" name="password" placeholder="Isi dengan password kuat" required
-                                        class="inp w-full pl-10 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-[0.86rem] transition-all" />
+                                        class="inp w-full sm:px-4 px-3 pl-10 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-[0.86rem] transition-all" />
                                 </div>
                                 <div class="mt-1">
                                     <div class="flex items-center gap-2 mb-1">
@@ -339,7 +333,7 @@
                                 </div>
                             </div>
                             <button type="submit"
-                                class="w-full py-2.5 bg-slate-900 text-white font-bold rounded-xl text-[0.88rem] mt-1 flex items-center justify-center gap-2 hover:bg-black hover:-translate-y-0.5 transition-all shadow-md cursor-pointer">
+                                class="w-full sm:px-4 px-3 py-2.5 bg-slate-900 text-white font-bold rounded-xl text-[0.88rem] mt-1 flex items-center justify-center gap-2 hover:bg-black hover:-translate-y-0.5 transition-all shadow-md cursor-pointer">
                                 Daftar
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                     stroke-width="2"><polyline points="9 18 15 12 9 6" /></svg>

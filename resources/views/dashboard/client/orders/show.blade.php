@@ -167,9 +167,36 @@
           </div>
         @endif
 
+        {{-- ACTION: Negotiated (Melengkapi Tombol Trigger Modal & Pembayaran Sukses) --}}
         @if($order->status === 'Negotiated' && $order->agreed_price)
           <div x-data="{ showNego: false, showReject: false, isSubmitting: false }"
             class="bg-white border border-slate-200 rounded-[18px] p-6">
+            
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
+              <div>
+                <h3 class="font-display font-extrabold text-slate-900 text-[1.1rem]">Penawaran Harga Hasil Negosiasi</h3>
+                <p class="text-2xl font-black text-[#0f766e] mt-1">Rp {{ number_format($order->agreed_price, 0, ',', '.') }}</p>
+                <p class="text-[12px] text-slate-500 mt-1">Silakan lakukan pelunasan untuk memulai project, atau ajukan negosiasi ulang.</p>
+              </div>
+              <div class="flex flex-wrap gap-2.5 w-full sm:w-auto justify-end">
+                <button type="button" @click="showReject = true"
+                  class="px-4 py-2.5 rounded-[12px] bg-white border border-red-200 text-red-600 font-bold text-[12.5px] hover:bg-red-50 transition-all flex items-center gap-1.5">
+                  <i class="ri-close-line"></i> Tolak
+                </button>
+                <button type="button" @click="showNego = true"
+                  class="px-4 py-2.5 rounded-[12px] bg-white border border-amber-200 text-amber-600 font-bold text-[12.5px] hover:bg-amber-50 transition-all flex items-center gap-1.5">
+                  <i class="ri-exchange-line"></i> Negosiasi
+                </button>
+                <form action="{{ route('client.orders.payment', $order->id) }}" method="POST" @submit="isSubmitting = true">
+                  @csrf
+                  <input type="hidden" name="payment_method" value="qris" />
+                  <button type="submit" :disabled="isSubmitting"
+                    class="px-5 py-2.5 rounded-[12px] bg-[#0f766e] text-white font-bold text-[12.5px] hover:bg-[#0a5e58] transition-all disabled:opacity-50 flex items-center gap-1.5">
+                    <i class="ri-wallet-3-line"></i> Bayar Sekarang
+                  </button>
+                </form>
+              </div>
+            </div>
 
             {{-- Modal Negosiasi --}}
             <div x-show="showNego"

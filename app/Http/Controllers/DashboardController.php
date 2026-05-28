@@ -179,6 +179,7 @@ class DashboardController extends Controller
                 'status' => $order->status ?? 'Pending',
                 'agreed_price' => $order->agreed_price,
                 'created_at' => $order->created_at,
+                'deadline' => $order->deadline,
             ];
         })->values();
 
@@ -209,6 +210,7 @@ class DashboardController extends Controller
                 'status' => $order->status,
                 'agreed_price' => $order->agreed_price,
                 'created_at' => $order->created_at,
+                'deadline' => $order->deadline,
             ];
         })->values();
 

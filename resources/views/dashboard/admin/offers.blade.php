@@ -154,9 +154,10 @@
 
 @section('scripts')
     <script>
-        // Menyiapkan data dari database ke format JSON untuk diolah JavaScript
-        var offersData = @json($offers ?? []);
-        var negotiationsData = @json($negotiations ?? []);
+        // PERBAIKAN TASK 4: Data dilempar langsung sebagai array JSON murni (mendukung pencarian real-time & multi-tab JS)
+        var offersData = @json($offers);
+        var negotiationsData = @json($negotiations);
+        
         window.__OFFERS_PAGE__ = {
             offers: offersData,
             negotiations: negotiationsData
@@ -165,17 +166,14 @@
         // Tab Switching Logic (Klik Tap-Tap)
         document.querySelectorAll('.section-tab').forEach(tab => {
             tab.addEventListener('click', function () {
-                // Hapus class active dari semua tab
                 document.querySelectorAll('.section-tab').forEach(t => {
                     t.classList.remove('active', 'text-teal-600', 'border-teal-600');
                     t.classList.add('text-gray-500', 'border-transparent');
                 });
 
-                // Tambahkan class active ke tab yang diklik
                 this.classList.add('active', 'text-teal-600', 'border-teal-600');
                 this.classList.remove('text-gray-500', 'border-transparent');
 
-                // Sembunyikan semua konten, tunjukkan yang dipilih
                 const target = this.getAttribute('data-target');
                 document.querySelectorAll('.tab-content').forEach(content => {
                     content.classList.remove('active');

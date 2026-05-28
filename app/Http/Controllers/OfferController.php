@@ -14,9 +14,18 @@ class OfferController extends Controller
     // ADMIN
     public function index()
     {
-        // Mengambil data dengan Eager Loading agar tidak berat
-        $offers = Offer::with(['order.service.freelancer.skomda_student', 'order.client'])->latest()->paginate(12);
-        $negotiations = Negotiation::with(['order.client', 'order.service.freelancer'])->latest()->get();
+        // PERBAIKAN TASK 4: Ambil koleksi penuh menggunakan get() dengan Eager Loading relasi krusial lengkap
+        // Ini memastikan JavaScript Client-side Pagination & Pencarian Global berfungsi 100% akurat di semua baris
+        $offers = Offer::with([
+            'order.service.freelancer.skomda_student', 
+            'order.client',
+            'order.service.service_category'
+        ])->latest()->get(); 
+
+        $negotiations = Negotiation::with([
+            'order.client', 
+            'order.service.freelancer.skomda_student'
+        ])->latest()->get();
 
         return view('dashboard.admin.offers', [
             'offers' => $offers,

@@ -1,4 +1,3 @@
-
 @extends('layouts.dashboard')
 @section('title', 'Admin Dashboard | Digitalance')
 
@@ -19,9 +18,9 @@
                 <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Today's Orders</span>
                 <span class="text-lg font-black text-slate-900">{{ $todayOrders ?? 0 }}</span>
             </div>
-            <div class="bg-[#0f766e] px-4 py-2 rounded-xl shadow-teal-sm flex flex-col items-end">
-                <span class="text-[10px] font-bold text-white/70 uppercase tracking-widest">Est. Revenue</span>
-                <span class="text-lg font-black text-white">Rp{{ number_format(($todayRevenue ?? 0), 0, ',', '.') }}</span>
+            <div class="bg-white px-4 py-2 rounded-xl border border-slate-200 shadow-sm flex flex-col items-end">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Est. Revenue</span>
+                <span class="text-lg font-black text-slate-900 text-[#0f766e]">Rp{{ number_format(($todayRevenue ?? 0), 0, ',', '.') }}</span>
             </div>
         </div>
     </section>
@@ -165,19 +164,19 @@
                             <div class="flex items-center justify-between mb-4">
                                 <div class="flex items-center gap-3.5">
                                     <img class="w-11 h-11 rounded-xl object-cover border-2 border-slate-50 shadow-sm" alt="Avatar"
-                                        src="https://ui-avatars.com/api/?name={{ urlencode($v->skomda_student->name ?? $v->skomda_student->email ?? 'User') }}&background=0f766e&color=fff" />
+                                        src="https://ui-avatars.com/api/?name={!! urlencode($v->skomda_student->name ?? $v->skomda_student->email ?? 'User') !!}&background=0f766e&color=fff" />
                                     <div class="min-w-0">
                                         <span class="font-bold text-[14px] text-slate-900 user-name block truncate">{{ $v->skomda_student->name ?? 'Freelancer' }}</span>
                                         <p class="text-[11px] text-slate-400 font-medium uppercase tracking-tight">{{ $v->skomda_student->major ?? 'Siswa Skomda' }}</p>
                                     </div>
                                 </div>
-                                <button onclick="window.openVerificationDetail({{ $v->id }})" class="w-8 h-8 rounded-lg bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-indigo-50 hover:text-indigo-600 transition-all">
+                                <button onclick="window.openVerificationDetail({{ $v->id }})" class="w-8 h-8 rounded-lg bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-[#0f766e] hover:text-white transition-all">
                                     <i class="ri-information-line text-lg"></i>
                                 </button>
                             </div>
                             <div class="flex gap-2 pt-3.5 border-t border-slate-50">
-                                <button type="button" data-action="approve" class="flex-1 py-2 bg-emerald-50 text-emerald-600 text-[11px] font-bold rounded-lg hover:bg-emerald-600 hover:text-white transition-all">Approve</button>
-                                <button type="button" data-action="reject" class="flex-1 py-2 bg-red-50 text-red-600 text-[11px] font-bold rounded-lg hover:bg-red-600 hover:text-white transition-all">Reject</button>
+                                <button type="button" onclick="window.processVerification({{ $v->id }}, 'approve', event)" class="flex-1 py-2 bg-emerald-50 text-emerald-600 text-[11px] font-bold rounded-lg hover:bg-emerald-600 hover:text-white transition-all">Approve</button>
+                                <button type="button" onclick="window.processVerification({{ $v->id }}, 'reject', event)" class="flex-1 py-2 bg-red-50 text-red-600 text-[11px] font-bold rounded-lg hover:bg-red-600 hover:text-white transition-all">Reject</button>
                             </div>
                         </div>
                     @empty
@@ -250,13 +249,9 @@
         </div>
     </div>
 
-    <div class="modal-overlay fixed inset-0 z-[60] bg-slate-900/40 backdrop-blur-sm flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300" id="modal-verify-overlay">
-        <div class="modal-box bg-white rounded-[28px] w-full max-w-[500px] shadow-2xl overflow-hidden transform scale-95 transition-all duration-300" id="modal-verify-box">
-            <div class="p-8 text-center py-20">
-                <div class="animate-spin w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full mx-auto mb-4"></div>
-                <p class="text-slate-500 font-bold">Memuat data freelancer...</p>
+    <div class="modal-overlay fixed inset-0 z-[100] bg-slate-900/40 backdrop-blur-sm flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300" id="modal-verify-overlay">
+        <div class="bg-white rounded-[32px] w-full max-w-[550px] shadow-2xl overflow-hidden transform scale-95 transition-all duration-300" id="modal-verify-box">
             </div>
-        </div>
     </div>
 
     {{-- Admin content area placeholder --}}
@@ -269,6 +264,211 @@
         window.__DASHBOARD_CHART_DATA__ = {
             monthly: @json($monthlyTurnover),
             weekly: @json($weeklyTurnover)
+        };
+        window.__PENDING_VERIFICATIONS__ = @json($pendingVerifications ?? []);
+    </script>
+    <script>
+        // ==========================================
+        // PERBAIKAN TASK 2: LOGIK CHART REVENUE DARI DB
+        // ==========================================
+        let performanceChart = null;
+
+        function initChart(viewType) {
+            const ctx = document.getElementById('performanceChart');
+            if (!ctx) return;
+
+            const dataSet = window.__DASHBOARD_CHART_DATA__[viewType] || [];
+            let labels = [];
+            let dataValues = [];
+
+            if (viewType === 'monthly') {
+                const monthNames = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
+                labels = dataSet.map(item => item.month ? `${monthNames[item.month - 1]} ${item.year}` : `${item.year}`);
+                dataValues = dataSet.map(item => item.total || 0);
+            } else {
+                labels = dataSet.map(item => item.week_label || `W-${item.yearweek}`);
+                dataValues = dataSet.map(item => item.total || 0);
+            }
+
+            if (performanceChart) {
+                performanceChart.destroy();
+            }
+
+            performanceChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Revenue (Rp)',
+                        data: dataValues,
+                        borderColor: '#0f766e',
+                        backgroundColor: 'rgba(15, 118, 110, 0.04)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.3,
+                        pointBackgroundColor: '#0f766e',
+                        pointHoverRadius: 6,
+                        pointRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(val) {
+                                    return 'Rp ' + Number(val).toLocaleString('id-ID');
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        window.switchChartView = function(viewType) {
+            const weeklyBtn = document.getElementById('chart-weekly-btn');
+            const monthlyBtn = document.getElementById('chart-monthly-btn');
+
+            if (viewType === 'weekly') {
+                weeklyBtn.classList.add('bg-white', 'text-[#0f766e]', 'shadow-sm');
+                weeklyBtn.classList.remove('text-slate-500');
+                monthlyBtn.classList.remove('bg-white', 'text-[#0f766e]', 'shadow-sm');
+                monthlyBtn.classList.add('text-slate-500');
+            } else {
+                monthlyBtn.classList.add('bg-white', 'text-[#0f766e]', 'shadow-sm');
+                monthlyBtn.classList.remove('text-slate-500');
+                weeklyBtn.classList.remove('bg-white', 'text-[#0f766e]', 'shadow-sm');
+                weeklyBtn.classList.add('text-slate-500');
+            }
+            initChart(viewType);
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initChart('monthly');
+        });
+
+        // ==========================================
+        // PERBAIKAN TASK 3: LOGIK MODAL VERIFIKASI TALENT
+        // ==========================================
+        window.openVerificationDetail = function(id) {
+            const v = window.__PENDING_VERIFICATIONS__.find(x => x.id == id);
+            if (!v) return;
+
+            const box = document.getElementById('modal-verify-box');
+            const overlay = document.getElementById('modal-verify-overlay');
+            if (!box || !overlay) return;
+
+            box.innerHTML = `
+                <div class="relative">
+                    <div class="h-28 bg-gradient-to-r from-[#0f766e] to-[#10b981] flex items-center px-8 relative">
+                        <div class="flex-1">
+                            <h2 class="text-white font-black text-xl tracking-tight">Freelancer Verification</h2>
+                            <p class="text-white/70 text-[10px] font-bold uppercase tracking-[0.2em]">Freelancer ID: #FLR-${v.id}</p>
+                        </div>
+                        <button onclick="window.closeVerificationDetail()" class="w-10 h-10 bg-white/20 text-white rounded-full flex items-center justify-center hover:bg-white/30 transition">
+                            <i class="ri-close-line text-xl"></i>
+                        </button>
+                    </div>
+
+                    <div class="px-8 pb-8 -mt-8 relative z-10">
+                        <div class="bg-white rounded-2xl p-6 shadow-xl border border-slate-50 mb-6">
+                            <div class="flex items-center gap-4">
+                                <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(v.skomda_student?.name || 'User')}&background=0f766e&color=fff" class="w-12 h-12 rounded-xl shadow-sm border" />
+                                <div>
+                                    <h3 class="text-[1.3rem] font-black text-slate-900 leading-tight">${v.skomda_student?.name || 'N/A'}</h3>
+                                    <p class="text-xs font-semibold text-slate-400 uppercase mt-0.5">${v.skomda_student?.major || 'Siswa Skomda'}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100 mb-6">
+                            <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Informasi Kontak</span>
+                            <div class="space-y-1.5 text-sm text-slate-700 font-medium">
+                                <p><span class="text-slate-400 font-normal">Email Akun:</span> ${v.skomda_student?.email || '-'}</p>
+                                <p><span class="text-slate-400 font-normal">Status Verifikasi:</span> <span class="px-2 py-0.5 bg-amber-100 text-amber-800 rounded text-xs font-bold font-sans">${v.status}</span></p>
+                            </div>
+                        </div>
+
+                        <div class="mb-6">
+                            <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Pengenalan Diri (Bio)</span>
+                            <div class="bg-slate-50/50 p-4 rounded-2xl border border-slate-100/50">
+                                <p class="text-[13px] text-slate-600 leading-relaxed font-medium max-h-[120px] overflow-y-auto custom-scrollbar">${v.bio || 'Freelancer belum mengisi kolom bio deskripsi diri.'}</p>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-3">
+                            <button type="button" onclick="window.processVerification(${v.id}, 'reject', event)" class="flex-1 py-4 bg-red-50 text-red-600 font-bold rounded-2xl text-[13px] hover:bg-red-600 hover:text-white transition-all">Reject</button>
+                            <button type="button" onclick="window.processVerification(${v.id}, 'approve', event)" class="flex-1 py-4 bg-[#0f766e] text-white font-bold rounded-2xl text-[13px] hover:bg-[#0a5e58] transition-all shadow-lg shadow-teal-sm">Approve</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            overlay.classList.remove('opacity-0', 'pointer-events-none');
+            box.classList.remove('scale-95');
+        };
+
+        window.closeVerificationDetail = function() {
+            const overlay = document.getElementById('modal-verify-overlay');
+            const box = document.getElementById('modal-verify-box');
+            if (overlay) overlay.classList.add('opacity-0', 'pointer-events-none');
+            if (box) box.classList.add('scale-95');
+        };
+
+        window.processVerification = async function(id, action, event) {
+            const container = document.getElementById('verification-container');
+            if (!container) return;
+
+            let url = '';
+            let bodyData = {};
+
+            if (action === 'approve') {
+                url = container.getAttribute('data-verify-url').replace('__ID__', id);
+            } else {
+                url = container.getAttribute('data-reject-url').replace('__ID__', id);
+                const reason = prompt('Masukkan alasan penolakan berkas freelancer:');
+                if (reason === null) return;
+                if (!reason.trim()) {
+                    window.showToast?.('Alasan penolakan wajib diisi.', 'warning');
+                    return;
+                }
+                bodyData.reason = reason.trim();
+            }
+
+            // Proteksi disable submit button & ubah ke loading state
+            const actionBtn = event.target;
+            const originalText = actionBtn.innerHTML;
+            actionBtn.disabled = true;
+            actionBtn.innerHTML = '<span class="animate-spin inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full mr-1 align-middle"></span> Processing...';
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(bodyData)
+                });
+
+                if (!response.ok) throw new Error('Gagal memperbarui status verifikasi');
+
+                window.showToast?.('Status verifikasi freelancer berhasil diperbarui!', 'success');
+                window.location.reload();
+            } catch (e) {
+                actionBtn.disabled = false;
+                actionBtn.innerHTML = originalText;
+                if (window.showToast) {
+                    window.showToast(e.message || 'Terjadi kesalahan sistem.', 'danger');
+                } else {
+                    alert(e.message);
+                }
+            }
         };
     </script>
     <script src="{{ asset('js/dashboard/admin/dashboard.js') }}"></script>
