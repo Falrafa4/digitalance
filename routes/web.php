@@ -63,6 +63,49 @@ Route::middleware('auth:administrator,client,freelancer')->group(function () {
         $notification->update(['is_kept' => $request->is_kept]);
         return response()->json(['success' => true]);
     })->name('notifications.keep');
+
+    // Polling endpoint for notification sync (used by frontend polling)
+    Route::get('/notifications/poll', function () {
+        $role = null;
+        $user = null;
+
+        if (auth('administrator')->check()) {
+            $role = 'admin';
+            $user = auth('administrator')->user();
+        } elseif (auth('client')->check()) {
+            $role = 'client';
+            $user = auth('client')->user();
+        } elseif (auth('freelancer')->check()) {
+            $role = 'freelancer';
+            $user = auth('freelancer')->user();
+        }
+
+        if (!$role || !$user) {
+            return response()->json(['unread_count' => 0, 'notifications' => []]);
+        }
+
+        $notifications = \App\Models\Notification::where('role', $role)
+            ->where('user_id', $user->id)
+            ->latest()
+            ->take(10)
+            ->get()
+            ->map(function ($n) {
+                return [
+                    'id' => $n->id,
+                    'title' => $n->title,
+                    'message' => $n->message,
+                    'is_read' => (bool) $n->is_read,
+                    'is_kept' => (bool) $n->is_kept,
+                    'link' => $n->link,
+                    'type' => $n->type,
+                    'created_at' => optional($n->created_at)->diffForHumans(),
+                ];
+            });
+
+        $unreadCount = $notifications->where('is_read', false)->count();
+
+        return response()->json(['unread_count' => $unreadCount, 'notifications' => $notifications]);
+    })->name('notifications.poll');
 });
 
 // ── ADMIN ────────────────────────────────────────────────
@@ -185,7 +228,7 @@ Route::middleware('auth:client')->prefix('client')->name('client.')->group(funct
     Route::post('/orders/{order}/accept', [OrderController::class, 'clientAcceptOrder'])->name('orders.accept');
     Route::post('/orders/{order}/reject', [OrderController::class, 'clientRejectOrder'])->name('orders.reject');
     Route::post('/orders/{order}/nego', [OrderController::class, 'clientNegoOrder'])->name('orders.nego');
-    Route::post('/orders/{order}/revision', [OrderController::class, 'clientRequestRevision'])->name('orders.revision');
+    Route::post('/orders/{order}/revision', [OrderController::class, 'clientRequestRevision'])->name('client.orders.revision');
     Route::post('/orders/{order}/complete', [OrderController::class, 'clientCompleteOrder'])->name('orders.complete');
     Route::get('/orders/{order}/checkout', [OrderController::class, 'checkout'])->name('orders.checkout');
     Route::post('/orders/{order}/checkout', [OrderController::class, 'processPayment'])->name('orders.process-payment');
@@ -199,25 +242,25 @@ Route::middleware('auth:client')->prefix('client')->name('client.')->group(funct
     Route::get('/talents/{freelancer}', [FreelancerController::class, 'clientTalentShow'])->name('talents.show');
 
     // Projects
-    Route::get('/projects', [OrderController::class, 'clientProjects'])->name('projects.index');
+    Route::get('/projects', [OrderController::class, 'clientProjects'])->name('client.projects.index');
 
     // Messages (negotiations)
-    Route::get('/messages', [NegotiationController::class, 'clientInbox'])->name('messages.index');
-    Route::post('/messages/send', [NegotiationController::class, 'clientSendMessage'])->name('messages.send');
+    Route::get('/messages', [NegotiationController::class, 'clientInbox'])->name('client.messages.index');
+    Route::post('/messages/send', [NegotiationController::class, 'clientSendMessage'])->name('client.messages.send');
 
     // Payments
-    Route::get('/payments', [TransactionController::class, 'clientIndex'])->name('payments.index');
-    Route::get('/payments/order/{order}', [TransactionController::class, 'clientShowByOrderId'])->name('payments.show');
+    Route::get('/payments', [TransactionController::class, 'clientIndex'])->name('client.payments.index');
+    Route::get('/payments/order/{order}', [TransactionController::class, 'clientShowByOrderId'])->name('client.payments.show');
 
     // History
-    Route::get('/history', [OrderController::class, 'clientHistory'])->name('history.index');
+    Route::get('/history', [OrderController::class, 'clientHistory'])->name('client.history.index');
 
     // Reviews
-    Route::get('/reviews', [ReviewController::class, 'clientIndex'])->name('reviews.index');
-    Route::get('/reviews/order/{orderId}', [ReviewController::class, 'clientShowByOrderId'])->name('reviews.showByOrderId');
-    Route::get('/reviews/create/{orderId}', [ReviewController::class, 'clientCreate'])->name('reviews.create');
-    Route::post('/reviews', [ReviewController::class, 'clientStore'])->name('reviews.store');
-    Route::delete('/reviews/{orderId}', [ReviewController::class, 'clientDestroy'])->name('reviews.destroy');
+    Route::get('/reviews', [ReviewController::class, 'clientIndex'])->name('client.reviews.index');
+    Route::get('/reviews/order/{orderId}', [ReviewController::class, 'clientShowByOrderId'])->name('client.reviews.showByOrderId');
+    Route::get('/reviews/create/{orderId}', [ReviewController::class, 'clientCreate'])->name('client.reviews.create');
+    Route::post('/reviews', [ReviewController::class, 'clientStore'])->name('client.reviews.store');
+    Route::delete('/reviews/{orderId}', [ReviewController::class, 'clientDestroy'])->name('client.reviews.destroy');
 
     // Offers
     Route::get('/offers', [OfferController::class, 'clientIndex'])->name('offers.index');
@@ -271,8 +314,8 @@ Route::middleware('auth:freelancer')->prefix('freelancer')->name('freelancer.')-
     Route::patch('/orders/{id}/price', [OrderController::class, 'updateAgreedPrice'])->name('orders.updateAgreedPrice');
     Route::post('/orders/{order}/accept', [OrderController::class, 'freelancerAccept'])->name('orders.accept');
     Route::post('/orders/{order}/reject', [OrderController::class, 'freelancerReject'])->name('orders.reject');
-    Route::post('/orders/{order}/revision/approve', [OrderController::class, 'freelancerApproveRevision'])->name('orders.revision.approve');
-    Route::post('/orders/{order}/revision/reject', [OrderController::class, 'freelancerRejectRevision'])->name('orders.revision.reject');
+    Route::post('/orders/{order}/revision/approve', [OrderController::class, 'freelancerApproveRevision'])->name('freelancer.orders.revision.approve');
+    Route::post('/orders/{order}/revision/reject', [OrderController::class, 'freelancerRejectRevision'])->name('freelancer.orders.revision.reject');
 
     // crud review
     Route::get('/reviews', [ReviewController::class, 'freelancerIndex'])->name('reviews.index');

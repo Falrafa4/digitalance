@@ -108,3 +108,13 @@ function toggleNotificationKeep(id, btn) {
 document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape') closeNotificationDrawer();
 });
+
+// Delegate clicks for bookmark buttons rendered in the notification drawer
+document.addEventListener('click', function (e) {
+    var btn = e.target.closest && e.target.closest('.notif-keep-btn');
+    if (!btn) return;
+    e.stopPropagation();
+    var id = btn.getAttribute('data-notif-id');
+    if (!id) return;
+    toggleNotificationKeep(id, btn);
+});

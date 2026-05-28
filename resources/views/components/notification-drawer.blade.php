@@ -80,15 +80,11 @@
                         </p>
                         <div class="flex items-center gap-1 flex-shrink-0">
                             @if ($n->is_kept)
-                                <button onclick="event.stopPropagation(); toggleNotificationKeep({{ $n->id }}, this)"
-                                    class="w-6 h-6 rounded-md flex items-center justify-center text-amber-500 hover:bg-amber-50 transition-all"
-                                    title="Lepas notifikasi">
+                                <button data-notif-id="{{ $n->id }}" class="notif-keep-btn w-6 h-6 rounded-md flex items-center justify-center text-amber-500 hover:bg-amber-50 transition-all" title="Lepas notifikasi">
                                     <i class="ri-bookmark-fill text-sm"></i>
                                 </button>
                             @else
-                                <button onclick="event.stopPropagation(); toggleNotificationKeep({{ $n->id }}, this)"
-                                    class="w-6 h-6 rounded-md flex items-center justify-center text-slate-300 hover:bg-slate-50 hover:text-amber-500 transition-all"
-                                    title="Simpan notifikasi">
+                                <button data-notif-id="{{ $n->id }}" class="notif-keep-btn w-6 h-6 rounded-md flex items-center justify-center text-slate-300 hover:bg-slate-50 hover:text-amber-500 transition-all" title="Simpan notifikasi">
                                     <i class="ri-bookmark-line text-sm"></i>
                                 </button>
                             @endif

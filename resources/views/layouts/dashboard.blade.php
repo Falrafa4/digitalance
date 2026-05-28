@@ -41,29 +41,29 @@
 </head>
 
 <body class="bg-slate-50 text-slate-900 font-sans h-screen overflow-hidden">
-@php
-    $notifUser = Auth::guard('administrator')->user()
-        ?? Auth::guard('client')->user()
-        ?? Auth::guard('freelancer')->user();
-    $notifRole = Auth::guard('administrator')->check() ? 'admin' : (Auth::guard('client')->check() ? 'client' : (Auth::guard('freelancer')->check() ? 'freelancer' : null));
+    @php
+        $notifUser = Auth::guard('administrator')->user()
+            ?? Auth::guard('client')->user()
+            ?? Auth::guard('freelancer')->user();
+        $notifRole = Auth::guard('administrator')->check() ? 'admin' : (Auth::guard('client')->check() ? 'client' : (Auth::guard('freelancer')->check() ? 'freelancer' : null));
 
-    \App\Models\Notification::where('created_at', '<', now()->subDays(30))
-        ->where('is_kept', false)
-        ->delete();
+        \App\Models\Notification::where('created_at', '<', now()->subDays(30))
+            ->where('is_kept', false)
+            ->delete();
 
-    $notifNotifications = $notifRole
-        ? \App\Models\Notification::where('role', $notifRole)
-            ->where('user_id', $notifUser->id)
-            ->latest()
-            ->take(30)
-            ->get()
-        : collect();
+        $notifNotifications = $notifRole
+            ? \App\Models\Notification::where('role', $notifRole)
+                ->where('user_id', $notifUser->id)
+                ->latest()
+                ->take(30)
+                ->get()
+            : collect();
 
-    $notifUnreadCount = $notifNotifications->where('is_read', false)->count();
-@endphp
+        $notifUnreadCount = $notifNotifications->where('is_read', false)->count();
+    @endphp
     {{-- Skip to main content link for accessibility --}}
     <a href="#main-content"
-       class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[9999] focus:px-4 focus:py-2 focus:bg-[#0f766e] focus:text-white focus:rounded-lg focus:font-bold focus:text-sm">
+        class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[9999] focus:px-4 focus:py-2 focus:bg-[#0f766e] focus:text-white focus:rounded-lg focus:font-bold focus:text-sm">
         Skip to main content
     </a>
 
@@ -95,15 +95,32 @@
     <script src="{{ asset('js/dashboard/search.js') }}"></script>
     <script src="{{ asset('js/dashboard/shared/notification-drawer.js') }}"></script>
     <script src="{{ asset('js/dashboard/global.js') }}"></script>
+    <script src="{{ asset('js/dashboard/shared/notification-listener.js') }}"></script>
 
     {{-- Flash messages injected by controller or set inline --}}
+    @php
+        $__flash_messages = [];
+        if (session('success'))
+            $__flash_messages[] = ['message' => session('success'), 'type' => 'success'];
+        if (session('error'))
+            $__flash_messages[] = ['message' => session('error'), 'type' => 'danger'];
+        if (session('warning'))
+            $__flash_messages[] = ['message' => session('warning'), 'type' => 'warning'];
+        if (session('info'))
+            $__flash_messages[] = ['message' => session('info'), 'type' => 'info'];
+        if ($errors->any())
+            $__flash_messages[] = ['message' => $errors->first(), 'type' => 'danger'];
+    @endphp
+    <script id="__FLASH_JSON__" type="application/json">{{ base64_encode(json_encode($__flash_messages)) }}</script>
     <script>
-        window.__FLASH_MESSAGES__ = [];
-        @if(session('success')) window.__FLASH_MESSAGES__.push({message: @json(session('success')), type: 'success'}); @endif
-        @if(session('error')) window.__FLASH_MESSAGES__.push({message: @json(session('error')), type: 'danger'}); @endif
-        @if(session('warning')) window.__FLASH_MESSAGES__.push({message: @json(session('warning')), type: 'warning'}); @endif
-        @if(session('info')) window.__FLASH_MESSAGES__.push({message: @json(session('info')), type: 'info'}); @endif
-        @if($errors->any()) window.__FLASH_MESSAGES__.push({message: @json($errors->first()), type: 'danger'}); @endif
+            (function () {
+                try {
+                    var b = document.getElementById('__FLASH_JSON__') && document.getElementById('__FLASH_JSON__').textContent || '';
+                    window.__FLASH_MESSAGES__ = b ? JSON.parse(atob(b)) : [];
+                } catch (e) {
+                    window.__FLASH_MESSAGES__ = [];
+                }
+            })();
     </script>
 
     @yield('scripts')
