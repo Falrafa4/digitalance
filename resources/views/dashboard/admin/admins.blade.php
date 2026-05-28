@@ -104,13 +104,13 @@
                         <div class="flex flex-col gap-1.5">
                             <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Nama
                                 Lengkap</label>
-                            <input type="text" name="name" required placeholder="Contoh: Budi Santoso"
-                                class="py-2.5 px-3.5 bg-slate-50 border-[1.5px] border-slate-200 rounded-xl text-[13.5px] outline-none focus:border-[#0f766e] focus:bg-white focus:shadow-[0_0_0_3px_rgba(15,118,110,0.08)] transition-all" />
+<input type="text" name="name" required value="{{ old('name') }}" placeholder="Contoh: Budi Santoso"
+    class="py-2.5 px-3.5 bg-slate-50 border-[1.5px] border-slate-200 rounded-xl text-[13.5px] outline-none focus:border-[#0f766e] focus:bg-white focus:shadow-[0_0_0_3px_rgba(15,118,110,0.08)] transition-all" />
                         </div>
                         <div class="flex flex-col gap-1.5">
                             <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Email</label>
-                            <input type="email" name="email" required placeholder="budi@digitalance.id"
-                                class="py-2.5 px-3.5 bg-slate-50 border-[1.5px] border-slate-200 rounded-xl text-[13.5px] outline-none focus:border-[#0f766e] focus:bg-white focus:shadow-[0_0_0_3px_rgba(15,118,110,0.08)] transition-all" />
+<input type="email" name="email" required value="{{ old('email') }}" placeholder="budi@digitalance.id"
+    class="py-2.5 px-3.5 bg-slate-50 border-[1.5px] border-slate-200 rounded-xl text-[13.5px] outline-none focus:border-[#0f766e] focus:bg-white focus:shadow-[0_0_0_3px_rgba(15,118,110,0.08)] transition-all" />
                         </div>
                     </div>
 

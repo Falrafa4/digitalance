@@ -26,32 +26,36 @@
     <div data-client-pager data-page-size="9" class="space-y-4">
       <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5" data-pager-list>
         @foreach($freelancers as $f)
-          <div data-pager-item class="bg-white border border-slate-200 rounded-[18px] p-5 hover:shadow-lg transition-all">
-            <div class="flex items-start gap-3">
-              <div class="w-12 h-12 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400">
-                <i class="ri-user-3-line text-[20px]"></i>
+          {{-- PERBAIKAN TASK 5: Menambahkan efek hover-highlight border teal dan shadow transisi smooth --}}
+          <div data-pager-item class="bg-white border border-slate-200 rounded-[22px] p-6 hover:shadow-xl hover:border-[#0f766e] hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
+            <div class="flex items-start gap-4">
+              <div class="w-12 h-12 rounded-2xl bg-teal-50 border border-teal-100 flex items-center justify-center text-[#0f766e] shrink-0">
+                <i class="ri-user-3-line text-[22px]"></i>
               </div>
-              <div class="min-w-0">
-                <p class="font-extrabold text-slate-900 truncate">{{ optional($f->skomda_student)->name ?? 'Freelancer' }}</p>
-                <p class="text-slate-500 text-[13px] mt-1 line-clamp-2">{{ $f->bio ?? 'Belum ada bio.' }}</p>
+              <div class="min-w-0 flex-1">
+                <p class="font-black text-slate-900 text-base truncate">{{ optional($f->skomda_student)->name ?? 'Freelancer' }}</p>
+                <p class="text-slate-400 text-[11px] font-bold uppercase tracking-tight mt-0.5">{{ optional($f->skomda_student)->major ?? 'Siswa SKOMDA' }}</p>
+                <p class="text-slate-500 text-[13px] mt-3 line-clamp-2 leading-relaxed font-medium">{{ $f->bio ?? 'Belum ada bio.' }}</p>
               </div>
             </div>
 
-            <div class="flex items-center justify-between mt-4 pt-4 border-t border-slate-100">
-              <span class="text-slate-500 text-[12px] font-bold">
-                Services: {{ $f->services_count ?? 0 }}
+            <div class="flex items-center justify-between mt-6 pt-4 border-t border-slate-100">
+              {{-- PERBAIKAN TASK 5: Tampilan Badge jumlah service dibuat lebih prominen menggunakan gaya pill modern --}}
+              <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-teal-50 border border-teal-100 text-[#0f766e] text-[11px] font-black rounded-full uppercase tracking-wider">
+                <i class="ri-briefcase-line"></i>
+                {{ $f->services_count ?? 0 }} Services
               </span>
 
               <a href="{{ route('client.talents.show', $f->id) }}"
-                 class="px-4 py-2.5 rounded-[12px] bg-slate-900 text-white font-bold text-[12.5px] hover:bg-black transition-all">
-                Profil
+                 class="px-4 py-2 rounded-xl bg-slate-900 text-white font-bold text-[12.5px] hover:bg-black transition-all shadow-md">
+                Profil Talent
               </a>
             </div>
           </div>
         @endforeach
       </div>
 
-      <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4">
         <p class="text-slate-500 text-[12.5px] font-bold" data-pager-info></p>
         <div class="flex items-center gap-2">
           <button type="button" data-pager-prev class="px-4 py-2.5 rounded-[12px] bg-white border border-slate-200 text-slate-700 font-bold text-[12.5px] hover:border-[#0f766e] hover:text-[#0f766e] disabled:opacity-40 transition-all">Prev</button>
@@ -60,8 +64,6 @@
         </div>
       </div>
     </div>
-
-    
   @endif
 </section>
 @endsection

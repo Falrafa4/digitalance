@@ -16,6 +16,20 @@
         </div>
     </section>
 
+    {{-- PERBAIKAN TASK 4: Menambahkan sistem alert penangkap flash message untuk konfirmasi status penataan --}}
+    @if(session('success'))
+        <div class="mb-6 p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-2xl flex items-center gap-3 text-sm font-medium animate-fadeUp">
+            <i class="ri-checkbox-circle-fill text-lg text-emerald-600"></i>
+            <span>{{ session('success') }}</span>
+        </div>
+    @endif
+    @if(session('error'))
+        <div class="mb-6 p-4 bg-red-50 border border-red-200 text-red-800 rounded-2xl flex items-center gap-3 text-sm font-medium animate-fadeUp">
+            <i class="ri-error-warning-fill text-lg text-red-600"></i>
+            <span>{{ session('error') }}</span>
+        </div>
+    @endif
+
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {{-- Quick Links --}}
         <section class="lg:col-span-2">
@@ -132,7 +146,6 @@
             <h2 class="font-display text-[1.1rem] font-bold text-slate-800 mb-4">Panduan Operasional</h2>
 
             <div class="bg-white border border-slate-200 rounded-[20px] p-6 h-[calc(100%-2.5rem)] shadow-sm">
-                
                 <div class="relative pl-6 pb-6 border-l-2 border-slate-100 last:pb-0 last:border-transparent">
                     <div class="absolute left-[-9px] top-0 w-4 h-4 rounded-full bg-white border-4 border-emerald-500 shadow-[0_0_0_3px_rgba(16,185,129,0.1)]"></div>
                     <h3 class="text-[14px] text-slate-900 mb-1.5 font-bold -mt-1">Verifikasi Akun</h3>
@@ -168,7 +181,6 @@
                         <div class="text-[11px] text-slate-400">Version 1.0.0</div>
                     </div>
                 </div>
-
             </div>
         </section>
     </div>

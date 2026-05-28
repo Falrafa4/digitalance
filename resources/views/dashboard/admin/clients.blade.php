@@ -169,17 +169,17 @@
                         <!-- Client & Common Fields -->
                         <div class="field-group" id="group-name">
                             <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Nama Lengkap</label>
-                            <input type="text" name="name" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700" placeholder="e.g. Budi Santoso">
+                            <input type="text" name="name" value="{{ old('name') }}" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700" placeholder="e.g. Budi Santoso">
                         </div>
 
                         <div class="field-group" id="group-email">
                             <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Alamat Email</label>
-                            <input type="email" name="email" id="input-email" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700" placeholder="name@example.com">
+                            <input type="email" name="email" id="input-email" value="{{ old('email') }}" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700" placeholder="name@example.com">
                         </div>
 
                         <div class="field-group" id="group-phone">
                             <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Nomor Telepon</label>
-                            <input type="text" name="phone" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700" placeholder="+62...">
+                            <input type="text" name="phone" value="{{ old('phone') }}" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700" placeholder="+62...">
                         </div>
 
                         <div class="field-group" id="group-password">
@@ -200,7 +200,7 @@
 
                         <div class="field-group hidden md:col-span-2" id="group-bio">
                             <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Bio</label>
-                            <textarea name="bio" rows="2" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700 resize-none" placeholder="Freelancer bio..."></textarea>
+                            <textarea name="bio" value="{{ old('bio') }}" rows="2" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700 resize-none" placeholder="Freelancer bio..."></textarea>
                         </div>
 
                         <!-- Student specific fields - Split into 2 columns -->
@@ -209,26 +209,26 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-3.5">
                                 <div>
                                     <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Nama Lengkap <span class="text-red-400">*</span></label>
-                                    <input type="text" name="name" id="input-student-name" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700" placeholder="Nama Lengkap">
+                                    <input type="text" name="name" value="{{ old('name') }}" id="input-student-name" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700" placeholder="Nama Lengkap">
                                 </div>
                                 <div>
                                     <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">NIS <span class="text-red-400">*</span></label>
-                                    <input type="text" name="nis" id="input-student-nis" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700" placeholder="123456789">
+                                    <input type="text" name="nis" value="{{ old('nis') }}" id="input-student-nis" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700" placeholder="123456789">
                                 </div>
                                 <div>
                                     <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Kelas <span class="text-red-400">*</span></label>
-                                    <input type="text" name="class" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700" placeholder="XI SIJA 1">
+                                    <input type="text" name="class" value="{{ old('class') }}" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700" placeholder="XI SIJA 1">
                                 </div>
                                 <div>
                                     <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Jurusan <span class="text-red-400">*</span></label>
-                                    <select name="major" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700 appearance-none">
-                                        <option value="SIJA">SIJA</option>
-                                        <option value="TJAT">TJAT</option>
-                                    </select>
+<select name="major" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700 appearance-none">
+    <option value="SIJA" {{ old('major') == 'SIJA' ? 'selected' : '' }}>SIJA</option>
+    <option value="TJAT" {{ old('major') == 'TJAT' ? 'selected' : '' }}>TJAT</option>
+</select>
                                 </div>
                                 <div class="md:col-span-2">
                                     <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Nomor Telepon <span class="text-red-400">*</span></label>
-                                    <input type="text" name="phone" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700" placeholder="+62...">
+<input type="text" name="phone" value="{{ old('phone') }}" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700" placeholder="+62...">
                                 </div>
                                 <div class="md:col-span-2 mt-1">
                                     <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Email <span class="text-red-400">*</span></label>
