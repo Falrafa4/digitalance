@@ -82,9 +82,6 @@
 
     @yield('modals')
 
-    <!-- Flash Component -->
-    <x-flash />
-
     <!-- Toast Container -->
     <div id="toast-container" role="region" aria-label="Notifications" aria-live="polite"></div>
 
