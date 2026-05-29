@@ -36,6 +36,9 @@
     </script>
     <script src="{{ asset('js/utils.js') }}"></script>
 
+    {{-- Alpine (used by various dashboard pages for interactive UI) --}}
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
     @yield('styles')
     @stack('styles')
 </head>

@@ -42,7 +42,7 @@
                     @else
                       {{ $o->service?->title ?? '-' }}
                     @endif
-                  </p>
+                  </div>
                   <p class="text-slate-400 text-[12px] font-bold mt-2">
                     @if($o->agreed_price)
                       Rp {{ number_format((float) $o->agreed_price, 0, ',', '.') }}
@@ -52,7 +52,29 @@
                   </p>
                 </div>
 
-                <x-ui.status-badge :status="$o->status ?? '-'" />
+                <div class="flex items-center gap-2">
+                  <div class="w-10 h-10 flex-shrink-0">
+                    <!-- Order Progress Indicator -->
+                    <div class="flex h-[2px] w-24 bg-slate-200 rounded-full overflow-hidden">
+                      @php
+                        $status = strtolower($o->status ?? 'pending');
+                        $progress = 0;
+                        switch($status) {
+                          case 'pending': $progress = 0; break;
+                          case 'negotiated': $progress = 25; break;
+                          case 'paid': $progress = 50; break;
+                          case 'in progress': $progress = 75; break;
+                          case 'revision': $progress = 85; break;
+                          case 'completed': $progress = 100; break;
+                          case 'cancelled': $progress = 0; break;
+                          default: $progress = 0;
+                        }
+                      @endphp
+                      <div class="h-full w-[{{ $progress }}%] bg-emerald-600 transition-all duration-500"></div>
+                    </div>
+                    <x-ui.status-badge :status="$o->status ?? '-'" class="ml-2" />
+                  </div>
+                </div>
               </div>
 
               <div class="flex gap-2 mt-4">

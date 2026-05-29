@@ -178,22 +178,22 @@ Dokumen ini menyusun seluruh hasil audit menjadi rencana kerja selama kurang leb
 
 ### 4. Client Panel - High
 
-- [ ] **Improve order tracking**
-    - Nama task: Enhance order progress visualization
-    - Deskripsi: Add visual progress indicator for order stages (pending → negotiation → payment → in progress → revision → completed)
-    - Tujuan: Better user understanding of order status
-    - Dampak ke user/business: Reduced anxiety and support inquiries
-    - Tingkat kesulitan: Medium
-    - Prioritas: High
-    - Dependency: None
-- [ ] **Enhance search and discovery**
-    - Nama task: Improve service discovery
-    - Deskripsi: Add advanced filters (category, price, delivery time, ratings) and saved searches
-    - Tujuan: Better matching of clients to freelancers
-    - Dampak ke user/business: Higher conversion rates
-    - Tingkat kesulitan: Medium
-    - Prioritas: High
-    - Dependency: None
+- [x] **Improve order tracking**
+     - Nama task: Enhance order progress visualization
+     - Deskripsi: Add visual progress indicator for order stages (pending → negotiation → payment → in progress → revision → completed)
+     - Tujuan: Better user understanding of order status
+     - Dampak ke user/business: Reduced anxiety and support inquiries
+     - Tingkat kesulitan: Medium
+     - Prioritas: High
+     - Dependency: None
+- [x] **Enhance search and discovery**
+     - Nama task: Improve service discovery
+     - Deskripsi: Add advanced filters (category, price, delivery time, ratings) and saved searches
+     - Tujuan: Better matching of clients to freelancers
+     - Dampak ke user/business: Higher conversion rates
+     - Tingkat kesulitan: Medium
+     - Prioritas: High
+     - Dependency: None
 
 ### 5. Freelancer Panel - High
 

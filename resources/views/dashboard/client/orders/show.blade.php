@@ -6,6 +6,14 @@
     [x-cloak] {
       display: none !important
     }
+
+    details>summary {
+      list-style: none;
+    }
+
+    details>summary::-webkit-details-marker {
+      display: none;
+    }
   </style>
 @endsection
 
@@ -169,7 +177,7 @@
 
         {{-- ACTION: Negotiated (Melengkapi Tombol Trigger Modal & Pembayaran Sukses) --}}
         @if($order->status === 'Negotiated' && $order->agreed_price)
-          <div x-data="{ showNego: false, showReject: false, isSubmitting: false }"
+          <div x-data="{ showNego: false, showReject: false, isSubmitting: false, isSubmittingNego: false }"
             class="bg-white border border-slate-200 rounded-[18px] p-6">
 
             <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
@@ -189,18 +197,13 @@
                   class="px-4 py-2.5 rounded-[12px] bg-white border border-amber-200 text-amber-600 font-bold text-[12.5px] hover:bg-amber-50 transition-all flex items-center gap-1.5">
                   <i class="ri-exchange-line"></i> Negosiasi
                 </button>
-                <form action="{{ route('client.orders.payment', $order->id) }}" method="POST" @submit="isSubmitting = true">
-                  @csrf
-                  <input type="hidden" name="payment_method" value="qris" />
-                  <button type="submit" :disabled="isSubmitting"
-                    class="px-5 py-2.5 rounded-[12px] bg-[#0f766e] text-white font-bold text-[12.5px] hover:bg-[#0a5e58] transition-all disabled:opacity-50 flex items-center gap-1.5">
-                    <i class="ri-wallet-3-line"></i> Bayar Sekarang
-                  </button>
-                </form>
+                <a href="{{ route('client.orders.checkout', $order->id) }}"
+                  class="px-5 py-2.5 rounded-[12px] bg-[#0f766e] text-white font-bold text-[12.5px] hover:bg-[#0a5e58] transition-all flex items-center gap-1.5">
+                  <i class="ri-wallet-3-line"></i> Bayar Sekarang
+                </a>
               </div>
             </div>
-
-            {{-- Modal Negosiasi --}}
+            {{-- Modal Negosiasi (Client) --}}
             <div x-show="showNego"
               x-init="$watch('showNego', value => { if(value) { $nextTick(() => window.DigitalanceUtils.focusTrap($el)) } })"
               x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
@@ -213,13 +216,14 @@
                 </button>
                 <h2 class="font-display text-xl font-bold text-slate-900 mb-1">Ajukan Negosiasi</h2>
                 <form action="{{ route('client.orders.nego', $order->id) }}" method="POST" class="space-y-4"
-                  @submit="isSubmitting = true">
+                  @submit.prevent="isSubmittingNego = true; $el.submit();">
                   @csrf
                   <div>
                     <label class="block text-sm font-bold text-slate-700 mb-2">Alasan <span
                         class="text-red-500">*</span></label>
                     <textarea name="reason" rows="2" required
-                      class="w-full px-4 py-3 rounded-[12px] border border-slate-200 focus:border-amber-400 outline-none text-sm"></textarea>
+                      class="w-full px-4 py-3 rounded-[12px] border border-slate-200 focus:border-amber-400 outline-none text-sm"
+                      placeholder="Misal: budget saya masih di bawah harga tersebut..."></textarea>
                   </div>
                   <div>
                     <label class="block text-sm font-bold text-slate-700 mb-2">Harga Baru <span
@@ -227,16 +231,17 @@
                     <div class="relative">
                       <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 font-semibold">Rp</span>
                       <input type="number" name="new_price" required min="1000"
-                        class="w-full pl-10 pr-4 py-3 rounded-[12px] border border-slate-200 focus:border-amber-400 outline-none text-sm font-semibold">
+                        class="w-full pl-10 pr-4 py-3 rounded-[12px] border border-slate-200 focus:border-amber-400 outline-none text-sm font-semibold"
+                        placeholder="Masukkan angka yang kamu mau">
                     </div>
                   </div>
                   <div class="flex gap-3 pt-2">
                     <button type="button" @click="showNego = false"
                       class="flex-1 py-3 rounded-[12px] bg-slate-100 text-slate-600 font-bold text-sm">Batal</button>
-                    <button type="submit" :disabled="isSubmitting"
+                    <button type="submit" :disabled="isSubmittingNego"
                       class="flex-1 py-3 rounded-[12px] bg-amber-500 text-white font-bold text-sm hover:bg-amber-600 disabled:opacity-50">
-                      <span x-show="!isSubmitting">Kirim</span>
-                      <span x-show="isSubmitting"><i class="ri-loader-4-line animate-spin"></i></span>
+                      <span x-show="!isSubmittingNego">Kirim</span>
+                      <span x-show="isSubmittingNego"><i class="ri-loader-4-line animate-spin"></i></span>
                     </button>
                   </div>
                 </form>
@@ -328,7 +333,7 @@
               <p class="text-slate-500 text-[13.5px] mt-1">Diskusi detail, nego harga, revisi, dll.</p>
             </div>
             <a href="{{ route('client.messages.index') }}" class="px-4 py-2.5 rounded-[12px] bg-white border border-slate-200 text-slate-700 font-bold text-[12.5px]
-                          hover:border-[#0f766e] hover:text-[#0f766e] transition-all">
+                                hover:border-[#0f766e] hover:text-[#0f766e] transition-all">
               Inbox
             </a>
           </div>
