@@ -9,7 +9,7 @@
     const closeModal = (id) => U.closeModal(id);
     const safeText = (v) => U.safeText(v);
 
-    const page = window.__SERVICES_PAGE__ || {};
+const page = window.__SERVICES_PAGE__ || {};
     let servicesData = Array.isArray(page.data) ? page.data : (page.data?.data || []);
     let perPage = 12;
     let currentPage = 1;
@@ -237,10 +237,19 @@
                 </div>
                 <p class="modal-section-title">Deskripsi Layanan</p>
                 <div class="desc-box">${desc}</div>
+                ${s.reject_reason ? `
+                <div class="reject-reason-box" style="background: #fef2f2; padding: 16px; border-radius: 12px; font-size: 13.5px; color: #991b1b; line-height: 1.6; margin-bottom: 24px; border: 1px solid #fecaca;">
+                    <strong style="display: block; margin-bottom: 6px; color: #7f1d1d; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Alasan Penolakan</strong>
+                    ${safeText(s.reject_reason)}
+                </div>
+                ` : ''}
                 <div class="modal-actions-row" style="margin-top: 24px; display: flex; gap: 12px;">
                     ${s.status === 'Pending' ? `
                         <button onclick="window.approveService('${s.id}')" class="btn-approve" style="flex: 1; padding: 12px; background: #0f766e; color: white; border: none; border-radius: 11px; font-weight: 700; font-size: 13px; cursor: pointer;"><i class="ri-check-line"></i> Setujui</button>
                         <button onclick="window.openRejectModal('${s.id}')" class="btn-reject" style="flex: 1; padding: 12px; background: #fee2e2; color: #dc2626; border: none; border-radius: 11px; font-weight: 700; font-size: 13px; cursor: pointer;"><i class="ri-close-line"></i> Reject</button>
+                    ` : s.status === 'Rejected' ? `
+                        <button onclick="window.approveService('${s.id}')" class="btn-approve" style="flex: 1; padding: 12px; background: #0f766e; color: white; border: none; border-radius: 11px; font-weight: 700; font-size: 13px; cursor: pointer;"><i class="ri-check-line"></i> Setujui</button>
+                        <button onclick="window.openRejectModal('${s.id}')" class="btn-reject" style="flex: 1; padding: 12px; background: #fffbeb; color: #d97706; border: none; border-radius: 11px; font-weight: 700; font-size: 13px; cursor: pointer;"><i class="ri-refresh-line"></i> Reject Ulang</button>
                     ` : `
                         <button onclick="window.closeServiceModal(); window.openDeleteService('${s.id}')" class="btn-delete" style="flex: 1; padding: 12px; background: #fee2e2; color: #dc2626; border: none; border-radius: 11px; font-weight: 700; font-size: 13px; cursor: pointer;"><i class="ri-delete-bin-line"></i> Hapus</button>
                     `}

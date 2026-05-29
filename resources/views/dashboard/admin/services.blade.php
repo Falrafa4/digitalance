@@ -115,7 +115,9 @@
 
 @section('scripts')
     <script>
-        window.__SERVICES_DATA__ = @json($services instanceof \Illuminate\Pagination\LengthAwarePaginator ? $services->items() : $services);
+        window.__SERVICES_PAGE__ = {
+            data: @json($services instanceof \Illuminate\Pagination\LengthAwarePaginator ? $services->items() : $services)
+        };
         let serviceModalOutsideClickHandler = null;
 
         function bindServiceModalOutsideClick(overlay) {
@@ -137,7 +139,7 @@
         }
 
         window.openServiceDetail = function (id) {
-            const s = window.__SERVICES_DATA__.find(x => x.id == id);
+            const s = window.__SERVICES_PAGE__.data.find(x => x.id == id);
             if (!s) {
                 return;
             }
@@ -162,7 +164,7 @@
                 actionButtons = `
                             <div class="flex gap-3">
                                 <button onclick="window.updateServiceStatus(${s.id}, 'Rejected')" class="flex-1 py-4 bg-red-50 text-red-600 font-bold rounded-2xl text-[13px] hover:bg-red-600 hover:text-white transition-all">Tolak</button>
-                                <button onclick="window.updateServiceStatus(${s.id}, 'Approved')" class="flex-1 py-4 bg-[#0f766e] text-white font-bold rounded-2xl text-[13px] hover:bg-[#0a5e58] transition-all shadow-lg shadow-teal-sm">Setujui</button>
+                                <button onclick="window.confirmApprove(${s.id})" class="flex-1 py-4 bg-[#0f766e] text-white font-bold rounded-2xl text-[13px] hover:bg-[#0a5e58] transition-all shadow-lg shadow-teal-sm">Setujui</button>
                             </div>
                         `;
             } else if (s.status === 'Rejected') {
@@ -170,13 +172,17 @@
                             <div class="p-4 bg-red-50 rounded-2xl border border-red-100 mb-6">
                                 <p class="text-[11px] text-red-700 font-bold leading-relaxed flex items-start gap-2">
                                     <i class="ri-close-circle-line mt-0.5"></i>
-                                    <span>Service ini telah ditolak. ${s.reject_reason ? 'Alasan: ' + s.reject_reason : 'Freelancer perlu mengajukan ulang.'}</span>
+                                    <span>Layanan ini ditolak dan dikembalikan ke freelancer.</span>
                                 </p>
+                            </div>
+                            <div class="p-4 bg-red-50/50 rounded-xl border border-red-100 mb-6">
+                                <p class="text-[10px] font-bold text-red-800 uppercase tracking-wider mb-2">Alasan Penolakan</p>
+                                <p class="text-[13px] text-red-900 font-medium">${s.reject_reason || 'Tidak ada alasan.'}</p>
                             </div>
                         `;
                 actionButtons = `
                             <div class="flex gap-3">
-                                <button onclick="window.updateServiceStatus(${s.id}, 'Rejected')" class="flex-1 py-4 bg-red-50 text-red-600 font-bold rounded-2xl text-[13px] hover:bg-red-600 hover:text-white transition-all">Tolak Ulang</button>
+                                <button onclick="window.updateServiceStatus(${s.id}, 'Rejected')" class="flex-1 py-4 bg-orange-50 text-orange-600 font-bold rounded-2xl text-[13px] hover:bg-orange-600 hover:text-white transition-all"><i class="ri-refresh-line"></i> Reject Ulang</button>
                                 <button onclick="window.updateServiceStatus(${s.id}, 'Approved')" class="flex-1 py-4 bg-[#0f766e] text-white font-bold rounded-2xl text-[13px] hover:bg-[#0a5e58] transition-all shadow-lg shadow-teal-sm">Setujui</button>
                             </div>
                         `;
@@ -247,6 +253,11 @@
             unbindServiceModalOutsideClick();
         };
 
+        window.confirmApprove = async function(id) {
+            if (!(await customConfirm('Yakin ingin menyetujui layanan ini?\nLayanan akan langsung ditampilkan ke publik.'))) return;
+            window.updateServiceStatus(id, 'Approved');
+        };
+
         window.updateServiceStatus = async function (id, status, event) {
             const box = document.getElementById('modal-service-box');
             var actionBtn = event ? event.target : box.querySelector('button:not([disabled])');
@@ -279,7 +290,13 @@
 
                     if (!response.ok) throw new Error('Gagal memperbarui status');
 
-                    window.showToast?.('Status berhasil diperbarui!', 'success');
+                    if (status === 'Approved') {
+                        window.showToast?.('Layanan berhasil disetujui dan ditampilkan ke publik.', 'success');
+                    } else if (status === 'Rejected') {
+                        window.showToast?.('Layanan berhasil ditolak. Freelancer akan menerima notifikasi.', 'success');
+                    } else {
+                        window.showToast?.('Status layanan berhasil diperbarui.', 'success');
+                    }
                     window.location.reload();
                     return;
                 }
