@@ -231,15 +231,14 @@
     function updateChart(ctx, view) {
         var chartData = window.__DASHBOARD_CHART_DATA__ || {};
         var data = view === 'weekly' ? (chartData.weekly || []) : (chartData.monthly || []);
-        var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         var labels = [];
         var totals = [];
 
         if (view === 'weekly' && data.length > 0) {
-            labels = data.map(function (d) { return d.week_label; });
+            labels = data.map(function (d) { return d.week_label || (d.period_start && d.period_end ? d.period_start + ' - ' + d.period_end : 'Minggu'); });
             totals = data.map(function (d) { return parseFloat(d.total); });
         } else if (view === 'monthly' && data.length > 0) {
-            labels = data.map(function (d) { return months[d.month - 1] + ' ' + d.year; });
+            labels = data.map(function (d) { return d.label || (d.month && d.year ? d.month + '/' + d.year : 'Bulan'); });
             totals = data.map(function (d) { return parseFloat(d.total); });
         }
 
@@ -248,18 +247,27 @@
             var periods = view === 'weekly' ? 12 : 6;
             for (var i = periods - 1; i >= 0; i--) {
                 if (view === 'weekly') {
-                    var d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - (i * 7));
-                    labels.push(d.getDate() + ' ' + months[d.getMonth()]);
+                    var start = new Date(now.getFullYear(), now.getMonth(), now.getDate() - (i * 7));
+                    var end = new Date(start.getFullYear(), start.getMonth(), start.getDate() + 6);
+                    labels.push(start.getDate() + ' ' + start.toLocaleString('id-ID', { month: 'long' }) + ' - ' + end.getDate() + ' ' + end.toLocaleString('id-ID', { month: 'long' }));
                 } else {
-                    var d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-                    labels.push(months[d.getMonth()] + ' ' + d.getFullYear());
+                    var monthDate = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                    labels.push(monthDate.toLocaleString('id-ID', { month: 'long' }) + ' ' + monthDate.getFullYear());
                 }
                 totals.push(0);
             }
         }
 
+        if (typeof Chart !== 'undefined' && Chart.getChart) {
+            var existingChart = Chart.getChart(ctx);
+            if (existingChart) {
+                existingChart.destroy();
+            }
+        }
+
         if (chartInstance) {
             chartInstance.destroy();
+            chartInstance = null;
         }
 
         chartInstance = new Chart(ctx, {
@@ -327,6 +335,8 @@
                         ticks: {
                             font: { size: 10, family: 'Plus Jakarta Sans', weight: 'bold' },
                             color: '#64748b',
+                            autoSkip: true,
+                            maxTicksLimit: 8,
                             maxRotation: 45,
                             minRotation: 0
                         }
@@ -362,7 +372,6 @@
     function init() {
         initAdminDashboard();
         setTimeout(initChart, 100);
-        window.switchChartView = switchChartView;
     }
 
     if (document.readyState === 'loading') {

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Models\Client;
 use App\Models\Freelancer;
 use App\Models\Offer;
@@ -9,10 +10,11 @@ use App\Models\Order;
 use App\Models\Service;
 use App\Models\SkomdaStudent;
 use App\Models\Transaction;
+use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
-    public function admin()
+    public function admin(Request $request)
     {
         $totalUsers = Client::count() + Freelancer::count() + SkomdaStudent::count();
         $totalClients = Client::count();
@@ -45,26 +47,57 @@ class DashboardController extends Controller
         $todayOrders = Order::whereDate('created_at', now()->toDateString())->count();
         $todayRevenue = $todayTurnover * 0.10;
 
-        // Monthly Revenue Chart Data (10% Platform Fee)
-        $monthlyTurnover = Transaction::where('status', 'Paid')
-            ->selectRaw('SUM(amount * 0.10) as total, MONTH(created_at) as month, YEAR(created_at) as year')
-            ->where('created_at', '>=', now()->subMonths(6))
-            ->groupBy('year', 'month')
-            ->orderBy('year')
-            ->orderBy('month')
-            ->get();
+        try {
+            $selectedMonth = $request->filled('month')
+                ? Carbon::createFromFormat('Y-m', $request->query('month'))->startOfMonth()
+                : now()->startOfMonth();
+        } catch (\Throwable $exception) {
+            $selectedMonth = now()->startOfMonth();
+        }
 
-        // Weekly Revenue Chart Data (last 12 weeks)
-        $weeklyTurnover = Transaction::where('status', 'Paid')
-            ->selectRaw('SUM(amount * 0.10) as total, YEARWEEK(created_at, 1) as yearweek, DATE_FORMAT(created_at, "%Y-%m-%d") as week_start')
-            ->where('created_at', '>=', now()->subWeeks(12))
-            ->groupBy('yearweek', 'week_start')
-            ->orderBy('yearweek')
-            ->get()
-            ->map(function ($item) {
-                $item->week_label = \Carbon\Carbon::parse($item->week_start)->format('d M');
-                return $item;
-            });
+        // Monthly Revenue Chart Data (10% Platform Fee)
+        $monthlyTurnover = collect(range(5, 0))->map(function ($offset) use ($selectedMonth) {
+            $monthStart = (clone $selectedMonth)->subMonthsNoOverflow($offset)->startOfMonth();
+            $monthEnd = (clone $monthStart)->endOfMonth();
+            $turnover = Transaction::where('status', 'Paid')
+                ->whereBetween('created_at', [$monthStart, $monthEnd])
+                ->sum('amount');
+
+            return (object) [
+                'month' => (int) $monthStart->month,
+                'year' => (int) $monthStart->year,
+                'month_key' => $monthStart->format('Y-m'),
+                'label' => $monthStart->translatedFormat('F Y'),
+                'total' => (float) $turnover * 0.10,
+            ];
+        });
+
+        // Weekly Revenue Chart Data inside the selected month
+        $weekStart = (clone $selectedMonth)->startOfMonth();
+        $monthEnd = (clone $selectedMonth)->endOfMonth();
+        $weeklyTurnover = collect();
+
+        while ($weekStart->lte($monthEnd)) {
+            $periodStart = (clone $weekStart);
+            $periodEnd = (clone $weekStart)->addDays(6);
+
+            if ($periodEnd->gt($monthEnd)) {
+                $periodEnd = (clone $monthEnd);
+            }
+
+            $turnover = Transaction::where('status', 'Paid')
+                ->whereBetween('created_at', [$periodStart->copy()->startOfDay(), $periodEnd->copy()->endOfDay()])
+                ->sum('amount');
+
+            $weeklyTurnover->push((object) [
+                'period_start' => $periodStart->translatedFormat('j M'),
+                'period_end' => $periodEnd->translatedFormat('j M'),
+                'week_label' => $periodStart->translatedFormat('j M') . ' - ' . $periodEnd->translatedFormat('j M'),
+                'total' => (float) $turnover * 0.10,
+            ]);
+
+            $weekStart = $periodEnd->copy()->addDay()->startOfDay();
+        }
 
         return view('dashboard.admin.dashboard', compact(
             'totalUsers',
@@ -89,7 +122,7 @@ class DashboardController extends Controller
     {
         $user = auth()->guard('client')->user();
 
-        if (! $user) {
+        if (!$user) {
             abort(403, 'Unauthorized');
         }
 
@@ -150,7 +183,7 @@ class DashboardController extends Controller
     {
         $freelancer = auth('freelancer')->user();
 
-        if (! $freelancer) {
+        if (!$freelancer) {
             abort(403, 'Unauthorized');
         }
 
@@ -240,7 +273,7 @@ class DashboardController extends Controller
             ->where('is_read', false)
             ->exists();
 
-        if (! $exists) {
+        if (!$exists) {
             \App\Models\Notification::create([
                 'title' => 'Akun Diverifikasi',
                 'message' => 'Selamat, akun freelancer kamu telah disetujui oleh admin!',
@@ -271,10 +304,10 @@ class DashboardController extends Controller
             ->where('is_read', false)
             ->exists();
 
-        if (! $exists) {
+        if (!$exists) {
             \App\Models\Notification::create([
                 'title' => 'Verifikasi Ditolak',
-                'message' => 'Maaf, pengajuan akun freelancer kamu belum dapat kami setujui. Alasan: '.$reason,
+                'message' => 'Maaf, pengajuan akun freelancer kamu belum dapat kami setujui. Alasan: ' . $reason,
                 'type' => 'danger',
                 'role' => 'freelancer',
                 'user_id' => $freelancer->id,
@@ -306,7 +339,7 @@ class DashboardController extends Controller
         $results = collect();
 
         if ($q) {
-            $fuzzy = '%'.str_replace(' ', '%', $q).'%';
+            $fuzzy = '%' . str_replace(' ', '%', $q) . '%';
 
             // Search Menus
             $menus = collect([
@@ -338,7 +371,7 @@ class DashboardController extends Controller
                 ->orWhere('email', 'like', $fuzzy)
                 ->get()->map(function ($item) {
                     $item->search_type = 'Client';
-                    $item->search_url = route('admin.clients.index').'?q='.urlencode($item->name);
+                    $item->search_url = route('admin.clients.index') . '?q=' . urlencode($item->name);
 
                     return $item;
                 });
@@ -352,7 +385,7 @@ class DashboardController extends Controller
             })
                 ->get()->map(function ($item) {
                     $item->search_type = 'Freelancer';
-                    $item->search_url = route('admin.freelancers.index').'?q='.urlencode($item->name);
+                    $item->search_url = route('admin.freelancers.index') . '?q=' . urlencode($item->name);
 
                     return $item;
                 });
@@ -362,7 +395,7 @@ class DashboardController extends Controller
                 ->orWhere('description', 'like', $fuzzy)
                 ->get()->map(function ($item) {
                     $item->search_type = 'Service';
-                    $item->search_url = route('admin.services.index').'?q='.urlencode($item->title);
+                    $item->search_url = route('admin.services.index') . '?q=' . urlencode($item->title);
 
                     return $item;
                 });
@@ -389,7 +422,7 @@ class DashboardController extends Controller
                 ->orWhere('status', 'like', $fuzzy)
                 ->orWhere('type', 'like', $fuzzy)
                 ->get()->map(function ($item) {
-                    $item->title = 'Transaksi #'.$item->id;
+                    $item->title = 'Transaksi #' . $item->id;
                     $item->search_type = 'Transaction';
                     $item->search_url = route('admin.transactions.index');
 
@@ -402,7 +435,7 @@ class DashboardController extends Controller
                 ->orWhere('nis', 'like', $fuzzy)
                 ->get()->map(function ($item) {
                     $item->search_type = 'Student';
-                    $item->search_url = route('admin.skomda-students.index').'?q='.urlencode($item->name);
+                    $item->search_url = route('admin.skomda-students.index') . '?q=' . urlencode($item->name);
 
                     return $item;
                 });
@@ -441,7 +474,7 @@ class DashboardController extends Controller
             $results_data = \App\Models\Result::where('note', 'like', $fuzzy)
                 ->orWhere('version', 'like', $fuzzy)
                 ->get()->map(function ($item) {
-                    $item->title = 'Result '.($item->version ?? $item->id);
+                    $item->title = 'Result ' . ($item->version ?? $item->id);
                     $item->search_type = 'Result';
                     $item->search_url = route('admin.results.index');
 
@@ -451,7 +484,7 @@ class DashboardController extends Controller
             // Search Reviews
             $reviews = \App\Models\Review::where('comment', 'like', $fuzzy)
                 ->get()->map(function ($item) {
-                    $item->title = 'Review for Order #'.$item->order_id;
+                    $item->title = 'Review for Order #' . $item->order_id;
                     $item->search_type = 'Review';
                     $item->search_url = route('admin.reviews.index');
 
@@ -461,7 +494,7 @@ class DashboardController extends Controller
             // Search Negotiations (Chat messages)
             $negotiations = \App\Models\Negotiation::where('message', 'like', $fuzzy)
                 ->get()->map(function ($item) {
-                    $item->title = 'Chat in Order #'.$item->order_id;
+                    $item->title = 'Chat in Order #' . $item->order_id;
                     $item->search_type = 'Chat';
                     $item->search_url = route('admin.negotiations.index');
 
@@ -493,7 +526,7 @@ class DashboardController extends Controller
         $results = collect();
 
         if ($q && $user) {
-            $fuzzy = '%'.str_replace(' ', '%', $q).'%';
+            $fuzzy = '%' . str_replace(' ', '%', $q) . '%';
 
             // Search Talents (Freelancers)
             $freelancers = Freelancer::where('status', 'Approved')
@@ -541,11 +574,16 @@ class DashboardController extends Controller
 
     public function getDisputeDetail($id)
     {
-        $order = Order::with(['client', 'service.freelancer', 'negotiations' => function ($q) {
-            $q->latest();
-        }, 'results' => function ($q) {
-            $q->latest();
-        }])->findOrFail($id);
+        $order = Order::with([
+            'client',
+            'service.freelancer',
+            'negotiations' => function ($q) {
+                $q->latest();
+            },
+            'results' => function ($q) {
+                $q->latest();
+            }
+        ])->findOrFail($id);
 
         return response()->json([
             'order' => $order,
@@ -572,7 +610,7 @@ class DashboardController extends Controller
         $results = collect();
 
         if ($q && $user) {
-            $fuzzy = '%'.str_replace(' ', '%', $q).'%';
+            $fuzzy = '%' . str_replace(' ', '%', $q) . '%';
 
             // Search Own Services
             $services = Service::where('freelancer_id', $user->id)
@@ -619,12 +657,12 @@ class DashboardController extends Controller
     public function resolveDispute(\Illuminate\Http\Request $request, $id)
     {
         $order = Order::findOrFail($id);
-        
+
         $request->validate([
             'status_decision' => 'required|in:Completed,Cancelled',
         ]);
 
-        $decision = $request->input('status_decision'); 
+        $decision = $request->input('status_decision');
 
         // Update status order berdasarkan keputusan peninjauan admin
         $order->update([
