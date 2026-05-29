@@ -102,7 +102,7 @@
 <div id="modal-edit" class="fixed inset-0 z-[100] flex items-center justify-center hidden opacity-0 transition-all duration-200">
     <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onclick="closeEditModal()"></div>
     <div class="bg-white rounded-[24px] w-full max-w-lg p-6 relative shadow-2xl scale-95 transition-transform duration-200 mx-4">
-        <h2 class="font-display font-extrabold text-[1.4rem] text-slate-900 mb-6">Edit Portofolio</h2>
+        <h2 class="font-display font-extrabold text-[1.4rem] text-slate-900 mb-6">Sunting Portofolio</h2>
         <form action="" method="POST" class="space-y-4" id="form-edit-portofolio">
             @csrf
             @method('PUT')

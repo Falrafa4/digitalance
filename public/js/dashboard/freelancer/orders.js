@@ -34,8 +34,8 @@
     const price = o?.agreed_price ?? o?.amount ?? o?.price ?? null;
     const created = o?.created_at ?? o?.date ?? o?.created ?? null;
 
-    const serviceTitle = o?.service?.title ?? o?.service?.name ?? o?.service_title ?? o?.service_name ?? 'Service';
-    const clientName = o?.client?.name ?? o?.client_name ?? o?.buyer?.name ?? 'Client';
+    const serviceTitle = o?.service?.title ?? o?.service?.name ?? o?.service_title ?? o?.service_name ?? 'Layanan';
+    const clientName = o?.client?.name ?? o?.client_name ?? o?.buyer?.name ?? 'Klien';
 
     return { id, status, brief, price, created, serviceTitle, clientName, _raw: o };
   }
@@ -71,7 +71,7 @@
     return `
       <div class="py-16 px-5 text-center bg-white border-2 border-dashed border-slate-200 rounded-3xl">
         <i class="ri-file-list-3-line text-[3rem] text-slate-300 block mb-3"></i>
-        <h3 class="font-display text-[1.1rem] font-bold text-slate-700 mb-1.5">No orders found</h3>
+        <h3 class="font-display text-[1.1rem] font-bold text-slate-700 mb-1.5">Tidak ada pesanan ditemukan</h3>
         <p class="text-[13px] text-slate-400">Coba ubah filter atau kata kunci pencarian.</p>
       </div>
     `;
@@ -109,7 +109,7 @@
             </div>
 
             <div class="text-right flex-shrink-0">
-              <div class="text-[11px] font-bold text-slate-400 uppercase tracking-[.12em]">Agreed</div>
+              <div class="text-[11px] font-bold text-slate-400 uppercase tracking-[.12em]">Disepakati</div>
               <div class="text-[14px] font-extrabold text-slate-900 mt-1">${money(o.price)}</div>
             </div>
           </div>
@@ -123,7 +123,7 @@
             <div class="flex gap-2">
               <a href="${page?.links?.showPrefix ? `${page.links.showPrefix}${o.id}` : '#'}"
                 class="px-4 py-2 rounded-[11px] bg-slate-900 text-white font-bold text-[12.5px] hover:bg-black transition-all ${page?.links?.showPrefix ? '' : 'pointer-events-none opacity-60'}">
-                Detail
+                Rincian
               </a>
             </div>
           </div>

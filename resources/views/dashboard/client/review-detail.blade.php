@@ -8,18 +8,18 @@
                 class="text-slate-500 font-bold text-[13px] hover:text-slate-900 inline-flex items-center gap-1 mb-2">
                 <i class="ri-arrow-left-line"></i> Kembali
             </a>
-            <h1 class="font-display text-[1.85rem] font-extrabold text-slate-900">Detail Review</h1>
+            <h1 class="font-display text-[1.85rem] font-extrabold text-slate-900">Detail Ulasan</h1>
             <p class="text-slate-500 mt-1">Order #{{ $review->order_id }} - {{ $review->order->service->title ?? '-' }}</p>
         </div>
 
         <div class="bg-white border border-slate-200 rounded-[18px] p-6 space-y-6">
             <div class="flex items-start justify-between gap-4 pb-4 border-b border-slate-100">
                 <div>
-                    <p class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest mb-1">Rating</p>
+                    <p class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest mb-1">Penilaian</p>
                     <p class="font-extrabold text-slate-900 text-[1.4rem]">
                         {{ number_format((float) ($review->rating ?? 0), 1) }}/5</p>
                 </div>
-                <span class="px-3 py-1.5 rounded-lg bg-amber-50 text-amber-700 font-bold text-[12px]">Review</span>
+                <span class="px-3 py-1.5 rounded-lg bg-amber-50 text-amber-700 font-bold text-[12px]">Ulasan</span>
             </div>
 
             <div>

@@ -100,7 +100,7 @@
     try {
       await apiRequest(url, { method: 'PUT', body: payload });
       closeModal('modal-edit');
-      if (window.showToast) window.showToast('User updated successfully', 'success');
+      if (window.showToast) window.showToast('Pengguna berhasil diperbarui', 'success');
       setTimeout(() => window.location.reload(), 1000);
     } catch (err) {
       if (window.showToast) window.showToast(err.message, 'danger');
@@ -113,7 +113,7 @@
     const u = usersData.find(x => x._uid === uid);
     if (!u) return;
     deleteTargetUid = uid;
-    $('delete-text').innerHTML = `Are you sure you want to delete <strong>${window.DigitalanceUtils?.escapeHtml(u.name) || u.name}</strong>?`;
+    $('delete-text').innerHTML = `Yakin ingin menghapus <strong>${window.DigitalanceUtils?.escapeHtml(u.name) || u.name}</strong>?`;
     openModal('modal-delete');
   };
 
@@ -128,7 +128,7 @@
     try {
       await apiRequest(url, { method: 'DELETE' });
       closeModal('modal-delete');
-      if (window.showToast) window.showToast('User deleted successfully', 'success');
+      if (window.showToast) window.showToast('Pengguna berhasil dihapus', 'success');
       setTimeout(() => window.location.reload(), 1000);
     } catch (err) {
       if (window.showToast) window.showToast(err.message, 'danger');
@@ -164,7 +164,7 @@
       try {
           await apiRequest(url, { method: 'POST', body: payload });
           closeModal('modal-add');
-          if (window.showToast) window.showToast('User added successfully', 'success');
+          if (window.showToast) window.showToast('Pengguna berhasil ditambahkan', 'success');
           setTimeout(() => window.location.reload(), 1000);
       } catch (err) {
           if (window.showToast) window.showToast(err.message, 'danger');

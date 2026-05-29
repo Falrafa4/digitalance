@@ -1,5 +1,5 @@
 @extends('layouts.dashboard')
-@section('title', 'Admin Management | Digitalance')
+@section('title', 'Manajemen Administrator | Digitalance')
 
 @section('styles')
     <link rel="stylesheet" href="{{ asset('css/dashboard/admin/admins.css') }}">
@@ -45,7 +45,9 @@
                                 src="{{ $admin->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode($admin->name) . '&background=0f766e&color=ffffff' }}"
                                 alt="{{ $admin->name }}" />
                         </div>
-                        <button onclick="openPasswordModal({{ $admin->id }})" class="w-9 h-9 rounded-xl bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-amber-500 hover:text-white transition-all" title="Change Password">
+                        <button onclick="openPasswordModal({{ $admin->id }})"
+                            class="w-9 h-9 rounded-xl bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-amber-500 hover:text-white transition-all"
+                            title="Ubah Kata Sandi">
                             <i class="ri-lock-password-line"></i>
                         </button>
                     </div>
@@ -104,13 +106,15 @@
                         <div class="flex flex-col gap-1.5">
                             <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Nama
                                 Lengkap</label>
-<input type="text" name="name" required value="{{ old('name') }}" placeholder="Contoh: Budi Santoso"
-    class="py-2.5 px-3.5 bg-slate-50 border-[1.5px] border-slate-200 rounded-xl text-[13.5px] outline-none focus:border-[#0f766e] focus:bg-white focus:shadow-[0_0_0_3px_rgba(15,118,110,0.08)] transition-all" />
+                            <input type="text" name="name" required value="{{ old('name') }}"
+                                placeholder="Contoh: Budi Santoso"
+                                class="py-2.5 px-3.5 bg-slate-50 border-[1.5px] border-slate-200 rounded-xl text-[13.5px] outline-none focus:border-[#0f766e] focus:bg-white focus:shadow-[0_0_0_3px_rgba(15,118,110,0.08)] transition-all" />
                         </div>
                         <div class="flex flex-col gap-1.5">
                             <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Email</label>
-<input type="email" name="email" required value="{{ old('email') }}" placeholder="budi@digitalance.id"
-    class="py-2.5 px-3.5 bg-slate-50 border-[1.5px] border-slate-200 rounded-xl text-[13.5px] outline-none focus:border-[#0f766e] focus:bg-white focus:shadow-[0_0_0_3px_rgba(15,118,110,0.08)] transition-all" />
+                            <input type="email" name="email" required value="{{ old('email') }}"
+                                placeholder="budi@digitalance.id"
+                                class="py-2.5 px-3.5 bg-slate-50 border-[1.5px] border-slate-200 rounded-xl text-[13.5px] outline-none focus:border-[#0f766e] focus:bg-white focus:shadow-[0_0_0_3px_rgba(15,118,110,0.08)] transition-all" />
                         </div>
                     </div>
 
@@ -175,7 +179,7 @@
         id="modal-password-admin">
         <div class="modal-box bg-white rounded-[18px] w-full max-w-[420px] shadow-2xl overflow-hidden">
             <div class="flex items-center justify-between px-[26px] py-[22px] border-b border-slate-100">
-                <h3 class="font-display text-[1.1rem] font-extrabold text-slate-900">Change Password</h3>
+                <h3 class="font-display text-[1.1rem] font-extrabold text-slate-900">Ubah Kata Sandi</h3>
                 <button onclick="closeModal('modal-password-admin')"
                     class="w-[34px] h-[34px] bg-slate-100 rounded-[9px] flex items-center justify-center text-[18px] text-slate-500 cursor-pointer border-none hover:bg-red-50 hover:text-red-500 transition-all">
                     <i class="ri-close-line"></i>

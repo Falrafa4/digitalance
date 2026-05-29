@@ -1,8 +1,8 @@
 {{-- Error State Component --}}
 @props([
     'icon' => 'ri-error-warning-line',
-    'title' => 'Something went wrong',
-    'description' => 'An error occurred while loading this content.',
+    'title' => 'Terjadi kesalahan',
+    'description' => 'Terjadi kesalahan saat memuat konten ini.',
     'retryUrl' => null,
 ])
 

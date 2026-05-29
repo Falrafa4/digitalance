@@ -28,7 +28,7 @@
 
   function normalizeService(s) {
     const id = s?.id ?? null;
-    const title = s?.title ?? s?.name ?? 'Service';
+    const title = s?.title ?? s?.name ?? 'Layanan';
     const category = s?.service_category?.name ?? s?.category?.name ?? s?.service_category_name ?? s?.category_name ?? '—';
     const status = s?.status ?? 'Draft';
     const price = s?.price ?? s?.starting_price ?? s?.min_price ?? null;
@@ -85,7 +85,7 @@
     return `
       <div class="col-span-full py-16 px-5 text-center bg-white border-2 border-dashed border-slate-200 rounded-3xl">
         <i class="ri-inbox-archive-line text-[3rem] text-slate-300 block mb-3"></i>
-        <h3 class="font-display text-[1.1rem] font-bold text-slate-700 mb-1.5">No services found</h3>
+        <h3 class="font-display text-[1.1rem] font-bold text-slate-700 mb-1.5">Tidak ada layanan yang ditemukan</h3>
         <p class="text-[13px] text-slate-400">Coba ubah filter atau kata kunci pencarian.</p>
       </div>
     `;
@@ -130,7 +130,7 @@
           </div>
 
           <div class="flex items-center justify-between bg-slate-50 border border-slate-200 rounded-[16px] px-4 py-3">
-            <div class="text-[12px] text-slate-500 font-semibold">Starting price</div>
+            <div class="text-[12px] text-slate-500 font-semibold">Harga mulai</div>
             <div class="text-[13px] font-extrabold text-[#0f766e]">${money(s.price)}</div>
           </div>
 
@@ -139,16 +139,16 @@
           <div class="flex gap-2 mt-4">
             ${hrefShow
               ? `<a href="${hrefShow}" class="flex-1 py-2.5 rounded-[12px] bg-slate-900 text-white font-bold text-[12.5px] flex items-center justify-center gap-1.5 hover:bg-black transition-all">
-                  <i class="ri-eye-line"></i> View
+                  <i class="ri-eye-line"></i> Lihat
                 </a>`
-              : `<button type="button" class="flex-1 py-2.5 rounded-[12px] bg-slate-900 text-white font-bold text-[12.5px] opacity-60 cursor-not-allowed">View</button>`
+              : `<button type="button" class="flex-1 py-2.5 rounded-[12px] bg-slate-900 text-white font-bold text-[12.5px] opacity-60 cursor-not-allowed">Lihat</button>`
             }
 
-            ${hrefEdit
+                ${hrefEdit
               ? `<a href="${hrefEdit}" class="flex-1 py-2.5 rounded-[12px] bg-white border-[1.5px] border-slate-200 text-slate-700 font-bold text-[12.5px] flex items-center justify-center gap-1.5 hover:border-[#0f766e] hover:text-[#0f766e] transition-all">
-                  <i class="ri-pencil-line"></i> Edit
+                  <i class="ri-pencil-line"></i> Sunting
                 </a>`
-              : `<button type="button" class="flex-1 py-2.5 rounded-[12px] bg-white border-[1.5px] border-slate-200 text-slate-700 font-bold text-[12.5px] opacity-60 cursor-not-allowed">Edit</button>`
+              : `<button type="button" class="flex-1 py-2.5 rounded-[12px] bg-white border-[1.5px] border-slate-200 text-slate-700 font-bold text-[12.5px] opacity-60 cursor-not-allowed">Sunting</button>`
             }
           </div>
         </div>

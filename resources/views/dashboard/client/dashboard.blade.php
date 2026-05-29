@@ -1,5 +1,5 @@
 @extends('layouts.dashboard')
-@section('title', 'Client Dashboard | Digitalance')
+@section('title', 'Dasbor Klien | Digitalance')
 
 @section('content')
     <div class="animate-fadeUp">
@@ -21,13 +21,14 @@
             {{-- TOTAL ORDERS --}}
             <div class="bg-white border border-slate-200 rounded-[18px] px-6 py-5">
                 <div class="flex items-center gap-4">
-                    <div class="w-[54px] h-[54px] rounded-[16px] bg-emerald-50 flex items-center justify-center text-[#0f766e]">
+                    <div
+                        class="w-[54px] h-[54px] rounded-[16px] bg-emerald-50 flex items-center justify-center text-[#0f766e]">
                         <i class="ri-file-list-3-line text-[22px]" aria-hidden="true"></i>
                     </div>
                     <div class="flex-1">
                         <p class="text-[12px] font-extrabold text-slate-400 uppercase tracking-[.12em]">TOTAL PESANAN</p>
-                        <p class="text-[28px] font-extrabold text-slate-900 leading-tight mt-1"
-                           data-client-stat="total" data-default="{{ $statsData['total'] }}">
+                        <p class="text-[28px] font-extrabold text-slate-900 leading-tight mt-1" data-client-stat="total"
+                            data-default="{{ $statsData['total'] }}">
                             {{ $statsData['total'] }}
                         </p>
                     </div>
@@ -42,8 +43,8 @@
                     </div>
                     <div class="flex-1">
                         <p class="text-[12px] font-extrabold text-slate-400 uppercase tracking-[.12em]">PROYEK AKTIF</p>
-                        <p class="text-[28px] font-extrabold text-slate-900 leading-tight mt-1"
-                           data-client-stat="active" data-default="{{ $statsData['active'] }}">
+                        <p class="text-[28px] font-extrabold text-slate-900 leading-tight mt-1" data-client-stat="active"
+                            data-default="{{ $statsData['active'] }}">
                             {{ $statsData['active'] }}
                         </p>
                     </div>
@@ -53,13 +54,14 @@
             {{-- COMPLETED --}}
             <div class="bg-white border border-slate-200 rounded-[18px] px-6 py-5">
                 <div class="flex items-center gap-4">
-                    <div class="w-[54px] h-[54px] rounded-[16px] bg-amber-50 flex items-center justify-center text-amber-700">
+                    <div
+                        class="w-[54px] h-[54px] rounded-[16px] bg-amber-50 flex items-center justify-center text-amber-700">
                         <i class="ri-medal-line text-[22px]" aria-hidden="true"></i>
                     </div>
                     <div class="flex-1">
                         <p class="text-[12px] font-extrabold text-slate-400 uppercase tracking-[.12em]">SELESAI</p>
-                        <p class="text-[28px] font-extrabold text-slate-900 leading-tight mt-1"
-                           data-client-stat="completed" data-default="{{ $statsData['completed'] }}">
+                        <p class="text-[28px] font-extrabold text-slate-900 leading-tight mt-1" data-client-stat="completed"
+                            data-default="{{ $statsData['completed'] }}">
                             {{ $statsData['completed'] }}
                         </p>
                     </div>
@@ -69,13 +71,16 @@
             {{-- TOTAL SPENT --}}
             <div class="bg-white border border-slate-200 rounded-[18px] px-6 py-5">
                 <div class="flex items-center gap-4">
-                    <div class="w-[54px] h-[54px] rounded-[16px] bg-emerald-50 flex items-center justify-center text-[#0f766e]">
+                    <div
+                        class="w-[54px] h-[54px] rounded-[16px] bg-emerald-50 flex items-center justify-center text-[#0f766e]">
                         <i class="ri-wallet-3-line text-[22px]" aria-hidden="true"></i>
                     </div>
                     <div class="flex-1">
-                        <p class="text-[12px] font-extrabold text-slate-400 uppercase tracking-[.12em]">TOTAL PENGELUARAN</p>
+                        <p class="text-[12px] font-extrabold text-slate-400 uppercase tracking-[.12em]">TOTAL PENGELUARAN
+                        </p>
                         <p class="text-[22px] sm:text-[24px] font-extrabold text-slate-900 leading-tight mt-1"
-                           data-client-stat="totalSpent" data-default="Rp {{ number_format((float) $statsData['totalSpent'], 0, ',', '.') }}">
+                            data-client-stat="totalSpent"
+                            data-default="Rp {{ number_format((float) $statsData['totalSpent'], 0, ',', '.') }}">
                             Rp {{ number_format((float) $statsData['totalSpent'], 0, ',', '.') }}
                         </p>
                     </div>
@@ -93,7 +98,8 @@
                         <h2 class="font-display text-[1.55rem] font-extrabold text-slate-900">Proyek Saya</h2>
                         <p class="text-slate-500 text-[0.95rem] mt-1">Pantau ringkasan order terakhir kamu.</p>
                     </div>
-                    <a href="{{ route('client.orders.index') }}" class="px-4 py-2 rounded-[11px] border-[1.5px] border-slate-200 bg-white text-slate-700 font-bold text-[12.5px] hover:border-[#0f766e] hover:text-[#0f766e] transition-all">
+                    <a href="{{ route('client.orders.index') }}"
+                        class="px-4 py-2 rounded-[11px] border-[1.5px] border-slate-200 bg-white text-slate-700 font-bold text-[12.5px] hover:border-[#0f766e] hover:text-[#0f766e] transition-all">
                         Lihat Semua
                     </a>
                 </div>
@@ -105,33 +111,37 @@
                                 <div class="p-5 flex flex-col sm:flex-row sm:items-center gap-4">
                                     <div class="flex-1 min-w-0">
                                         <p class="text-slate-900 font-extrabold text-[14.5px] truncate">
-                                            {{ $o->service->title ?? $o->service->name ?? 'Service' }}
+                                            {{ $o->service->title ?? $o->service->name ?? 'Layanan' }}
                                         </p>
                                         <p class="text-slate-500 text-[13px] mt-1 line-clamp-1">
                                             {{ $o->brief }}
                                         </p>
                                         <div class="flex flex-wrap items-center gap-2 mt-3">
-                                            <span class="px-3 py-1 rounded-full text-[12px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                                            <span
+                                                class="px-3 py-1 rounded-full text-[12px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
                                                 {{ $o->status }}
                                             </span>
-                                            <span class="px-3 py-1 rounded-full text-[12px] font-bold bg-white text-slate-600 border border-slate-200">
-                                                Deadline: {{ $o->deadline ? \Carbon\Carbon::parse($o->deadline)->format('d M Y') : '-' }}
+                                            <span
+                                                class="px-3 py-1 rounded-full text-[12px] font-bold bg-white text-slate-600 border border-slate-200">
+                                                Deadline:
+                                                {{ $o->deadline ? \Carbon\Carbon::parse($o->deadline)->format('d M Y') : '-' }}
                                             </span>
-                                            <span class="px-3 py-1 rounded-full text-[12px] font-bold bg-white text-slate-600 border border-slate-200">
+                                            <span
+                                                class="px-3 py-1 rounded-full text-[12px] font-bold bg-white text-slate-600 border border-slate-200">
                                                 Rp {{ number_format((float) ($o->agreed_price ?? 0), 0, ',', '.') }}
                                             </span>
                                         </div>
                                     </div>
                                     <div class="flex gap-2 sm:flex-col sm:items-end">
                                         <a href="{{ route('client.orders.show', $o->id) }}"
-                                           class="px-4 py-2.5 rounded-[12px] bg-slate-900 text-white font-bold text-[12.5px] hover:bg-black transition-all">
-                                            Detail
+                                            class="px-4 py-2.5 rounded-[12px] bg-slate-900 text-white font-bold text-[12.5px] hover:bg-black transition-all">
+                                            Rincian
                                         </a>
                                         @if($o->service_id && $o->service)
-                                        <a href="{{ route('client.services.show', $o->service_id) }}"
-                                           class="px-4 py-2.5 rounded-[12px] bg-white border-[1.5px] border-slate-200 text-slate-700 font-bold text-[12.5px] hover:border-[#0f766e] hover:text-[#0f766e] transition-all">
-                                            Lihat Jasa
-                                        </a>
+                                            <a href="{{ route('client.services.show', $o->service_id) }}"
+                                                class="px-4 py-2.5 rounded-[12px] bg-white border-[1.5px] border-slate-200 text-slate-700 font-bold text-[12.5px] hover:border-[#0f766e] hover:text-[#0f766e] transition-all">
+                                                Lihat Layanan
+                                            </a>
                                         @endif
                                     </div>
                                 </div>
@@ -145,11 +155,11 @@
                                 </div>
                                 <p class="text-slate-900 font-extrabold text-[1.25rem]">Belum Ada Proyek</p>
                                 <p class="text-slate-500 mt-2">Mulai order pertamamu dari katalog jasa.</p>
-<a href="{{ route('client.services.index') }}"
-                                   class="inline-flex items-center justify-center mt-5 px-5 py-3 rounded-[12px] bg-slate-900 text-white font-bold text-[13px] hover:bg-black transition-all">
-                                Jelajah Katalog
-                                <i class="ri-arrow-right-line ml-2" aria-hidden="true"></i>
-                            </a>
+                                <a href="{{ route('client.services.index') }}"
+                                    class="inline-flex items-center justify-center mt-5 px-5 py-3 rounded-[12px] bg-slate-900 text-white font-bold text-[13px] hover:bg-black transition-all">
+                                    Jelajah Katalog
+                                    <i class="ri-arrow-right-line ml-2" aria-hidden="true"></i>
+                                </a>
                             </div>
                         </div>
                     @endif
@@ -167,7 +177,8 @@
 
                 <div class="bg-white border border-slate-200 rounded-[18px] p-5">
                     <div class="flex items-start gap-3">
-                        <div class="w-[48px] h-[48px] rounded-[16px] bg-emerald-50 flex items-center justify-center text-[#0f766e]">
+                        <div
+                            class="w-[48px] h-[48px] rounded-[16px] bg-emerald-50 flex items-center justify-center text-[#0f766e]">
                             <i class="ri-shield-check-line text-[22px]" aria-hidden="true"></i>
                         </div>
                         <div class="flex-1">
@@ -187,17 +198,17 @@
                     <p class="text-[12px] font-extrabold text-slate-400 uppercase tracking-[.12em]">Aksi Cepat</p>
                     <div class="mt-4 flex flex-col gap-2.5">
                         <a href="{{ route('client.talents.index') }}"
-                           class="flex items-center justify-between px-4 py-3 rounded-[14px] bg-slate-50 border border-slate-200 hover:border-[#0f766e] transition-all">
+                            class="flex items-center justify-between px-4 py-3 rounded-[14px] bg-slate-50 border border-slate-200 hover:border-[#0f766e] transition-all">
                             <span class="font-bold text-[13px] text-slate-800">Cari Talenta</span>
                             <i class="ri-arrow-right-line text-slate-400" aria-hidden="true"></i>
                         </a>
                         <a href="{{ route('client.orders.index') }}"
-                           class="flex items-center justify-between px-4 py-3 rounded-[14px] bg-slate-50 border border-slate-200 hover:border-[#0f766e] transition-all">
+                            class="flex items-center justify-between px-4 py-3 rounded-[14px] bg-slate-50 border border-slate-200 hover:border-[#0f766e] transition-all">
                             <span class="font-bold text-[13px] text-slate-800">Pesanan</span>
                             <i class="ri-arrow-right-line text-slate-400" aria-hidden="true"></i>
                         </a>
                         <a href="{{ route('client.profile') }}"
-                           class="flex items-center justify-between px-4 py-3 rounded-[14px] bg-slate-50 border border-slate-200 hover:border-[#0f766e] transition-all">
+                            class="flex items-center justify-between px-4 py-3 rounded-[14px] bg-slate-50 border border-slate-200 hover:border-[#0f766e] transition-all">
                             <span class="font-bold text-[13px] text-slate-800">Akun</span>
                             <i class="ri-arrow-right-line text-slate-400" aria-hidden="true"></i>
                         </a>
@@ -209,11 +220,11 @@
 @endsection
 
 @section('scripts')
-<script>
-window.__PAGE__ = {
-    projects: @json($projectsData),
-    stats: @json($statsData),
-};
-</script>
-<script src="{{ asset('js/dashboard/client/dashboard.js') }}" defer></script>
+    <script>
+        window.__PAGE__ = {
+            projects: @json($projectsData),
+            stats: @json($statsData),
+        };
+    </script>
+    <script src="{{ asset('js/dashboard/client/dashboard.js') }}" defer></script>
 @endsection

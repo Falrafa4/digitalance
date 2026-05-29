@@ -1,5 +1,5 @@
 @extends('layouts.dashboard')
-@section('title', 'User Management | Digitalance')
+@section('title', 'Manajemen Pengguna | Digitalance')
 @section('styles')
     <link rel="stylesheet" href="{{ asset('css/dashboard/admin/clients.css') }}">
 @endsection
@@ -7,7 +7,7 @@
 @section('content')
     <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8 animate-fadeUp">
         <div>
-            <h1 class="font-display text-[2.1rem] font-extrabold text-slate-900">User Management</h1>
+            <h1 class="font-display text-[2.1rem] font-extrabold text-slate-900">Manajemen Pengguna</h1>
             <p class="text-slate-500 text-[0.95rem] mt-1">Kelola seluruh pengguna platform: Client, Freelancer, dan Siswa Skomda.</p>
         </div>
         <div class="flex items-center gap-3">
@@ -43,7 +43,7 @@
         <form action="{{ route('admin.clients.index') }}" method="GET" class="relative">
             <input type="hidden" name="role" value="{{ $role }}">
             <i class="ri-search-line absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-[15px]"></i>
-            <input type="text" name="q" value="{{ $q }}" placeholder="Search name or email..." 
+            <input type="text" name="q" value="{{ $q }}" placeholder="Cari nama atau email..." 
                    class="pl-10 pr-4 py-[9px] w-[260px] border-[1.5px] border-slate-200 rounded-[14px] text-[13px] font-semibold text-slate-700 bg-white outline-none focus:border-[#0f766e] transition-all" />
         </form>
     </div>
@@ -245,7 +245,7 @@
 
                     <div class="flex gap-4 mt-10">
                         <button type="button" onclick="window.closeAddModal()" class="flex-1 py-4 bg-slate-100 text-slate-500 font-bold rounded-2xl hover:bg-slate-200 transition-all">Cancel</button>
-                        <button type="submit" class="flex-1 py-4 bg-[#0f766e] text-white font-bold rounded-2xl shadow-xl shadow-teal-sm hover:bg-[#0a5e58] transition-all">Create Account</button>
+                        <button type="submit" class="flex-1 py-4 bg-[#0f766e] text-white font-bold rounded-2xl shadow-xl shadow-teal-sm hover:bg-[#0a5e58] transition-all">Buat Akun</button>
                     </div>
                 </form>
              </div>
@@ -268,7 +268,7 @@
                 box.innerHTML = `
                     <div class="p-7">
                         <div class="flex justify-between items-center mb-8">
-                            <h2 class="text-[1.5rem] font-black text-slate-900">Edit Client</h2>
+                            <h2 class="text-[1.5rem] font-black text-slate-900">Edit Klien</h2>
                             <button onclick="window.closeUserModal()" class="w-10 h-10 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center hover:bg-red-50 hover:text-red-500 transition">
                                 <i class="ri-close-line text-xl"></i>
                             </button>
@@ -277,21 +277,21 @@
                             @csrf @method('PUT')
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-4 mb-10">
                                 <div>
-                                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Full Name</label>
+                                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Nama Lengkap</label>
                                     <input type="text" name="name" value="${u.name || ''}" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700">
                                 </div>
                                 <div>
-                                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Email Address</label>
+                                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Alamat Email</label>
                                     <input type="email" name="email" value="${u.email || ''}" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700">
                                 </div>
                                 <div class="md:col-span-2">
-                                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Phone Number</label>
+                                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Nomor Telepon</label>
                                     <input type="text" name="phone" value="${u.phone || ''}" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700">
                                 </div>
                             </div>
                             <div class="flex gap-4">
                                 <button type="button" onclick="window.closeUserModal()" class="flex-1 py-4 bg-slate-100 text-slate-500 font-bold rounded-2xl">Batal</button>
-                                <button type="submit" class="flex-1 py-4 bg-[#0f766e] text-white font-bold rounded-2xl shadow-xl shadow-teal-sm hover:bg-[#0a5e58] transition-all">Update Account</button>
+                                <button type="submit" class="flex-1 py-4 bg-[#0f766e] text-white font-bold rounded-2xl shadow-xl shadow-teal-sm hover:bg-[#0a5e58] transition-all">Simpan Perubahan</button>
                             </div>
                         </form>
                     </div>
@@ -309,13 +309,13 @@
                             @csrf @method('PUT')
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-4 mb-10">
                                 <div>
-                                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Name</label>
+                                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Nama</label>
                                     <input type="text" value="${u.name || ''}" class="w-full px-4 py-2.5 bg-slate-100 border border-slate-200 rounded-xl font-bold text-slate-500" disabled>
-                                    <p class="text-[9px] text-slate-400 mt-1">Nama diatur oleh data Skomda Student</p>
+                                    <p class="text-[9px] text-slate-400 mt-1">Nama diatur oleh data siswa SKOMDA</p>
                                 </div>
                                 <div class="md:col-start-1 md:col-span-2">
                                     <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Bio</label>
-                                    <textarea name="bio" rows="3" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700 resize-none" placeholder="Freelancer bio...">${u.bio || ''}</textarea>
+                                    <textarea name="bio" rows="3" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700 resize-none" placeholder="Bio freelancer...">${u.bio || ''}</textarea>
                                 </div>
                             </div>
                             <div class="flex gap-4">
@@ -329,7 +329,7 @@
                 box.innerHTML = `
                     <div class="p-7">
                         <div class="flex justify-between items-center mb-8">
-                            <h2 class="text-[1.5rem] font-black text-slate-900">Edit Student</h2>
+                            <h2 class="text-[1.5rem] font-black text-slate-900">Edit Siswa</h2>
                             <button onclick="window.closeUserModal()" class="w-10 h-10 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center hover:bg-red-50 hover:text-red-500 transition">
                                 <i class="ri-close-line text-xl"></i>
                             </button>
@@ -338,7 +338,7 @@
                             @csrf @method('PUT')
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-3.5 mb-8">
                                 <div>
-                                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Full Name</label>
+                                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Nama Lengkap</label>
                                     <input type="text" name="name" value="${u.name || ''}" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700">
                                 </div>
                                 <div>
@@ -347,12 +347,12 @@
                                     <p class="text-[9px] text-slate-400 mt-1">NIS tidak dapat diubah</p>
                                 </div>
                                 <div>
-                                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Class</label>
+                                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Kelas</label>
                                     <input type="text" value="${u.class || ''}" class="w-full px-4 py-2.5 bg-slate-100 border border-slate-200 rounded-xl font-bold text-slate-500" disabled>
                                     <p class="text-[9px] text-slate-400 mt-1">Kelas tidak dapat diubah</p>
                                 </div>
                                 <div>
-                                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Major</label>
+                                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Jurusan</label>
                                     <select name="major" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700 appearance-none">
                                         <option value="SIJA" ${u.major === 'SIJA' ? 'selected' : ''}>SIJA</option>
                                         <option value="TJAT" ${u.major === 'TJAT' ? 'selected' : ''}>TJAT</option>
@@ -363,13 +363,13 @@
                                     <input type="text" value="${u.email || ''}" class="w-full px-4 py-2.5 bg-slate-100 border border-slate-200 rounded-xl font-bold text-slate-500" disabled>
                                 </div>
                                 <div class="md:col-span-2">
-                                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Phone</label>
+                                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Telepon</label>
                                     <input type="text" name="phone" value="${u.phone || ''}" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700">
                                 </div>
                             </div>
                             <div class="flex gap-4">
                                 <button type="button" onclick="window.closeUserModal()" class="flex-1 py-4 bg-slate-100 text-slate-500 font-bold rounded-2xl">Batal</button>
-                                <button type="submit" class="flex-1 py-4 bg-[#0f766e] text-white font-bold rounded-2xl shadow-xl shadow-teal-sm hover:bg-[#0a5e58] transition-all">Update Student</button>
+                                <button type="submit" class="flex-1 py-4 bg-[#0f766e] text-white font-bold rounded-2xl shadow-xl shadow-teal-sm hover:bg-[#0a5e58] transition-all">Simpan Perubahan</button>
                             </div>
                         </form>
                     </div>
@@ -402,8 +402,8 @@
                     <!-- Gradient Header -->
                     <div class="h-28 bg-gradient-to-r ${gradientClass} flex items-center px-8 relative">
                         <div class="flex-1">
-                            <h2 class="text-white font-black text-xl tracking-tight">${role} Profile</h2>
-                            <p class="text-white/70 text-[10px] font-bold uppercase tracking-[0.2em]">User ID: #UID-${u.id}</p>
+                            <h2 class="text-white font-black text-xl tracking-tight">${role === 'Client' ? 'Profil Klien' : (role === 'Freelancer' ? 'Profil Freelancer' : 'Profil Siswa SKOMDA')}</h2>
+                            <p class="text-white/70 text-[10px] font-bold uppercase tracking-[0.2em]">ID Pengguna: #UID-${u.id}</p>
                         </div>
                         <button onclick="window.closeUserModal()" class="w-10 h-10 bg-white/20 text-white rounded-full flex items-center justify-center hover:bg-white/30 transition">
                             <i class="ri-close-line text-xl"></i>
@@ -436,21 +436,21 @@
 
                         <div class="grid grid-cols-2 gap-4 mb-8">
                             <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 group hover:border-[#0f766e]/30 transition-all">
-                                <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Email Address</span>
+                                <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Alamat Email</span>
                                 <span class="text-[13px] font-bold text-slate-700 block truncate">${u.email}</span>
                             </div>
                             <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 group hover:border-[#0f766e]/30 transition-all">
-                                <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Phone Number</span>
-                                <span class="text-[13px] font-bold text-slate-700 block truncate">${u.phone || 'Not provided'}</span>
+                                <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Nomor Telepon</span>
+                                <span class="text-[13px] font-bold text-slate-700 block truncate">${u.phone || 'Tidak tersedia'}</span>
                             </div>
                             
                             ${role === 'Skomda Student' ? `
                                 <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 group hover:border-[#0f766e]/30 transition-all">
-                                    <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">NIS / Student ID</span>
+                                    <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">NIS / ID Siswa</span>
                                     <span class="text-[13px] font-bold text-slate-700 block truncate">${u.nis || '-'}</span>
                                 </div>
                                 <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 group hover:border-[#0f766e]/30 transition-all">
-                                    <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Class & Major</span>
+                                    <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Kelas & Jurusan</span>
                                     <span class="text-[13px] font-bold text-slate-700 block truncate">${u.class || ''} ${u.major || ''}</span>
                                 </div>
                             ` : ''}
@@ -458,17 +458,17 @@
 
                         ${role === 'Freelancer' && u.bio ? `
                             <div class="bg-slate-50 p-5 rounded-2xl border border-slate-100 mb-8">
-                                <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2.5">Freelancer Bio</span>
+                                <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2.5">Bio Freelancer</span>
                                 <p class="text-[13px] text-slate-600 leading-relaxed font-medium">${u.bio}</p>
                             </div>
                         ` : ''}
 
                         <div class="flex gap-3">
                             <button onclick="window.openPasswordModal('${role}', ${u.id})" class="flex-1 py-3.5 bg-amber-50 text-amber-600 font-bold rounded-xl text-[12px] hover:bg-amber-500 hover:text-white transition-all flex items-center justify-center gap-2">
-                                <i class="ri-lock-password-line"></i> Change Password
+                                <i class="ri-lock-password-line"></i> Ubah Kata Sandi
                             </button>
                             <button onclick="window.openUserModal('${role}', ${u.id})" class="flex-1 py-3.5 bg-slate-900 text-white font-bold rounded-xl text-[12px] hover:bg-slate-800 transition-all flex items-center justify-center gap-2">
-                                <i class="ri-edit-line"></i> Edit Details
+                                <i class="ri-edit-line"></i> Edit Detail
                             </button>
                         </div>
                     </div>
@@ -499,7 +499,7 @@
             box.innerHTML = `
                 <div class="p-8">
                     <div class="flex justify-between items-center mb-8">
-                        <h2 class="text-[1.5rem] font-black text-slate-900">Change Password</h2>
+                        <h2 class="text-[1.5rem] font-black text-slate-900">Ubah Kata Sandi</h2>
                         <button onclick="window.closePasswordModal()" class="w-10 h-10 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center hover:bg-red-50 hover:text-red-500 transition">
                             <i class="ri-close-line text-xl"></i>
                         </button>
@@ -509,22 +509,22 @@
                         <input type="hidden" name="_method" value="PUT">
                         <div class="space-y-5 mb-6">
                             <div class="bg-slate-50 p-4 rounded-2xl">
-                                <p class="text-[12px] font-bold text-slate-500 uppercase tracking-wider mb-1">User</p>
+                                <p class="text-[12px] font-bold text-slate-500 uppercase tracking-wider mb-1">Pengguna</p>
                                 <p class="font-bold text-slate-800">${u.name || 'N/A'}</p>
                                 <p class="text-[12px] text-slate-400">${u.email || ''}</p>
                             </div>
                             <div>
-                                <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2.5">New Password</label>
-                                <input type="password" name="password" required minlength="8" class="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700" placeholder="Min. 8 characters">
+                                <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2.5">Kata Sandi Baru</label>
+                                <input type="password" name="password" required minlength="8" class="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700" placeholder="Minimal 8 karakter">
                             </div>
                             <div>
-                                <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2.5">Confirm Password</label>
-                                <input type="password" name="password_confirmation" required minlength="8" class="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700" placeholder="Re-enter new password">
+                                <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2.5">Konfirmasi Kata Sandi</label>
+                                <input type="password" name="password_confirmation" required minlength="8" class="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700" placeholder="Masukkan ulang kata sandi baru">
                             </div>
                         </div>
                         <div class="flex gap-4">
                             <button type="button" onclick="window.closePasswordModal()" class="flex-1 py-4 bg-slate-100 text-slate-500 font-bold rounded-2xl">Batal</button>
-                            <button type="submit" class="flex-1 py-4 bg-amber-500 text-white font-bold rounded-2xl shadow-xl hover:bg-amber-600 transition-all">Change Password</button>
+                            <button type="submit" class="flex-1 py-4 bg-amber-500 text-white font-bold rounded-2xl shadow-xl hover:bg-amber-600 transition-all">Ubah Kata Sandi</button>
                         </div>
                     </form>
                 </div>

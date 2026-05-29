@@ -37,8 +37,8 @@
     function setMeta(totalShown, totalAll) {
         const meta = $('pagination-meta');
         if (meta) {
-            if (totalAll === 0) meta.textContent = `Showing 0–0 of 0`;
-            else meta.textContent = `Showing 1–${totalShown} of ${totalAll}`;
+            if (totalAll === 0) meta.textContent = `Menampilkan 0–0 dari 0`;
+            else meta.textContent = `Menampilkan 1–${totalShown} dari ${totalAll}`;
         }
     }
 
@@ -79,21 +79,21 @@
                 <div class="stat-icon blue"><i class="ri-tools-line"></i></div>
                 <div class="stat-text">
                     <span class="stat-value">${total}</span>
-                    <span class="stat-label">Total Services</span>
+                    <span class="stat-label">Total Layanan</span>
                 </div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon teal"><i class="ri-checkbox-circle-line"></i></div>
                 <div class="stat-text">
                     <span class="stat-value">${approved}</span>
-                    <span class="stat-label">Approved</span>
+                    <span class="stat-label">Disetujui</span>
                 </div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon amber"><i class="ri-time-line"></i></div>
                 <div class="stat-text">
                     <span class="stat-value">${pending}</span>
-                    <span class="stat-label">Pending Approval</span>
+                    <span class="stat-label">Menunggu Persetujuan</span>
                 </div>
             </div>
             <div class="stat-card">
@@ -151,7 +151,7 @@
                     </div>
                     <div class="card-footer">
                         <div class="action-btns">
-                            <button class="btn-action" title="Detail" onclick="window.openServiceModal('${s.id}')"><i class="ri-eye-line"></i></button>
+                            <button class="btn-action" title="Rincian" onclick="window.openServiceModal('${s.id}')"><i class="ri-eye-line"></i></button>
                         </div>
                     </div>
                 </div>
@@ -171,7 +171,7 @@
         }
 
         let html = '';
-        html += `<button class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-[13px] font-bold text-slate-500 hover:bg-slate-50 disabled:opacity-50 transition-all" ${currentPage === 1 ? 'disabled' : ''} onclick="window.changeServicePage(${currentPage - 1})">Prev</button>`;
+        html += `<button class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-[13px] font-bold text-slate-500 hover:bg-slate-50 disabled:opacity-50 transition-all" ${currentPage === 1 ? 'disabled' : ''} onclick="window.changeServicePage(${currentPage - 1})">Sebelumnya</button>`;
 
         for (let i = 1; i <= totalPages; i++) {
             if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
@@ -181,7 +181,7 @@
             }
         }
 
-        html += `<button class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-[13px] font-bold text-slate-500 hover:bg-slate-50 disabled:opacity-50 transition-all" ${currentPage === totalPages ? 'disabled' : ''} onclick="window.changeServicePage(${currentPage + 1})">Next</button>`;
+        html += `<button class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-[13px] font-bold text-slate-500 hover:bg-slate-50 disabled:opacity-50 transition-all" ${currentPage === totalPages ? 'disabled' : ''} onclick="window.changeServicePage(${currentPage + 1})">Selanjutnya</button>`;
         wrap.innerHTML = html;
     }
 
@@ -239,10 +239,10 @@
                 <div class="desc-box">${desc}</div>
                 <div class="modal-actions-row" style="margin-top: 24px; display: flex; gap: 12px;">
                     ${s.status === 'Pending' ? `
-                        <button onclick="window.approveService('${s.id}')" class="btn-approve" style="flex: 1; padding: 12px; background: #0f766e; color: white; border: none; border-radius: 11px; font-weight: 700; font-size: 13px; cursor: pointer;"><i class="ri-check-line"></i> Approve</button>
+                        <button onclick="window.approveService('${s.id}')" class="btn-approve" style="flex: 1; padding: 12px; background: #0f766e; color: white; border: none; border-radius: 11px; font-weight: 700; font-size: 13px; cursor: pointer;"><i class="ri-check-line"></i> Setujui</button>
                         <button onclick="window.openRejectModal('${s.id}')" class="btn-reject" style="flex: 1; padding: 12px; background: #fee2e2; color: #dc2626; border: none; border-radius: 11px; font-weight: 700; font-size: 13px; cursor: pointer;"><i class="ri-close-line"></i> Reject</button>
                     ` : `
-                        <button onclick="window.closeServiceModal(); window.openDeleteService('${s.id}')" class="btn-delete" style="flex: 1; padding: 12px; background: #fee2e2; color: #dc2626; border: none; border-radius: 11px; font-weight: 700; font-size: 13px; cursor: pointer;"><i class="ri-delete-bin-line"></i> Delete</button>
+                        <button onclick="window.closeServiceModal(); window.openDeleteService('${s.id}')" class="btn-delete" style="flex: 1; padding: 12px; background: #fee2e2; color: #dc2626; border: none; border-radius: 11px; font-weight: 700; font-size: 13px; cursor: pointer;"><i class="ri-delete-bin-line"></i> Hapus</button>
                     `}
                 </div>
             </div>

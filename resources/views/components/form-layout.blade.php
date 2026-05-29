@@ -1,8 +1,8 @@
-{{-- Standardized Form Layout --}}
+{{-- Tata Letak Formulir Standar --}}
 @props([
-    'title' => 'Form',
+    'title' => 'Formulir',
     'backUrl' => null,
-    'backLabel' => 'Back',
+    'backLabel' => 'Kembali',
 ])
 
 <div>

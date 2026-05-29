@@ -142,7 +142,7 @@
                             <div class="flex justify-end">
                                 <button type="submit"
                                     class="inline-flex items-center gap-2 px-[22px] py-[11px] bg-[#0f766e] text-white font-display font-bold text-[13px] rounded-[12px] shadow-teal-md hover:bg-[#0a5e58] hover:shadow-teal-lg transition-all duration-200 hover:-translate-y-0.5 cursor-pointer border-none">
-                                    <i class="ri-lock-password-line"></i> Update Password
+                                    <i class="ri-lock-password-line"></i> Ubah Kata Sandi
                                 </button>
                             </div>
                         </form>
@@ -152,7 +152,7 @@
                 {{-- Danger Zone --}}
                 <div class="bg-white rounded-[18px] border border-red-100 animate-fadeUp-3">
                     <div class="px-7 py-5 border-b border-red-100">
-                        <h2 class="font-display font-bold text-[1.05rem] text-red-600">Danger Zone</h2>
+                        <h2 class="font-display font-bold text-[1.05rem] text-red-600">Zona Berbahaya</h2>
                         <p class="text-[12px] text-slate-400 mt-0.5">Aksi berbahaya yang tidak bisa dibatalkan.</p>
                     </div>
                     <div class="px-7 py-6 flex items-center justify-between flex-wrap gap-4">

@@ -1,5 +1,5 @@
 @extends('layouts.dashboard')
-@section('title', 'Transaction Management | Digitalance')
+@section('title', 'Manajemen Transaksi | Digitalance')
 @section('styles')
     <style>
         /* Pastikan CSS ini ada jika belum di global css */
@@ -72,12 +72,13 @@
             @endphp
             <a href="{{ $filterLink('all') }}"
                 class="filter-tab px-[18px] py-2 rounded-full border-[1.5px] {{ $currentStatus === 'all' ? 'border-[#0f766e] bg-[#0f766e] text-white shadow-teal-sm' : 'border-slate-200 bg-white text-slate-500' }} font-bold text-[12.5px] cursor-pointer transition-all duration-150">Semua</a>
-<a href="{{ $filterLink('paid') }}"
-                 class="filter-tab px-[18px] py-2 rounded-full border-[1.5px] {{ $currentStatus === 'paid' ? 'border-[#0f766e] bg-[#0f766e] text-white shadow-teal-sm' : 'border-slate-200 bg-white text-slate-500' }} font-bold text-[12.5px] cursor-pointer transition-all duration-150">Sudah Dibayar</a>
+            <a href="{{ $filterLink('paid') }}"
+                class="filter-tab px-[18px] py-2 rounded-full border-[1.5px] {{ $currentStatus === 'paid' ? 'border-[#0f766e] bg-[#0f766e] text-white shadow-teal-sm' : 'border-slate-200 bg-white text-slate-500' }} font-bold text-[12.5px] cursor-pointer transition-all duration-150">Sudah
+                Dibayar</a>
             <a href="{{ $filterLink('pending') }}"
-                 class="filter-tab px-[18px] py-2 rounded-full border-[1.5px] {{ $currentStatus === 'pending' ? 'border-[#0f766e] bg-[#0f766e] text-white shadow-teal-sm' : 'border-slate-200 bg-white text-slate-500' }} font-bold text-[12.5px] cursor-pointer transition-all duration-150">Menunggu</a>
+                class="filter-tab px-[18px] py-2 rounded-full border-[1.5px] {{ $currentStatus === 'pending' ? 'border-[#0f766e] bg-[#0f766e] text-white shadow-teal-sm' : 'border-slate-200 bg-white text-slate-500' }} font-bold text-[12.5px] cursor-pointer transition-all duration-150">Menunggu</a>
             <a href="{{ $filterLink('failed') }}"
-                 class="filter-tab px-[18px] py-2 rounded-full border-[1.5px] {{ $currentStatus === 'failed' ? 'border-[#0f766e] bg-[#0f766e] text-white shadow-teal-sm' : 'border-slate-200 bg-white text-slate-500' }} font-bold text-[12.5px] cursor-pointer transition-all duration-150">Gagal</a>
+                class="filter-tab px-[18px] py-2 rounded-full border-[1.5px] {{ $currentStatus === 'failed' ? 'border-[#0f766e] bg-[#0f766e] text-white shadow-teal-sm' : 'border-slate-200 bg-white text-slate-500' }} font-bold text-[12.5px] cursor-pointer transition-all duration-150">Gagal</a>
         </div>
 
         <form action="{{ route('admin.transactions.index') }}" method="GET" class="relative">

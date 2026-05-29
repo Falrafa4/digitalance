@@ -92,8 +92,8 @@
       grid.innerHTML = `
         <div class="col-span-full py-10 px-5 text-center bg-white border-2 border-dashed border-slate-200 rounded-[18px]">
           <div class="text-slate-300 text-[42px] mb-2"><i class="ri-inbox-2-line"></i></div>
-          <p class="text-slate-900 font-extrabold text-[1.05rem]">No projects found</p>
-          <p class="text-slate-500 mt-1.5 text-[13px]">It seems you don't have any active projects right now.</p>
+          <p class="text-slate-900 font-extrabold text-[1.05rem]">Belum ada proyek</p>
+          <p class="text-slate-500 mt-1.5 text-[13px]">Sepertinya kamu belum punya proyek aktif saat ini.</p>
         </div>`;
       return;
     }
@@ -103,7 +103,7 @@
       const deadline = formatDeadline(p.deadline);
       const amount = p.agreed_price ? money(p.agreed_price) : '—';
       const href = p.href || `/client/orders/${p.id}`;
-      const serviceTitle = p.service?.title || p.service_title || 'Service';
+      const serviceTitle = p.service?.title || p.service_title || 'Layanan';
 
       return `
         <div class="bg-white border border-slate-200 rounded-[18px] p-5 flex flex-col sm:flex-row sm:items-center gap-4 hover:shadow-lg transition-all">
@@ -117,8 +117,8 @@
             </div>
           </div>
           <div class="flex gap-2 sm:flex-col sm:items-end">
-            <a href="${href}" class="px-4 py-2.5 rounded-[12px] bg-slate-900 text-white font-bold text-[12.5px] hover:bg-black transition-all">Detail</a>
-            ${p.service_id ? `<a href="/client/services/${p.service_id}" class="px-4 py-2.5 rounded-[12px] bg-white border-[1.5px] border-slate-200 text-slate-700 font-bold text-[12.5px] hover:border-[#0f766e] hover:text-[#0f766e] transition-all">Lihat Jasa</a>` : ''}
+            <a href="${href}" class="px-4 py-2.5 rounded-[12px] bg-slate-900 text-white font-bold text-[12.5px] hover:bg-black transition-all">Rincian</a>
+            ${p.service_id ? `<a href="/client/services/${p.service_id}" class="px-4 py-2.5 rounded-[12px] bg-white border-[1.5px] border-slate-200 text-slate-700 font-bold text-[12.5px] hover:border-[#0f766e] hover:text-[#0f766e] transition-all">Lihat Layanan</a>` : ''}
           </div>
         </div>`;
     }).join('');

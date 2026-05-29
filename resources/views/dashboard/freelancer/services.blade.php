@@ -20,13 +20,13 @@
                     data-filter="Draft">Draft</button>
                 <button
                     class="filter-tab px-[18px] py-2 rounded-full border-[1.5px] border-slate-200 bg-white text-slate-500 font-bold text-[12.5px] cursor-pointer transition-all duration-150 hover:border-[#0f766e] hover:text-[#0f766e]"
-                    data-filter="Pending">Pending</button>
+                    data-filter="Pending">Tertunda</button>
                 <button
                     class="filter-tab px-[18px] py-2 rounded-full border-[1.5px] border-slate-200 bg-white text-slate-500 font-bold text-[12.5px] cursor-pointer transition-all duration-150 hover:border-[#0f766e] hover:text-[#0f766e]"
-                    data-filter="Approved">Approved</button>
+                    data-filter="Approved">Disetujui</button>
                 <button
                     class="filter-tab px-[18px] py-2 rounded-full border-[1.5px] border-slate-200 bg-white text-slate-500 font-bold text-[12.5px] cursor-pointer transition-all duration-150 hover:border-[#0f766e] hover:text-[#0f766e]"
-                    data-filter="Rejected">Rejected</button>
+                    data-filter="Rejected">Ditolak</button>
             </div>
 
             <div class="relative">

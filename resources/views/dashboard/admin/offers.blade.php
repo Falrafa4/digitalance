@@ -1,5 +1,5 @@
 @extends('layouts.dashboard')
-@section('title', 'Offers & Negotiations | Digitalance')
+@section('title', 'Penawaran & Negosiasi | Digitalance')
 
 @section('styles')
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
@@ -32,7 +32,7 @@
         <button
             class="section-tab active w-full md:w-auto px-6 py-3 text-sm font-semibold text-gray-500 border-b-2 border-transparent transition-all"
             data-target="offers-section">
-            <i class="ri-price-tag-3-line mr-2"></i>Data Tawaran (Offers)
+            <i class="ri-price-tag-3-line mr-2"></i>Data Tawaran
         </button>
         <button
             class="section-tab w-full md:w-auto px-6 py-3 text-sm font-semibold text-gray-500 border-b-2 border-transparent transition-all"
@@ -157,7 +157,7 @@
         // PERBAIKAN TASK 4: Data dilempar langsung sebagai array JSON murni (mendukung pencarian real-time & multi-tab JS)
         var offersData = @json($offers);
         var negotiationsData = @json($negotiations);
-        
+
         window.__OFFERS_PAGE__ = {
             offers: offersData,
             negotiations: negotiationsData

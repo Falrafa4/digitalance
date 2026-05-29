@@ -78,7 +78,7 @@
                     <td class="px-6 py-4">
                         ${item.file_url ? 
                             `<a href="/storage/${item.file_url}" target="_blank" class="inline-flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-600 rounded-md text-xs font-bold hover:bg-blue-100">
-                                <i class="ri-file-link-line"></i> View
+                                <i class="ri-file-link-line"></i> Lihat
                             </a>` : '<span class="text-slate-300 text-xs">—</span>'
                         }
                     </td>
@@ -100,9 +100,9 @@
         const meta = $('results-meta');
         if (meta) {
             if (data.length === 0) {
-                meta.textContent = 'Showing 0-0 of 0';
+                meta.textContent = 'Menampilkan 0-0 dari 0';
             } else {
-                meta.textContent = `Showing ${startIndex + 1}-${Math.min(startIndex + itemsPerPage, data.length)} of ${data.length}`;
+                meta.textContent = `Menampilkan ${startIndex + 1}-${Math.min(startIndex + itemsPerPage, data.length)} dari ${data.length}`;
             }
         }
 
@@ -135,7 +135,7 @@
         if (!box) return;
 
         const date = r.created_at ? new Date(r.created_at).toLocaleString('id-ID') : '-';
-        const orderStatus = (r.order?.status || 'Unknown').replace(/\b\w/g, l => l.toUpperCase());
+        const orderStatus = (r.order?.status || 'Tidak diketahui').replace(/\b\w/g, l => l.toUpperCase());
 
         box.innerHTML = `
             <div class="modal-hero relative h-20 bg-gradient-to-r from-[#0f766e] to-[#10B981]">
@@ -155,7 +155,7 @@
                         <span class="font-bold text-slate-900">#${r.order_id}</span>
                     </div>
                     <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
-                        <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Status Order</span>
+                        <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Status Pesanan</span>
                         <span class="px-2 py-0.5 rounded-lg bg-emerald-100 text-emerald-700 text-[10px] font-bold uppercase">${orderStatus}</span>
                     </div>
                 </div>
@@ -177,11 +177,11 @@
                                 <i class="ri-file-zip-line text-xl"></i>
                             </div>
                             <div>
-                                <div class="text-[13px] font-bold text-slate-900">Project Files</div>
+                                <div class="text-[13px] font-bold text-slate-900">File Proyek</div>
                                 <div class="text-[11px] text-slate-500">${date}</div>
                             </div>
                         </div>
-                        <a href="/storage/${r.file_url}" target="_blank" class="px-4 py-2 bg-[#0f766e] text-white rounded-lg text-[12px] font-bold hover:bg-[#0a5e58] transition-all">Download</a>
+                        <a href="/storage/${r.file_url}" target="_blank" class="px-4 py-2 bg-[#0f766e] text-white rounded-lg text-[12px] font-bold hover:bg-[#0a5e58] transition-all">Unduh</a>
                     </div>
                 </div>
 
@@ -205,7 +205,7 @@
         }
 
         let html = '';
-        html += `<button class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-[13px] font-bold text-slate-500 hover:bg-slate-50 disabled:opacity-50 transition-all" ${currentPage === 1 ? 'disabled' : ''} onclick="window.changeResultPage(${currentPage - 1})">Prev</button>`;
+        html += `<button class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-[13px] font-bold text-slate-500 hover:bg-slate-50 disabled:opacity-50 transition-all" ${currentPage === 1 ? 'disabled' : ''} onclick="window.changeResultPage(${currentPage - 1})">Sebelumnya</button>`;
         
         for (let i = 1; i <= totalPages; i++) {
             if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
@@ -215,7 +215,7 @@
             }
         }
         
-        html += `<button class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-[13px] font-bold text-slate-500 hover:bg-slate-50 disabled:opacity-50 transition-all" ${currentPage === totalPages ? 'disabled' : ''} onclick="window.changeResultPage(${currentPage + 1})">Next</button>`;
+        html += `<button class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-[13px] font-bold text-slate-500 hover:bg-slate-50 disabled:opacity-50 transition-all" ${currentPage === totalPages ? 'disabled' : ''} onclick="window.changeResultPage(${currentPage + 1})">Berikutnya</button>`;
         wrap.innerHTML = html;
     }
 

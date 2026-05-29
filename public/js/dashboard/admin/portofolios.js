@@ -118,7 +118,7 @@ function renderPagination(totalPages) {
     }
 
     let html = '';
-    html += `<button class="px-3 py-1 rounded border border-slate-200 bg-white text-sm hover:bg-slate-50 disabled:opacity-50" ${currentPage === 1 ? 'disabled' : ''} onclick="window.changePortPage(${currentPage - 1})">Prev</button>`;
+    html += `<button class="px-3 py-1 rounded border border-slate-200 bg-white text-sm hover:bg-slate-50 disabled:opacity-50" ${currentPage === 1 ? 'disabled' : ''} onclick="window.changePortPage(${currentPage - 1})">Sebelumnya</button>`;
     
     for (let i = 1; i <= totalPages; i++) {
         if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
@@ -128,7 +128,7 @@ function renderPagination(totalPages) {
         }
     }
 
-    html += `<button class="px-3 py-1 rounded border border-slate-200 bg-white text-sm hover:bg-slate-50 disabled:opacity-50" ${currentPage === totalPages ? 'disabled' : ''} onclick="window.changePortPage(${currentPage + 1})">Next</button>`;
+    html += `<button class="px-3 py-1 rounded border border-slate-200 bg-white text-sm hover:bg-slate-50 disabled:opacity-50" ${currentPage === totalPages ? 'disabled' : ''} onclick="window.changePortPage(${currentPage + 1})">Berikutnya</button>`;
     wrap.innerHTML = html;
 }
 
@@ -162,7 +162,7 @@ function openPortModal(id) {
             <div class="flex items-center gap-3 mb-4">
                 <span class="font-bold text-slate-800">#${p.id}</span>
                 <span class="bg-slate-100 px-3 py-1 rounded-lg text-xs font-bold text-slate-600">
-                    Service #${p.service_id}
+                    Layanan #${p.service_id}
                 </span>
             </div>
             
@@ -183,7 +183,7 @@ function openPortModal(id) {
             <div class="text-sm text-slate-600 leading-relaxed mb-6 bg-slate-50 p-4 rounded-xl border border-slate-100">${desc}</div>
 
             <div class="flex gap-2 border-t border-slate-100 pt-4">
-                <button class="flex-1 bg-slate-100 text-slate-700 py-2.5 rounded-xl font-bold text-sm hover:bg-slate-200 transition flex items-center justify-center gap-2" onclick="openEditPortModal('${p.id}')"><i class="ri-edit-line"></i> Edit</button>
+                <button class="flex-1 bg-slate-100 text-slate-700 py-2.5 rounded-xl font-bold text-sm hover:bg-slate-200 transition flex items-center justify-center gap-2" onclick="openEditPortModal('${p.id}')"><i class="ri-edit-line"></i> Sunting</button>
                 <button class="flex-1 bg-red-50 text-red-600 py-2.5 rounded-xl font-bold text-sm hover:bg-red-100 transition flex items-center justify-center gap-2" onclick="deletePort('${p.id}')"><i class="ri-delete-bin-line"></i> Hapus</button>
             </div>
         </div>
@@ -203,8 +203,8 @@ function openEditPortModal(id) {
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
 
     box.innerHTML = `
-        <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
-            <span class="font-bold text-slate-900">Edit Portofolio #${p.id}</span>
+            <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
+            <span class="font-bold text-slate-900">Sunting Portofolio #${p.id}</span>
             <button onclick="openPortModal('${id}')" class="w-8 h-8 flex items-center justify-center bg-slate-100 text-slate-500 rounded-lg hover:bg-slate-200 transition"><i class="ri-arrow-left-line"></i></button>
         </div>
         <form action="/admin/portofolios/${p.id}" method="POST" class="p-6">

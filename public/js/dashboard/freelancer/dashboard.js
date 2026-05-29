@@ -111,7 +111,7 @@
 
   function normalizeOrder(o) {
     const id = o?.id ?? o?.order_id ?? null;
-    const title = o?.title ?? o?.service_title ?? o?.service?.title ?? o?.service?.name ?? o?.service_name ?? 'Order';
+    const title = o?.title ?? o?.service_title ?? o?.service?.title ?? o?.service?.name ?? o?.service_name ?? 'Pesanan';
     const client = o?.client_name ?? o?.client?.name ?? o?.buyer?.name ?? o?.customer_name ?? '—';
     const status = o?.status ?? o?.state ?? 'Pending';
     const amount = o?.amount ?? o?.agreed_price ?? o?.price ?? o?.total ?? null;
@@ -154,7 +154,7 @@
     if (!el) return;
 
     if (!list.length) {
-      el.innerHTML = cardEmpty('ri-inbox-archive-line', 'No orders yet', 'When you get new orders, they will appear here.');
+      el.innerHTML = cardEmpty('ri-inbox-archive-line', 'Belum ada pesanan', 'Saat ada pesanan baru, semuanya akan tampil di sini.');
       return;
     }
 
@@ -163,8 +163,8 @@
       const deadline = o.deadline ? safeText(o.deadline) : '—';
       const amount = o.amount === null ? '—' : money(o.amount);
       const cta = o.href
-        ? `<a href="${o.href}" class="px-4 py-2.5 rounded-[12px] bg-slate-900 text-white font-bold text-[12.5px] hover:bg-black transition-all">Detail</a>`
-        : `<button type="button" class="px-4 py-2.5 rounded-[12px] bg-slate-900 text-white font-bold text-[12.5px] opacity-60 cursor-not-allowed">Detail</button>`;
+        ? `<a href="${o.href}" class="px-4 py-2.5 rounded-[12px] bg-slate-900 text-white font-bold text-[12.5px] hover:bg-black transition-all">Rincian</a>`
+        : `<button type="button" class="px-4 py-2.5 rounded-[12px] bg-slate-900 text-white font-bold text-[12.5px] opacity-60 cursor-not-allowed">Rincian</button>`;
 
       return `
         <div class="p-5 flex flex-col sm:flex-row sm:items-center gap-4">
@@ -192,7 +192,7 @@
     if (!el) return;
 
     if (!list.length) {
-      el.innerHTML = cardEmpty('ri-briefcase-3-line', 'No opportunities', 'Try again later — new jobs will show up here.');
+      el.innerHTML = cardEmpty('ri-briefcase-3-line', 'Belum ada peluang', 'Coba lagi nanti — lowongan baru akan tampil di sini.');
       return;
     }
 

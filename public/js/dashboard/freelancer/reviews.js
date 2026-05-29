@@ -16,7 +16,7 @@
     const created = r?.created_at ?? r?.date ?? null;
 
     const orderId = r?.order_id ?? r?.order?.id ?? null;
-    const serviceTitle = r?.order?.service?.title ?? r?.order?.service?.name ?? r?.service_title ?? 'Service';
+    const serviceTitle = r?.order?.service?.title ?? r?.order?.service?.name ?? r?.service_title ?? 'Layanan';
 
     return { id, rating, comment, created, orderId, serviceTitle, _raw: r };
   }
@@ -67,7 +67,7 @@
     return `
       <div class="col-span-full py-16 px-5 text-center bg-white border-2 border-dashed border-slate-200 rounded-3xl">
         <i class="ri-star-smile-line text-[3rem] text-slate-300 block mb-3"></i>
-        <h3 class="font-display text-[1.1rem] font-bold text-slate-700 mb-1.5">No reviews found</h3>
+        <h3 class="font-display text-[1.1rem] font-bold text-slate-700 mb-1.5">Tidak ada ulasan ditemukan</h3>
         <p class="text-[13px] text-slate-400">Coba ubah filter atau kata kunci pencarian.</p>
       </div>
     `;
@@ -109,8 +109,8 @@
               <i class="ri-time-line mr-1"></i>${safeText(r.created || '—')}
             </div>
             ${href
-              ? `<a href="${href}" class="px-4 py-2 rounded-[11px] bg-slate-900 text-white font-bold text-[12.5px] hover:bg-black transition-all">Detail</a>`
-              : `<button type="button" class="px-4 py-2 rounded-[11px] bg-slate-900 text-white font-bold text-[12.5px] opacity-60 cursor-not-allowed">Detail</button>`
+              ? `<a href="${href}" class="px-4 py-2 rounded-[11px] bg-slate-900 text-white font-bold text-[12.5px] hover:bg-black transition-all">Rincian</a>`
+              : `<button type="button" class="px-4 py-2 rounded-[11px] bg-slate-900 text-white font-bold text-[12.5px] opacity-60 cursor-not-allowed">Rincian</button>`
             }
           </div>
         </div>

@@ -30,7 +30,7 @@ function openAdminModal(id) {
             <!-- Gradient Header -->
             <div class="h-28 bg-gradient-to-r from-slate-800 to-slate-900 flex items-center px-8 relative">
                 <div class="flex-1">
-                    <h2 class="text-white font-black text-xl tracking-tight">Admin Profile</h2>
+                    <h2 class="text-white font-black text-xl tracking-tight">Profil Administrator</h2>
                     <p class="text-white/70 text-[10px] font-bold uppercase tracking-[0.2em]">Admin ID: #ADM-${id}</p>
                 </div>
                 <button onclick="closeModal('admin-modal-overlay')" class="w-10 h-10 bg-white/20 text-white rounded-full flex items-center justify-center hover:bg-white/30 transition">
@@ -67,10 +67,10 @@ function openAdminModal(id) {
 
                 <div class="flex gap-3 pt-2">
                     <button onclick="openPasswordModal(${id})" class="flex-1 py-3.5 bg-amber-50 text-amber-600 font-bold rounded-xl text-[12px] hover:bg-amber-500 hover:text-white transition-all flex items-center justify-center gap-2">
-                        <i class="ri-lock-password-line"></i> Password
+                        <i class="ri-lock-password-line"></i> Kata Sandi
                     </button>
                     <button onclick="openEditAdmin(${id})" class="flex-1 py-3.5 bg-slate-100 text-slate-700 font-bold rounded-xl text-[12px] hover:bg-slate-200 transition-all flex items-center justify-center gap-2">
-                        <i class="ri-edit-line"></i> Edit
+                        <i class="ri-edit-line"></i> Sunting
                     </button>
                     <button onclick="openDeleteAdmin(${id})" class="flex-1 py-3.5 bg-red-50 text-red-600 font-bold rounded-xl text-[12px] hover:bg-red-500 hover:text-white transition-all flex items-center justify-center gap-2">
                         <i class="ri-delete-bin-line"></i> Hapus
@@ -98,7 +98,7 @@ function openEditAdmin(id) {
     editBox.innerHTML = `
         <div class="modal-box bg-white rounded-3xl w-full max-w-[520px] max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
             <div class="flex items-center justify-between px-[26px] py-[22px] border-b border-slate-100 flex-shrink-0">
-                <span class="font-display text-[1.1rem] font-extrabold text-slate-900">Edit Admin</span>
+                <span class="font-display text-[1.1rem] font-extrabold text-slate-900">Sunting Admin</span>
                 <button onclick="closeModal('modal-edit-admin')" class="w-[34px] h-[34px] bg-slate-100 rounded-[9px] flex items-center justify-center text-[18px] text-slate-500 cursor-pointer border-none hover:bg-red-50 hover:text-red-500 transition-all">
                     <i class="ri-close-line"></i>
                 </button>
@@ -169,27 +169,27 @@ function openPasswordModal(id) {
             <input type="hidden" name="_token" value="${csrfToken}">
             <input type="hidden" name="_method" value="PUT">
             <div class="px-[26px] py-[22px] overflow-y-auto flex-1">
-                <div class="bg-slate-50 p-4 rounded-2xl mb-5">
-                    <p class="text-[12px] font-bold text-slate-500 uppercase tracking-wider mb-1">User</p>
+                    <div class="bg-slate-50 p-4 rounded-2xl mb-5">
+                    <p class="text-[12px] font-bold text-slate-500 uppercase tracking-wider mb-1">Pengguna</p>
                     <p class="font-bold text-slate-800">${name}</p>
                     <p class="text-[12px] text-slate-400">${email}</p>
                 </div>
-                <div class="space-y-4">
-                    <div class="flex flex-col gap-1.5">
-                        <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">New Password</label>
-                        <input type="password" name="password" required minlength="8" placeholder="Min. 8 characters"
-                            class="py-2.5 px-3.5 bg-slate-50 border-[1.5px] border-slate-200 rounded-xl text-[13.5px] outline-none focus:border-[#0f766e] focus:bg-white transition-all" />
-                    </div>
-                    <div class="flex flex-col gap-1.5">
-                        <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Confirm Password</label>
-                        <input type="password" name="password_confirmation" required minlength="8" placeholder="Re-enter new password"
-                            class="py-2.5 px-3.5 bg-slate-50 border-[1.5px] border-slate-200 rounded-xl text-[13.5px] outline-none focus:border-[#0f766e] focus:bg-white transition-all" />
-                    </div>
+                    <div class="space-y-4">
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Kata Sandi Baru</label>
+                            <input type="password" name="password" required minlength="8" placeholder="Min. 8 karakter"
+                                class="py-2.5 px-3.5 bg-slate-50 border-[1.5px] border-slate-200 rounded-xl text-[13.5px] outline-none focus:border-[#0f766e] focus:bg-white transition-all" />
+                        </div>
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Konfirmasi Kata Sandi</label>
+                            <input type="password" name="password_confirmation" required minlength="8" placeholder="Masukkan ulang kata sandi baru"
+                                class="py-2.5 px-3.5 bg-slate-50 border-[1.5px] border-slate-200 rounded-xl text-[13.5px] outline-none focus:border-[#0f766e] focus:bg-white transition-all" />
+                        </div>
                 </div>
             </div>
             <div class="flex gap-2.5 px-[26px] py-[16px] border-t border-slate-100 bg-slate-50">
                 <button type="button" onclick="closeModal('modal-password-admin')" class="flex-1 py-3 rounded-xl bg-slate-200 text-slate-600 font-bold text-[13px] hover:bg-slate-300 transition-all">Batal</button>
-                <button type="submit" class="flex-1 py-3 rounded-xl bg-amber-500 text-white font-bold text-[13px] hover:bg-amber-600 transition-all">Change Password</button>
+                <button type="submit" class="flex-1 py-3 rounded-xl bg-amber-500 text-white font-bold text-[13px] hover:bg-amber-600 transition-all">Ubah Kata Sandi</button>
             </div>
         </form>
     `;

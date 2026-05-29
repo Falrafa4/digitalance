@@ -116,21 +116,21 @@ function renderStats() {
             <div class="w-12 h-12 rounded-lg bg-teal-50 flex items-center justify-center text-teal-600 text-2xl"><i class="ri-price-tag-3-line"></i></div>
             <div>
                 <div class="text-2xl font-bold text-gray-800">${totalOffers}</div>
-                <div class="text-[10px] text-gray-400 uppercase font-bold">Total Offers</div>
+                <div class="text-[10px] text-gray-400 uppercase font-bold">Total Tawaran</div>
             </div>
         </div>
         <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex items-center gap-4">
             <div class="w-12 h-12 rounded-lg bg-amber-50 flex items-center justify-center text-amber-600 text-2xl"><i class="ri-time-line"></i></div>
             <div>
                 <div class="text-2xl font-bold text-gray-800">${pendingOffers}</div>
-                <div class="text-[10px] text-gray-400 uppercase font-bold">Pending</div>
+                <div class="text-[10px] text-gray-400 uppercase font-bold">Tertunda</div>
             </div>
         </div>
         <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex items-center gap-4">
             <div class="w-12 h-12 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600 text-2xl"><i class="ri-discuss-line"></i></div>
             <div>
                 <div class="text-2xl font-bold text-gray-800">${totalNego}</div>
-                <div class="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Negotiations</div>
+                <div class="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Negosiasi</div>
             </div>
         </div>
     `;
@@ -161,10 +161,10 @@ function renderOffers() {
             <tr class="hover:bg-gray-50 transition border-b border-gray-50">
                 <td class="px-6 py-4 text-sm font-bold text-gray-700">#OFF-${offer.id}</td>
                 <td class="px-6 py-4">
-                    <div class="text-sm font-semibold text-gray-800">${offer.order?.client?.name || 'User'}</div>
-                    <div class="text-[10px] text-gray-400 uppercase font-medium">To: ${offer.order?.service?.freelancer?.skomda_student?.name || 'Freelancer'}</div>
+                    <div class="text-sm font-semibold text-gray-800">${offer.order?.client?.name || 'Pengguna'}</div>
+                    <div class="text-[10px] text-gray-400 uppercase font-medium">Kepada: ${offer.order?.service?.freelancer?.skomda_student?.name || 'Freelancer'}</div>
                 </td>
-                <td class="px-6 py-4 text-sm text-gray-600">${offer.order?.service?.title || 'N/A'}</td>
+                <td class="px-6 py-4 text-sm text-gray-600">${offer.order?.service?.title || 'Tidak tersedia'}</td>
                 <td class="px-6 py-4 text-sm font-bold text-teal-600">Rp ${Number(offer.offered_price || 0).toLocaleString('id-ID')}</td>
                 <td class="px-6 py-4">
                     <span class="px-3 py-1 text-[10px] font-bold uppercase rounded-full ${getStatusColor(offer.status)}">${offer.status}</span>
@@ -352,8 +352,8 @@ function openOfferModal(id) {
             </div>
             <div class="space-y-4">
                 <div>
-                    <span class="text-xs text-gray-400 uppercase font-bold">Client ⮕ Freelancer</span>
-                    <p class="font-semibold text-gray-800">${o.order?.client?.name || 'N/A'} ⮕ ${o.order?.service?.freelancer?.skomda_student?.name || 'N/A'}</p>
+                    <span class="text-xs text-gray-400 uppercase font-bold">Klien ⮕ Freelancer</span>
+                    <p class="font-semibold text-gray-800">${o.order?.client?.name || 'Tidak tersedia'} ⮕ ${o.order?.service?.freelancer?.skomda_student?.name || 'Tidak tersedia'}</p>
                 </div>
                 <div>
                     <span class="text-xs text-gray-400 uppercase font-bold">Pesan Tambahan</span>

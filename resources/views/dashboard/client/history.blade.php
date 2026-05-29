@@ -39,19 +39,19 @@
                 @if($o->status === 'Completed' && empty($o->review))
                   <a href="{{ route('client.reviews.create', $o->id) }}"
                     class="flex-1 px-4 py-2.5 rounded-[12px] bg-amber-50 border border-amber-100 text-amber-700 font-extrabold text-[12.5px] hover:bg-amber-100 transition-all text-center">
-                    Review
+                    Ulas
                   </a>
                 @endif
 
                 @if(!empty($o->review))
                   <span
                     class="flex-1 px-4 py-2.5 rounded-[12px] bg-emerald-50 border border-emerald-100 text-emerald-700 font-extrabold text-[12.5px] text-center">
-                    Reviewed
+                    Sudah Diulas
                   </span>
                 @else
                   <span
                     class="flex-1 px-4 py-2.5 rounded-[12px] bg-slate-50 border border-slate-200 text-slate-600 font-extrabold text-[12.5px] text-center">
-                    No Review
+                    Belum Ada Ulasan
                   </span>
                 @endif
               </div>
@@ -63,10 +63,10 @@
           <p class="text-slate-500 text-[12.5px] font-bold" data-pager-info></p>
           <div class="flex items-center gap-2">
             <button type="button" data-pager-prev
-              class="px-4 py-2.5 rounded-[12px] bg-white border border-slate-200 text-slate-700 font-bold text-[12.5px] hover:border-[#0f766e] hover:text-[#0f766e] disabled:opacity-40 transition-all">Prev</button>
+              class="px-4 py-2.5 rounded-[12px] bg-white border border-slate-200 text-slate-700 font-bold text-[12.5px] hover:border-[#0f766e] hover:text-[#0f766e] disabled:opacity-40 transition-all">Sebelumnya</button>
             <div class="flex items-center gap-2" data-pager-numbers></div>
             <button type="button" data-pager-next
-              class="px-4 py-2.5 rounded-[12px] bg-white border border-slate-200 text-slate-700 font-bold text-[12.5px] hover:border-[#0f766e] hover:text-[#0f766e] disabled:opacity-40 transition-all">Next</button>
+              class="px-4 py-2.5 rounded-[12px] bg-white border border-slate-200 text-slate-700 font-bold text-[12.5px] hover:border-[#0f766e] hover:text-[#0f766e] disabled:opacity-40 transition-all">Berikutnya</button>
           </div>
         </div>
       </div>

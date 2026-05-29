@@ -7,13 +7,9 @@
       actionUrl="{{ route('client.orders.index') }}" actionLabel="My Orders" actionIcon="ri-shopping-cart-line" />
 
     @if(empty($services) || count($services) === 0)
-      <x-ui.empty-state
-        icon="ri-tools-line"
-        title="Tidak Ada Layanan Tersedia"
-        description="Saat ini belum ada layanan yang tersedia untuk dijelajahi."
-        actionUrl="{{ route('client.dashboard') }}"
-        actionLabel="Kembali ke Dasbor"
-      />
+      <x-ui.empty-state icon="ri-tools-line" title="Tidak Ada Layanan Tersedia"
+        description="Saat ini belum ada layanan yang tersedia untuk dijelajahi." actionUrl="{{ route('client.dashboard') }}"
+        actionLabel="Kembali ke Dasbor" />
     @else
       <div data-client-pager data-page-size="9" class="space-y-4">
         <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5" data-pager-list>
@@ -22,7 +18,7 @@
               <div class="flex items-start justify-between gap-3">
                 <div class="min-w-0">
                   <p class="font-extrabold text-slate-900 text-[1.02rem] truncate">
-                    {{ $s->title ?? 'Service' }}
+                    {{ $s->title ?? 'Layanan' }}
                   </p>
                   <p class="text-slate-500 text-[13px] mt-1">
                     Kategori: <span class="font-bold">{{ $s->category->name ?? '-' }}</span>
@@ -44,7 +40,7 @@
                   Detail
                 </a>
                 <a href="{{ route('client.orders.create', $s->id) }}" class="flex-1 px-4 py-2.5 rounded-[12px] bg-white border border-slate-200 text-slate-700 font-bold text-[12.5px]
-                              hover:border-[#0f766e] hover:text-[#0f766e] transition-all text-center">
+                                    hover:border-[#0f766e] hover:text-[#0f766e] transition-all text-center">
                   Order
                 </a>
               </div>
@@ -67,13 +63,13 @@
           <div class="flex items-center gap-2">
             <button type="button" data-pager-prev
               class="px-4 py-2.5 rounded-[12px] bg-white border border-slate-200 text-slate-700 font-bold text-[12.5px]
-                             hover:border-[#0f766e] hover:text-[#0f766e] disabled:opacity-40 disabled:hover:border-slate-200 disabled:hover:text-slate-700 transition-all">
+                                 hover:border-[#0f766e] hover:text-[#0f766e] disabled:opacity-40 disabled:hover:border-slate-200 disabled:hover:text-slate-700 transition-all">
               Prev
             </button>
             <div class="flex items-center gap-2" data-pager-numbers></div>
             <button type="button" data-pager-next
               class="px-4 py-2.5 rounded-[12px] bg-white border border-slate-200 text-slate-700 font-bold text-[12.5px]
-                             hover:border-[#0f766e] hover:text-[#0f766e] disabled:opacity-40 disabled:hover:border-slate-200 disabled:hover:text-slate-700 transition-all">
+                                 hover:border-[#0f766e] hover:text-[#0f766e] disabled:opacity-40 disabled:hover:border-slate-200 disabled:hover:text-slate-700 transition-all">
               Next
             </button>
           </div>
@@ -81,6 +77,6 @@
       </div>
     @endif
 
-    
+
   </section>
 @endsection

@@ -147,20 +147,20 @@
                 (negos.length ? negos.map(function (n) {
                     return '<div class="relative"><div class="absolute -left-[31px] top-1 w-2.5 h-2.5 rounded-full bg-white border-2 border-slate-200"></div>' +
                         '<div class="flex items-center justify-between mb-1"><span class="text-[11px] font-bold ' + (n.sender === 'Client' ? 'text-blue-600' : 'text-emerald-600') + ' uppercase">' + escapeHtml(n.sender) + '</span><span class="text-[10px] text-slate-400">' + new Date(n.created_at).toLocaleString('id-ID') + '</span></div>' +
-                        '<p class="text-[13px] text-slate-700 leading-relaxed">' + escapeHtml(n.message || 'No message') + '</p>' +
+                        '<p class="text-[13px] text-slate-700 leading-relaxed">' + escapeHtml(n.message || 'Tidak ada pesan') + '</p>' +
                         (n.proposed_price ? '<div class="mt-2 text-[11px] font-bold bg-slate-50 inline-block px-2 py-1 rounded">Tawaran: Rp' + n.proposed_price.toLocaleString() + '</div>' : '');
                 }).join('') : '<p class="text-slate-400 text-xs italic">Belum ada riwayat negosiasi.</p>') +
                 '</div></section>' +
-                '<section><h3 class="text-[12px] font-black text-slate-900 uppercase tracking-widest mb-4 flex items-center gap-2"><i class="ri-file-list-3-line text-emerald-500"></i> Project Results</h3>' +
+                '<section><h3 class="text-[12px] font-black text-slate-900 uppercase tracking-widest mb-4 flex items-center gap-2"><i class="ri-file-list-3-line text-emerald-500"></i> Hasil Proyek</h3>' +
                 '<div class="space-y-3">' +
                 (results.length ? results.map(function (r) {
-                    return '<div class="p-4 bg-emerald-50/50 border border-emerald-100 rounded-2xl flex items-center justify-between"><div><p class="text-[12px] font-bold text-slate-800">' + escapeHtml(r.version || 'Version') + '</p><p class="text-[10px] text-slate-500">' + new Date(r.created_at).toLocaleString('id-ID') + '</p></div><a href="/storage/' + r.file_url + '" target="_blank" class="px-3 py-1.5 bg-white text-[#0f766e] border border-[#0f766e] rounded-lg text-[10px] font-bold hover:bg-[#0f766e] hover:text-white transition-all">Download</a></div>';
+                    return '<div class="p-4 bg-emerald-50/50 border border-emerald-100 rounded-2xl flex items-center justify-between"><div><p class="text-[12px] font-bold text-slate-800">' + escapeHtml(r.version || 'Versi') + '</p><p class="text-[10px] text-slate-500">' + new Date(r.created_at).toLocaleString('id-ID') + '</p></div><a href="/storage/' + r.file_url + '" target="_blank" class="px-3 py-1.5 bg-white text-[#0f766e] border border-[#0f766e] rounded-lg text-[10px] font-bold hover:bg-[#0f766e] hover:text-white transition-all">Unduh</a></div>';
                 }).join('') : '<p class="text-slate-400 text-xs italic">Belum ada hasil yang dikirim.</p>') +
                 '</div></section>' +
                 '</div></div>' +
                 '<div class="p-6 bg-slate-50 border-t border-slate-100 flex gap-3">' +
                 '<button onclick="window.closeModal(\'modal-dispute-overlay\')" class="flex-1 py-3 bg-white border border-slate-200 text-slate-600 font-bold rounded-xl text-sm hover:bg-slate-100 transition-all">Tutup Detail</button>' +
-                '<a href="/admin/orders" class="flex-1 py-3 bg-[#0f766e] text-white text-center font-bold rounded-xl text-sm hover:bg-[#0a5e58] transition-all shadow-lg shadow-teal-sm">Kelola di Halaman Order</a>' +
+                '<a href="/admin/orders" class="flex-1 py-3 bg-[#0f766e] text-white text-center font-bold rounded-xl text-sm hover:bg-[#0a5e58] transition-all shadow-lg shadow-teal-sm">Kelola di Halaman Pesanan</a>' +
                 '</div>';
 
         } catch (error) {
@@ -186,13 +186,13 @@
             var student = data.skomda_student || {};
 
             box.innerHTML = '<div class="modal-header relative h-24 bg-gradient-to-r from-indigo-600 to-indigo-700 flex items-center px-8">' +
-                '<div class="flex-1"><h2 class="text-white font-extrabold text-xl tracking-tight">Detail Verifikasi</h2><p class="text-white/80 text-[11px] font-bold uppercase tracking-wider">Freelancer ID: #FREELANCER-' + data.id + '</p></div>' +
+                '<div class="flex-1"><h2 class="text-white font-extrabold text-xl tracking-tight">Detail Verifikasi</h2><p class="text-white/80 text-[11px] font-bold uppercase tracking-wider">ID Freelancer: #FREELANCER-' + data.id + '</p></div>' +
                 '<button onclick="window.closeModal(\'modal-verify-overlay\')" class="w-10 h-10 bg-white/20 text-white rounded-full flex items-center justify-center hover:bg-white/30 transition"><i class="ri-close-line text-xl"></i></button>' +
                 '</div>' +
                 '<div class="p-8">' +
                 '<div class="flex items-center gap-5 mb-8">' +
                 '<img src="https://ui-avatars.com/api/?name=' + encodeURIComponent(student.name || 'F') + '&background=4f46e5&color=fff&size=128" class="w-20 h-20 rounded-[22px] border-4 border-white shadow-lg" />' +
-                '<div><h3 class="text-[1.3rem] font-black text-slate-900 leading-tight">' + escapeHtml(student.name || 'N/A') + '</h3><p class="text-[13px] font-bold text-indigo-600 mt-1 uppercase tracking-wide">' + escapeHtml(student.major || 'Program Studi') + '</p></div>' +
+                '<div><h3 class="text-[1.3rem] font-black text-slate-900 leading-tight">' + escapeHtml(student.name || 'Tidak tersedia') + '</h3><p class="text-[13px] font-bold text-indigo-600 mt-1 uppercase tracking-wide">' + escapeHtml(student.major || 'Program Studi') + '</p></div>' +
                 '</div>' +
                 '<div class="space-y-5 mb-8">' +
                 '<div class="grid grid-cols-2 gap-4">' +
@@ -200,7 +200,7 @@
                 '<div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-100"><span class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Kelas</span><span class="text-[13.5px] font-extrabold text-slate-700">' + escapeHtml(student.class || '-') + '</span></div>' +
                 '</div>' +
                 '<div class="grid grid-cols-2 gap-4">' +
-                '<div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-100"><span class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Services</span><span class="text-[13.5px] font-extrabold text-[#0f766e]">' + (data.services_count || 0) + ' Terdaftar</span></div>' +
+                '<div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-100"><span class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Layanan</span><span class="text-[13.5px] font-extrabold text-[#0f766e]">' + (data.services_count || 0) + ' Terdaftar</span></div>' +
                 '<div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-100"><span class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Portofolio</span><span class="text-[13.5px] font-extrabold text-blue-600">' + (data.portofolios_count || 0) + ' Karya</span></div>' +
                 '</div>' +
                 '<div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-100"><span class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Email Sekolah</span><span class="text-[13.5px] font-bold text-slate-700">' + escapeHtml(student.email || '-') + '</span></div>' +

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Services - Digitalance')
+@section('title', 'Layanan - Digitalance')
 
 @section('content')
     <section class="pt-24 pb-16 bg-slate-100 min-h-screen" id="services">
@@ -30,7 +30,7 @@
                                 layanan</label>
                             <div class="relative">
                                 <input id="serviceSearch" type="text" name="q" value="{{ $search }}"
-                                    placeholder="Web Design, Logo, Video Editing..."
+                                    placeholder="Desain web, logo, edit video..."
                                     class="w-full px-5 py-4 pr-32 rounded-2xl border-2 border-slate-200 bg-white text-slate-900 focus:outline-none focus:border-primary transition-all" />
 <button type="submit"
                                      class="absolute right-2 top-2 bottom-2 px-5 rounded-xl bg-primary text-white font-bold text-sm hover:bg-teal-800 transition-all">
@@ -64,7 +64,7 @@
                 <div class="mb-12">
                     <div class="flex items-center justify-between gap-4 mb-5">
                         <div>
-                            <h2 class="font-display text-2xl font-extrabold text-slate-900">Featured Services</h2>
+                            <h2 class="font-display text-2xl font-extrabold text-slate-900">Layanan Unggulan</h2>
                             <p class="text-slate-500 text-sm mt-1">Pilihan layanan terbaru dari freelancer aktif.</p>
                         </div>
                     </div>
@@ -83,7 +83,7 @@
                                     <div>
                                         <p class="text-xs text-slate-400 font-semibold">Freelancer</p>
                                         <p class="text-sm font-bold text-slate-800">
-                                            {{ optional(optional($service->freelancer)->skomda_student)->name ?? 'Unknown' }}</p>
+                                            {{ optional(optional($service->freelancer)->skomda_student)->name ?? 'Tidak diketahui' }}</p>
                                     </div>
                                     <div class="text-right">
                                         <p class="text-xs text-slate-400 font-semibold">Mulai dari</p>
@@ -100,7 +100,7 @@
             <div class="flex items-center justify-between gap-4 mb-5">
                 <div>
                     <h2 class="font-display text-2xl font-extrabold text-slate-900">Semua Layanan</h2>
-                    <p class="text-slate-500 text-sm mt-1">Hanya menampilkan layanan dengan status approved.</p>
+                    <p class="text-slate-500 text-sm mt-1">Hanya menampilkan layanan dengan status disetujui.</p>
                 </div>
                 <div class="text-right">
                     <p class="text-sm font-bold text-slate-700">{{ $services->total() }} layanan ditemukan</p>
@@ -131,7 +131,7 @@
                         @if($search || $categoryId)
                             <a href="{{ route('services.index') }}"
                                 class="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-slate-900 text-white font-bold hover:bg-black transition-all">
-                                <i class="ri-refresh-line"></i> Reset Filter
+                                <i class="ri-refresh-line"></i> Atur Ulang Filter
                             </a>
                         @endif
                         <a href="{{ route('home') }}#join"
@@ -143,9 +143,9 @@
                         <div class="mt-6 pt-6 border-t border-slate-100">
                             <p class="text-sm text-slate-400 mb-3">Pencarian populer:</p>
                             <div class="flex flex-wrap gap-2 justify-center">
-                                <a href="{{ route('services.index', ['q' => 'Web Dev']) }}" class="px-3 py-1.5 rounded-full bg-slate-100 text-slate-600 text-xs font-bold hover:bg-slate-200 transition-all">#Web Dev</a>
-                                <a href="{{ route('services.index', ['q' => 'Logo Design']) }}" class="px-3 py-1.5 rounded-full bg-slate-100 text-slate-600 text-xs font-bold hover:bg-slate-200 transition-all">#Logo Design</a>
-                                <a href="{{ route('services.index', ['q' => 'Video Editor']) }}" class="px-3 py-1.5 rounded-full bg-slate-100 text-slate-600 text-xs font-bold hover:bg-slate-200 transition-all">#Video Editor</a>
+                                <a href="{{ route('services.index', ['q' => 'Pengembang Web']) }}" class="px-3 py-1.5 rounded-full bg-slate-100 text-slate-600 text-xs font-bold hover:bg-slate-200 transition-all">#Pengembang Web</a>
+                                <a href="{{ route('services.index', ['q' => 'Desain Logo']) }}" class="px-3 py-1.5 rounded-full bg-slate-100 text-slate-600 text-xs font-bold hover:bg-slate-200 transition-all">#Desain Logo</a>
+                                <a href="{{ route('services.index', ['q' => 'Editor Video']) }}" class="px-3 py-1.5 rounded-full bg-slate-100 text-slate-600 text-xs font-bold hover:bg-slate-200 transition-all">#Editor Video</a>
                                 <a href="{{ route('services.index', ['q' => 'UI/UX']) }}" class="px-3 py-1.5 rounded-full bg-slate-100 text-slate-600 text-xs font-bold hover:bg-slate-200 transition-all">#UI/UX</a>
                             </div>
                         </div>
@@ -179,7 +179,7 @@
                                 <div class="rounded-2xl bg-slate-50 p-3">
                                     <p class="text-[11px] uppercase tracking-wider text-slate-400 font-bold">Estimasi</p>
                                     <p class="font-extrabold text-slate-900 mt-1">
-                                        {{ $service->delivery_time ? $service->delivery_time . ' hari' : 'N/A' }}
+                                        {{ $service->delivery_time ? $service->delivery_time . ' hari' : 'Tidak tersedia' }}
                                     </p>
                                 </div>
                             </div>
@@ -188,11 +188,11 @@
                                 <div>
                                     <p class="text-xs text-slate-400 font-semibold">Freelancer</p>
                                     <p class="text-sm font-bold text-slate-800">
-                                        {{ optional(optional($service->freelancer)->skomda_student)->name ?? 'Unknown' }}</p>
+                                        {{ optional(optional($service->freelancer)->skomda_student)->name ?? 'Tidak diketahui' }}</p>
                                 </div>
                                 <a href="{{ route('login') }}"
                                     class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900 text-white font-bold text-sm hover:bg-black transition-all">
-                                    Hire
+                                    Pilih
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                         stroke-width="2">
                                         <line x1="5" y1="12" x2="19" y2="12" />

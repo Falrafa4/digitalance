@@ -7,15 +7,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // daftar menu admin
   const menus = [
-  { name: 'Dashboard', url: '/admin' },
-  { name: 'Users', url: '/admin/clients' },
-  { name: 'Orders', url: '/admin/orders' },
-  { name: 'Working', url: '/admin/orders?status=in_progress' },
-  { name: 'Services', url: '/admin/services' },
-  { name: 'Offers', url: '/admin/offers' },
-  { name: 'Transactions', url: '/admin/transactions' },
-  { name: 'Settings', url: '/admin/settings' },
-  { name: 'Account', url: '/admin/profile' },
+  { name: 'Dasbor', url: '/admin' },
+  { name: 'Pengguna', url: '/admin/clients' },
+  { name: 'Pesanan', url: '/admin/orders' },
+  { name: 'Sedang Dikerjakan', url: '/admin/orders?status=in_progress' },
+  { name: 'Layanan', url: '/admin/services' },
+  { name: 'Penawaran', url: '/admin/offers' },
+  { name: 'Transaksi', url: '/admin/transactions' },
+  { name: 'Pengaturan', url: '/admin/settings' },
+  { name: 'Akun', url: '/admin/profile' },
 ];
 
   input.addEventListener('input', function () {

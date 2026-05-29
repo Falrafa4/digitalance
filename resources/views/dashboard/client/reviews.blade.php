@@ -20,7 +20,7 @@
           <div class="bg-white border border-slate-200 rounded-[18px] p-5 hover:shadow-md transition-all">
             <div class="flex items-start justify-between gap-4 mb-4 pb-4 border-b border-slate-100">
               <div>
-                <p class="font-extrabold text-slate-900 text-[15px]">{{ $review->order->service->title ?? 'Service' }}</p>
+                <p class="font-extrabold text-slate-900 text-[15px]">{{ $review->order->service->title ?? 'Layanan' }}</p>
                 <p class="text-slate-500 text-[12px] mt-1">Order #{{ $review->order_id }}</p>
               </div>
               <button type="button" data-review-delete data-order-id="{{ $review->order_id }}"
@@ -91,9 +91,9 @@
         form.method = 'POST';
         form.action = '/client/reviews/' + id;
         form.innerHTML = `
-                  <input type="hidden" name="_token" value="${document.querySelector('meta[name="csrf-token"]').content}">
-                  <input type="hidden" name="_method" value="DELETE">
-              `;
+                    <input type="hidden" name="_token" value="${document.querySelector('meta[name="csrf-token"]').content}">
+                    <input type="hidden" name="_method" value="DELETE">
+                `;
         document.body.appendChild(form);
         form.submit();
       };

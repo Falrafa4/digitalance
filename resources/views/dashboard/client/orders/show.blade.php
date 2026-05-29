@@ -171,12 +171,14 @@
         @if($order->status === 'Negotiated' && $order->agreed_price)
           <div x-data="{ showNego: false, showReject: false, isSubmitting: false }"
             class="bg-white border border-slate-200 rounded-[18px] p-6">
-            
+
             <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
               <div>
                 <h3 class="font-display font-extrabold text-slate-900 text-[1.1rem]">Penawaran Harga Hasil Negosiasi</h3>
-                <p class="text-2xl font-black text-[#0f766e] mt-1">Rp {{ number_format($order->agreed_price, 0, ',', '.') }}</p>
-                <p class="text-[12px] text-slate-500 mt-1">Silakan lakukan pelunasan untuk memulai project, atau ajukan negosiasi ulang.</p>
+                <p class="text-2xl font-black text-[#0f766e] mt-1">Rp {{ number_format($order->agreed_price, 0, ',', '.') }}
+                </p>
+                <p class="text-[12px] text-slate-500 mt-1">Silakan lakukan pelunasan untuk memulai project, atau ajukan
+                  negosiasi ulang.</p>
               </div>
               <div class="flex flex-wrap gap-2.5 w-full sm:w-auto justify-end">
                 <button type="button" @click="showReject = true"
@@ -326,7 +328,7 @@
               <p class="text-slate-500 text-[13.5px] mt-1">Diskusi detail, nego harga, revisi, dll.</p>
             </div>
             <a href="{{ route('client.messages.index') }}" class="px-4 py-2.5 rounded-[12px] bg-white border border-slate-200 text-slate-700 font-bold text-[12.5px]
-                        hover:border-[#0f766e] hover:text-[#0f766e] transition-all">
+                          hover:border-[#0f766e] hover:text-[#0f766e] transition-all">
               Inbox
             </a>
           </div>
@@ -452,16 +454,16 @@
               @csrf
               <input type="hidden" name="order_id" value="{{ $order->id }}" />
               <div class="flex gap-4 items-center">
-<select name="rating" required class="px-4 py-2.5 rounded-[12px] bg-slate-50 border border-slate-200">
-                             @for($i = 5; $i >= 1; $i--)
-                             <option value="{{ $i }}">{{ $i }} Bintang</option> @endfor
-                         </select>
+                <select name="rating" required class="px-4 py-2.5 rounded-[12px] bg-slate-50 border border-slate-200">
+                  @for($i = 5; $i >= 1; $i--)
+                  <option value="{{ $i }}">{{ $i }} Bintang</option> @endfor
+                </select>
                 <input name="comment" class="flex-1 px-4 py-2.5 rounded-[12px] bg-slate-50 border border-slate-200"
                   placeholder="Komentar singkat...">
               </div>
               <button
                 class="px-6 py-2.5 rounded-[12px] bg-slate-900 text-white font-bold text-[13px] hover:bg-black transition-all">Kirim
-                Review</button>
+                Ulas</button>
             </form>
           @endif
         </div>

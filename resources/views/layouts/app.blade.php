@@ -125,8 +125,8 @@
                 const roleBtns = $$(".role-btn");
                 const heroSearch = $("#heroSearch");
                 const phMap = {
-                    client: "Cari jasa: Web Design, Video Editing…",
-                    freelancer: "Cari projek: Redesign Landing Page…",
+                    client: "Cari jasa: desain web, edit video…",
+                    freelancer: "Cari proyek: redisein halaman utama…",
                 };
 
                 roleBtns.forEach((btn) =>
@@ -207,10 +207,10 @@
                 const typingEl = $("#typingTarget");
                 if (typingEl) {
                     const phrases = [
-                        "Freelance Solutions",
-                        "Creative Talents",
-                        "Digital Projects",
-                        "Future Careers",
+                        "Solusi Freelance",
+                        "Talenta Kreatif",
+                        "Proyek Digital",
+                        "Karier Masa Depan",
                     ];
                     let pi = 0,
                         ci = 0,

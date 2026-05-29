@@ -30,7 +30,7 @@
         <div class="stat-icon blue"><i class="ri-chat-1-line"></i></div>
         <div class="stat-text">
           <span class="stat-value">${total}</span>
-          <span class="stat-label">Total Review</span>
+          <span class="stat-label">Total Ulasan</span>
         </div>
       </div>
       <div class="stat-card">
@@ -44,7 +44,7 @@
         <div class="stat-icon teal"><i class="ri-thumb-up-fill"></i></div>
         <div class="stat-text">
           <span class="stat-value">${fiveStars}</span>
-          <span class="stat-label">Review 5 Bintang</span>
+          <span class="stat-label">Ulasan 5 Bintang</span>
         </div>
       </div>
       <div class="stat-card">
@@ -76,7 +76,7 @@
       const date = r.created_at ? new Date(r.created_at).toLocaleDateString('id-ID') : '-';
       
       const clientName = window.DigitalanceUtils?.escapeHtml(r.order?.client?.user?.name ?? r.order?.client?.name ?? r.client_name ?? 'Client ' + (r.order?.client_id ?? '-'));
-      const serviceName = window.DigitalanceUtils?.escapeHtml(r.order?.service?.title ?? r.service_name ?? 'Service ' + (r.order?.service_id ?? '-'));
+      const serviceName = window.DigitalanceUtils?.escapeHtml(r.order?.service?.title ?? r.service_name ?? 'Layanan ' + (r.order?.service_id ?? '-'));
       const comment = window.DigitalanceUtils?.escapeHtml(r.comment || 'Tidak ada komentar');
 
       return `
@@ -92,7 +92,7 @@
           ${generateStars(r.rating)}
           <div class="text-[12px] text-slate-500 mt-2 mb-1">
             <strong>Client:</strong> ${clientName} <br>
-            <strong>Service:</strong> ${serviceName}
+            <strong>Layanan:</strong> ${serviceName}
           </div>
           <div class="card-comment mt-2" title="${comment}">${comment}</div>
         </div>
@@ -137,11 +137,11 @@
           </div>
           <div class="modal-info-row">
             <i class="ri-user-line"></i>
-            <div><span style="display:block;font-weight:700;color:var(--slate-800)">Client</span>${clientName}</div>
+            <div><span style="display:block;font-weight:700;color:var(--slate-800)">Klien</span>${clientName}</div>
           </div>
           <div class="modal-info-row">
             <i class="ri-tools-line"></i>
-            <div><span style="display:block;font-weight:700;color:var(--slate-800)">Service Used</span>${serviceName}</div>
+            <div><span style="display:block;font-weight:700;color:var(--slate-800)">Layanan</span>${serviceName}</div>
           </div>
           <div class="modal-info-row">
             <i class="ri-star-line"></i>
@@ -194,7 +194,7 @@
     }
 
     let html = '';
-    html += `<button class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-[13px] font-bold text-slate-500 hover:bg-slate-50 disabled:opacity-50 transition-all" ${currentPage === 1 ? 'disabled' : ''} onclick="window.changeReviewPage(${currentPage - 1})">Prev</button>`;
+    html += `<button class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-[13px] font-bold text-slate-500 hover:bg-slate-50 disabled:opacity-50 transition-all" ${currentPage === 1 ? 'disabled' : ''} onclick="window.changeReviewPage(${currentPage - 1})">Sebelumnya</button>`;
     
     for (let i = 1; i <= totalPages; i++) {
         if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
@@ -204,7 +204,7 @@
         }
     }
     
-    html += `<button class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-[13px] font-bold text-slate-500 hover:bg-slate-50 disabled:opacity-50 transition-all" ${currentPage === totalPages ? 'disabled' : ''} onclick="window.changeReviewPage(${currentPage + 1})">Next</button>`;
+    html += `<button class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-[13px] font-bold text-slate-500 hover:bg-slate-50 disabled:opacity-50 transition-all" ${currentPage === totalPages ? 'disabled' : ''} onclick="window.changeReviewPage(${currentPage + 1})">Berikutnya</button>`;
     wrap.innerHTML = html;
   }
 

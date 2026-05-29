@@ -9,7 +9,7 @@
 
     // ─── Error Boundary ───────────────────────────────────────
     window.addEventListener('error', function(e) {
-        var msg = (e.message || e.reason?.message || 'Unknown error').toLowerCase();
+                var msg = (e.message || e.reason?.message || 'Kesalahan tidak diketahui').toLowerCase();
         var src = e.filename || '';
 
         // Ignore ResizeObserver loop limit errors (harmless browser warnings)
@@ -200,7 +200,7 @@
             if (info) {
                 var start = items.length > 0 ? (currentPage - 1) * pageSize + 1 : 0;
                 var end = Math.min(currentPage * pageSize, items.length);
-                info.textContent = items.length > 0 ? 'Showing ' + start + '-' + end + ' of ' + items.length : 'No items';
+                info.textContent = items.length > 0 ? 'Menampilkan ' + start + '-' + end + ' dari ' + items.length : 'Tidak ada data';
             }
             var prev = container.querySelector('[data-pager-prev]');
             var next = container.querySelector('[data-pager-next]');

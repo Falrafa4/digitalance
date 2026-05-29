@@ -25,7 +25,7 @@
                     <div class="flex items-start justify-between mb-4 pb-4 border-b border-slate-100">
                         <div>
                             <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Order #{{ $res->order_id }}</span>
-                            <h3 class="font-bold text-slate-900 line-clamp-1" title="{{ $res->order->service->title ?? '-' }}">{{ $res->order->service->title ?? 'Service' }}</h3>
+                            <h3 class="font-bold text-slate-900 line-clamp-1" title="{{ $res->order->service->title ?? '-' }}">{{ $res->order->service->title ?? 'Layanan' }}</h3>
                         </div>
                     </div>
 

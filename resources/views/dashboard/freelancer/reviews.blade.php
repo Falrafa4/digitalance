@@ -19,7 +19,7 @@
             <div class="flex gap-2 flex-wrap" id="filter-tabs">
                 <button
                     class="filter-tab px-[18px] py-2 rounded-full border-[1.5px] border-[#0f766e] bg-[#0f766e] text-white font-bold text-[12.5px] shadow-teal-sm cursor-pointer transition-all duration-150 active"
-                    data-filter="all">All</button>
+                    data-filter="all">Semua</button>
                 <button
                     class="filter-tab px-[18px] py-2 rounded-full border-[1.5px] border-slate-200 bg-white text-slate-500 font-bold text-[12.5px] cursor-pointer transition-all duration-150 hover:border-[#0f766e] hover:text-[#0f766e]"
                     data-filter="5">5★</button>
@@ -40,7 +40,7 @@
             <div class="relative">
                 <i
                     class="ri-search-line absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[15px] pointer-events-none"></i>
-                <input type="text" id="review-search" placeholder="Cari order id, service, komentar…"
+                <input type="text" id="review-search" placeholder="Cari ID order, layanan, komentar…"
                     class="pl-9 pr-4 py-[9px] w-[300px] border-[1.5px] border-slate-200 rounded-[11px] text-[13px] font-semibold text-slate-700 bg-white outline-none transition-all duration-200 placeholder:font-normal placeholder:text-slate-400 focus:border-[#0f766e] focus:shadow-[0_0_0_3px_rgba(15,118,110,0.08)]" />
             </div>
         </div>

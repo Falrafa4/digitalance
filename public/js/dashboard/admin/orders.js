@@ -144,7 +144,7 @@
         <td>${o.display_date}</td>
         <td>
           <div class="action-btns">
-            <button class="btn-action" title="Detail" onclick="openOrderModal('${o.id}')"><i class="ri-eye-line"></i></button>
+            <button class="btn-action" title="Rincian" onclick="openOrderModal('${o.id}')"><i class="ri-eye-line"></i></button>
           </div>
         </td>
       </tr>
@@ -168,7 +168,7 @@
     }
 
     let html = '';
-    html += `<button class="px-3 py-1 rounded border border-slate-200 bg-white text-sm hover:bg-slate-50 disabled:opacity-50" ${currentPage === 1 ? 'disabled' : ''} onclick="window.changeOrderPage(${currentPage - 1})">Prev</button>`;
+    html += `<button class="px-3 py-1 rounded border border-slate-200 bg-white text-sm hover:bg-slate-50 disabled:opacity-50" ${currentPage === 1 ? 'disabled' : ''} onclick="window.changeOrderPage(${currentPage - 1})">Sebelumnya</button>`;
     for (let i = 1; i <= totalPages; i++) {
         if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
             html += `<button class="px-3 py-1 rounded border ${i === currentPage ? 'bg-[#0f766e] text-white border-[#0f766e]' : 'border-slate-200 bg-white hover:bg-slate-50'} text-sm" onclick="window.changeOrderPage(${i})">${i}</button>`;
@@ -176,7 +176,7 @@
             html += `<span class="px-2 py-1 text-slate-400">...</span>`;
         }
     }
-    html += `<button class="px-3 py-1 rounded border border-slate-200 bg-white text-sm hover:bg-slate-50 disabled:opacity-50" ${currentPage === totalPages ? 'disabled' : ''} onclick="window.changeOrderPage(${currentPage + 1})">Next</button>`;
+    html += `<button class="px-3 py-1 rounded border border-slate-200 bg-white text-sm hover:bg-slate-50 disabled:opacity-50" ${currentPage === totalPages ? 'disabled' : ''} onclick="window.changeOrderPage(${currentPage + 1})">Berikutnya</button>`;
     wrap.innerHTML = html;
   }
 
@@ -218,7 +218,7 @@
         <div class="modal-info-list">
           <div class="modal-info-row">
             <i class="ri-user-line"></i>
-            <div><span style="display:block;font-weight:700;color:var(--slate-800)">Client</span>${o.client_name}</div>
+            <div><span style="display:block;font-weight:700;color:var(--slate-800)">Klien</span>${o.client_name}</div>
           </div>
           <div class="modal-info-row">
             <i class="ri-briefcase-line"></i>
@@ -226,15 +226,15 @@
           </div>
           <div class="modal-info-row">
             <i class="ri-tools-line"></i>
-            <div><span style="display:block;font-weight:700;color:var(--slate-800)">Service</span>${o.service_name}</div>
+            <div><span style="display:block;font-weight:700;color:var(--slate-800)">Layanan</span>${o.service_name}</div>
           </div>
           <div class="modal-info-row">
             <i class="ri-money-dollar-circle-line"></i>
-            <div><span style="display:block;font-weight:700;color:var(--slate-800)">Agreed Price</span>${formatRupiah(o.agreed_price)}</div>
+            <div><span style="display:block;font-weight:700;color:var(--slate-800)">Harga Disepakati</span>${formatRupiah(o.agreed_price)}</div>
           </div>
         </div>
 
-        <p class="modal-section-title">Brief</p>
+        <p class="modal-section-title">Ringkasan</p>
         <div class="brief-box">${o.brief || '-'}</div>
 
         <p class="modal-section-title mt-4">Ubah Status</p>
@@ -325,14 +325,14 @@
           <input type="hidden" name="_token" value="${getCsrfToken()}">
           <div class="form-row">
             <div class="form-group">
-              <label>Client</label>
+              <label>Klien</label>
               <select name="client_id" required>
                 <option value="" disabled selected>Pilih Client...</option>
                 ${clientOptions}
               </select>
             </div>
             <div class="form-group">
-              <label>Service</label>
+              <label>Layanan</label>
               <select name="service_id" required>
                 <option value="" disabled selected>Pilih Layanan...</option>
                 ${serviceOptions}
@@ -341,7 +341,7 @@
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label>Agreed Price</label>
+              <label>Harga Disepakati</label>
               <input type="number" name="agreed_price" placeholder="Contoh: 500000" />
             </div>
             <div class="form-group">

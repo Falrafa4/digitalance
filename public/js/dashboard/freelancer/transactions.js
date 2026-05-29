@@ -33,7 +33,7 @@
     const type = t?.type ?? t?.method ?? '—';
     const amount = t?.amount ?? t?.total ?? null;
     const created = t?.created_at ?? t?.date ?? null;
-    const serviceTitle = t?.order?.service?.title ?? t?.order?.service?.name ?? t?.service_title ?? 'Service';
+    const serviceTitle = t?.order?.service?.title ?? t?.order?.service?.name ?? t?.service_title ?? 'Layanan';
     return { id, orderId, status, type, amount, created, serviceTitle, _raw: t };
   }
 
@@ -122,8 +122,8 @@
               <i class="ri-time-line mr-1"></i>${safeText(t.created || '—')}
             </div>
             ${href
-              ? `<a href="${href}" class="px-4 py-2 rounded-[11px] bg-slate-900 text-white font-bold text-[12.5px] hover:bg-black transition-all">Detail</a>`
-              : `<button type="button" class="px-4 py-2 rounded-[11px] bg-slate-900 text-white font-bold text-[12.5px] opacity-60 cursor-not-allowed">Detail</button>`
+              ? `<a href="${href}" class="px-4 py-2 rounded-[11px] bg-slate-900 text-white font-bold text-[12.5px] hover:bg-black transition-all">Rincian</a>`
+              : `<button type="button" class="px-4 py-2 rounded-[11px] bg-slate-900 text-white font-bold text-[12.5px] opacity-60 cursor-not-allowed">Rincian</button>`
             }
           </div>
         </div>
