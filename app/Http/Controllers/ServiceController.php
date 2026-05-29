@@ -89,7 +89,7 @@ class ServiceController extends Controller
         $search = $request->query('q');
 
         $query = Service::with([
-            'service_category:id,name',
+            'category:id,name',
             'freelancer.skomda_student:id,name',
         ]);
 
@@ -208,11 +208,11 @@ class ServiceController extends Controller
         }
 
         $service->load([
-            'service_category:id,name',
+            'category:id,name',
             'freelancer.skomda_student:id,name,email',
         ]);
 
-        $otherServices = Service::with('service_category:id,name')
+        $otherServices = Service::with('category:id,name')
             ->where('freelancer_id', $service->freelancer_id)
             ->where('id', '!=', $service->id)
             ->where('status', 'Approved')
@@ -232,9 +232,21 @@ class ServiceController extends Controller
     {
         $freelancer = auth('freelancer')->user();
 
-        $services = Service::with('service_category:id,name')
-            ->select(['id', 'freelancer_id', 'service_category_id', 'title', 'price', 'status', 'description', 'created_at'])
+        $services = Service::with('category:id,name')
+            ->select([
+                'id',
+                'freelancer_id',
+                'category_id',
+                'title',
+                'price_min',
+                'price_max',
+                'status',
+                'description',
+                'reject_reason',
+                'created_at',
+            ])
             ->where('freelancer_id', $freelancer->id)
+            ->latest()
             ->get();
 
         return view('dashboard.freelancer.services', compact('services'));
@@ -273,7 +285,7 @@ class ServiceController extends Controller
     public function show(string $id)
     {
         $service = Service::with([
-            'service_category:id,name',
+            'category:id,name',
         ])->where('id', $id)->first();
 
         if (!$service) {
@@ -294,7 +306,7 @@ class ServiceController extends Controller
     public function edit(string $id)
     {
         $freelancer = auth('freelancer')->user();
-        $service = Service::with('service_category:id,name')
+        $service = Service::with('category:id,name')
             ->where('freelancer_id', $freelancer->id)
             ->findOrFail($id);
 

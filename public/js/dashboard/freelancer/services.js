@@ -31,7 +31,7 @@
     const title = s?.title ?? s?.name ?? 'Layanan';
     const category = s?.service_category?.name ?? s?.category?.name ?? s?.service_category_name ?? s?.category_name ?? '—';
     const status = s?.status ?? 'Draft';
-    const price = s?.price ?? s?.starting_price ?? s?.min_price ?? null;
+    const price = s?.price ?? s?.price_min ?? s?.starting_price ?? s?.min_price ?? null;
     const desc = s?.description ?? s?.desc ?? '';
     const rejectReason = s?.reject_reason ?? null;
     return { id, title, category, status, price, desc, rejectReason, _raw: s };
