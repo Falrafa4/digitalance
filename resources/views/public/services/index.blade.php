@@ -83,7 +83,7 @@
                                     <div>
                                         <p class="text-xs text-slate-400 font-semibold">Freelancer</p>
                                         <p class="text-sm font-bold text-slate-800">
-                                            {{ optional(optional($service->freelancer)->skomda_student)->name ?? 'Tidak diketahui' }}</p>
+                                            {{ optional(optional($service->freelancer)->skomda_student)->name ?? '-' }}</p>
                                     </div>
                                     <div class="text-right">
                                         <p class="text-xs text-slate-400 font-semibold">Mulai dari</p>
@@ -188,7 +188,7 @@
                                 <div>
                                     <p class="text-xs text-slate-400 font-semibold">Freelancer</p>
                                     <p class="text-sm font-bold text-slate-800">
-                                        {{ optional(optional($service->freelancer)->skomda_student)->name ?? 'Tidak diketahui' }}</p>
+                                        {{ optional(optional($service->freelancer)->skomda_student)->name ?? '-' }}</p>
                                 </div>
                                 <a href="{{ route('login') }}"
                                     class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900 text-white font-bold text-sm hover:bg-black transition-all">

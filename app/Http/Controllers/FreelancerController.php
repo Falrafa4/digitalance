@@ -15,6 +15,45 @@ class FreelancerController extends Controller
 {
     private const DEFAULT_PROFILE_PHOTO = 'profiles/placeholder.webp';
 
+    private function buildProfileData(Freelancer $freelancer): array
+    {
+        $freelancer->load([
+            'skomda_student',
+            'services' => function ($query) {
+                $query->with('category:id,name')
+                    ->latest();
+            },
+            'portofolios' => function ($query) {
+                $query->with('service.category:id,name')
+                    ->latest();
+            },
+        ]);
+
+        $services = $freelancer->services->values();
+        $approvedServices = $services->where('status', 'Approved')->values();
+        $portofolios = $freelancer->portofolios->values();
+        $skillSource = $approvedServices->isNotEmpty() ? $approvedServices : $services;
+        $skillTags = $skillSource
+            ->pluck('category.name')
+            ->filter()
+            ->unique()
+            ->values();
+
+        return [
+            'freelancer' => $freelancer,
+            'services' => $services,
+            'approvedServices' => $approvedServices,
+            'portofolios' => $portofolios,
+            'skillTags' => $skillTags,
+            'stats' => [
+                'services' => $services->count(),
+                'approvedServices' => $approvedServices->count(),
+                'portofolios' => $portofolios->count(),
+                'skills' => $skillTags->count(),
+            ],
+        ];
+    }
+
     // =========================
     // FREELANCER ONLY
     // =========================
@@ -23,13 +62,16 @@ class FreelancerController extends Controller
         /** @var Freelancer $freelancer */
         $freelancer = auth('freelancer')->user();
 
-        $freelancer->load('skomda_student');
-
-        $freelancer->name = $freelancer->skomda_student->name ?? 'Siswa Skomda';
-        $freelancer->email = $freelancer->skomda_student->email ?? '-';
+        $profileData = $this->buildProfileData($freelancer);
 
         return view('dashboard.freelancer.profile', [
-            'user' => $freelancer,
+            'user' => $profileData['freelancer'],
+            'freelancer' => $profileData['freelancer'],
+            'services' => $profileData['services'],
+            'approvedServices' => $profileData['approvedServices'],
+            'portofolios' => $profileData['portofolios'],
+            'skillTags' => $profileData['skillTags'],
+            'stats' => $profileData['stats'],
             'role' => 'Freelancer',
         ]);
     }
@@ -38,9 +80,9 @@ class FreelancerController extends Controller
     {
         /** @var Freelancer $freelancer */
         $freelancer = auth('freelancer')->user();
-        
+
         $validated = $request->validated();
-        
+
         $freelancerData = [
             'bio' => $validated['bio'] ?? $freelancer->bio,
         ];
@@ -80,7 +122,7 @@ class FreelancerController extends Controller
             }
         }
 
-        if (! empty($freelancerData)) {
+        if (!empty($freelancerData)) {
             $freelancer->update($freelancerData);
         }
 
@@ -173,7 +215,7 @@ class FreelancerController extends Controller
             }
         }
 
-        if (! empty($freelancerData)) {
+        if (!empty($freelancerData)) {
             $freelancer->update($freelancerData);
         }
 
@@ -277,20 +319,20 @@ class FreelancerController extends Controller
             return redirect()->route('client.talents.index')->with('warning', 'Freelancer tidak tersedia.');
         }
 
-        $freelancer->load('skomda_student');
+        $profileData = $this->buildProfileData($freelancer);
 
-        $services = Service::with('service_category:id,name')
-            ->where('freelancer_id', $freelancer->id)
-            ->where('status', 'Approved')
-            ->latest()
-            ->get();
-
-        return view('dashboard.client.talents.talent-show', compact('freelancer', 'services'));
+        return view('dashboard.client.talents.talent-show', [
+            'freelancer' => $profileData['freelancer'],
+            'services' => $profileData['approvedServices'],
+            'portofolios' => $profileData['portofolios'],
+            'skillTags' => $profileData['skillTags'],
+            'stats' => $profileData['stats'],
+        ]);
     }
 
     private function storeProfilePhoto(Request $request): ?string
     {
-        if (! $request->hasFile('profile_photo')) {
+        if (!$request->hasFile('profile_photo')) {
             return null;
         }
 
@@ -299,7 +341,7 @@ class FreelancerController extends Controller
 
     private function deleteProfilePhoto(?string $path): void
     {
-        if (! $path || $path === self::DEFAULT_PROFILE_PHOTO) {
+        if (!$path || $path === self::DEFAULT_PROFILE_PHOTO) {
             return;
         }
 

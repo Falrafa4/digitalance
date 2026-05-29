@@ -16,12 +16,16 @@ class TransactionController extends Controller
         $search = trim((string) $request->query('q', ''));
 
         // PERBAIKAN: Tambahkan order.service ke dalam eager loading
-        $baseQuery = Transaction::with(['order.client', 'order.service']);
+        $baseQuery = Transaction::with(['order.client', 'order.service.freelancer.skomda_student'])
+            ->whereHas('order.service', function ($query) {
+                $query->whereNotNull('freelancer_id')
+                    ->whereHas('freelancer');
+            });
 
         if ($status !== 'all' && in_array($status, ['paid', 'pending', 'failed', 'refund'], true)) {
             $baseQuery->whereRaw('LOWER(status) = ?', [$status]);
         }
-        
+
         if ($search !== '') {
             $baseQuery->where(function ($query) use ($search) {
                 $query->where('id', 'like', '%' . $search . '%')
@@ -54,9 +58,11 @@ class TransactionController extends Controller
     {
         $freelancer = auth('freelancer')->user();
 
-        $transactions = Transaction::with('order.service')
+        $transactions = Transaction::with('order.service.freelancer.skomda_student')
             ->whereHas('order.service', function ($query) use ($freelancer) {
-                $query->where('freelancer_id', $freelancer->id);
+                $query->where('freelancer_id', $freelancer->id)
+                    ->whereNotNull('freelancer_id')
+                    ->whereHas('freelancer');
             })
             ->get();
 
@@ -67,11 +73,13 @@ class TransactionController extends Controller
     {
         $freelancer = auth('freelancer')->user();
 
-        $transaction = Transaction::with('order.service.freelancer')
+        $transaction = Transaction::with('order.service.freelancer.skomda_student')
             ->whereHas('order', function ($query) use ($orderId, $freelancer) {
                 $query->where('id', $orderId)
                     ->whereHas('service', function ($q) use ($freelancer) {
-                        $q->where('freelancer_id', $freelancer->id);
+                        $q->where('freelancer_id', $freelancer->id)
+                            ->whereNotNull('freelancer_id')
+                            ->whereHas('freelancer');
                     });
             })
             ->firstOrFail();
@@ -84,8 +92,12 @@ class TransactionController extends Controller
     {
         $client = auth('client')->user();
 
-        $transactions = Transaction::with('order.service')
+        $transactions = Transaction::with('order.service.freelancer.skomda_student')
             ->whereHas('order', fn($q) => $q->where('client_id', $client->id))
+            ->whereHas('order.service', function ($query) {
+                $query->whereNotNull('freelancer_id')
+                    ->whereHas('freelancer');
+            })
             ->latest()
             ->get();
 
@@ -97,7 +109,9 @@ class TransactionController extends Controller
         $client = auth('client')->user();
         abort_unless($order->client_id === $client->id, 403);
 
-        $transaction = Transaction::with('order.service')
+        abort_unless($order->service_id && $order->service?->freelancer_id, 404);
+
+        $transaction = Transaction::with('order.service.freelancer.skomda_student')
             ->where('order_id', $order->id)
             ->latest()
             ->firstOrFail();

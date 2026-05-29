@@ -33,7 +33,9 @@ class ServiceController extends Controller
                 'category:id,name',
                 'freelancer.skomda_student:id,name',
             ])
-            ->where('status', 'Approved');
+            ->where('status', 'Approved')
+            ->whereNotNull('freelancer_id')
+            ->whereHas('freelancer');
 
         if ($categoryId) {
             $servicesQuery->where('category_id', $categoryId);
@@ -63,6 +65,8 @@ class ServiceController extends Controller
                 'freelancer.skomda_student:id,name',
             ])
             ->where('status', 'Approved')
+            ->whereNotNull('freelancer_id')
+            ->whereHas('freelancer')
             ->latest()
             ->take(3)
             ->get();
@@ -109,26 +113,98 @@ class ServiceController extends Controller
 
     /**
      * CLIENT: Katalog Jasa (Page)
-     * - Tanpa filter
-     * - Ambil dari DB + eager load
+     * - Dengan filter
+     * - Ambil dari DB + eager load + paginate
      */
-    public function clientIndex()
+    public function clientIndex(Request $request)
     {
-        $services = Service::with([
+        $categoryId = $request->query('category');
+        $search = trim((string) $request->query('q', ''));
+        $priceMin = $request->query('price_min');
+        $priceMax = $request->query('price_max');
+        $deliveryTime = $request->query('delivery_time');
+
+        $categories = ServiceCategory::query()
+            ->where('is_active', true)
+            ->withCount([
+                'services as approved_services_count' => function ($query) {
+                    $query->where('status', 'Approved');
+                },
+            ])
+            ->orderBy('name')
+            ->get();
+
+        $servicesQuery = Service::with([
             'category:id,name',
             'freelancer.skomda_student:id,name',
         ])
             ->where('status', 'Approved')
+            ->whereNotNull('freelancer_id')
+            ->whereHas('freelancer');
+
+        if ($categoryId) {
+            $servicesQuery->where('category_id', $categoryId);
+        }
+
+        if ($search !== '') {
+            $servicesQuery->where(function ($query) use ($search) {
+                $query->where('title', 'like', '%' . $search . '%')
+                    ->orWhere('description', 'like', '%' . $search . '%')
+                    ->orWhereHas('category', function ($categoryQuery) use ($search) {
+                        $categoryQuery->where('name', 'like', '%' . $search . '%');
+                    })
+                    ->orWhereHas('freelancer.skomda_student', function ($freelancerQuery) use ($search) {
+                        $freelancerQuery->where('name', 'like', '%' . $search . '%');
+                    });
+            });
+        }
+
+        if ($priceMin !== '' && is_numeric($priceMin)) {
+            $servicesQuery->where('price_min', '>=', $priceMin);
+        }
+
+        if ($priceMax !== '' && is_numeric($priceMax)) {
+            $servicesQuery->where('price_max', '<=', $priceMax);
+        }
+
+        if ($deliveryTime !== '' && is_numeric($deliveryTime)) {
+            $servicesQuery->where('delivery_time', '<=', $deliveryTime);
+        }
+
+        $services = $servicesQuery->latest()->paginate(12)->withQueryString();
+
+        $featuredServices = Service::query()
+            ->with([
+                'category:id,name',
+                'freelancer.skomda_student:id,name',
+            ])
+            ->where('status', 'Approved')
+            ->whereNotNull('freelancer_id')
+            ->whereHas('freelancer')
             ->latest()
+            ->take(3)
             ->get();
 
-        return view('dashboard.client.services.index', compact('services'));
+        return view('dashboard.client.services.index', compact(
+            'services',
+            'featuredServices',
+            'categories',
+            'search',
+            'categoryId',
+            'priceMin',
+            'priceMax',
+            'deliveryTime'
+        ));
     }
 
     public function clientShow(Service $service)
     {
         if ($service->status !== 'Approved') {
             return redirect()->route('client.services.index')->with('warning', 'Layanan tidak tersedia.');
+        }
+
+        if (!$service->freelancer_id || !$service->freelancer) {
+            return redirect()->route('client.services.index')->with('warning', 'Layanan ini tidak memiliki freelancer yang tertaut.');
         }
 
         $service->load([
@@ -140,6 +216,8 @@ class ServiceController extends Controller
             ->where('freelancer_id', $service->freelancer_id)
             ->where('id', '!=', $service->id)
             ->where('status', 'Approved')
+            ->whereNotNull('freelancer_id')
+            ->whereHas('freelancer')
             ->latest()
             ->take(6)
             ->get();

@@ -49,27 +49,19 @@
         <ul class="flex flex-col list-none gap-2 text-center p-0 m-0 w-full">
             <li>
                 <a href="#home"
-                    class="text-slate-800 no-underline font-semibold block py-3.5 hover:text-primary transition-colors">Beranda</a>
+                    class="text-slate-800 no-underline font-semibold block py-5 hover:text-primary transition-colors w-full">Beranda</a>
             </li>
             <li>
                 <a href="#services"
-                    class="text-slate-800 no-underline font-semibold block py-3.5 hover:text-primary transition-colors">Layanan</a>
+                    class="text-slate-800 no-underline font-semibold block py-5 hover:text-primary transition-colors w-full">Layanan</a>
             </li>
             <li>
                 <a href="#faq"
-                    class="text-slate-800 no-underline font-semibold block py-3.5 hover:text-primary transition-colors">Pertanyaan</a>
-            </li>
-            <li>
-                <a href="#services"
-                    class="text-slate-800 no-underline font-semibold block py-3.5 hover:text-primary transition-colors">Layanan</a>
-            </li>
-            <li>
-                <a href="#faq"
-                    class="text-slate-800 no-underline font-semibold block py-3.5 hover:text-primary transition-colors">FAQ</a>
+                    class="text-slate-800 no-underline font-semibold block py-5 hover:text-primary transition-colors w-full">Pertanyaan</a>
             </li>
         </ul>
         <button onclick="location.href = 'login'"
-            class="gradient-bg text-white border-none px-6 py-4 rounded-full font-bold cursor-pointer w-full mt-4">
+            class="gradient-bg text-white border-none px-6 py-5 rounded-full font-bold cursor-pointer w-full mt-4">
             Mulai
         </button>
     </div>

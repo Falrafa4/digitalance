@@ -119,6 +119,10 @@ class OrderController extends Controller
             return redirect()->route('client.services.index')->with('warning', 'Layanan tidak tersedia untuk diorder.');
         }
 
+        if (!$service->freelancer_id || !$service->freelancer) {
+            return redirect()->route('client.services.index')->with('warning', 'Layanan ini tidak memiliki freelancer yang tertaut.');
+        }
+
         $service->load(['freelancer.skomda_student', 'service_category']);
 
         return view('dashboard.client.orders.create', compact('service'));
@@ -136,6 +140,10 @@ class OrderController extends Controller
 
         if ($service->status !== 'Approved') {
             return redirect()->route('client.services.index')->with('error', 'Layanan tidak tersedia.');
+        }
+
+        if (!$service->freelancer_id || !$service->freelancer) {
+            return redirect()->route('client.services.index')->with('error', 'Layanan ini tidak memiliki freelancer yang tertaut.');
         }
 
         $order = Order::create([
@@ -360,6 +368,10 @@ class OrderController extends Controller
         $client = auth('client')->user();
         abort_unless($order->client_id === $client->id, 403);
 
+        if (!$order->service_id || !$order->service?->freelancer_id) {
+            return redirect()->back()->with('error', 'Transaksi hanya tersedia untuk order client dan freelancer.');
+        }
+
         if (!in_array($order->status, ['Pending', 'Negotiated'])) {
             return redirect()->back()->with('error', 'Order tidak dapat diterima.');
         }
@@ -376,6 +388,10 @@ class OrderController extends Controller
         $client = auth('client')->user();
         abort_unless($order->client_id === $client->id, 403);
 
+        if (!$order->service_id || !$order->service?->freelancer_id) {
+            return redirect()->route('client.orders.show', $order->id)->with('error', 'Transaksi hanya tersedia untuk order client dan freelancer.');
+        }
+
         if (!in_array($order->status, ['Pending', 'Negotiated'])) {
             return redirect()->route('client.orders.show', $order->id)->with('error', 'Pembayaran tidak dapat diproses.');
         }
@@ -390,6 +406,14 @@ class OrderController extends Controller
         $client = auth('client')->user();
         abort_unless($order->client_id === $client->id, 403);
         $expectsJson = $request->expectsJson();
+
+        if (!$order->service_id || !$order->service?->freelancer_id) {
+            if ($expectsJson) {
+                return response()->json(['message' => 'Transaksi hanya tersedia untuk order client dan freelancer.'], 422);
+            }
+
+            return redirect()->route('client.orders.show', $order->id)->with('error', 'Transaksi hanya tersedia untuk order client dan freelancer.');
+        }
 
         if (!in_array($order->status, ['Pending', 'Negotiated'])) {
             if ($expectsJson) {
@@ -563,6 +587,10 @@ class OrderController extends Controller
         $client = auth('client')->user();
         abort_unless($order->client_id === $client->id, 403);
 
+        if (!$order->service_id || !$order->service?->freelancer_id) {
+            return redirect()->back()->with('error', 'Aksi ini hanya berlaku untuk order client dan freelancer.');
+        }
+
         if ($order->status !== 'In Progress') {
             return redirect()->back()->with('error', 'Order tidak dalam tahap pengerjaan.');
         }
@@ -589,7 +617,7 @@ class OrderController extends Controller
     // =========================
     // FREELANCER: Approve Revision
     // =========================
-   public function freelancerApproveRevision(Order $order)
+    public function freelancerApproveRevision(Order $order)
     {
         $freelancer = auth('freelancer')->user();
         abort_unless(($order->freelancer_id ?? $order->service?->freelancer_id) === $freelancer->id, 403);

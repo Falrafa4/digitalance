@@ -24,8 +24,7 @@
                     Kategori: <span class="font-bold">{{ $s->category->name ?? '-' }}</span>
                   </p>
                   <p class="text-slate-500 text-[13px] mt-1">
-                    Oleh: <span
-                      class="font-bold">{{ optional(optional($s->freelancer)->skomda_student)->name ?? 'Freelancer' }}</span>
+                    Oleh: <span class="font-bold">{{ optional(optional($s->freelancer)->skomda_student)->name ?? '-' }}</span>
                   </p>
                 </div>
               </div>
@@ -40,14 +39,14 @@
                   Detail
                 </a>
                 <a href="{{ route('client.orders.create', $s->id) }}" class="flex-1 px-4 py-2.5 rounded-[12px] bg-white border border-slate-200 text-slate-700 font-bold text-[12.5px]
-                                    hover:border-[#0f766e] hover:text-[#0f766e] transition-all text-center">
+                                          hover:border-[#0f766e] hover:text-[#0f766e] transition-all text-center">
                   Order
                 </a>
               </div>
 
               <div class="flex items-center justify-between mt-4 pt-4 border-t border-slate-100">
-                <button type="button"
-                  onclick="navigator.clipboard.writeText(@json(route('client.services.show', $s->id))); window.showToast('Link copied!', 'success')"
+                <button type="button" data-share-url="{{ route('client.services.show', $s->id) }}"
+                  onclick="navigator.clipboard.writeText(this.dataset.shareUrl); window.showToast('Link copied!', 'success')"
                   class="text-slate-500 hover:text-slate-900 text-[12.5px] font-bold transition-all">
                   <i class="ri-share-line mr-1"></i> Share
                 </button>
@@ -63,13 +62,13 @@
           <div class="flex items-center gap-2">
             <button type="button" data-pager-prev
               class="px-4 py-2.5 rounded-[12px] bg-white border border-slate-200 text-slate-700 font-bold text-[12.5px]
-                                 hover:border-[#0f766e] hover:text-[#0f766e] disabled:opacity-40 disabled:hover:border-slate-200 disabled:hover:text-slate-700 transition-all">
+                                     hover:border-[#0f766e] hover:text-[#0f766e] disabled:opacity-40 disabled:hover:border-slate-200 disabled:hover:text-slate-700 transition-all">
               Prev
             </button>
             <div class="flex items-center gap-2" data-pager-numbers></div>
             <button type="button" data-pager-next
               class="px-4 py-2.5 rounded-[12px] bg-white border border-slate-200 text-slate-700 font-bold text-[12.5px]
-                                 hover:border-[#0f766e] hover:text-[#0f766e] disabled:opacity-40 disabled:hover:border-slate-200 disabled:hover:text-slate-700 transition-all">
+                                     hover:border-[#0f766e] hover:text-[#0f766e] disabled:opacity-40 disabled:hover:border-slate-200 disabled:hover:text-slate-700 transition-all">
               Next
             </button>
           </div>

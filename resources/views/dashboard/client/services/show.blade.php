@@ -28,7 +28,7 @@
               Order Jasa Ini <i class="ri-arrow-right-line ml-2"></i>
             </a>
             <a href="{{ route('client.services.index') }}" class="px-5 py-3 rounded-[12px] bg-white border border-slate-200 text-slate-700 font-bold text-[13px]
-                      hover:border-[#0f766e] hover:text-[#0f766e] transition-all text-center">
+                        hover:border-[#0f766e] hover:text-[#0f766e] transition-all text-center">
               Kembali <i class="ri-arrow-left-line ml-2"></i>
             </a>
           </div>
@@ -54,19 +54,23 @@
       <aside class="w-full lg:w-[360px] shrink-0 space-y-6">
         <div class="bg-white border border-slate-200 rounded-[18px] p-6">
           <h3 class="font-display font-extrabold text-slate-900 text-[1.2rem]">Freelancer</h3>
+          @php
+            $freelancerName = optional(optional($service->freelancer)->skomda_student)->name ?? '-';
+            $freelancerAvatarFallback = 'https://api.dicebear.com/7.x/avataaars/svg?seed=' . urlencode('freelancer-' . ($service->freelancer_id ?? '0') . '-' . random_int(1000, 999999));
+          @endphp
           <a href="{{ $service->freelancer_id ? route('client.talents.show', $service->freelancer_id) : '#' }}"
             class="flex items-start gap-3 mt-4 hover:bg-slate-50 -mx-2 px-2 py-2 rounded-lg transition-colors">
             @if(optional($service->freelancer)->skomda_student?->avatar)
               <img src="{{ asset('storage/' . optional($service->freelancer)->skomda_student->avatar) }}"
                 class="w-12 h-12 rounded-2xl object-cover border border-slate-200" />
             @else
-              <img
-                src="https://ui-avatars.com/api/?name={{ urlencode(optional(optional($service->freelancer)->skomda_student)->name ?? 'Freelancer') }}&background=0f766e&color=fff"
+              <img src="{{ $freelancerAvatarFallback }}"
+                onerror="this.onerror=null;this.src='{{ $freelancerAvatarFallback }}'"
                 class="w-12 h-12 rounded-2xl border border-slate-200" />
             @endif
             <div class="min-w-0">
               <p class="font-extrabold text-slate-900 truncate hover:text-[#0f766e]">
-                {{ optional(optional($service->freelancer)->skomda_student)->name ?? 'Freelancer' }}
+                {{ $freelancerName }}
               </p>
               <p class="text-[#0f766e] text-[12px] font-bold mt-0.5">
                 <i class="ri-star-fill text-amber-400 mr-1"></i> Terverifikasi
@@ -83,12 +87,12 @@
           <div class="mt-5 pt-5 border-t border-slate-100 flex flex-col gap-3">
             @if($service->freelancer_id)
               <a href="{{ route('client.talents.show', $service->freelancer_id) }}" class="w-full inline-flex items-center justify-center px-5 py-3 rounded-[12px] bg-[#0f766e] text-white font-bold text-[13px]
-                      hover:bg-[#0a5e58] transition-all">
+                          hover:bg-[#0a5e58] transition-all">
                 Lihat Profil Lengkap <i class="ri-arrow-right-line ml-2"></i>
               </a>
             @endif
             <a href="{{ route('client.talents.index') }}" class="w-full inline-flex items-center justify-center px-5 py-3 rounded-[12px] bg-white border border-slate-200 text-slate-700 font-bold text-[13px]
-                    hover:border-[#0f766e] hover:text-[#0f766e] transition-all">
+                      hover:border-[#0f766e] hover:text-[#0f766e] transition-all">
               Lihat Freelancer Lain <i class="ri-user-search-line ml-2"></i>
             </a>
           </div>
