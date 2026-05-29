@@ -35,7 +35,7 @@
             @if ($unreadCount > 0)
                 <button onclick="markAllNotificationsRead(event)"
                     class="px-3 py-1.5 rounded-lg text-[11px] font-bold text-teal-700 bg-teal-50 hover:bg-teal-100 border border-teal-100 transition-all">
-                    <i class="ri-check-double-line mr-0.5"></i> Tandai Baca
+                    <i class="ri-check-double-line mr-0.5"></i> Tandai Dibaca
                 </button>
             @endif
             <button onclick="closeNotificationDrawer()"
@@ -117,7 +117,7 @@
     {{-- Footer --}}
     <div class="px-6 py-4 border-t border-slate-100 flex-shrink-0">
         <p class="text-[11px] text-center text-slate-400 font-bold uppercase tracking-widest">
-            Digitalance Notifications
+            Notifikasi Digitalance
         </p>
     </div>
 </aside>

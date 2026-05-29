@@ -17,7 +17,7 @@
                     Digitalance
                 </div>
                 <p class="text-slate-500 italic font-medium leading-relaxed">
-                    Platform freelance eksklusif untuk siswa/i SKOMDA. Connecting talent dengan opportunity.
+                    Platform freelance eksklusif untuk siswa/i SKOMDA. Menghubungkan talenta dengan peluang.
                 </p>
                 <div class="flex items-center gap-3 mt-1">
                     <!-- Email -->
@@ -58,12 +58,21 @@
             <div class="flex flex-row gap-16 w-full md:w-auto justify-start md:justify-end">
                 <!-- Navigasi -->
                 <div>
-                    <h4 class="font-display font-black text-xs text-slate-900 uppercase tracking-widest mb-3">Navigasi</h4>
+                    <h4 class="font-display font-black text-xs text-slate-900 uppercase tracking-widest mb-3">Navigasi
+                    </h4>
                     <ul class="flex flex-col gap-1">
-                        <li><a href="{{ route('home') }}#home" class="text-slate-700 font-semibold text-sm hover:text-primary transition-colors block py-1.5">Home</a></li>
-                        <li><a href="{{ route('home') }}#services" class="text-slate-700 font-semibold text-sm hover:text-primary transition-colors block py-1.5">Services</a></li>
-                        <li><a href="{{ route('home') }}#faq" class="text-slate-700 font-semibold text-sm hover:text-primary transition-colors block py-1.5">FAQ</a></li>
-                        <li><a href="/login" class="text-slate-700 font-semibold text-sm hover:text-primary transition-colors block py-1.5">Get Started</a></li>
+                        <li><a href="{{ route('home') }}#home"
+                                class="text-slate-700 font-semibold text-sm hover:text-primary transition-colors block py-1.5">Beranda</a>
+                        </li>
+                        <li><a href="{{ route('home') }}#services"
+                                class="text-slate-700 font-semibold text-sm hover:text-primary transition-colors block py-1.5">Layanan</a>
+                        </li>
+                        <li><a href="{{ route('home') }}#faq"
+                                class="text-slate-700 font-semibold text-sm hover:text-primary transition-colors block py-1.5">Pertanyaan</a>
+                        </li>
+                        <li><a href="/login"
+                                class="text-slate-700 font-semibold text-sm hover:text-primary transition-colors block py-1.5">Mulai</a>
+                        </li>
                     </ul>
                 </div>
                 <!-- Legal -->
@@ -71,17 +80,22 @@
                     <h4 class="font-display font-black text-xs text-slate-900 uppercase tracking-widest mb-3">Legal</h4>
                     <ul class="flex flex-col gap-2">
                         <li>
-                            <button onclick="openPrivacyModal()" type="button" class="text-slate-700 font-semibold text-sm hover:text-primary focus:outline-none transition-colors text-left w-full">Privasi</button>
+                            <button onclick="openPrivacyModal()" type="button"
+                                class="text-slate-700 font-semibold text-sm hover:text-primary focus:outline-none transition-colors text-left w-full">Privasi</button>
                         </li>
                         <li>
-                            <button onclick="openTnCModal()" type="button" class="text-slate-700 font-semibold text-sm hover:text-primary focus:outline-none transition-colors text-left w-full">Terms of Condition</button>
+                            <button onclick="openTnCModal()" type="button"
+                                class="text-slate-700 font-semibold text-sm hover:text-primary focus:outline-none transition-colors text-left w-full">Syarat
+                                &amp;
+                                Ketentuan</button>
                         </li>
                     </ul>
                 </div>
             </div>
         </div>
         <div class="border-t border-slate-200 mt-10 pt-6 flex flex-col items-center justify-center gap-3">
-            <span class="text-slate-400 font-semibold text-xs text-center">© {{ date('Y') }} Digitalance. All rights reserved.</span>
+            <span class="text-slate-400 font-semibold text-xs text-center">© {{ date('Y') }} Digitalance. Seluruh hak
+                dilindungi.</span>
         </div>
     </div>
 

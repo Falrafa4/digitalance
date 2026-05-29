@@ -8,7 +8,7 @@
                 <div class="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center text-slate-600">
                     <i class="ri-settings-4-line text-[20px]"></i>
                 </div>
-                Settings
+                Pengaturan
             </h1>
             <p class="text-slate-500 text-[13.5px]">
                 Pusat navigasi dan pengaturan akun Client.

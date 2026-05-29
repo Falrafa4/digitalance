@@ -8,7 +8,7 @@ use Illuminate\Support\Str;
 <section class="animate-fadeUp">
   <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
     <div>
-      <h1 class="font-display text-[1.85rem] font-extrabold text-slate-900">Orders</h1>
+      <h1 class="font-display text-[1.85rem] font-extrabold text-slate-900">Pesanan</h1>
       <p class="text-slate-500 mt-1">Pantau pesanan kamu dari dibuat sampai selesai.</p>
     </div>
 

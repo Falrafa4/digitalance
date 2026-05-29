@@ -7,7 +7,7 @@
         <!-- Page Header -->
         <div class="flex items-end justify-between mb-8 gap-4 flex-wrap animate-fadeUp">
             <div>
-                <h1 class="font-display text-[2.1rem] font-extrabold text-slate-900">Reviews</h1>
+                <h1 class="font-display text-[2.1rem] font-extrabold text-slate-900">Ulasan</h1>
                 <p class="text-slate-500 text-[0.95rem] mt-1">
                     Lihat review dari client untuk layanan kamu.
                 </p>

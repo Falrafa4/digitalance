@@ -452,10 +452,10 @@
               @csrf
               <input type="hidden" name="order_id" value="{{ $order->id }}" />
               <div class="flex gap-4 items-center">
-                <select name="rating" required class="px-4 py-2.5 rounded-[12px] bg-slate-50 border border-slate-200">
-                  @for($i = 5; $i >= 1; $i--)
-                  <option value="{{ $i }}">{{ $i }} Stars</option> @endfor
-                </select>
+<select name="rating" required class="px-4 py-2.5 rounded-[12px] bg-slate-50 border border-slate-200">
+                             @for($i = 5; $i >= 1; $i--)
+                             <option value="{{ $i }}">{{ $i }} Bintang</option> @endfor
+                         </select>
                 <input name="comment" class="flex-1 px-4 py-2.5 rounded-[12px] bg-slate-50 border border-slate-200"
                   placeholder="Komentar singkat...">
               </div>

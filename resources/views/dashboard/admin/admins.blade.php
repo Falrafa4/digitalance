@@ -9,7 +9,7 @@
     <div class="flex-1">
         <div class="flex items-end justify-between mb-8 gap-4 flex-wrap animate-fadeUp">
             <div>
-                <h1 class="font-display text-[2.1rem] font-extrabold text-slate-900">Admin Management</h1>
+                <h1 class="font-display text-[2.1rem] font-extrabold text-slate-900">Manajemen Admin</h1>
                 <p class="text-slate-500 text-[0.95rem] mt-1">
                     Kelola akun admin dan hak akses di platform Digitalance.
                 </p>

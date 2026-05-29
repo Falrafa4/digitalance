@@ -1,5 +1,5 @@
 @extends('layouts.dashboard')
-@section('title', 'Checkout | Digitalance')
+@section('title', 'Pembayaran | Digitalance')
 
 @php
     $totalPayment = (float)($order->agreed_price ?? 0);
@@ -21,9 +21,9 @@
         methodLabel() {
             const labels = {
                 'qris': 'QRIS',
-                'va_bca': 'BCA Virtual Account',
-                'va_mandiri': 'Mandiri VA',
-                'va_bri': 'BRI Virtual Account'
+                'va_bca': 'Virtual Account BCA',
+                'va_mandiri': 'Virtual Account Mandiri',
+                'va_bri': 'Virtual Account BRI'
             };
             return labels[this.method] || this.method.toUpperCase();
         },
@@ -76,8 +76,8 @@
     {{-- MAIN CHECKOUT --}}
     <div x-show="!paymentSuccess" class="max-w-4xl mx-auto">
         <div class="mb-8">
-            <h1 class="font-display text-[2.1rem] font-extrabold text-slate-900 leading-tight">Checkout</h1>
-            <p class="text-slate-500 mt-1 text-[0.95rem]">Pilih metode pembayaran dan selesaikan transaksi.</p>
+            <h1 class="font-display text-[2.1rem] font-extrabold text-slate-900 leading-tight">Pembayaran</h1>
+            <p class="text-slate-500 mt-1 text-[0.95rem]">Pilih metode pembayaran, cek total, lalu selesaikan transaksi.</p>
         </div>
 
         {{-- Error Banner --}}
@@ -101,10 +101,10 @@
                         </div>
                         <div class="flex-1">
                             <p class="text-xs font-black text-teal-600 uppercase tracking-widest mb-1">
-                                {{ $order->lokerApplication ? 'Custom Project' : ($order->service?->service_category?->name ?? 'Service') }}
+                                {{ $order->lokerApplication ? 'Proyek Kustom' : ($order->service?->service_category?->name ?? 'Layanan') }}
                             </p>
                             <h4 class="text-xl font-bold text-slate-900 mb-2">
-                                {{ $order->lokerApplication ? 'Order #' . $order->id : ($order->service?->title ?? 'Service Order') }}
+                                {{ $order->lokerApplication ? 'Pesanan #' . $order->id : ($order->service?->title ?? 'Pesanan Layanan') }}
                             </h4>
                             <div class="flex items-center gap-2 text-sm text-slate-500 font-medium">
                                 <div class="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center text-[10px]">
@@ -131,6 +131,27 @@
                     </div>
                 </div>
 
+                <div class="bg-white border border-slate-200 rounded-[24px] p-8 shadow-sm">
+                    <h3 class="text-lg font-bold text-slate-900 mb-4">Alur Pembayaran</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                            <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Langkah 1</p>
+                            <p class="font-bold text-slate-900 text-sm">Pilih metode pembayaran</p>
+                            <p class="text-[12px] text-slate-500 mt-1">QRIS atau Virtual Account sesuai preferensi kamu.</p>
+                        </div>
+                        <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                            <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Langkah 2</p>
+                            <p class="font-bold text-slate-900 text-sm">Cek detail nominal</p>
+                            <p class="text-[12px] text-slate-500 mt-1">Pastikan total pembayaran sudah sesuai sebelum konfirmasi.</p>
+                        </div>
+                        <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                            <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Langkah 3</p>
+                            <p class="font-bold text-slate-900 text-sm">Konfirmasi transaksi</p>
+                            <p class="text-[12px] text-slate-500 mt-1">Status pesanan akan berubah otomatis setelah pembayaran berhasil.</p>
+                        </div>
+                    </div>
+                </div>
+
                 {{-- Payment Methods --}}
                 <div class="bg-white border border-slate-200 rounded-[24px] p-8 shadow-sm">
                     <h3 class="text-lg font-bold text-slate-900 mb-6">Pilih Metode Pembayaran</h3>
@@ -138,9 +159,9 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         @foreach([
                             ['value' => 'qris', 'label' => 'QRIS', 'desc' => 'Gopay, OVO, Dana, LinkAja', 'icon' => 'ri-qr-code-line', 'color' => 'text-rose-500'],
-                            ['value' => 'va_bca', 'label' => 'BCA Virtual Account', 'desc' => 'Transfer Bank BCA', 'icon' => 'ri-bank-line', 'color' => 'text-blue-600'],
-                            ['value' => 'va_mandiri', 'label' => 'Mandiri VA', 'desc' => "Livin' by Mandiri", 'icon' => 'ri-bank-card-2-line', 'color' => 'text-blue-800'],
-                            ['value' => 'va_bri', 'label' => 'BRI Virtual Account', 'desc' => 'BRIVA / Mobile Banking', 'icon' => 'ri-money-dollar-box-line', 'color' => 'text-emerald-600'],
+                            ['value' => 'va_bca', 'label' => 'Virtual Account BCA', 'desc' => 'Transfer Bank BCA', 'icon' => 'ri-bank-line', 'color' => 'text-blue-600'],
+                            ['value' => 'va_mandiri', 'label' => 'Virtual Account Mandiri', 'desc' => "Livin' by Mandiri", 'icon' => 'ri-bank-card-2-line', 'color' => 'text-blue-800'],
+                            ['value' => 'va_bri', 'label' => 'Virtual Account BRI', 'desc' => 'BRIVA / Mobile Banking', 'icon' => 'ri-money-dollar-box-line', 'color' => 'text-emerald-600'],
                         ] as $pm)
                         <label class="relative cursor-pointer group">
                             <input type="radio" name="payment_method" value="{{ $pm['value'] }}" x-model="method" class="absolute opacity-0 peer">
@@ -239,7 +260,7 @@
             <div class="w-16 h-16 bg-teal-50 rounded-full flex items-center justify-center mx-auto mb-6">
                 <i class="ri-secure-payment-line text-4xl text-[#0f766e]"></i>
             </div>
-            <h2 class="text-xl font-black text-slate-900 text-center mb-2">Konfirmasi Pembayaran</h2>
+                <h2 class="text-xl font-black text-slate-900 text-center mb-2">Konfirmasi Pembayaran</h2>
             <p class="text-slate-500 text-sm text-center mb-6">Pastikan detail pembayaran sudah benar.</p>
 
             <div class="bg-slate-50 rounded-2xl p-5 mb-6 space-y-3">

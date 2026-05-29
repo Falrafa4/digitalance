@@ -16,8 +16,8 @@
                         <path
                             d="M12 21.75c-4.694 0-8.5-3.51-8.5-7.75 0-.5 4.203-1.273 9.663-1.273 5.46 0 9.663.773 9.663 1.273 0 4.24-3.806 7.75-8.5 7.75z" />
                     </svg>
-                    The #1 Talent Hub for SKOMDA Students
-                </div>
+                    Platform Freelance Terbaik untuk Mahasiswa SKOMDA
+                    </div>
 
                 <h1
                     class="hero-anim font-display text-[clamp(2.4rem,4vw,3.8rem)] font-extrabold leading-[1.13] tracking-tight text-slate-900">
@@ -112,16 +112,16 @@
                         <path d="M16 3.13a4 4 0 0 1 0 7.75" />
                     </svg>
                 </div>
-                <p class="stat-number font-display text-[2rem] font-extrabold leading-none" data-target="500"
-                    data-suffix="+">
-                    0
-                </p>
-                <div>
-                    <p class="font-bold text-[0.95rem]">Registered Users</p>
-                    <p class="text-xs text-slate-500 font-medium">
-                        Active community
-                    </p>
-                </div>
+<p class="stat-number font-display text-[2rem] font-extrabold leading-none" data-target="500"
+                     data-suffix="+">
+                     0
+                 </p>
+                 <div>
+                     <p class="font-bold text-[0.95rem]">Pengguna Terdaftar</p>
+                     <p class="text-xs text-slate-500 font-medium">
+                         Komunitas aktif
+                     </p>
+                 </div>
             </div>
 
             <div class="reveal flex flex-col items-center text-center gap-3 group cursor-default">
@@ -137,12 +137,12 @@
                     0
                 </p>
                 <div>
-                    <p class="font-bold text-[0.95rem]">
-                        Completed Projects
-                    </p>
-                    <p class="text-xs text-slate-500 font-medium">
-                        Successfully delivered
-                    </p>
+<p class="font-bold text-[0.95rem]">
+                         Proyek Selesai
+                     </p>
+                     <p class="text-xs text-slate-500 font-medium">
+                         Berhasil diselesaikan
+                     </p>
                 </div>
             </div>
 
@@ -159,10 +159,10 @@
                     0
                 </p>
                 <div>
-                    <p class="font-bold text-[0.95rem]">Total Earnings</p>
-                    <p class="text-xs text-slate-500 font-medium">
-                        Paid to freelancers
-                    </p>
+<p class="font-bold text-[0.95rem]">Total Penghasilan</p>
+                     <p class="text-xs text-slate-500 font-medium">
+                         Terbayar ke freelancer
+                     </p>
                 </div>
             </div>
 
@@ -180,10 +180,10 @@
                     0
                 </p>
                 <div>
-                    <p class="font-bold text-[0.95rem]">Average Rating</p>
-                    <p class="text-xs text-slate-500 font-medium">
-                        Client satisfaction
-                    </p>
+<p class="font-bold text-[0.95rem]">Rating Rata-rata</p>
+                     <p class="text-xs text-slate-500 font-medium">
+                         Kepuasan klien
+                     </p>
                 </div>
             </div>
         </div>
@@ -194,10 +194,10 @@
         <div class="max-w-7xl mx-auto px-6">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
                 <div class="max-w-lg reveal">
-                    <div
-                        class="inline-block bg-orange-500/10 text-orange-500 px-4 py-2 rounded-full text-xs font-extrabold uppercase tracking-widest mb-4">
-                        Why Digitalance
-                    </div>
+<div
+                            class="inline-block bg-orange-500/10 text-orange-500 px-4 py-2 rounded-full text-xs font-extrabold uppercase tracking-widest mb-4">
+                         Mengapa Digitalance
+                     </div>
                     <h2 class="font-display text-[clamp(1.75rem,3vw,2.5rem)] font-extrabold leading-snug mb-4">
                         Platform Freelance<br /><span class="gradient-text">Khusus SKOMDA</span>
                     </h2>
@@ -336,10 +336,10 @@
     <section class="py-20 bg-slate-900 text-white relative overflow-hidden">
         <div class="max-w-7xl mx-auto px-6">
             <div class="text-center mb-12 reveal">
-                <div
+<div
                     class="inline-block bg-orange-500/10 text-orange-400 px-4 py-2 rounded-full text-xs font-extrabold uppercase tracking-widest mb-4">
-                    How It Works
-                </div>
+                     Cara Kerja
+                 </div>
                 <h2 class="font-display text-[clamp(1.75rem,3vw,2.5rem)] font-extrabold leading-snug">
                     Mulai Journey Freelance<br /><span class="gradient-text">Dalam 3 Langkah</span>
                 </h2>
@@ -385,9 +385,9 @@
                                 <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                             </svg>
                         </div>
-                        <h3 class="font-extrabold text-base mb-3">
-                            Post Your Project
-                        </h3>
+<h3 class="font-extrabold text-base mb-3">
+                             Buat Proyek
+                         </h3>
                         <p class="text-white/65 leading-relaxed text-sm">
                             Deskripsikan project kamu dengan detail.
                             Tentukan budget dan timeline yang sesuai.
@@ -407,9 +407,9 @@
                                 <polyline points="16 11 18 13 22 9" />
                             </svg>
                         </div>
-                        <h3 class="font-extrabold text-base mb-3">
-                            Review Proposals
-                        </h3>
+<h3 class="font-extrabold text-base mb-3">
+                             Tinjau Proposal
+                         </h3>
                         <p class="text-white/65 leading-relaxed text-sm">
                             Terima proposals dari talented SKOMDA
                             freelancers. Review portfolio dan pilih yang
@@ -428,9 +428,9 @@
                                 <polyline points="20 6 9 17 4 12" />
                             </svg>
                         </div>
-                        <h3 class="font-extrabold text-base mb-3">
-                            Get Quality Work
-                        </h3>
+<h3 class="font-extrabold text-base mb-3">
+                             Dapatkan Hasil Berkualitas
+                         </h3>
                         <p class="text-white/65 leading-relaxed text-sm">
                             Collaborate dengan freelancer, track progress,
                             dan terima hasil berkualitas tinggi.
@@ -440,7 +440,7 @@
                 <div class="flex justify-center">
                     <a href="{{ route('login', ['mode' => 'register', 'role' => 'client']) }}"
                         class="inline-flex items-center gap-3 bg-emerald-500 text-white border-none px-8 py-4 rounded-2xl font-black text-base cursor-pointer transition-all shadow-[0_12px_32px_rgba(16,185,129,.25)] hover:bg-emerald-600 hover:-translate-y-0.5 no-underline">
-                        Post a Project
+                        Buat Proyek
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2">
                             <line x1="5" y1="12" x2="19" y2="12" />
@@ -536,7 +536,7 @@
             <div class="text-center mb-12 reveal">
                 <div
                     class="inline-block bg-orange-500/10 text-orange-500 px-4 py-2 rounded-full text-xs font-extrabold uppercase tracking-widest mb-4">
-                    Testimonials
+                    Testimoni
                 </div>
                 <h2 class="font-display text-[clamp(1.75rem,3vw,2.5rem)] font-extrabold">
                     Apa Kata <span class="gradient-text">Mereka?</span>
@@ -565,7 +565,7 @@
                         pertama sebagai freelancer. Client-nya profesional
                         dan payment system-nya aman banget!"
                     </p>
-                    <span class="t-badge">Verified Freelancer</span>
+                    <span class="t-badge">Terverifikasi</span>
                 </div>
 
                 <div
@@ -586,11 +586,11 @@
                         </div>
                     </div>
                     <p class="italic font-medium text-slate-600 leading-relaxed mb-5 text-sm">
-                        "Impressed dengan kualitas talent SKOMDA. Project
-                        web development kami selesai ahead of schedule
-                        dengan hasil yang memuaskan."
+                        "Kami terkesan dengan kualitas talent SKOMDA. Proyek
+                        web development kami selesai lebih cepat dari
+                        jadwal dengan hasil yang memuaskan."
                     </p>
-                    <span class="t-badge">Client</span>
+                    <span class="t-badge">Klien</span>
                 </div>
 
                 <div
@@ -613,9 +613,9 @@
                     <p class="italic font-medium text-slate-600 leading-relaxed mb-5 text-sm">
                         "Dari sini aku belajar banyak tentang
                         profesionalisme. Mentoring dari senior SKOMDA juga
-                        super helpful untuk develop skills."
+                        sangat membantu untuk mengembangkan skill."
                     </p>
-                    <span class="t-badge">Verified Freelancer</span>
+                    <span class="t-badge">Terverifikasi</span>
                 </div>
 
                 <div
@@ -636,11 +636,11 @@
                         </div>
                     </div>
                     <p class="italic font-medium text-slate-600 leading-relaxed mb-5 text-sm">
-                        "Tim kami sering hire talent SKOMDA untuk digital
-                        marketing projects. Always creative, responsive, dan
-                        hasil-nya selalu on point!"
+                        "Tim kami sering merekrut talent SKOMDA untuk proyek
+                        digital marketing. Selalu kreatif, responsif, dan
+                        hasilnya selalu memuaskan!"
                     </p>
-                    <span class="t-badge">Client</span>
+                    <span class="t-badge">Klien</span>
                 </div>
 
                 <div
@@ -661,11 +661,11 @@
                         </div>
                     </div>
                     <p class="italic font-medium text-slate-600 leading-relaxed mb-5 text-sm">
-                        "Platformnya user-friendly banget. Dalam 2 bulan
-                        udah dapet 10+ projects dan earning lumayan untuk
-                        masih jadi siswa!"
+                        "Platform ini sangat user-friendly. Dalam 2 bulan
+                        sudah mendapatkan 10+ proyek dan penghasilan
+                        lumayan untuk masih sekolah!"
                     </p>
-                    <span class="t-badge">Verified Freelancer</span>
+                    <span class="t-badge">Terverifikasi</span>
                 </div>
 
                 <div
@@ -686,11 +686,11 @@
                         </div>
                     </div>
                     <p class="italic font-medium text-slate-600 leading-relaxed mb-5 text-sm">
-                        "Kami bahkan recruit beberapa freelancer SKOMDA
-                        sebagai full-time employee. Great platform untuk
-                        talent scouting!"
+                        "Kami bahkan merekrut beberapa freelancer SKOMDA
+                        sebagai karyawan tetap. Platform yang luar biasa
+                        untuk mencari talent!"
                     </p>
-                    <span class="t-badge">Client</span>
+                    <span class="t-badge">Klien</span>
                 </div>
             </div>
         </div>
@@ -704,9 +704,8 @@
                     class="inline-block bg-orange-500/10 text-orange-500 px-4 py-2 rounded-full text-xs font-extrabold uppercase tracking-widest mb-4">
                     FAQ
                 </div>
-                <h2 class="font-display text-[clamp(1.75rem,3vw,2.5rem)] font-extrabold">
-                    Frequently Asked
-                    <span class="gradient-text">Questions</span>
+<h2 class="font-display text-[clamp(1.75rem,3vw,2.5rem)] font-extrabold">
+                    Pertanyaan yang <span class="gradient-text">Sering Ditanyai</span>
                 </h2>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
@@ -838,7 +837,7 @@
                 <div class="relative z-10">
                     <h2
                         class="font-display text-[clamp(2rem,3.5vw,3rem)] font-black leading-snug text-white max-w-3xl mx-auto mb-6">
-                        Ready to Start Your<br /><span class="text-white/80">Freelance Journey?</span>
+                        Siap Memulai Perjalanan Freelance?<br /><span class="text-white/80">Bergabung Sekarang!</span>
                     </h2>
                     <p class="text-lg text-white/80 font-medium leading-relaxed max-w-2xl mx-auto mb-10">
                         Join ratusan siswa/i SKOMDA yang sudah sukses
@@ -853,7 +852,7 @@
                                 <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
                                 <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
                             </svg>
-                            Join as Freelancer
+                            Bergabung sebagai Freelancer
                         </button>
                         <button
                             class="inline-flex items-center gap-3 bg-slate-900 text-white border-none px-8 py-4 rounded-2xl font-black text-base cursor-pointer transition-all shadow-[0_8px_24px_rgba(0,0,0,.18)] hover:bg-black hover:-translate-y-0.5">
@@ -862,7 +861,7 @@
                                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
                                 <circle cx="12" cy="7" r="4" />
                             </svg>
-                            Hire Talent
+                            Cari Talenta
                         </button>
                     </div>
                 </div>

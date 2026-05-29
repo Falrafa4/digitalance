@@ -4,7 +4,7 @@
 @section('content')
   <section class="animate-fadeUp">
     <div class="mb-6">
-      <h1 class="font-display text-[1.85rem] font-extrabold text-slate-900">History</h1>
+      <h1 class="font-display text-[1.85rem] font-extrabold text-slate-900">Riwayat</h1>
       <p class="text-slate-500 mt-1">Riwayat order yang sudah selesai / dibatalkan.</p>
     </div>
 

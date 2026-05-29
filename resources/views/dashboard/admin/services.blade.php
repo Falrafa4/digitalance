@@ -98,8 +98,8 @@
             {{ $services->links() }}
         </div>
     @else
-        <x-ui.empty-state icon="ri-tools-line" title="No Services Found"
-            description="No services match your search criteria." />
+<x-ui.empty-state icon="ri-tools-line" title="Tidak Ada Layanan"
+             description="Tidak ada layanan yang sesuai kriteria pencarian." />
     @endif
 @endsection
 
@@ -196,8 +196,8 @@
                         <!-- Gradient Header -->
                         <div class="h-28 bg-gradient-to-r from-[#0f766e] to-[#10b981] flex items-center px-8 relative">
                             <div class="flex-1">
-                                <h2 class="text-white font-black text-xl tracking-tight">Service Details</h2>
-                                <p class="text-white/70 text-[10px] font-bold uppercase tracking-[0.2em]">Service ID: #SRV-${s.id}</p>
+                                <h2 class="text-white font-black text-xl tracking-tight">Detail Layanan</h2>
+                                <p class="text-white/70 text-[10px] font-bold uppercase tracking-[0.2em]">ID Layanan: #SRV-${s.id}</p>
                             </div>
                             <button onclick="window.closeServiceDetail()" class="w-10 h-10 bg-white/20 text-white rounded-full flex items-center justify-center hover:bg-white/30 transition">
                                 <i class="ri-close-line text-xl"></i>
@@ -212,26 +212,15 @@
                                     <span class="px-3 py-1 bg-teal-50 text-[#0f766e] text-[10px] font-black rounded-lg uppercase tracking-wider border border-teal-100 shadow-sm">${s.status}</span>
                                 </div>
                                 <div class="flex items-center justify-between pt-4 border-t border-slate-50">
-                                    <span class="text-[13px] font-bold text-slate-500">Starting Price</span>
+                                    <span class="text-[13px] font-bold text-slate-500">Harga Mulai</span>
                                     <span class="text-[1.5rem] font-black text-[#0f766e]">Rp${Number(s.price_min || s.base_price).toLocaleString('id-ID')}</span>
                                 </div>
                             </div>
 
                             <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100 mb-6">
-                                <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Service Provider</span>
-                                <div class="flex items-center gap-4">
-                                    <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(s.freelancer?.skomda_student?.name || s.freelancer?.skomda_student?.email || 'Freelancer')}&background=0f766e&color=fff" class="w-11 h-11 rounded-xl shadow-sm" />
-                                    <div>
-                                        <p class="text-[14px] font-black text-slate-800">${s.freelancer?.skomda_student?.name || 'N/A'}</p>
-                                        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-tight">${s.freelancer?.skomda_student?.major || 'Freelancer'}</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="mb-6">
-                                <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Service Description</span>
-                                <div class="bg-slate-50/50 p-5 rounded-2xl border border-slate-100/50">
-                                    <p class="text-[13px] text-slate-600 leading-relaxed font-medium max-h-[120px] overflow-y-auto pr-2 custom-scrollbar">${s.description || 'No description provided.'}</p>
+<span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Penyedia Layanan</span>
+                                <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Deskripsi Layanan</span>
+                                <p class="text-[13px] text-slate-600 leading-relaxed font-medium max-h-[120px] overflow-y-auto pr-2 custom-scrollbar">${s.description || 'Tidak ada deskripsi.'}</p>
                                 </div>
                             </div>
 

@@ -8,7 +8,7 @@
 @section('content')
     <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8 animate-fadeUp">
         <div>
-            <h1 class="font-display text-[2.1rem] font-extrabold text-slate-900">Order Management</h1>
+            <h1 class="font-display text-[2.1rem] font-extrabold text-slate-900">Manajemen Pesanan</h1>
             <p class="text-slate-500 text-[0.95rem] mt-1">Kelola dan pantau seluruh transaksi pesanan di platform.</p>
         </div>
         <div class="flex items-center gap-3">
@@ -21,7 +21,7 @@
                     <div class="text-[1.2rem] font-black text-slate-900 leading-none">
                         {{ $orders instanceof \Illuminate\Pagination\LengthAwarePaginator ? $orders->total() : $orders->count() }}
                     </div>
-                    <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Total Orders</div>
+                    <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Total Pesanan</div>
                 </div>
             </div>
         </div>
@@ -54,12 +54,12 @@
             <table class="w-full text-left border-collapse min-w-[800px] data-table">
                 <thead>
                     <tr class="bg-slate-50/50 border-b border-slate-100">
-                        <th class="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">Order Info</th>
-                        <th class="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">Client & Freelancer</th>
-                        <th class="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">Amount</th>
+                        <th class="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">Info Pesanan</th>
+                        <th class="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">Klien & Freelancer</th>
+                        <th class="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">Jumlah</th>
                         <th class="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">Status</th>
-                        <th class="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">Date</th>
-                        <th class="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest text-center">Actions</th>
+                        <th class="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">Tanggal</th>
+                        <th class="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest text-center">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-50">
@@ -109,7 +109,7 @@
                     @empty
                         <tr>
                             <td colspan="6">
-                                <x-ui.empty-state icon="ri-file-list-3-line" title="No Orders Found" description="Belum ada pesanan yang sesuai dengan filter ini." />
+                                <x-ui.empty-state icon="ri-file-list-3-line" title="Tidak Ada Pesanan Ditemukan" description="Belum ada pesanan yang sesuai dengan filter ini." />
                             </td>
                         </tr>
                     @endforelse
@@ -162,13 +162,13 @@
                     <i class="ri-close-line text-xl"></i>
                 </button>
             </div>
-            <h2 class="text-[1.5rem] font-black text-slate-900 mb-1">Edit Order Status</h2>
+            <h2 class="text-[1.5rem] font-black text-slate-900 mb-1">Ubah Status Pesanan</h2>
             <p class="text-slate-400 text-[11px] font-bold uppercase tracking-widest mb-8">Order ID: #ORD-${o.id}</p>
             <form action="/admin/orders/${o.id}/status" method="POST">
                 <input type="hidden" name="_token" value="${document.querySelector('meta[name="csrf-token"]').content}">
                 <div class="space-y-6 mb-10">
                     <div class="field-group">
-                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">New Status</label>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Status Baru</label>
                         <div class="relative">
                             <select name="status" class="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-700 font-bold focus:border-[#0f766e] focus:bg-white outline-none transition-all appearance-none">
                                 ${['Pending', 'Negotiated', 'Paid', 'In Progress', 'Revision', 'Completed', 'Cancelled'].map(s => `
@@ -181,13 +181,13 @@
                     <div class="p-4 bg-amber-50 rounded-2xl border border-amber-100">
                         <p class="text-[11px] text-amber-700 font-bold leading-relaxed flex items-start gap-2">
                             <i class="ri-information-line mt-0.5"></i>
-                            <span>Status updates are visible to both Client and Freelancer immediately.</span>
+                            <span>Perubahan status akan langsung terlihat oleh Klien dan Freelancer.</span>
                         </p>
                     </div>
                 </div>
                 <div class="flex gap-3">
-                    <button type="button" onclick="window.closeOrderModal()" class="flex-1 py-4 bg-slate-100 text-slate-500 font-bold rounded-2xl text-[13px] hover:bg-slate-200 transition-all">Cancel</button>
-                    <button type="submit" class="flex-1 py-4 bg-[#0f766e] text-white font-bold rounded-2xl text-[13px] hover:bg-[#0a5e58] transition-all shadow-lg shadow-teal-sm">Update Status</button>
+                    <button type="button" onclick="window.closeOrderModal()" class="flex-1 py-4 bg-slate-100 text-slate-500 font-bold rounded-2xl text-[13px] hover:bg-slate-200 transition-all">Batal</button>
+                    <button type="submit" class="flex-1 py-4 bg-[#0f766e] text-white font-bold rounded-2xl text-[13px] hover:bg-[#0a5e58] transition-all shadow-lg shadow-teal-sm">Perbarui Status</button>
                 </div>
             </form>
         </div>`;
@@ -227,8 +227,8 @@
         <div class="relative">
             <div class="h-28 bg-gradient-to-r from-teal-600 to-emerald-600 flex items-center px-8">
                 <div class="flex-1">
-                    <h2 class="text-white font-black text-xl tracking-tight">Order Details</h2>
-                    <p class="text-white/70 text-[10px] font-bold uppercase tracking-[0.2em]">Transaction #ORD-${o.id}</p>
+                    <h2 class="text-white font-black text-xl tracking-tight">Detail Pesanan</h2>
+                    <p class="text-white/70 text-[10px] font-bold uppercase tracking-[0.2em]">Transaksi #ORD-${o.id}</p>
                 </div>
                 <button onclick="window.closeOrderModal()" class="w-10 h-10 bg-white/20 text-white rounded-full flex items-center justify-center hover:bg-white/30 transition">
                     <i class="ri-close-line text-xl"></i>
@@ -238,26 +238,26 @@
                 <div class="bg-white rounded-2xl p-6 shadow-xl border border-slate-50 mb-6">
                     <div class="flex justify-between items-start mb-4">
                         <div>
-                            <h3 class="text-[13px] font-bold text-slate-400 uppercase tracking-widest mb-1">Service Purchased</h3>
-                            <p class="text-[1.1rem] font-black text-slate-900 line-clamp-2 leading-tight">${o.service?.title || 'N/A'}</p>
-                        </div>
-                        <span class="px-3 py-1 bg-teal-50 text-[#0f766e] text-[10px] font-black rounded-lg uppercase tracking-wider border border-teal-100">${o.status}</span>
+<h3 class="text-[13px] font-bold text-slate-400 uppercase tracking-widest mb-1">Layanan yang Dibeli</h3>
+                        <p class="text-[1.1rem] font-black text-slate-900 line-clamp-2 leading-tight">${o.service?.title || 'N/A'}</p>
                     </div>
-                    <div class="flex items-center justify-between pt-4 border-t border-slate-50">
-                        <span class="text-[13px] font-bold text-slate-500">Order Amount</span>
-                        <span class="text-[1.3rem] font-black text-[#0f766e]">Rp${(o.agreed_price || 0).toLocaleString('id-ID')}</span>
-                    </div>
+                    <span class="px-3 py-1 bg-teal-50 text-[#0f766e] text-[10px] font-black rounded-lg uppercase tracking-wider border border-teal-100">${o.status}</span>
+                </div>
+                <div class="flex items-center justify-between pt-4 border-t border-slate-50">
+                    <span class="text-[13px] font-bold text-slate-500">Total Pesanan</span>
+                    <span class="text-[1.3rem] font-black text-[#0f766e]">Rp${(o.agreed_price || 0).toLocaleString('id-ID')}</span>
+                </div>
                 </div>
                 <div class="grid grid-cols-2 gap-4 mb-6">
                     <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                        <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Purchased By</span>
+                        <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Pembeli</span>
                         <div class="flex items-center gap-3">
                             <div class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center font-black text-[11px]">C</div>
-                            <span class="text-[13px] font-bold text-slate-700 truncate">${o.client?.name || 'Client'}</span>
+                            <span class="text-[13px] font-bold text-slate-700 truncate">${o.client?.name || 'Klien'}</span>
                         </div>
                     </div>
                     <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                        <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Fulfilled By</span>
+                        <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Penyedia</span>
                         <div class="flex items-center gap-3">
                             <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center font-black text-[11px]">F</div>
                             <span class="text-[13px] font-bold text-slate-700 truncate">${o.service?.freelancer?.skomda_student?.name || 'Freelancer'}</span>
@@ -268,14 +268,14 @@
                     <div class="flex justify-between items-center">
                         <div class="flex items-center gap-2">
                             <i class="ri-calendar-line text-slate-400"></i>
-                            <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Order Date</span>
+                            <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Tanggal Pesanan</span>
                         </div>
                         <span class="text-[13px] font-bold text-slate-700">${date}</span>
                     </div>
                 </div>
                 <div class="flex gap-3">
                     <button onclick="window.openOrderModal(${o.id})" class="flex-1 py-4 bg-slate-900 text-white font-bold rounded-2xl text-[13px] hover:bg-slate-800 transition-all flex items-center justify-center gap-2 shadow-lg shadow-slate-200">
-                        <i class="ri-edit-line"></i> Edit Status
+                        <i class="ri-edit-line"></i> Ubah Status
                     </button>
                 </div>
             </div>

@@ -5,7 +5,7 @@
 <div class="animate-fadeUp">
     <div class="flex items-end justify-between mb-8">
         <div>
-            <h1 class="font-display text-[1.85rem] font-extrabold text-slate-900 leading-tight">My Offers</h1>
+            <h1 class="font-display text-[1.85rem] font-extrabold text-slate-900 leading-tight">Penawaran Saya</h1>
             <p class="text-slate-500 mt-1 text-[0.95rem]">Lihat penawaran harga dari freelancer untuk pesanan Anda.</p>
         </div>
     </div>

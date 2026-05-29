@@ -11,7 +11,7 @@
 @section('content')
     <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8 animate-fadeUp">
         <div>
-            <h1 class="font-display text-[2.1rem] font-extrabold text-slate-900">Review Management</h1>
+            <h1 class="font-display text-[2.1rem] font-extrabold text-slate-900">Manajemen Ulasan</h1>
             <p class="text-slate-500 text-[0.95rem] mt-1">Kelola ulasan dan penilaian yang diberikan oleh pengguna platform.</p>
         </div>
         <div class="flex items-center gap-3">

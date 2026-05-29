@@ -14,7 +14,7 @@
             <div class="flex gap-2 flex-wrap" id="filter-tabs">
                 <button
                     class="filter-tab px-[18px] py-2 rounded-full border-[1.5px] border-[#0f766e] bg-[#0f766e] text-white font-bold text-[12.5px] shadow-teal-sm cursor-pointer transition-all duration-150 active"
-                    data-filter="all">All</button>
+                    data-filter="all">Semua</button>
                 <button
                     class="filter-tab px-[18px] py-2 rounded-full border-[1.5px] border-slate-200 bg-white text-slate-500 font-bold text-[12.5px] cursor-pointer transition-all duration-150 hover:border-[#0f766e] hover:text-[#0f766e]"
                     data-filter="Draft">Draft</button>

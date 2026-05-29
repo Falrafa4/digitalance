@@ -5,7 +5,7 @@
 <div class="animate-fadeUp flex-1 px-8 py-7 overflow-y-auto">
     <div class="flex items-end justify-between mb-8 gap-4 flex-wrap">
         <div>
-            <h1 class="font-display text-[2.1rem] font-extrabold text-slate-900 leading-tight">My Offers</h1>
+            <h1 class="font-display text-[2.1rem] font-extrabold text-slate-900 leading-tight">Penawaran Saya</h1>
             <p class="text-slate-500 mt-1 text-[0.95rem]">Pantau penawaran harga yang kamu ajukan ke klien.</p>
         </div>
         <!-- Modal Trigger for adding a new offer could be placed here if needed -->

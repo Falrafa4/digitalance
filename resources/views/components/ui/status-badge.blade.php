@@ -7,7 +7,7 @@
 
 @php
     $statusKey = strtolower(trim((string) $status));
-    $statusLabel = $statusKey === '' || $statusKey === '-' ? 'Unknown' : \Illuminate\Support\Str::headline($status);
+    $statusLabel = $statusKey === '' || $statusKey === '-' ? 'Tidak Diketahui' : \Illuminate\Support\Str::headline($status);
 
     $map = [
         'draft' => ['bg' => 'bg-slate-100', 'text' => 'text-slate-700', 'border' => 'border-slate-200', 'icon' => 'ri-draft-line'],

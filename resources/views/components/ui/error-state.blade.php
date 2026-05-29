@@ -13,9 +13,7 @@
 
     <h3 class="text-lg font-semibold text-slate-700 mb-2">{{ $title }}</h3>
 
-    @if ($description)
-        <p class="text-slate-500 text-center mb-6 max-w-sm">{{ $description }}</p>
-    @endif
+    <p class="text-slate-500 text-center mb-6 max-w-sm">{{ $description }}</p>
 
     @if ($retryUrl)
         <a href="{{ $retryUrl }}"

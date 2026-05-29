@@ -9,10 +9,10 @@
     @if(empty($services) || count($services) === 0)
       <x-ui.empty-state
         icon="ri-tools-line"
-        title="No Services Available"
-        description="No services are currently available for browse."
+        title="Tidak Ada Layanan Tersedia"
+        description="Saat ini belum ada layanan yang tersedia untuk dijelajahi."
         actionUrl="{{ route('client.dashboard') }}"
-        actionLabel="Back to Dashboard"
+        actionLabel="Kembali ke Dasbor"
       />
     @else
       <div data-client-pager data-page-size="9" class="space-y-4">

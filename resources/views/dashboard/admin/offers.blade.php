@@ -12,7 +12,7 @@
             <div>
                 <div class="flex items-center gap-2 mb-2">
                     <i class="ri-price-tag-3-line text-2xl text-teal-600"></i>
-                    <h1 class="text-2xl font-bold text-slate-800">Offers & Negotiations</h1>
+                    <h1 class="text-2xl font-bold text-slate-800">Tawaran & Negosiasi</h1>
                 </div>
                 <p class="text-slate-600">Pantau tawaran jasa masuk dan log pesan negosiasi antar pengguna secara real-time.
                 </p>
@@ -48,13 +48,13 @@
                 data-filter="all">Semua</button>
             <button
                 class="filter-tab px-4 py-1.5 text-xs font-medium rounded-full bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
-                data-filter="sent">Sent</button>
+                data-filter="sent">Terkirim</button>
             <button
                 class="filter-tab px-4 py-1.5 text-xs font-medium rounded-full bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
-                data-filter="accepted">Accepted</button>
+                data-filter="accepted">Diterima</button>
             <button
                 class="filter-tab px-4 py-1.5 text-xs font-medium rounded-full bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
-                data-filter="rejected">Rejected</button>
+                data-filter="rejected">Ditolak</button>
         </div>
 
         <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
@@ -62,7 +62,7 @@
                 <table class="w-full text-left border-collapse" id="offers-table">
                     <thead>
                         <tr class="bg-gray-50 border-b border-gray-100">
-                            <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase">Offer ID</th>
+                            <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase">ID Tawaran</th>
                             <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase">Klien & Freelancer</th>
                             <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase">Detail Layanan</th>
                             <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase">Harga</th>

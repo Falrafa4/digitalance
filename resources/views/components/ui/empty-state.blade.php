@@ -15,9 +15,7 @@
 
     <h3 class="text-[1.15rem] font-extrabold text-slate-900 mb-2">{{ $title }}</h3>
 
-    @if($description)
         <p class="text-slate-500 text-[13.5px] max-w-xs leading-relaxed mb-5">{{ $description }}</p>
-    @endif
 
     @if($actionUrl && $actionLabel)
         <a href="{{ $actionUrl }}"

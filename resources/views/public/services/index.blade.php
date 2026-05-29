@@ -32,10 +32,10 @@
                                 <input id="serviceSearch" type="text" name="q" value="{{ $search }}"
                                     placeholder="Web Design, Logo, Video Editing..."
                                     class="w-full px-5 py-4 pr-32 rounded-2xl border-2 border-slate-200 bg-white text-slate-900 focus:outline-none focus:border-primary transition-all" />
-                                <button type="submit"
-                                    class="absolute right-2 top-2 bottom-2 px-5 rounded-xl bg-primary text-white font-bold text-sm hover:bg-teal-800 transition-all">
-                                    Search
-                                </button>
+<button type="submit"
+                                     class="absolute right-2 top-2 bottom-2 px-5 rounded-xl bg-primary text-white font-bold text-sm hover:bg-teal-800 transition-all">
+                                     Cari
+                                 </button>
                             </div>
                         </div>
 

@@ -16,8 +16,8 @@
                     <i class="ri-group-line"></i>
                 </div>
                 <div>
-                    <div class="text-[1.2rem] font-black text-slate-900 leading-none">{{ $users->total() }}</div>
-                    <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Total Users</div>
+<div class="text-[1.2rem] font-black text-slate-900 leading-none">{{ $users->total() }}</div>
+                        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Total Pengguna</div>
                 </div>
             </div>
             <button id="btn-add-user" class="px-6 py-3.5 bg-[#0f766e] text-white font-black text-[13px] rounded-2xl shadow-teal-md hover:bg-[#0a5e58] transition-all flex items-center gap-2">

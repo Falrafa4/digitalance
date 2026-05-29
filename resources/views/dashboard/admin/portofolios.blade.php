@@ -13,7 +13,7 @@
 @section('content')
     <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8 animate-fadeUp">
         <div>
-            <h1 class="font-display text-[2.1rem] font-extrabold text-slate-900">Portfolios</h1>
+            <h1 class="font-display text-[2.1rem] font-extrabold text-slate-900">Portofolio</h1>
             <p class="text-slate-500 text-[0.95rem] mt-1">Review dan kelola karya-karya terbaik dari freelancer kami.</p>
         </div>
         <div class="flex items-center gap-3">

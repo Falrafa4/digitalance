@@ -5,7 +5,7 @@
 <div class="animate-fadeUp flex-1 px-8 py-7 overflow-y-auto">
     <div class="flex items-end justify-between mb-8 gap-4 flex-wrap">
         <div>
-            <h1 class="font-display text-[2.1rem] font-extrabold text-slate-900 leading-tight">Project Results</h1>
+            <h1 class="font-display text-[2.1rem] font-extrabold text-slate-900 leading-tight">Hasil Proyek</h1>
             <p class="text-slate-500 mt-1 text-[0.95rem]">Pantau dan kirimkan hasil pekerjaan akhir ke klien.</p>
         </div>
     </div>

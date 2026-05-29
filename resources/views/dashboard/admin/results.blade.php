@@ -7,7 +7,7 @@
 @section('content')
     <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8 animate-fadeUp">
         <div>
-            <h1 class="font-display text-[2.1rem] font-extrabold text-slate-900">Project Results</h1>
+            <h1 class="font-display text-[2.1rem] font-extrabold text-slate-900">Hasil Proyek</h1>
             <p class="text-slate-500 text-[0.95rem] mt-1">Pantau hasil pekerjaan yang telah dikirimkan oleh freelancer.</p>
         </div>
         <div class="flex items-center gap-3">

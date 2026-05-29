@@ -48,7 +48,7 @@
 @section('content')
     <div class="flex items-end justify-between mb-8 gap-4 flex-wrap animate-fadeUp">
         <div>
-            <h1 class="font-display text-[2.1rem] font-extrabold text-slate-900">Transactions Management</h1>
+            <h1 class="font-display text-[2.1rem] font-extrabold text-slate-900">Manajemen Transaksi</h1>
             <p class="text-slate-500 text-[0.95rem] mt-1">Kelola dan pantau seluruh transaksi pembayaran, DP, serta
                 pengembalian dana.</p>
         </div>
@@ -72,12 +72,12 @@
             @endphp
             <a href="{{ $filterLink('all') }}"
                 class="filter-tab px-[18px] py-2 rounded-full border-[1.5px] {{ $currentStatus === 'all' ? 'border-[#0f766e] bg-[#0f766e] text-white shadow-teal-sm' : 'border-slate-200 bg-white text-slate-500' }} font-bold text-[12.5px] cursor-pointer transition-all duration-150">Semua</a>
-            <a href="{{ $filterLink('paid') }}"
-                class="filter-tab px-[18px] py-2 rounded-full border-[1.5px] {{ $currentStatus === 'paid' ? 'border-[#0f766e] bg-[#0f766e] text-white shadow-teal-sm' : 'border-slate-200 bg-white text-slate-500' }} font-bold text-[12.5px] cursor-pointer transition-all duration-150">Paid</a>
+<a href="{{ $filterLink('paid') }}"
+                 class="filter-tab px-[18px] py-2 rounded-full border-[1.5px] {{ $currentStatus === 'paid' ? 'border-[#0f766e] bg-[#0f766e] text-white shadow-teal-sm' : 'border-slate-200 bg-white text-slate-500' }} font-bold text-[12.5px] cursor-pointer transition-all duration-150">Sudah Dibayar</a>
             <a href="{{ $filterLink('pending') }}"
-                class="filter-tab px-[18px] py-2 rounded-full border-[1.5px] {{ $currentStatus === 'pending' ? 'border-[#0f766e] bg-[#0f766e] text-white shadow-teal-sm' : 'border-slate-200 bg-white text-slate-500' }} font-bold text-[12.5px] cursor-pointer transition-all duration-150">Pending</a>
+                 class="filter-tab px-[18px] py-2 rounded-full border-[1.5px] {{ $currentStatus === 'pending' ? 'border-[#0f766e] bg-[#0f766e] text-white shadow-teal-sm' : 'border-slate-200 bg-white text-slate-500' }} font-bold text-[12.5px] cursor-pointer transition-all duration-150">Menunggu</a>
             <a href="{{ $filterLink('failed') }}"
-                class="filter-tab px-[18px] py-2 rounded-full border-[1.5px] {{ $currentStatus === 'failed' ? 'border-[#0f766e] bg-[#0f766e] text-white shadow-teal-sm' : 'border-slate-200 bg-white text-slate-500' }} font-bold text-[12.5px] cursor-pointer transition-all duration-150">Failed</a>
+                 class="filter-tab px-[18px] py-2 rounded-full border-[1.5px] {{ $currentStatus === 'failed' ? 'border-[#0f766e] bg-[#0f766e] text-white shadow-teal-sm' : 'border-slate-200 bg-white text-slate-500' }} font-bold text-[12.5px] cursor-pointer transition-all duration-150">Gagal</a>
         </div>
 
         <form action="{{ route('admin.transactions.index') }}" method="GET" class="relative">
@@ -98,7 +98,7 @@
                 <tr
                     class="bg-slate-50 text-[12px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200">
                     <th class="px-6 py-4">ID Transaksi</th>
-                    <th class="px-6 py-4">Order ID</th>
+                    <th class="px-6 py-4">ID Pesanan</th>
                     <th class="px-6 py-4">Nominal</th>
                     <th class="px-6 py-4">Tipe</th>
                     <th class="px-6 py-4">Status</th>

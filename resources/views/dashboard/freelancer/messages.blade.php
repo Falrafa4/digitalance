@@ -5,7 +5,7 @@
 <div class="animate-fadeUp flex-1 px-8 py-7 overflow-y-auto">
     <div class="flex items-end justify-between mb-8 gap-4 flex-wrap">
         <div>
-            <h1 class="font-display text-[2.1rem] font-extrabold text-slate-900 leading-tight">Messages</h1>
+            <h1 class="font-display text-[2.1rem] font-extrabold text-slate-900 leading-tight">Pesan</h1>
             <p class="text-slate-500 mt-1 text-[0.95rem]">Kotak masuk negosiasi dan percakapan dengan klien.</p>
         </div>
     </div>

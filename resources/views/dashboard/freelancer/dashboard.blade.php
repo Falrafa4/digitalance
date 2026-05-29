@@ -11,7 +11,7 @@
                 <span class="inline-block align-middle">👋</span>
             </h1>
             <p class="text-slate-500 text-[1.02rem] mt-2">
-                Here's what's happening with your jobs today.
+                Berikut informasi pekerjaanmu hari ini.
             </p>
         </section>
 
@@ -120,24 +120,24 @@
                 <button
                     class="filter-tab px-[18px] py-2 rounded-full border-[1.5px] border-[#0f766e] bg-[#0f766e] text-white font-bold text-[12.5px] shadow-teal-sm cursor-pointer transition-all duration-150 active"
                     data-filter="all">
-                    All
+                    Semua
                 </button>
                 <button
                     class="filter-tab px-[18px] py-2 rounded-full border-[1.5px] border-slate-200 bg-white text-slate-500 font-bold text-[12.5px] cursor-pointer transition-all duration-150 hover:border-[#0f766e] hover:text-[#0f766e]"
                     data-filter="orders">
-                    Orders
+                    Pesanan
                 </button>
                 <button
                     class="filter-tab px-[18px] py-2 rounded-full border-[1.5px] border-slate-200 bg-white text-slate-500 font-bold text-[12.5px] cursor-pointer transition-all duration-150 hover:border-[#0f766e] hover:text-[#0f766e]"
                     data-filter="opportunities">
-                    Opportunities
+                    Lowongan
                 </button>
             </div>
 
             <div class="relative">
                 <i
                     class="ri-search-line absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[15px] pointer-events-none"></i>
-                <input type="text" id="freelancer-search" placeholder="Search title, client, status…"
+                <input type="text" id="freelancer-search" placeholder="Cari judul, klien, status…"
                     class="pl-9 pr-4 py-[9px] w-[260px] border-[1.5px] border-slate-200 rounded-[11px] text-[13px] font-semibold text-slate-700 bg-white outline-none transition-all duration-200 placeholder:font-normal placeholder:text-slate-400 focus:border-[#0f766e] focus:shadow-[0_0_0_3px_rgba(15,118,110,0.08)]" />
             </div>
         </section>
@@ -148,13 +148,13 @@
             <div class="xl:col-span-2 min-w-0">
                 <div class="flex items-end justify-between mb-4 gap-3 flex-wrap">
                     <div>
-                        <h2 class="font-display text-[1.55rem] font-extrabold text-slate-900">Latest Orders</h2>
-                        <p class="text-slate-500 text-[0.95rem] mt-1">Track your most recent order activity.</p>
+<h2 class="font-display text-[1.55rem] font-extrabold text-slate-900">Pesanan Terbaru</h2>
+                        <p class="text-slate-500 text-[0.95rem] mt-1">Lacak aktivitas pesanan terbarumu.</p>
                     </div>
 
                     <a href="{{ route('freelancer.orders.index') }}" class="px-4 py-2 rounded-[11px] border-[1.5px] border-slate-200 bg-white text-slate-700 font-bold text-[12.5px]
-                                    hover:border-[#0f766e] hover:text-[#0f766e] transition-all">
-                        View All
+                                        hover:border-[#0f766e] hover:text-[#0f766e] transition-all">
+                        Lihat Semua
                     </a>
                 </div>
 
@@ -200,8 +200,8 @@
             <div class="min-w-0">
                 <div class="flex items-end justify-between mb-4 gap-3 flex-wrap">
                     <div>
-                        <h2 class="font-display text-[1.55rem] font-extrabold text-slate-900">Job Opportunities</h2>
-                        <p class="text-slate-500 text-[0.95rem] mt-1">New jobs matching your skills.</p>
+                        <h2 class="font-display text-[1.55rem] font-extrabold text-slate-900">Lowongan Pekerjaan</h2>
+                        <p class="text-slate-500 text-[0.95rem] mt-1">Pekerjaan baru yang sesuai skillmu.</p>
                     </div>
                 </div>
 

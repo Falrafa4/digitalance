@@ -11,7 +11,7 @@
                 <span class="inline-block align-middle">👋</span>
             </h1>
             <p class="text-slate-500 text-[1.02rem] mt-2">
-                Here's what's happening with your projects today.
+                Berikut informasi proyekmu hari ini.
             </p>
         </section>
 
@@ -25,7 +25,7 @@
                         <i class="ri-file-list-3-line text-[22px]" aria-hidden="true"></i>
                     </div>
                     <div class="flex-1">
-                        <p class="text-[12px] font-extrabold text-slate-400 uppercase tracking-[.12em]">TOTAL ORDERS</p>
+                        <p class="text-[12px] font-extrabold text-slate-400 uppercase tracking-[.12em]">TOTAL PESANAN</p>
                         <p class="text-[28px] font-extrabold text-slate-900 leading-tight mt-1"
                            data-client-stat="total" data-default="{{ $statsData['total'] }}">
                             {{ $statsData['total'] }}
@@ -41,7 +41,7 @@
                         <i class="ri-timer-line text-[22px]" aria-hidden="true"></i>
                     </div>
                     <div class="flex-1">
-                        <p class="text-[12px] font-extrabold text-slate-400 uppercase tracking-[.12em]">ACTIVE PROJECTS</p>
+                        <p class="text-[12px] font-extrabold text-slate-400 uppercase tracking-[.12em]">PROYEK AKTIF</p>
                         <p class="text-[28px] font-extrabold text-slate-900 leading-tight mt-1"
                            data-client-stat="active" data-default="{{ $statsData['active'] }}">
                             {{ $statsData['active'] }}
@@ -57,7 +57,7 @@
                         <i class="ri-medal-line text-[22px]" aria-hidden="true"></i>
                     </div>
                     <div class="flex-1">
-                        <p class="text-[12px] font-extrabold text-slate-400 uppercase tracking-[.12em]">COMPLETED</p>
+                        <p class="text-[12px] font-extrabold text-slate-400 uppercase tracking-[.12em]">SELESAI</p>
                         <p class="text-[28px] font-extrabold text-slate-900 leading-tight mt-1"
                            data-client-stat="completed" data-default="{{ $statsData['completed'] }}">
                             {{ $statsData['completed'] }}
@@ -73,7 +73,7 @@
                         <i class="ri-wallet-3-line text-[22px]" aria-hidden="true"></i>
                     </div>
                     <div class="flex-1">
-                        <p class="text-[12px] font-extrabold text-slate-400 uppercase tracking-[.12em]">TOTAL SPENT</p>
+                        <p class="text-[12px] font-extrabold text-slate-400 uppercase tracking-[.12em]">TOTAL PENGELUARAN</p>
                         <p class="text-[22px] sm:text-[24px] font-extrabold text-slate-900 leading-tight mt-1"
                            data-client-stat="totalSpent" data-default="Rp {{ number_format((float) $statsData['totalSpent'], 0, ',', '.') }}">
                             Rp {{ number_format((float) $statsData['totalSpent'], 0, ',', '.') }}
@@ -90,11 +90,11 @@
             <div class="xl:col-span-2">
                 <div class="flex items-end justify-between mb-4">
                     <div>
-                        <h2 class="font-display text-[1.55rem] font-extrabold text-slate-900">My Projects</h2>
+                        <h2 class="font-display text-[1.55rem] font-extrabold text-slate-900">Proyek Saya</h2>
                         <p class="text-slate-500 text-[0.95rem] mt-1">Pantau ringkasan order terakhir kamu.</p>
                     </div>
                     <a href="{{ route('client.orders.index') }}" class="px-4 py-2 rounded-[11px] border-[1.5px] border-slate-200 bg-white text-slate-700 font-bold text-[12.5px] hover:border-[#0f766e] hover:text-[#0f766e] transition-all">
-                        View All
+                        Lihat Semua
                     </a>
                 </div>
 
@@ -143,13 +143,13 @@
                                 <div class="text-slate-300 text-[44px] mb-3">
                                     <i class="ri-inbox-2-line" aria-hidden="true"></i>
                                 </div>
-                                <p class="text-slate-900 font-extrabold text-[1.25rem]">No Projects Yet</p>
+                                <p class="text-slate-900 font-extrabold text-[1.25rem]">Belum Ada Proyek</p>
                                 <p class="text-slate-500 mt-2">Mulai order pertamamu dari katalog jasa.</p>
-                                <a href="{{ route('client.services.index') }}"
+<a href="{{ route('client.services.index') }}"
                                    class="inline-flex items-center justify-center mt-5 px-5 py-3 rounded-[12px] bg-slate-900 text-white font-bold text-[13px] hover:bg-black transition-all">
-                                    Browse Katalog
-                                    <i class="ri-arrow-right-line ml-2" aria-hidden="true"></i>
-                                </a>
+                                Jelajah Katalog
+                                <i class="ri-arrow-right-line ml-2" aria-hidden="true"></i>
+                            </a>
                             </div>
                         </div>
                     @endif
@@ -160,7 +160,7 @@
             <div>
                 <div class="flex items-end justify-between mb-4">
                     <div>
-                        <h2 class="font-display text-[1.55rem] font-extrabold text-slate-900">System Alerts</h2>
+                        <h2 class="font-display text-[1.55rem] font-extrabold text-slate-900">Informasi Sistem</h2>
                         <p class="text-slate-500 text-[0.95rem] mt-1">Info sistem untuk akunmu.</p>
                     </div>
                 </div>
@@ -176,7 +176,7 @@
                         </div>
                     </div>
                     <div class="mt-5 p-4 rounded-[16px] bg-slate-50 border border-slate-100">
-                        <p class="text-[12px] font-extrabold text-slate-400 uppercase tracking-[.12em]">Quick Tips</p>
+                        <p class="text-[12px] font-extrabold text-slate-400 uppercase tracking-[.12em]">Tips Cepat</p>
                         <p class="text-slate-600 text-[13px] mt-1">
                             Untuk mempercepat proses, isi brief yang jelas dan tentukan deadline yang realistis.
                         </p>
@@ -184,21 +184,21 @@
                 </div>
 
                 <div class="mt-6 bg-white border border-slate-200 rounded-[18px] p-5">
-                    <p class="text-[12px] font-extrabold text-slate-400 uppercase tracking-[.12em]">Quick Actions</p>
+                    <p class="text-[12px] font-extrabold text-slate-400 uppercase tracking-[.12em]">Aksi Cepat</p>
                     <div class="mt-4 flex flex-col gap-2.5">
                         <a href="{{ route('client.talents.index') }}"
                            class="flex items-center justify-between px-4 py-3 rounded-[14px] bg-slate-50 border border-slate-200 hover:border-[#0f766e] transition-all">
-                            <span class="font-bold text-[13px] text-slate-800">Find Talent</span>
+                            <span class="font-bold text-[13px] text-slate-800">Cari Talenta</span>
                             <i class="ri-arrow-right-line text-slate-400" aria-hidden="true"></i>
                         </a>
                         <a href="{{ route('client.orders.index') }}"
                            class="flex items-center justify-between px-4 py-3 rounded-[14px] bg-slate-50 border border-slate-200 hover:border-[#0f766e] transition-all">
-                            <span class="font-bold text-[13px] text-slate-800">Orders</span>
+                            <span class="font-bold text-[13px] text-slate-800">Pesanan</span>
                             <i class="ri-arrow-right-line text-slate-400" aria-hidden="true"></i>
                         </a>
                         <a href="{{ route('client.profile') }}"
                            class="flex items-center justify-between px-4 py-3 rounded-[14px] bg-slate-50 border border-slate-200 hover:border-[#0f766e] transition-all">
-                            <span class="font-bold text-[13px] text-slate-800">Account</span>
+                            <span class="font-bold text-[13px] text-slate-800">Akun</span>
                             <i class="ri-arrow-right-line text-slate-400" aria-hidden="true"></i>
                         </a>
                     </div>
