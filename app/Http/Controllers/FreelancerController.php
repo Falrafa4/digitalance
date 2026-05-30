@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateFreelancerPasswordRequest;
 use App\Http\Requests\UpdateFreelancerRequest;
 use App\Models\Freelancer;
 use App\Models\Service;
+use App\Support\ImageStorage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -110,7 +111,7 @@ class FreelancerController extends Controller
             }
         }
 
-        if ($profilePhoto = $this->storeProfilePhoto($request)) {
+        if ($profilePhoto = ImageStorage::storeAsWebp($request->file('profile_photo'), 'profiles')) {
             $this->deleteProfilePhoto($freelancer->profile_photo);
             $validated['profile_photo'] = $profilePhoto;
         }
@@ -336,7 +337,7 @@ class FreelancerController extends Controller
             return null;
         }
 
-        return $request->file('profile_photo')->store('profiles', 'public');
+        return ImageStorage::storeAsWebp($request->file('profile_photo'), 'profiles');
     }
 
     private function deleteProfilePhoto(?string $path): void

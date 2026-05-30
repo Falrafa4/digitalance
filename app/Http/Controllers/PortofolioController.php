@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StorePortofolioRequest;
 use App\Http\Requests\UpdatePortofolioRequest;
 use App\Models\Portofolio;
+use App\Support\ImageStorage;
 
 class PortofolioController extends Controller
 {
@@ -51,7 +52,7 @@ class PortofolioController extends Controller
         }
 
         if ($request->hasFile('media_file')) {
-            $validated['media_url'] = $request->file('media_file')->store('portofolios', 'public');
+            $validated['media_url'] = ImageStorage::storeAsWebp($request->file('media_file'), 'portofolios');
         }
 
         Portofolio::create($validated);

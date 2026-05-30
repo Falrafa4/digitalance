@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateClientPasswordRequest;
 use App\Http\Requests\UpdateClientProfileRequest;
 use App\Models\Client;
 use App\Models\SkomdaStudent;
+use App\Support\ImageStorage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -243,7 +244,7 @@ class ClientController extends Controller
             return null;
         }
 
-        return $request->file('profile_photo')->store('profiles', 'public');
+        return ImageStorage::storeAsWebp($request->file('profile_photo'), 'profiles');
     }
 
     private function deleteProfilePhoto(?string $path): void
