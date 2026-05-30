@@ -172,7 +172,7 @@ class ClientController extends Controller
         /** @var Client $client */
         $client = auth('client')->user();
 
-        if (! Hash::check($request->current_password, $client->password)) {
+        if (!Hash::check($request->current_password, $client->password)) {
             return redirect()->route('client.profile')->withErrors('Password saat ini salah');
         }
 
@@ -240,7 +240,7 @@ class ClientController extends Controller
 
     private function storeProfilePhoto(Request $request): ?string
     {
-        if (! $request->hasFile('profile_photo')) {
+        if (!$request->hasFile('profile_photo')) {
             return null;
         }
 
@@ -249,7 +249,7 @@ class ClientController extends Controller
 
     private function deleteProfilePhoto(?string $path): void
     {
-        if (! $path || $path === self::DEFAULT_PROFILE_PHOTO) {
+        if (!$path || $path === self::DEFAULT_PROFILE_PHOTO) {
             return;
         }
 

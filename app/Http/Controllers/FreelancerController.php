@@ -358,9 +358,11 @@ class FreelancerController extends Controller
     {
         $freelancers = Freelancer::with('skomda_student')
             ->where('status', 'Approved')
-            ->withCount(['services as services_count' => function ($query) {
-                $query->where('status', 'Approved');
-            }])
+            ->withCount([
+                'services as services_count' => function ($query) {
+                    $query->where('status', 'Approved');
+                }
+            ])
             ->orderByDesc('services_count')
             ->orderByDesc('created_at')
             ->get();

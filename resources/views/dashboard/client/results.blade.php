@@ -67,7 +67,7 @@
                 </a>
               @endif
               <a href="{{ route('client.orders.show', $result->order_id) }}" class="flex-1 px-4 py-2.5 rounded-[12px] bg-white border border-slate-200 text-slate-700 font-bold text-[12.5px]
-                            hover:border-[#0f766e] hover:text-[#0f766e] transition-all text-center">
+                                  hover:border-[#0f766e] hover:text-[#0f766e] transition-all text-center">
                 Lihat Order
               </a>
             </div>
@@ -75,5 +75,5 @@
         @endforeach
       </div>
     @endif
-    </div>
+  </div>
 @endsection

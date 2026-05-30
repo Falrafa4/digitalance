@@ -28,7 +28,7 @@
               Order Jasa Ini <i class="ri-arrow-right-line ml-2"></i>
             </a>
             <a href="{{ route('client.services.index') }}" class="px-5 py-3 rounded-[12px] bg-white border border-slate-200 text-slate-700 font-bold text-[13px]
-                      hover:border-[#0f766e] hover:text-[#0f766e] transition-all text-center">
+                        hover:border-[#0f766e] hover:text-[#0f766e] transition-all text-center">
               Kembali <i class="ri-arrow-left-line ml-2"></i>
             </a>
           </div>
@@ -78,11 +78,13 @@
               <div class="grid grid-cols-2 gap-3 mb-4">
                 <div class="rounded-[14px] border border-slate-200 bg-slate-50 px-4 py-3">
                   <p class="text-[10px] font-black text-slate-400 uppercase tracking-[.12em]">Review</p>
-                  <p class="text-slate-900 font-extrabold mt-1">{{ (int) ($freelancerReviewSummary->total_reviews ?? 0) }}</p>
+                  <p class="text-slate-900 font-extrabold mt-1">{{ (int) ($freelancerReviewSummary->total_reviews ?? 0) }}
+                  </p>
                 </div>
                 <div class="rounded-[14px] border border-slate-200 bg-slate-50 px-4 py-3">
                   <p class="text-[10px] font-black text-slate-400 uppercase tracking-[.12em]">Rating</p>
-                  <p class="text-slate-900 font-extrabold mt-1">{{ number_format((float) ($freelancerReviewSummary->average_rating ?? 0), 1) }}/5</p>
+                  <p class="text-slate-900 font-extrabold mt-1">
+                    {{ number_format((float) ($freelancerReviewSummary->average_rating ?? 0), 1) }}/5</p>
                 </div>
               </div>
             @endif
@@ -98,7 +100,8 @@
                 @foreach($service->freelancer->portofolios->take(2) as $portfolio)
                   <div class="rounded-[14px] border border-slate-200 bg-slate-50 p-3">
                     <p class="font-bold text-slate-900 text-[13px] truncate">{{ $portfolio->title }}</p>
-                    <p class="text-[12px] text-slate-500 mt-1 line-clamp-2">{{ $portfolio->description ?? 'Portofolio terkait layanan ini.' }}</p>
+                    <p class="text-[12px] text-slate-500 mt-1 line-clamp-2">
+                      {{ $portfolio->description ?? 'Portofolio terkait layanan ini.' }}</p>
                   </div>
                 @endforeach
               </div>
@@ -108,12 +111,12 @@
           <div class="mt-5 pt-5 border-t border-slate-100 flex flex-col gap-3">
             @if($service->freelancer_id)
               <a href="{{ route('client.talents.show', $service->freelancer_id) }}" class="w-full inline-flex items-center justify-center px-5 py-3 rounded-[12px] bg-[#0f766e] text-white font-bold text-[13px]
-                                hover:bg-[#0a5e58] transition-all">
+                                    hover:bg-[#0a5e58] transition-all">
                 Lihat Profil Lengkap <i class="ri-arrow-right-line ml-2"></i>
               </a>
             @endif
             <a href="{{ route('client.talents.index') }}" class="w-full inline-flex items-center justify-center px-5 py-3 rounded-[12px] bg-white border border-slate-200 text-slate-700 font-bold text-[13px]
-                        hover:border-[#0f766e] hover:text-[#0f766e] transition-all">
+                          hover:border-[#0f766e] hover:text-[#0f766e] transition-all">
               Lihat Freelancer Lain <i class="ri-user-search-line ml-2"></i>
             </a>
           </div>

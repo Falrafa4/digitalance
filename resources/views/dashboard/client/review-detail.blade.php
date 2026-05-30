@@ -17,7 +17,8 @@
                 <div>
                     <p class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest mb-1">Penilaian</p>
                     <p class="font-extrabold text-slate-900 text-[1.4rem]">
-                        {{ number_format((float) ($review->rating ?? 0), 1) }}/5</p>
+                        {{ number_format((float) ($review->rating ?? 0), 1) }}/5
+                    </p>
                 </div>
                 <span class="px-3 py-1.5 rounded-lg bg-amber-50 text-amber-700 font-bold text-[12px]">Ulasan</span>
             </div>
@@ -26,7 +27,8 @@
                 <p class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest mb-2">Komentar</p>
                 <div class="rounded-[16px] border border-slate-200 bg-slate-50 p-5">
                     <p class="text-slate-700 text-[14px] leading-relaxed whitespace-pre-wrap">
-                        {{ $review->comment ?: 'Tanpa komentar.' }}</p>
+                        {{ $review->comment ?: 'Tanpa komentar.' }}
+                    </p>
                 </div>
             </div>
 
@@ -34,11 +36,14 @@
                 <div class="bg-slate-50 rounded-[14px] p-4 border border-slate-100">
                     <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Freelancer</p>
                     <p class="font-semibold text-slate-800">
-                        {{ optional($review->order->service->freelancer->skomda_student)->name ?? '-' }}</p>
+                        {{ optional($review->order->service->freelancer->skomda_student)->name ?? '-' }}
+                    </p>
                 </div>
                 <div class="bg-slate-50 rounded-[14px] p-4 border border-slate-100">
                     <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Tanggal</p>
-                    <p class="font-semibold text-slate-800">{{ optional($review->created_at)->timezone(config('app.timezone'))->format('d M Y H:i') ?? '-' }} WIB
+                    <p class="font-semibold text-slate-800">
+                        {{ optional($review->created_at)->timezone(config('app.timezone'))->format('d M Y H:i') ?? '-' }}
+                        WIB
                     </p>
                 </div>
             </div>
