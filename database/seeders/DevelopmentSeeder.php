@@ -13,7 +13,6 @@ use App\Models\Result;
 use App\Models\Review;
 use App\Models\Service;
 use App\Models\ServiceCategory;
-use App\Models\SkomdaStudent;
 use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -46,7 +45,15 @@ class DevelopmentSeeder extends Seeder
         );
 
         // 2 - BASE USER DATA
-        // $students = SkomdaStudent::factory(50)->create();
+        Client::updateOrCreate(
+            ['email' => 'client1@email.com'],
+            [
+                'name' => 'Client 1',
+                'password' => bcrypt('client123'),
+                'phone' => '081234567890',
+            ]
+        );
+        
         $clients = Client::factory(10)->create();
         User::factory(5)->create();
 
