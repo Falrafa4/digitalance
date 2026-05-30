@@ -45,6 +45,7 @@ Digitalance dibuat untuk:
 - Kategori layanan
 - Dashboard berbeda untuk setiap role
 - Attachment upload pada order
+- Upload gambar profil dan portofolio dengan konversi WebP
 - Dokumentasi API sederhana
 - Realtime infrastructure (persiapan negotiation/chat)
 
@@ -108,7 +109,7 @@ Digitalance dibuat untuk:
 
 ## Frontend
 - Blade Templates
-- Tailwind CSS
+- Tailwind CSS melalui Vite/PostCSS
 - Vanilla JavaScript
 - Vite (`vite`, `laravel-vite-plugin`)
 
@@ -136,6 +137,7 @@ Digitalance menggunakan pendekatan:
 ## Requirements
 
 - PHP >= 8.2
+- PHP GD extension
 - Composer
 - Node.js + npm
 - MySQL
@@ -214,7 +216,21 @@ php artisan migrate --seed
 npm install
 ```
 
-### 9. Jalankan Aplikasi
+### 9. Build Asset Frontend
+
+Development:
+
+```bash
+npm run dev
+```
+
+Production:
+
+```bash
+npm run build
+```
+
+### 10. Jalankan Aplikasi
 
 Rekomendasi:
 
@@ -229,7 +245,7 @@ php artisan serve
 npm run dev
 ```
 
-### 10. Akses Aplikasi
+### 11. Akses Aplikasi
 
 ```text
 http://localhost:8000
@@ -308,8 +324,10 @@ Jika tidak mengetahui email seeded account, pengguna dapat melakukan registrasi 
 
 ```text
 app/                # Controllers, Models, Form Requests
+app/Support/        # Helper pendukung seperti optimasi upload gambar
 routes/             # web.php dan api.php
 resources/views/    # Blade templates
+resources/css/      # Input Tailwind/Vite
 public/js/          # Vanilla JavaScript
 public/css/         # Styling dashboard
 database/           # Migrations, factories, seeders
@@ -325,6 +343,15 @@ docs/               # Dokumentasi internal
 - Realtime negotiation/chat belum sepenuhnya selesai end-to-end
 - Payment gateway belum diimplementasikan
 - Test coverage masih minimal dan membutuhkan perluasan feature testing
+
+---
+
+# 🖼️ Optimasi Gambar
+
+- Upload gambar profil dan portofolio disimpan sebagai WebP di disk `public`.
+- Path yang disimpan di database tetap relatif terhadap `storage/app/public`, contohnya `profiles/xxxxx.webp`.
+- Placeholder default foto profil menggunakan `profiles/placeholder.webp`.
+- Beberapa gambar list/card memakai lazy loading agar halaman lebih ringan saat discroll.
 
 ---
 

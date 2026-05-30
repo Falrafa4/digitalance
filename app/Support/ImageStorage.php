@@ -14,6 +14,7 @@ class ImageStorage
         $image = match ($file->getMimeType()) {
             'image/jpeg', 'image/jpg' => imagecreatefromjpeg($file->getPathname()),
             'image/png' => imagecreatefrompng($file->getPathname()),
+            'image/webp' => imagecreatefromwebp($file->getPathname()),
             'image/gif' => imagecreatefromgif($file->getPathname()),
             default => null,
         };
@@ -35,7 +36,7 @@ class ImageStorage
         }
 
         imagewebp($image, $fullPath, 80);
-        // imagedestroy($image);
+        imagedestroy($image);
 
         return $path;
     }
