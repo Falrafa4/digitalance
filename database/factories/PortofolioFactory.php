@@ -18,7 +18,7 @@ class PortofolioFactory extends Factory
     public function definition(): array
     {
         $portfolioSamples = [
-            ['title' => 'Landing Page Website 1', 'description' => 'Halaman promosi untuk jasa servis AC dengan form lead, CTA WhatsApp, dan optimasi mobile speed.'],
+            ['title' => 'Landing Page Website', 'description' => 'Halaman promosi untuk jasa servis AC dengan form lead, CTA WhatsApp, dan optimasi mobile speed.'],
             ['title' => 'Redesign Company Profile Klinik', 'description' => 'Peremajaan tampilan website klinik agar lebih modern, informatif, dan mudah diakses pasien.'],
             ['title' => 'Dashboard Monitoring Penjualan', 'description' => 'Dashboard internal untuk memantau transaksi harian, performa produk, dan laporan bulanan.'],
             ['title' => 'UI Kit Aplikasi Booking', 'description' => 'Paket komponen antarmuka untuk aplikasi booking jasa, termasuk tombol, kartu layanan, dan form checkout.'],
@@ -27,11 +27,14 @@ class PortofolioFactory extends Factory
 
         $sample = fake()->randomElement($portfolioSamples);
 
+        // random portofolio (portofolio-1, portofolio-2, dst)
+        $portofolio = fake()->numberBetween(1, 4);
+
         return [
             'service_id' => Service::inRandomOrder()->first()->id,
             'title' => $sample['title'],
             'description' => $sample['description'],
-            'media_url' => 'https://picsum.photos/seed/portfolio-'.fake()->unique()->numberBetween(1, 9999).'/1280/720',
+            'media_url' => "portofolios/portofolio-{$portofolio}.webp",
         ];
     }
 }

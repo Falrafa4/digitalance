@@ -15,11 +15,11 @@
         </div>
         <div class="flex items-center gap-3" id="dashboard-summary-cards">
             <div class="bg-white px-4 py-2 rounded-xl border border-slate-200 shadow-sm flex flex-col items-end">
-                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Today's Orders</span>
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Pesanan Hari Ini</span>
                 <span class="text-lg font-black text-slate-900">{{ $todayOrders ?? 0 }}</span>
             </div>
             <div class="bg-white px-4 py-2 rounded-xl border border-slate-200 shadow-sm flex flex-col items-end">
-                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Est. Revenue</span>
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Pendapatan Hari Ini</span>
                 <span
                     class="text-lg font-black text-slate-900 text-[#0f766e]">Rp{{ number_format(($todayRevenue ?? 0), 0, ',', '.') }}</span>
             </div>
@@ -36,7 +36,7 @@
                 <i class="ri-group-line"></i>
             </div>
             <div>
-                <span class="text-slate-400 text-[10px] font-extrabold uppercase tracking-widest">Total Users</span>
+                <span class="text-slate-400 text-[10px] font-extrabold uppercase tracking-widest">Total Pengguna</span>
                 <div class="text-[1.85rem] font-extrabold text-slate-900 leading-none mt-1">
                     {{ number_format($totalUsers ?? 0) }}
                 </div>
@@ -51,7 +51,7 @@
                 <i class="ri-money-dollar-circle-line"></i>
             </div>
             <div>
-                <span class="text-slate-400 text-[10px] font-extrabold uppercase tracking-widest">Platform Revenue</span>
+                <span class="text-slate-400 text-[10px] font-extrabold uppercase tracking-widest">Total Pendapatan</span>
                 <div class="text-[1.85rem] font-extrabold text-slate-900 leading-none mt-1">
                     <span
                         class="text-[0.6em] text-slate-400 mr-0.5">Rp</span>{{ number_format(($totalRevenue ?? 0) / 1000, 0) }}<span
@@ -68,7 +68,7 @@
                 <i class="ri-exchange-funds-line"></i>
             </div>
             <div>
-                <span class="text-slate-400 text-[10px] font-extrabold uppercase tracking-widest">Total Turnover</span>
+                <span class="text-slate-400 text-[10px] font-extrabold uppercase tracking-widest">Total Transaksi</span>
                 <div class="text-[1.85rem] font-extrabold text-slate-900 leading-none mt-1">
                     <span
                         class="text-[0.6em] text-slate-400 mr-0.5">Rp</span>{{ number_format(($totalTurnover ?? 0) / 1000000, 1) }}<span
@@ -128,7 +128,7 @@
             <section>
                 <div class="flex items-center justify-between mb-6">
                     <div>
-                        <h2 class="font-display text-[1.4rem] font-extrabold text-slate-900">Pesanan Bersengketa</h2>
+                        <h2 class="font-display text-[1.4rem] font-extrabold text-slate-900">Pesanan Revisi</h2>
                         <p class="text-slate-500 text-xs">Pesanan dalam status Revision yang memerlukan pantauan.</p>
                     </div>
                     <a href="{{ route('admin.orders.index') }}"
