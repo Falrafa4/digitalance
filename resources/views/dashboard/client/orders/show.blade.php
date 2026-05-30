@@ -52,7 +52,7 @@
               <x-ui.status-badge :status="$order->status ?? '-'" />
               <span
                 class="px-3 py-1 rounded-full text-[12px] font-extrabold bg-white text-slate-700 border border-slate-200">
-                Agreed: Rp {{ number_format((float) ($order->agreed_price ?? 0), 0, ',', '.') }}
+                Agreed: Rp{{ number_format((float) ($order->agreed_price ?? 0), 0, ',', '.') }}
               </span>
             </div>
           </div>
@@ -148,7 +148,7 @@
             <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
               <div>
                 <h3 class="font-display font-extrabold text-slate-900 text-[1.1rem]">Harga Fluancer</h3>
-                <p class="text-2xl font-black text-[#0f766e] mt-1">Rp {{ number_format($order->agreed_price, 0, ',', '.') }}
+                <p class="text-2xl font-black text-[#0f766e] mt-1">Rp{{ number_format($order->agreed_price, 0, ',', '.') }}
                 </p>
                 <p class="text-[12px] text-slate-500 mt-1">Dari lamaran lowongan:
                   {{ optional($order->lokerApplication->freelancer->skomda_student)->name ?? 'Freelancer' }}
@@ -183,7 +183,7 @@
             <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
               <div>
                 <h3 class="font-display font-extrabold text-slate-900 text-[1.1rem]">Penawaran Harga Hasil Negosiasi</h3>
-                <p class="text-2xl font-black text-[#0f766e] mt-1">Rp {{ number_format($order->agreed_price, 0, ',', '.') }}
+                <p class="text-2xl font-black text-[#0f766e] mt-1">Rp{{ number_format($order->agreed_price, 0, ',', '.') }}
                 </p>
                 <p class="text-[12px] text-slate-500 mt-1">Silakan lakukan pelunasan untuk memulai project, atau ajukan
                   negosiasi ulang.</p>
@@ -230,7 +230,7 @@
                         class="text-red-500">*</span></label>
                     <div class="relative">
                       <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 font-semibold">Rp</span>
-                      <input type="number" name="new_price" required min="1000"
+                      <input type="text" name="new_price" required data-rupiah-input inputmode="numeric"
                         class="w-full pl-10 pr-4 py-3 rounded-[12px] border border-slate-200 focus:border-amber-400 outline-none text-sm font-semibold"
                         placeholder="Masukkan angka yang kamu mau">
                     </div>
@@ -333,7 +333,7 @@
               <p class="text-slate-500 text-[13.5px] mt-1">Diskusi detail, nego harga, revisi, dll.</p>
             </div>
             <a href="{{ route('client.messages.index') }}" class="px-4 py-2.5 rounded-[12px] bg-white border border-slate-200 text-slate-700 font-bold text-[12.5px]
-                                hover:border-[#0f766e] hover:text-[#0f766e] transition-all">
+                                    hover:border-[#0f766e] hover:text-[#0f766e] transition-all">
               Inbox
             </a>
           </div>

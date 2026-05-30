@@ -276,13 +276,18 @@
                     const suffix = el.dataset.suffix || "";
                     const prefix = el.dataset.prefix || "";
                     const dec = parseInt(el.dataset.decimal || "0");
+                    const isRupiah = el.dataset.currency === "rupiah";
                     const dur = 1500;
                     const t0 = performance.now();
 
                     (function step(now) {
                         const p = Math.min((now - t0) / dur, 1);
                         const v = target * (1 - Math.pow(1 - p, 3));
-                        el.textContent = prefix + v.toFixed(dec) + suffix;
+                        if (isRupiah && window.DigitalanceUtils?.formatRupiah) {
+                            el.textContent = window.DigitalanceUtils.formatRupiah(v);
+                        } else {
+                            el.textContent = prefix + v.toFixed(dec) + suffix;
+                        }
                         if (p < 1) requestAnimationFrame(step);
                     })(t0);
                 }

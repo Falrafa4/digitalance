@@ -33,6 +33,9 @@ class ResultController extends Controller
 
     public function store(StoreResultRequest $request, string $orderId)
     {
+        if ($resp = $this->ensureFreelancerApproved())
+            return $resp;
+
         $freelancer = auth('freelancer')->user();
         $order = Order::with('service')->findOrFail($orderId);
         $validated = $request->validated();

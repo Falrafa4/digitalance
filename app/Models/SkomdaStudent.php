@@ -9,7 +9,7 @@ class SkomdaStudent extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['nis', 'name', 'email', 'phone', 'class', 'major'];
+    protected $fillable = ['nis', 'name', 'email', 'phone', 'class', 'major', 'avatar'];
 
     public function getRouteKeyName()
     {

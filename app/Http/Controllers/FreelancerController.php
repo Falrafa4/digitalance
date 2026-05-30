@@ -156,6 +156,28 @@ class FreelancerController extends Controller
             return redirect()->route('freelancer.profile')->with('error', 'Password salah');
         }
 
+        // Before deleting, if the freelancer's email domain indicates they're a Skomda student,
+        // recreate a SkomdaStudent record so they can register again as a student.
+        try {
+            $email = strtolower($freelancer->email ?? '');
+            if ($email && (str_contains($email, 'telkom') || str_contains($email, 'skomda') || str_contains($email, 'smk'))) {
+                $exists = \App\Models\SkomdaStudent::where('email', $freelancer->email)->exists();
+                if (!$exists) {
+                    \App\Models\SkomdaStudent::create([
+                        'nis' => null,
+                        'name' => $freelancer->name ?? ($freelancer->skomda_student->name ?? 'Siswa'),
+                        'email' => $freelancer->email,
+                        'phone' => $freelancer->phone ?? null,
+                        'class' => null,
+                        'major' => null,
+                        'avatar' => $freelancer->profile_photo ?? null,
+                    ]);
+                }
+            }
+        } catch (\Throwable $e) {
+            // ignore failures during fallback recreation
+        }
+
         $this->deleteProfilePhoto($freelancer->profile_photo);
         $freelancer->delete();
 
@@ -289,6 +311,44 @@ class FreelancerController extends Controller
 
         return redirect()->route('admin.freelancers.index')
             ->with('success', 'Freelancer berhasil diaktifkan kembali');
+    }
+
+    /**
+     * Freelancer applies for verification — triggered from onboarding modal.
+     */
+    public function applyForVerification(Request $request)
+    {
+        /** @var Freelancer $freelancer */
+        $freelancer = auth('freelancer')->user();
+        if (!$freelancer) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        // If already approved or already pending, return appropriate response
+        if ($freelancer->status === 'Approved') {
+            return response()->json(['message' => 'Akun sudah terverifikasi'], 200);
+        }
+
+        if ($freelancer->status === 'Pending') {
+            return response()->json(['message' => 'Permintaan verifikasi sudah dikirim. Tunggu keputusan admin.'], 200);
+        }
+
+        // Update status to Pending and notify all administrators
+        $freelancer->update(['status' => 'Pending']);
+
+        $admins = \App\Models\Administrator::all();
+        foreach ($admins as $admin) {
+            \App\Models\Notification::create([
+                'title' => 'Permintaan Verifikasi Freelancer',
+                'message' => "Freelancer '{$freelancer->getNameAttribute()}' (ID: {$freelancer->id}) mengajukan verifikasi.",
+                'type' => 'info',
+                'role' => 'admin',
+                'user_id' => $admin->id,
+                'link' => route('admin.freelancers.show', $freelancer->id),
+            ]);
+        }
+
+        return response()->json(['message' => 'Permintaan verifikasi berhasil dikirim. Tunggu konfirmasi dari admin.']);
     }
 
     // =========================

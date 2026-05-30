@@ -24,7 +24,7 @@
                     {{ $o->service->title ?? '-' }}
                   </p>
                   <p class="text-slate-400 text-[12px] font-bold mt-2">
-                    Agreed: Rp {{ number_format((float) ($o->agreed_price ?? 0), 0, ',', '.') }}
+                    Agreed: Rp{{ number_format((float) ($o->agreed_price ?? 0), 0, ',', '.') }}
                   </p>
                 </div>
                 <x-ui.status-badge :status="$o->status ?? '-'" />

@@ -17,13 +17,13 @@ class OfferController extends Controller
         // PERBAIKAN TASK 4: Ambil koleksi penuh menggunakan get() dengan Eager Loading relasi krusial lengkap
         // Ini memastikan JavaScript Client-side Pagination & Pencarian Global berfungsi 100% akurat di semua baris
         $offers = Offer::with([
-            'order.service.freelancer.skomda_student', 
+            'order.service.freelancer.skomda_student',
             'order.client',
             'order.service.service_category'
-        ])->latest()->get(); 
+        ])->latest()->get();
 
         $negotiations = Negotiation::with([
-            'order.client', 
+            'order.client',
             'order.service.freelancer.skomda_student'
         ])->latest()->get();
 
@@ -100,6 +100,9 @@ class OfferController extends Controller
 
     public function freelancerStore(StoreOfferRequest $request)
     {
+        if ($resp = $this->ensureFreelancerApproved())
+            return $resp;
+
         $validatedData = $request->validated();
         $freelancer = auth('freelancer')->user();
 
@@ -117,6 +120,9 @@ class OfferController extends Controller
 
     public function freelancerUpdate(UpdateOfferRequest $request, Offer $offer)
     {
+        if ($resp = $this->ensureFreelancerApproved())
+            return $resp;
+
         if ($offer->order->service->freelancer_id !== auth('freelancer')->id()) {
             abort(403, 'Akses ditolak.');
         }

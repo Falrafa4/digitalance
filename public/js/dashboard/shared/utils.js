@@ -8,10 +8,7 @@
 window.DashboardUtils = window.DigitalanceUtils;
 
 window.DashboardUtils.formatRupiah = function(value) {
-    if (value === null || value === undefined || value === '') return 'Rp 0';
-    var num = typeof value === 'string' ? parseFloat(value.replace(/[^0-9]/g, '')) : value;
-    if (isNaN(num)) return 'Rp 0';
-    return 'Rp ' + num.toLocaleString('id-ID');
+    return window.DigitalanceUtils.formatRupiah(value);
 };
 
 window.DashboardUtils.safeText = function(v) {

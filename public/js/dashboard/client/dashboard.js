@@ -40,7 +40,8 @@
   const money = (v) => {
     if (!v && v !== 0) return '—';
     try {
-      return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(v);
+      return window.DigitalanceUtils?.formatRupiah(v)
+        || new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(v);
     } catch (e) {
       return String(v);
     }

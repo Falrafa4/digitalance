@@ -4,14 +4,17 @@
 @section('content')
     @php
         $student = $freelancer->skomda_student;
-        $displayName = $student?->name ?? $freelancer->name ?? 'Freelancer';
-        $displayEmail = $student?->email ?? '-';
-        $displayPhone = $student?->phone ?? '-';
-        $displayMajor = $student?->major ?? 'Siswa SKOMDA';
-        $displayClass = $student?->class ?? '-';
-        $displayNis = $student?->nis ?? '-';
-        $avatarFallbackUrl = 'https://api.dicebear.com/7.x/avataaars/svg?seed=' . urlencode('freelancer-' . $displayNis . '-' . random_int(1000, 999999));
-        $avatarUrl = $freelancer->profile_photo ? asset('storage/' . $freelancer->profile_photo) : $avatarFallbackUrl;
+        $displayName = $student->name ?? $freelancer->name ?? 'Freelancer';
+        $displayEmail = $student->email ?? '-';
+        $displayPhone = $student->phone ?? '-';
+        $displayMajor = $student->major ?? 'Siswa SKOMDA';
+        $displayClass = $student->class ?? '-';
+        $displayNis = $student->nis ?? '-';
+        $avatarUrl = $freelancer->profile_photo 
+            ? asset('storage/' . $freelancer->profile_photo) 
+            : ($student->avatar 
+                ? asset('storage/' . $student->avatar) 
+                : 'https://api.dicebear.com/7.x/initials/svg?seed=' . urlencode($displayName . '-' . ($displayNis ?? '0')) . '&background=0f766e&color=fff&size=128');
         $serviceItems = $services ?? collect();
         $portfolioItems = $portofolios ?? collect();
         $skillItems = $skillTags ?? collect();
@@ -40,8 +43,6 @@
                     <div class="flex flex-col sm:flex-row gap-5 sm:items-center min-w-0">
                         <div class="shrink-0">
                             <img src="{{ $avatarUrl }}" alt="{{ $displayName }}"
-                                onerror="this.onerror=null;this.src='{{ $avatarFallbackUrl }}'"
-                                loading="lazy" decoding="async"
                                 class="w-28 h-28 sm:w-32 sm:h-32 rounded-[28px] object-cover border-4 border-white/20 shadow-2xl" />
                         </div>
                         <div class="min-w-0">
@@ -173,8 +174,8 @@
                                         {{ $service->description }}
                                     </p>
                                     <div class="flex flex-wrap gap-2 mt-4 text-[12px] text-slate-500 font-semibold">
-                                        <span class="px-3 py-1 rounded-full bg-slate-100">Rp {{ number_format((float) ($service->price_min ?? 0), 0, ',', '.') }}</span>
-                                        <span class="px-3 py-1 rounded-full bg-slate-100">Sampai Rp {{ number_format((float) ($service->price_max ?? 0), 0, ',', '.') }}</span>
+                                        <span class="px-3 py-1 rounded-full bg-slate-100">Rp{{ number_format((float) ($service->price_min ?? 0), 0, ',', '.') }}</span>
+                                        <span class="px-3 py-1 rounded-full bg-slate-100">Sampai Rp{{ number_format((float) ($service->price_max ?? 0), 0, ',', '.') }}</span>
                                         <span class="px-3 py-1 rounded-full bg-slate-100">{{ $service->delivery_time ?? '-' }} hari</span>
                                     </div>
                                     <div class="mt-4">

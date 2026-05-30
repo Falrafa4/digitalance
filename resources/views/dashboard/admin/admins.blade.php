@@ -41,9 +41,7 @@
 
                     <div class="flex justify-between items-start mb-4">
                         <div class="relative">
-                            <img class="w-14 h-14 rounded-[15px] object-cover border-2 border-slate-50 group-hover:border-teal-100 transition-all"
-                                src="{{ $admin->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode($admin->name) . '&background=0f766e&color=ffffff' }}"
-                                alt="{{ $admin->name }}" />
+                            <x-avatar :user="$admin" role="admin" photo-field="avatar" :size="56" class="w-14 h-14 rounded-[15px] object-cover border-2 border-slate-50 group-hover:border-teal-100 transition-all" />
                         </div>
                         <button onclick="openPasswordModal({{ $admin->id }})"
                             class="w-9 h-9 rounded-xl bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-amber-500 hover:text-white transition-all"

@@ -207,7 +207,7 @@
                                 <div class="relative group">
                                     <span
                                         class="absolute left-6 top-1/2 -translate-y-1/2 text-emerald-600 font-black text-xl">Rp</span>
-                                    <input type="number" name="agreed_price" id="agreed_price" required step="1"
+                                    <input type="text" name="agreed_price" id="agreed_price" required data-rupiah-input inputmode="numeric"
                                         class="w-full pl-16 pr-6 py-5 bg-white border-2 border-emerald-100 rounded-2xl focus:border-emerald-500 focus:ring-8 focus:ring-emerald-500/10 outline-none transition-all font-black text-slate-900 text-2xl shadow-inner text-center md:text-left"
                                         value="{{ old('agreed_price', (int) ($order->agreed_price ?? $order->service?->price_min ?? 0)) }}">
                                 </div>
@@ -275,7 +275,7 @@
                                     Kesepakatan Baru (ACC)</label>
                                 <div class="relative">
                                     <span class="absolute left-4 top-1/2 -translate-y-1/2 text-teal-600 font-bold">Rp</span>
-                                    <input type="number" name="agreed_price" id="agreed_price" required step="1"
+                                    <input type="text" name="agreed_price" id="agreed_price" required data-rupiah-input inputmode="numeric"
                                         class="w-full pl-12 pr-4 py-4 bg-white border-2 border-teal-100 rounded-xl focus:border-teal-500 outline-none font-bold text-slate-900 shadow-sm"
                                         value="{{ old('agreed_price', (int) ($order->agreed_price ?? $order->service?->price_min ?? 0)) }}">
                                 </div>

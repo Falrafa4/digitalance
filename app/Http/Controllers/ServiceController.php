@@ -257,6 +257,9 @@ class ServiceController extends Controller
      */
     public function create()
     {
+        if ($resp = $this->ensureFreelancerApproved())
+            return $resp;
+
         $categories = ServiceCategory::query()
             ->where('is_active', true)
             ->orderBy('name')
@@ -270,13 +273,22 @@ class ServiceController extends Controller
      */
     public function store(StoreServiceRequest $request)
     {
+        if ($resp = $this->ensureFreelancerApproved())
+            return $resp;
+
         $freelancer = auth('freelancer')->user();
+        $formAction = $request->input('form_action', 'draft');
+
         $service = Service::create(array_merge($request->validated(), [
             'freelancer_id' => $freelancer->id,
-            'status' => 'Pending',
+            'status' => $formAction === 'submit' ? 'Pending' : 'Draft',
         ]));
 
-        return redirect()->route('freelancer.services.show', $service->id)->with('success', 'Layanan berhasil ditambahkan');
+        $message = $formAction === 'submit'
+            ? 'Layanan berhasil diajukan untuk tinjauan admin.'
+            : 'Layanan berhasil disimpan sebagai draft.';
+
+        return redirect()->route('freelancer.services.show', $service->id)->with('success', $message);
     }
 
     /**
@@ -305,6 +317,9 @@ class ServiceController extends Controller
      */
     public function edit(string $id)
     {
+        if ($resp = $this->ensureFreelancerApproved())
+            return $resp;
+
         $freelancer = auth('freelancer')->user();
         $service = Service::with('category:id,name')
             ->where('freelancer_id', $freelancer->id)
@@ -318,9 +333,16 @@ class ServiceController extends Controller
      */
     public function update(UpdateServiceRequest $request, string $id)
     {
+        if ($resp = $this->ensureFreelancerApproved())
+            return $resp;
+
         $freelancer = auth('freelancer')->user();
         $service = Service::where('freelancer_id', $freelancer->id)->findOrFail($id);
-        $service->update($request->validated());
+
+        $service->update(array_merge($request->validated(), [
+            'category_id' => $service->category_id,
+            'freelancer_id' => $service->freelancer_id,
+        ]));
 
         return redirect()->route('freelancer.services.index')->with('success', 'Layanan berhasil diperbarui');
     }
@@ -330,6 +352,9 @@ class ServiceController extends Controller
      */
     public function destroy(string $id)
     {
+        if ($resp = $this->ensureFreelancerApproved())
+            return $resp;
+
         $freelancer = auth('freelancer')->user();
         $service = Service::where('freelancer_id', $freelancer->id)->findOrFail($id);
         $service->delete();
@@ -339,6 +364,9 @@ class ServiceController extends Controller
 
     public function submit(int $id)
     {
+        if ($resp = $this->ensureFreelancerApproved())
+            return $resp;
+
         $freelancer = auth('freelancer')->user();
         $service = Service::where('freelancer_id', $freelancer->id)
             ->where('status', 'Draft')

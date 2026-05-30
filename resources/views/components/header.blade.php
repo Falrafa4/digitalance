@@ -54,11 +54,7 @@
         <a href="{{ $urlProfil }}"
             class="flex items-center gap-[11px] cursor-pointer hover:opacity-80 transition-opacity">
 
-            <img class="w-[42px] h-[42px] rounded-xl object-cover"
-                src="{{ $user?->profile_photo
-    ? asset('storage/' . $user->profile_photo)
-    : 'https://ui-avatars.com/api/?name=' . urlencode($user?->name ?? $user?->email) . '&background=0f766e&color=fff' }}" alt="{{ $user?->name ?? 'Profile' }}"
-                loading="lazy" decoding="async" />
+<x-avatar :user="$user" :role="$role" :size="42" class="w-[42px] h-[42px] rounded-xl object-cover" alt="{{ $user?->name ?? 'Profile' }}" loading="lazy" decoding="async" />
 
             <div class="hidden sm:flex flex-col">
                 <span class="font-bold text-[13.5px] text-slate-800 leading-none">

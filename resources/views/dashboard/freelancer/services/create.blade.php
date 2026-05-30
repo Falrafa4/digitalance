@@ -24,7 +24,25 @@
                 @csrf
                 @include('dashboard.freelancer.services._form-fields', ['categories' => $categories])
 
-                <x-form-actions submitLabel="Simpan Service" cancelUrl="{{ route('freelancer.services.index') }}" />
+                <div class="flex items-center justify-between gap-4 pt-6 border-t border-slate-200">
+                    <a href="{{ route('freelancer.services.index') }}"
+                        class="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 font-semibold hover:bg-slate-50 transition-colors">
+                        Batal
+                    </a>
+
+                    <div class="flex items-center gap-3">
+                        <button type="submit" name="form_action" value="draft"
+                            class="inline-flex items-center gap-2 px-6 py-2 rounded-lg border border-slate-300 text-slate-700 font-semibold hover:bg-slate-50 transition-colors">
+                            <i class="ri-save-line"></i>
+                            Simpan Draft
+                        </button>
+                        <button type="submit" name="form_action" value="submit"
+                            class="inline-flex items-center gap-2 px-6 py-2 rounded-lg bg-[#0f766e] hover:bg-teal-800 text-white font-semibold transition-colors">
+                            <i class="ri-send-plane-fill"></i>
+                            Ajukan ke Admin
+                        </button>
+                    </div>
+                </div>
             </form>
         </x-form-layout>
     </div>

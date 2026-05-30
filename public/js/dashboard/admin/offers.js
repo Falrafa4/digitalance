@@ -165,7 +165,7 @@ function renderOffers() {
                     <div class="text-[10px] text-gray-400 uppercase font-medium">Kepada: ${offer.order?.service?.freelancer?.skomda_student?.name || 'Freelancer'}</div>
                 </td>
                 <td class="px-6 py-4 text-sm text-gray-600">${offer.order?.service?.title || 'Tidak tersedia'}</td>
-                <td class="px-6 py-4 text-sm font-bold text-teal-600">Rp ${Number(offer.offered_price || 0).toLocaleString('id-ID')}</td>
+                <td class="px-6 py-4 text-sm font-bold text-teal-600">${U.formatRupiah(offer.offered_price || 0)}</td>
                 <td class="px-6 py-4">
                     <span class="px-3 py-1 text-[10px] font-bold uppercase rounded-full ${getStatusColor(offer.status)}">${offer.status}</span>
                 </td>
@@ -343,7 +343,7 @@ function openOfferModal(id) {
             <div class="grid grid-cols-2 gap-4 mb-6">
                 <div class="p-4 bg-gray-50 rounded-2xl">
                     <span class="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Harga Ditawarkan</span>
-                    <div class="text-lg font-bold text-teal-600">Rp ${Number(o.offered_price || 0).toLocaleString('id-ID')}</div>
+                    <div class="text-lg font-bold text-teal-600">${U.formatRupiah(o.offered_price || 0)}</div>
                 </div>
                 <div class="p-4 bg-gray-50 rounded-2xl">
                     <span class="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Status</span>

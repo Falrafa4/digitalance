@@ -68,31 +68,121 @@ window.DigitalanceUtils = {
     },
 
     /**
+     * Parse a Rupiah-formatted value into a plain integer.
+     */
+    parseRupiahValue: function(value) {
+        if (value === null || value === undefined || value === '') return '';
+
+        if (typeof value === 'number') {
+            return Number.isFinite(value) ? value : '';
+        }
+
+        var raw = String(value).trim();
+        if (!raw) return '';
+
+        var compact = raw.replace(/\s/g, '').replace(/[^0-9.,-]/g, '');
+
+        if (compact.indexOf(',') !== -1) {
+            var indonesian = compact.replace(/\./g, '').replace(/,/g, '.');
+            var parsedIndonesian = Number(indonesian.replace(/[^0-9.-]/g, ''));
+            return Number.isFinite(parsedIndonesian) ? parsedIndonesian : '';
+        }
+
+        var dotCount = (compact.match(/\./g) || []).length;
+        if (dotCount === 1) {
+            var dotParts = compact.split('.');
+            var decimalPart = dotParts[1] || '';
+
+            // Database values often arrive as "2222222.00"; treat those as plain rupiah integers.
+            if (/^\d{1,2}$/.test(decimalPart)) {
+                var decimalValue = Number(dotParts[0] + '.' + decimalPart);
+                return Number.isFinite(decimalValue) ? decimalValue : '';
+            }
+        }
+
+        // Treat dot-separated currency input as a thousand-grouped rupiah value.
+        var thousandsSeparated = Number(compact.replace(/\./g, '').replace(/[^0-9.-]/g, ''));
+        return Number.isFinite(thousandsSeparated) ? thousandsSeparated : '';
+    },
+
+    /**
+     * Format an amount as Indonesian Rupiah without decimals.
+     */
+    formatRupiah: function(value) {
+        var num = this.parseRupiahValue(value);
+        if (num === '') return 'Rp0';
+
+        return new Intl.NumberFormat('id-ID', {
+            style: 'currency',
+            currency: 'IDR',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        }).format(num);
+    },
+
+    /**
      * Format currency to IDR
      */
     formatCurrency: function(value) {
-        if (value === null || value === undefined || value === '') return '—';
-        if (typeof value === 'string') return value;
+        var num = this.parseRupiahValue(value);
+        if (num === '') return '—';
+
         try {
             return new Intl.NumberFormat('id-ID', {
                 style: 'currency',
                 currency: 'IDR',
                 minimumFractionDigits: 0,
                 maximumFractionDigits: 0
-            }).format(value);
+            }).format(num);
         } catch (e) {
-            return String(value);
+            return String(num);
         }
     },
 
     /**
-     * Format currency to Rupiah string
+     * Format an amount for use inside an editable Rupiah input.
      */
-    formatRupiah: function(value) {
-        if (value === null || value === undefined || value === '') return 'Rp 0';
-        var num = typeof value === 'string' ? parseFloat(value.replace(/[^0-9]/g, '')) : value;
-        if (isNaN(num)) return 'Rp 0';
-        return 'Rp ' + num.toLocaleString('id-ID');
+    formatRupiahInput: function(value) {
+        var num = this.parseRupiahValue(value);
+        if (num === '') return '';
+
+        return new Intl.NumberFormat('id-ID', {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        }).format(num);
+    },
+
+    /**
+     * Initialize automatic Rupiah formatting for inputs.
+     */
+    initRupiahInputs: function(root) {
+        var scope = root || document;
+        var fields = scope.querySelectorAll('input[data-rupiah-input]');
+
+        fields.forEach(function(input) {
+            if (input.dataset.rupiahBound === '1') return;
+            input.dataset.rupiahBound = '1';
+
+            var formatValue = function() {
+                input.value = window.DigitalanceUtils.formatRupiahInput(input.value);
+            };
+
+            formatValue();
+
+            input.addEventListener('input', formatValue);
+            input.addEventListener('blur', formatValue);
+
+            var form = input.form;
+            if (!form || form.dataset.rupiahSubmitBound === '1') return;
+
+            form.dataset.rupiahSubmitBound = '1';
+            form.addEventListener('submit', function() {
+                form.querySelectorAll('input[data-rupiah-input]').forEach(function(field) {
+                    var parsed = window.DigitalanceUtils.parseRupiahValue(field.value);
+                    field.value = parsed === '' ? '' : String(parsed);
+                });
+            });
+        });
     },
 
     /**
@@ -219,6 +309,10 @@ window.DigitalanceUtils = {
         }
     }
 };
+
+window.DigitalanceUtils.ready(function() {
+    window.DigitalanceUtils.initRupiahInputs();
+});
 
 // Backward compatibility alias
 window.DashboardUtils = window.DigitalanceUtils;

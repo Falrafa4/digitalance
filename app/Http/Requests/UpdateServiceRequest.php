@@ -22,8 +22,6 @@ class UpdateServiceRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'category_id' => 'required|exists:service_categories,id',
-            'freelancer_id' => 'required|exists:freelancers,id',
             'title' => 'required|string',
             'delivery_time' => 'required|integer',
             'price_min' => 'required|numeric',

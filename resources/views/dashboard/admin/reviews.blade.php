@@ -76,9 +76,13 @@
             @foreach($reviews as $review)
                 <div class="bg-white border border-slate-200 rounded-[24px] p-6 hover:shadow-lg transition-all duration-300">
                     <div class="flex items-start justify-between mb-5">
-                        <div class="flex items-center gap-3.5">
-                            <img src="https://ui-avatars.com/api/?name={{ urlencode($review->order->client->name ?? $review->order->client->email ?? 'User') }}&background=0f766e&color=fff"
-                                class="w-11 h-11 rounded-xl shadow-sm" />
+<div class="flex items-center gap-3.5">
+                            @php
+                                $clientAvatarUrl = $review->order->client->profile_photo 
+                                    ? asset('storage/' . $review->order->client->profile_photo) 
+                                    : 'https://api.dicebear.com/7.x/initials/svg?seed=' . urlencode($review->order->client->name ?? $review->order->client->email ?? 'User') . '&background=0f766e&color=fff&size=44';
+                            @endphp
+                            <img src="{{ $clientAvatarUrl }}" class="w-11 h-11 rounded-xl" />
                             <div>
                                 <h3 class="font-bold text-slate-900 text-[14.5px]">{{ $review->order->client->name ?? 'Klien' }}
                                 </h3>

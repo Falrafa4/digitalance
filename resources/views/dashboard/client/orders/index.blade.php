@@ -26,26 +26,26 @@
       <div data-client-pager data-page-size="8" class="space-y-4" x-data="{ loading: false }">
         <div class="grid grid-cols-1 xl:grid-cols-2 gap-5" data-pager-list>
           @foreach($orders as $o)
-            <div data-pager-item class="bg-white border border-slate-200 rounded-[18px] p-5 hover:shadow-lg transition-all">
-              <div class="flex items-start justify-between gap-4">
-                <div class="min-w-0">
-                  <div class="flex items-center gap-2 mb-1">
-                    @if($o->lokerApplication)
-                      <span
-                        class="px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-indigo-100 text-indigo-700 uppercase tracking-wider">Lowongan</span>
-                    @endif
-                    <p class="font-extrabold text-slate-900">Order #{{ $o->id }}</p>
-                  </div>
-                  <p class="text-slate-500 text-[13px] mt-1 truncate">
-                    @if($o->lokerApplication)
-                      {{ optional($o->freelancer->skomda_student)->name ?? 'Freelancer' }} - {{ Str::limit($o->brief, 40) }}
-                    @else
-                      {{ $o->service?->title ?? '-' }}
-                    @endif
+              <div data-pager-item class="bg-white border border-slate-200 rounded-[18px] p-5 hover:shadow-lg transition-all">
+                <div class="flex items-start justify-between gap-4">
+                  <div class="min-w-0">
+                    <div class="flex items-center gap-2 mb-1">
+                      @if($o->lokerApplication)
+                        <span
+                          class="px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-indigo-100 text-indigo-700 uppercase tracking-wider">Lowongan</span>
+                      @endif
+                      <p class="font-extrabold text-slate-900">Order #{{ $o->id }}</p>
+                    </div>
+                    <p class="text-slate-500 text-[13px] mt-1 truncate">
+                      @if($o->lokerApplication)
+                        {{ optional($o->freelancer->skomda_student)->name ?? 'Freelancer' }} - {{ Str::limit($o->brief, 40) }}
+                      @else
+                        {{ $o->service?->title ?? '-' }}
+                      @endif
                   </div>
                   <p class="text-slate-400 text-[12px] font-bold mt-2">
                     @if($o->agreed_price)
-                      Rp {{ number_format((float) $o->agreed_price, 0, ',', '.') }}
+                      Rp{{ number_format((float) $o->agreed_price, 0, ',', '.') }}
                     @else
                       Belum disepakati
                     @endif
@@ -59,15 +59,30 @@
                       @php
                         $status = strtolower($o->status ?? 'pending');
                         $progress = 0;
-                        switch($status) {
-                          case 'pending': $progress = 0; break;
-                          case 'negotiated': $progress = 25; break;
-                          case 'paid': $progress = 50; break;
-                          case 'in progress': $progress = 75; break;
-                          case 'revision': $progress = 85; break;
-                          case 'completed': $progress = 100; break;
-                          case 'cancelled': $progress = 0; break;
-                          default: $progress = 0;
+                        switch ($status) {
+                          case 'pending':
+                            $progress = 0;
+                            break;
+                          case 'negotiated':
+                            $progress = 25;
+                            break;
+                          case 'paid':
+                            $progress = 50;
+                            break;
+                          case 'in progress':
+                            $progress = 75;
+                            break;
+                          case 'revision':
+                            $progress = 85;
+                            break;
+                          case 'completed':
+                            $progress = 100;
+                            break;
+                          case 'cancelled':
+                            $progress = 0;
+                            break;
+                          default:
+                            $progress = 0;
                         }
                       @endphp
                       <div class="h-full w-[{{ $progress }}%] bg-emerald-600 transition-all duration-500"></div>
@@ -84,25 +99,25 @@
                 </a>
                 @if(!$o->lokerApplication)
                   <a href="{{ route('client.services.show', $o->service_id) }}" class="flex-1 px-4 py-2.5 rounded-[12px] bg-white border border-slate-200 text-slate-700 font-bold text-[12.5px]
-                                  hover:border-[#0f766e] hover:text-[#0f766e] transition-all text-center">
+                                                      hover:border-[#0f766e] hover:text-[#0f766e] transition-all text-center">
                     Lihat Jasa
                   </a>
                 @endif
               </div>
             </div>
           @endforeach
-        </div>
+      </div>
 
-        <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p class="text-slate-500 text-[12.5px] font-bold" data-pager-info></p>
-          <div class="flex items-center gap-2">
-            <button type="button" data-pager-prev
-              class="px-4 py-2.5 rounded-[12px] bg-white border border-slate-200 text-slate-700 font-bold text-[12.5px] hover:border-[#0f766e] hover:text-[#0f766e] disabled:opacity-40 transition-all">Sebelumnya</button>
-            <div class="flex items-center gap-2" data-pager-numbers></div>
-            <button type="button" data-pager-next
-              class="px-4 py-2.5 rounded-[12px] bg-white border border-slate-200 text-slate-700 font-bold text-[12.5px] hover:border-[#0f766e] hover:text-[#0f766e] disabled:opacity-40 transition-all">Berikutnya</button>
-          </div>
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
+        <p class="text-slate-500 text-[12.5px] font-bold" data-pager-info></p>
+        <div class="flex items-center gap-2">
+          <button type="button" data-pager-prev
+            class="px-4 py-2.5 rounded-[12px] bg-white border border-slate-200 text-slate-700 font-bold text-[12.5px] hover:border-[#0f766e] hover:text-[#0f766e] disabled:opacity-40 transition-all">Sebelumnya</button>
+          <div class="flex items-center gap-2" data-pager-numbers></div>
+          <button type="button" data-pager-next
+            class="px-4 py-2.5 rounded-[12px] bg-white border border-slate-200 text-slate-700 font-bold text-[12.5px] hover:border-[#0f766e] hover:text-[#0f766e] disabled:opacity-40 transition-all">Berikutnya</button>
         </div>
+      </div>
       </div>
     @endif
   </section>

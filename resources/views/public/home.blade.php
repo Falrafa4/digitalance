@@ -111,8 +111,8 @@
                         <path d="M16 3.13a4 4 0 0 1 0 7.75" />
                     </svg>
                 </div>
-                <p class="stat-number font-display text-[2rem] font-extrabold leading-none" data-target="500"
-                    data-suffix="+">
+                <p class="stat-number font-display text-[2rem] font-extrabold leading-none"
+                    data-target="{{ $usersCount ?? 0 }}" data-suffix="+">
                     0
                 </p>
                 <div>
@@ -130,8 +130,8 @@
                         <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
                     </svg>
                 </div>
-                <p class="stat-number font-display text-[2rem] font-extrabold leading-none" data-target="250"
-                    data-suffix="+">
+                <p class="stat-number font-display text-[2rem] font-extrabold leading-none"
+                    data-target="{{ $projectsCompleted ?? 0 }}" data-suffix="+">
                     0
                 </p>
                 <div>
@@ -151,8 +151,8 @@
                         <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
                     </svg>
                 </div>
-                <p class="stat-number font-display text-[2rem] font-extrabold leading-none" data-prefix="Rp "
-                    data-target="50" data-suffix="M+">
+                <p class="stat-number font-display text-[2rem] font-extrabold leading-none" data-currency="rupiah"
+                    data-target="{{ $totalTurnover ?? 0 }}">
                     0
                 </p>
                 <div>
@@ -171,8 +171,8 @@
                             points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
                     </svg>
                 </div>
-                <p class="stat-number font-display text-[2rem] font-extrabold leading-none" data-target="4.8"
-                    data-suffix="/5" data-decimal="1">
+                <p class="stat-number font-display text-[2rem] font-extrabold leading-none"
+                    data-target="{{ $avgRatingFormatted ?? '0.0' }}" data-suffix="/5" data-decimal="1">
                     0
                 </p>
                 <div>
@@ -532,155 +532,44 @@
                 </h2>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 stagger">
-                <div
-                    class="reveal bg-white border border-slate-200 rounded-3xl p-6 shadow-md transition-all hover:-translate-y-2 hover:shadow-xl">
-                    <div class="flex justify-between items-start mb-4">
-                        <div class="w-12 h-12 rounded-2xl gradient-bg shrink-0"></div>
-                        <div class="flex-1 ml-3">
-                            <p class="font-bold text-sm">Sarah Wijaya</p>
-                            <p class="text-xs text-slate-400 font-bold">
-                                Desainer UI/UX
-                            </p>
-                        </div>
-                        <div class="flex items-center gap-1">
-                            <svg width="14" height="14" fill="#F97316" viewBox="0 0 24 24">
-                                <polygon
-                                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                            </svg><span class="text-sm font-bold">5.0</span>
-                        </div>
-                    </div>
-                    <p class="italic font-medium text-slate-600 leading-relaxed mb-5 text-sm">
-                        "Platform ini benar-benar membantu saya mendapatkan proyek
-                        pertama sebagai freelancer. Kliennya profesional
-                        dan sistem pembayarannya aman."
-                    </p>
-                    <span class="t-badge">Terverifikasi</span>
-                </div>
+                @foreach($testimonials ?? collect() as $review)
+                    @php
+                        $author = optional($review->order->client)->name
+                            ?? optional(optional($review->order->service)->freelancer->skomda_student)->name
+                            ?? 'Pengguna';
+                        $role = optional($review->order->client)->name ? 'Klien' : 'Terverifikasi';
+                        $position = optional($review->order->client)->company ?? optional($review->order->service->freelancer->skomda_student)->major ?? '';
 
-                <div
-                    class="reveal bg-white border border-slate-200 rounded-3xl p-6 shadow-md transition-all hover:-translate-y-2 hover:shadow-xl">
-                    <div class="flex justify-between items-start mb-4">
-                        <div class="w-12 h-12 rounded-2xl gradient-bg shrink-0"></div>
-                        <div class="flex-1 ml-3">
-                            <p class="font-bold text-sm">Budi Santoso</p>
-                            <p class="text-xs text-slate-400 font-bold">
-                                CEO Startup Teknologi
-                            </p>
-                        </div>
-                        <div class="flex items-center gap-1">
-                            <svg width="14" height="14" fill="#F97316" viewBox="0 0 24 24">
-                                <polygon
-                                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                            </svg><span class="text-sm font-bold">5.0</span>
-                        </div>
-                    </div>
-                    <p class="italic font-medium text-slate-600 leading-relaxed mb-5 text-sm">
-                        "Kami terkesan dengan kualitas talenta SKOMDA. Proyek
-                        pengembangan web kami selesai lebih cepat dari
-                        jadwal dengan hasil yang memuaskan."
-                    </p>
-                    <span class="t-badge">Klien</span>
-                </div>
+                        // Determine profile photo: prefer client -> freelancer, fallback to placeholder
+                        $client = $review->order->client ?? null;
+                        $freelancer = optional($review->order->service)->freelancer ?? null;
+                        $photo = $client->profile_photo ?? ($freelancer->profile_photo ?? null);
+                        $photoUrl = $photo ? asset('storage/' . $photo) : asset('storage/profiles/placeholder.webp');
+                    @endphp
 
-                <div
-                    class="reveal bg-white border border-slate-200 rounded-3xl p-6 shadow-md transition-all hover:-translate-y-2 hover:shadow-xl">
-                    <div class="flex justify-between items-start mb-4">
-                        <div class="w-12 h-12 rounded-2xl gradient-bg shrink-0"></div>
-                        <div class="flex-1 ml-3">
-                            <p class="font-bold text-sm">Rani Kusuma</p>
-                            <p class="text-xs text-slate-400 font-bold">
-                                Pengembang Mobile
-                            </p>
+                    <div
+                        class="reveal bg-white border border-slate-200 rounded-3xl p-6 shadow-md transition-all hover:-translate-y-2 hover:shadow-xl">
+                        <div class="flex justify-between items-start mb-4">
+                            <img src="{{ $photoUrl }}" alt="{{ $author }}"
+                                class="w-12 h-12 object-cover rounded-2xl shrink-0" />
+                            <div class="flex-1 ml-3">
+                                <p class="font-bold text-sm">{{ $author }}</p>
+                                @if($position)
+                                    <p class="text-xs text-slate-400 font-bold">{{ $position }}</p>
+                                @endif
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <svg width="14" height="14" fill="#F97316" viewBox="0 0 24 24">
+                                    <polygon
+                                        points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                                </svg>
+                                <span class="text-sm font-bold">{{ number_format($review->rating ?? 0, 1) }}</span>
+                            </div>
                         </div>
-                        <div class="flex items-center gap-1">
-                            <svg width="14" height="14" fill="#F97316" viewBox="0 0 24 24">
-                                <polygon
-                                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                            </svg><span class="text-sm font-bold">5.0</span>
-                        </div>
+                        <p class="italic font-medium text-slate-600 leading-relaxed mb-5 text-sm">{{ $review->comment }}</p>
+                        <span class="t-badge">{{ $role }}</span>
                     </div>
-                    <p class="italic font-medium text-slate-600 leading-relaxed mb-5 text-sm">
-                        "Dari sini saya belajar banyak tentang
-                        profesionalisme. Pendampingan dari senior SKOMDA juga
-                        sangat membantu mengembangkan keahlian."
-                    </p>
-                    <span class="t-badge">Terverifikasi</span>
-                </div>
-
-                <div
-                    class="reveal bg-white border border-slate-200 rounded-3xl p-6 shadow-md transition-all hover:-translate-y-2 hover:shadow-xl">
-                    <div class="flex justify-between items-start mb-4">
-                        <div class="w-12 h-12 rounded-2xl gradient-bg shrink-0"></div>
-                        <div class="flex-1 ml-3">
-                            <p class="font-bold text-sm">David Chen</p>
-                            <p class="text-xs text-slate-400 font-bold">
-                                Direktur Pemasaran
-                            </p>
-                        </div>
-                        <div class="flex items-center gap-1">
-                            <svg width="14" height="14" fill="#F97316" viewBox="0 0 24 24">
-                                <polygon
-                                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                            </svg><span class="text-sm font-bold">5.0</span>
-                        </div>
-                    </div>
-                    <p class="italic font-medium text-slate-600 leading-relaxed mb-5 text-sm">
-                        "Tim kami sering merekrut talenta SKOMDA untuk proyek
-                        pemasaran digital. Selalu kreatif, responsif, dan
-                        hasilnya memuaskan!"
-                    </p>
-                    <span class="t-badge">Klien</span>
-                </div>
-
-                <div
-                    class="reveal bg-white border border-slate-200 rounded-3xl p-6 shadow-md transition-all hover:-translate-y-2 hover:shadow-xl">
-                    <div class="flex justify-between items-start mb-4">
-                        <div class="w-12 h-12 rounded-2xl gradient-bg shrink-0"></div>
-                        <div class="flex-1 ml-3">
-                            <p class="font-bold text-sm">Ayu Lestari</p>
-                            <p class="text-xs text-slate-400 font-bold">
-                                Desainer Grafis
-                            </p>
-                        </div>
-                        <div class="flex items-center gap-1">
-                            <svg width="14" height="14" fill="#F97316" viewBox="0 0 24 24">
-                                <polygon
-                                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                            </svg><span class="text-sm font-bold">5.0</span>
-                        </div>
-                    </div>
-                    <p class="italic font-medium text-slate-600 leading-relaxed mb-5 text-sm">
-                        "Platform ini sangat user-friendly. Dalam 2 bulan
-                        sudah mendapatkan 10+ proyek dan penghasilan
-                        lumayan untuk masih sekolah!"
-                    </p>
-                    <span class="t-badge">Terverifikasi</span>
-                </div>
-
-                <div
-                    class="reveal bg-white border border-slate-200 rounded-3xl p-6 shadow-md transition-all hover:-translate-y-2 hover:shadow-xl">
-                    <div class="flex justify-between items-start mb-4">
-                        <div class="w-12 h-12 rounded-2xl gradient-bg shrink-0"></div>
-                        <div class="flex-1 ml-3">
-                            <p class="font-bold text-sm">PT Maju Jaya</p>
-                            <p class="text-xs text-slate-400 font-bold">
-                                Manajer SDM
-                            </p>
-                        </div>
-                        <div class="flex items-center gap-1">
-                            <svg width="14" height="14" fill="#F97316" viewBox="0 0 24 24">
-                                <polygon
-                                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                            </svg><span class="text-sm font-bold">5.0</span>
-                        </div>
-                    </div>
-                    <p class="italic font-medium text-slate-600 leading-relaxed mb-5 text-sm">
-                        "Kami bahkan merekrut beberapa freelancer SKOMDA
-                        sebagai karyawan tetap. Platform yang luar biasa
-                        untuk mencari talenta!"
-                    </p>
-                    <span class="t-badge">Klien</span>
-                </div>
+                @endforeach
             </div>
         </div>
     </section>
@@ -813,12 +702,12 @@
         <div class="max-w-7xl mx-auto px-6">
             <div class="reveal relative rounded-[2rem] p-16 text-center overflow-hidden shadow-[0_20px_60px_rgba(15,118,110,.28)]"
                 style="
-                            background: linear-gradient(
-                                135deg,
-                                #0f766e 0%,
-                                #10b981 100%
-                            );
-                        ">
+                                    background: linear-gradient(
+                                        135deg,
+                                        #0f766e 0%,
+                                        #10b981 100%
+                                    );
+                                ">
                 <div class="absolute inset-0 opacity-20 pointer-events-none">
                     <div class="absolute w-80 h-80 rounded-full blur-3xl bg-white -top-20 -left-20"></div>
                     <div class="absolute w-96 h-96 rounded-full blur-3xl bg-teal-900 -bottom-20 -right-20"></div>

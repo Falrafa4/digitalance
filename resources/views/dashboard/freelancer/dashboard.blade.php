@@ -153,7 +153,7 @@
                     </div>
 
                     <a href="{{ route('freelancer.orders.index') }}" class="px-4 py-2 rounded-[11px] border-[1.5px] border-slate-200 bg-white text-slate-700 font-bold text-[12.5px]
-                                            hover:border-[#0f766e] hover:text-[#0f766e] transition-all">
+                                                hover:border-[#0f766e] hover:text-[#0f766e] transition-all">
                         Lihat Semua
                     </a>
                 </div>
@@ -215,7 +215,9 @@
 
 @php
     $freelancer = Auth::guard('freelancer')->user();
-    $isNewFreelancer = $freelancer && $freelancer->status === 'Approved' && now()->diffInHours($freelancer->created_at) < 48;
+    // Show onboarding when user is newly created (within 72 hours) and not yet approved
+    // Include 'Pending' status so freshly-registered freelancers see the modal.
+    $isNewFreelancer = $freelancer && in_array($freelancer->status, [null, '', 'New', 'Draft', 'Pending']) && now()->diffInHours($freelancer->created_at) < 72;
 @endphp
 @section('scripts')
     <script>
@@ -232,6 +234,10 @@
             }
 
             window.__SHOW_ONBOARDING__ = {!! json_encode($isNewFreelancer) !!};
+            window.__FREELANCER_STATUS__ = {!! json_encode($freelancer->status ?? null) !!};
+            window.__FREELANCER_ONBOARDING__ = {
+                applyUrl: {!! json_encode(route('freelancer.onboarding.apply')) !!}
+            };
         })();
     </script>
     <script src="{{ asset('js/dashboard/freelancer/dashboard.js') }}"></script>
@@ -305,6 +311,10 @@
                     class="flex-1 py-3 bg-white border border-slate-200 text-slate-600 font-bold rounded-xl text-sm hover:bg-slate-100 transition-all text-center">
                     Buat Layanan Pertama
                 </a>
+                <button id="onboarding-apply-btn" type="button"
+                    class="flex-1 py-3 bg-amber-500 text-white font-bold rounded-xl text-sm hover:bg-amber-600 transition-all shadow-md">
+                    Ajukan ke Admin
+                </button>
                 <button onclick="closeOnboarding()"
                     class="flex-1 py-3 bg-[#0f766e] text-white font-bold rounded-xl text-sm hover:bg-[#0a5e58] transition-all shadow-lg shadow-teal-sm">
                     Saya Mengerti, Mulai!

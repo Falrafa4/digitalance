@@ -73,11 +73,15 @@
                                 <span class="block text-white text-[13px] font-bold mb-1"><i class="ri-eye-line mr-1"></i> Lihat
                                     Detail Karya</span>
                                 <div class="flex items-center gap-2">
-                                    <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(p.service?.freelancer?.skomda_student?.name || p.service?.freelancer?.skomda_student?.email || 'Freelancer')}&background=0f766e&color=fff"
-                                        loading="lazy" decoding="async"
-                                        class="w-5 h-5 rounded-full" />
-                                    <span
-                                        class="text-white/80 text-[11px] font-medium">{{ $p->service->freelancer->skomda_student->name ?? 'Freelancer' }}</span>
+                                    @php
+                                        $portAvatarUrl = $p->service->freelancer->profile_photo
+                                            ? asset('storage/' . $p->service->freelancer->profile_photo)
+                                            : ($p->service->freelancer->skomda_student->avatar
+                                                ? asset('storage/' . $p->service->freelancer->skomda_student->avatar)
+                                                : 'https://api.dicebear.com/7.x/initials/svg?seed=' . urlencode($p->service->freelancer->skomda_student->name ?? $p->service->freelancer->skomda_student->email ?? 'Freelancer') . '&background=0f766e&color=fff&size=20');
+                                    @endphp
+                                    <img src="{{ $portAvatarUrl }}" loading="lazy" decoding="async" class="w-5 h-5 rounded-full" />
+                                    <span class="text-white/80 text-[11px] font-medium">{{ $p->service->freelancer->skomda_student->name ?? 'Freelancer' }}</span>
                                 </div>
                             </div>
                         </div>
@@ -163,6 +167,15 @@
     <script>
         window.__PORTOFOLIOS_DATA__ = @json($portofolios->items());
 
+        function getAvatarUrl(freelancer) {
+            if (!freelancer) return 'https://api.dicebear.com/7.x/initials/svg?seed=User&background=0f766e&color=fff&size=36';
+            return freelancer.profile_photo
+                ? '/storage/' + freelancer.profile_photo
+                : (freelancer.skomda_student?.avatar
+                    ? '/storage/' + freelancer.skomda_student.avatar
+                    : 'https://api.dicebear.com/7.x/initials/svg?seed=' + encodeURIComponent(freelancer.skomda_student?.name || freelancer.skomda_student?.email || 'User') + '&background=0f766e&color=fff&size=36');
+        }
+
         window.openPortDetail = function (id) {
             const p = window.__PORTOFOLIOS_DATA__.find(x => x.id == id);
             if (!p) return;
@@ -171,6 +184,7 @@
             const overlay = document.getElementById('modal-port-overlay');
 
             const imageUrl = p.media_url ? `/storage/${p.media_url}` : 'https://placehold.co/800x600?text=Digitalance';
+            const freelancerAvatar = getAvatarUrl(p.service?.freelancer);
 
             box.innerHTML = `
                     <div class="relative">
@@ -189,7 +203,7 @@
                         <div class="p-7">
                             <div class="grid grid-cols-2 gap-3.5 mb-7">
                                 <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-100 flex items-center gap-3">
-                                    <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(p.service?.freelancer?.skomda_student?.name || p.service?.freelancer?.skomda_student?.email || 'Freelancer')}&background=0f766e&color=fff" class="w-9 h-9 rounded-xl" loading="lazy" decoding="async" />
+                                    <img src="${freelancerAvatar}" class="w-9 h-9 rounded-xl" loading="lazy" decoding="async" />
                                     <div class="min-w-0">
                                         <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Freelancer</p>
                                         <p class="text-[12px] font-black text-slate-800 truncate">${p.service?.freelancer?.skomda_student?.name || 'N/A'}</p>

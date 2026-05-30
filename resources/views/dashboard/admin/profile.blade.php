@@ -17,9 +17,7 @@
                 <div
                     class="bg-white rounded-[18px] border border-slate-200 p-6 flex flex-col items-center text-center animate-fadeUp">
                     <div class="relative mb-4">
-                        <img id="avatar-preview"
-                            src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=0f766e&color=fff&size=128"
-                            class="w-24 h-24 rounded-[18px] object-cover border-4 border-white shadow-teal-md" />
+                        <x-avatar :user="$admin ?? Auth::user()" role="admin" photo-field="avatar" :size="128" class="w-24 h-24 rounded-[18px] object-cover border-4 border-white shadow-teal-md" />
                     </div>
                     <h3 class="font-display font-extrabold text-[1.15rem] text-slate-900">{{ Auth::user()->name }}</h3>
                     <p class="text-[13px] text-slate-400 mt-0.5">{{ Auth::user()->email }}</p>

@@ -53,9 +53,9 @@
 
   const money = (v) => {
     if (v === null || v === undefined || v === '') return '—';
-    if (typeof v === 'string') return v;
     try {
-      return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(v);
+      if (window?.DigitalanceUtils?.formatRupiah) return window.DigitalanceUtils.formatRupiah(v);
+      return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(Number(String(v).replace(/[^0-9.-]/g, '')));
     } catch (e) {
       return String(v);
     }
@@ -257,15 +257,57 @@
       });
     });
 
-    if (window.__SHOW_ONBOARDING__) {
+    if (window.__SHOW_ONBOARDING__ && !localStorage.getItem('onboarding_seen')) {
       const overlay = $('onboarding-overlay');
       if (overlay) overlay.classList.remove('hidden');
+    }
+
+    // Onboarding: apply to admin
+    const applyBtn = $('onboarding-apply-btn');
+    if (applyBtn) {
+      applyBtn.addEventListener('click', async function () {
+        if (isLoading) return;
+        isLoading = true;
+        applyBtn.disabled = true;
+        applyBtn.classList.add('opacity-70', 'cursor-not-allowed');
+
+        try {
+          const url = window.__FREELANCER_ONBOARDING__?.applyUrl;
+          if (!url) throw new Error('URL tidak tersedia');
+
+          const token = document.querySelector('meta[name="csrf-token"]')?.content || '';
+          const res = await fetch(url, {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': token },
+            body: JSON.stringify({}),
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.message || 'Gagal mengirim permintaan');
+
+          // mark seen and hide overlay
+          localStorage.setItem('onboarding_seen', '1');
+          const overlay = $('onboarding-overlay');
+          if (overlay) overlay.classList.add('hidden');
+
+          // show success toast if available
+          if (window.showToast) window.showToast(data.message || 'Permintaan terkirim', 'success');
+        } catch (e) {
+          console.error(e);
+          if (window.showToast) window.showToast(e.message || 'Terjadi kesalahan', 'danger');
+        } finally {
+          isLoading = false;
+          applyBtn.disabled = false;
+          applyBtn.classList.remove('opacity-70', 'cursor-not-allowed');
+        }
+      });
     }
   }
 
   window.closeOnboarding = function() {
     const overlay = $('onboarding-overlay');
     if (overlay) overlay.classList.add('hidden');
+    try { localStorage.setItem('onboarding_seen', '1'); } catch (e) {}
   };
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);

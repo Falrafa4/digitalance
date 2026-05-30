@@ -367,4 +367,6 @@ Route::middleware('auth:freelancer')->prefix('freelancer')->name('freelancer.')-
     Route::get('/loker/{loker}', [LokerController::class, 'freelancerShow'])->name('loker.show');
     Route::post('/loker/{loker}/apply', [LokerController::class, 'freelancerApply'])->name('loker.apply');
     Route::get('/loker/my/applications', [LokerController::class, 'freelancerMyApplications'])->name('loker.my-applications');
+    // Onboarding: freelancer applies for admin verification
+    Route::post('/onboarding/apply', [FreelancerController::class, 'applyForVerification'])->name('onboarding.apply');
 });

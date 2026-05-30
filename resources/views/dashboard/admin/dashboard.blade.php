@@ -53,9 +53,7 @@
             <div>
                 <span class="text-slate-400 text-[10px] font-extrabold uppercase tracking-widest">Total Pendapatan</span>
                 <div class="text-[1.85rem] font-extrabold text-slate-900 leading-none mt-1">
-                    <span
-                        class="text-[0.6em] text-slate-400 mr-0.5">Rp</span>{{ number_format(($totalRevenue ?? 0) / 1000, 0) }}<span
-                        class="text-[0.4em] text-slate-400">jt</span>
+                    Rp{{ number_format(($totalRevenue ?? 0), 0, ',', '.') }}
                 </div>
             </div>
         </div>
@@ -70,9 +68,7 @@
             <div>
                 <span class="text-slate-400 text-[10px] font-extrabold uppercase tracking-widest">Total Transaksi</span>
                 <div class="text-[1.85rem] font-extrabold text-slate-900 leading-none mt-1">
-                    <span
-                        class="text-[0.6em] text-slate-400 mr-0.5">Rp</span>{{ number_format(($totalTurnover ?? 0) / 1000000, 1) }}<span
-                        class="text-[0.4em] text-slate-400">jt</span>
+                    Rp{{ number_format(($totalTurnover ?? 0), 0, ',', '.') }}
                 </div>
             </div>
         </div>
@@ -147,7 +143,8 @@
                                 <span class="text-[10px] font-mono text-slate-400">#ORD-{{ $order->id }}</span>
                             </div>
                             <h3 class="font-bold text-slate-800 text-[14px] mb-1 truncate">
-                                {{ $order->service->title ?? 'Tidak tersedia' }}</h3>
+                                {{ $order->service->title ?? 'Tidak tersedia' }}
+                            </h3>
                             <div class="flex items-center gap-2 mb-4 text-[12px]">
                                 <span class="text-slate-500">Klien:</span>
                                 <span class="font-bold text-slate-700">{{ $order->client->name ?? 'Pengguna' }}</span>
@@ -190,13 +187,14 @@
                             <div class="flex items-center justify-between mb-4">
                                 <div class="flex items-center gap-3.5">
                                     <img class="w-11 h-11 rounded-xl object-cover border-2 border-slate-50 shadow-sm"
-                                        alt="Avatar"
-                                        src="https://ui-avatars.com/api/?name={!! urlencode($v->skomda_student->name ?? $v->skomda_student->email ?? 'User') !!}&background=0f766e&color=fff" />
+                                           alt="Avatar"
+                                           src="{{ $v->skomda_student?->avatar ? asset('storage/' . $v->skomda_student->avatar) : 'https://api.dicebear.com/7.x/initials/svg?seed=' . urlencode($v->skomda_student->name ?? $v->skomda_student->email ?? 'User') . '&background=0f766e&color=fff&size=44' }}" />
                                     <div class="min-w-0">
                                         <span
                                             class="font-bold text-[14px] text-slate-900 user-name block truncate">{{ $v->skomda_student->name ?? 'Freelancer' }}</span>
                                         <p class="text-[11px] text-slate-400 font-medium uppercase tracking-tight">
-                                            {{ $v->skomda_student->major ?? 'Siswa Skomda' }}</p>
+                                            {{ $v->skomda_student->major ?? 'Siswa Skomda' }}
+                                        </p>
                                     </div>
                                 </div>
                                 <button onclick="window.openVerificationDetail({{ $v->id }})"
@@ -366,7 +364,7 @@
                             beginAtZero: true,
                             ticks: {
                                 callback: function (val) {
-                                    return 'Rp ' + Number(val).toLocaleString('id-ID');
+                                    return window.DigitalanceUtils.formatRupiah(val);
                                 }
                             }
                         }
@@ -409,50 +407,50 @@
             if (!box || !overlay) return;
 
             box.innerHTML = `
-                    <div class="relative">
-                        <div class="h-28 bg-gradient-to-r from-[#0f766e] to-[#10b981] flex items-center px-8 relative">
-                            <div class="flex-1">
-                                <h2 class="text-white font-black text-xl tracking-tight">Freelancer Verification</h2>
-                                <p class="text-white/70 text-[10px] font-bold uppercase tracking-[0.2em]">Freelancer ID: #FLR-${v.id}</p>
+                        <div class="relative">
+                            <div class="h-28 bg-gradient-to-r from-[#0f766e] to-[#10b981] flex items-center px-8 relative">
+                                <div class="flex-1">
+                                    <h2 class="text-white font-black text-xl tracking-tight">Freelancer Verification</h2>
+                                    <p class="text-white/70 text-[10px] font-bold uppercase tracking-[0.2em]">Freelancer ID: #FLR-${v.id}</p>
+                                </div>
+                                <button onclick="window.closeVerificationDetail()" class="w-10 h-10 bg-white/20 text-white rounded-full flex items-center justify-center hover:bg-white/30 transition">
+                                    <i class="ri-close-line text-xl"></i>
+                                </button>
                             </div>
-                            <button onclick="window.closeVerificationDetail()" class="w-10 h-10 bg-white/20 text-white rounded-full flex items-center justify-center hover:bg-white/30 transition">
-                                <i class="ri-close-line text-xl"></i>
-                            </button>
-                        </div>
 
-                        <div class="px-8 pb-8 -mt-8 relative z-10">
-                            <div class="bg-white rounded-2xl p-6 shadow-xl border border-slate-50 mb-6">
-                                <div class="flex items-center gap-4">
-                                    <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(v.skomda_student?.name || 'User')}&background=0f766e&color=fff" class="w-12 h-12 rounded-xl shadow-sm border" />
-                                    <div>
-                                        <h3 class="text-[1.3rem] font-black text-slate-900 leading-tight">${v.skomda_student?.name || 'Tidak tersedia'}</h3>
-                                        <p class="text-xs font-semibold text-slate-400 uppercase mt-0.5">${v.skomda_student?.major || 'Siswa Skomda'}</p>
+                            <div class="px-8 pb-8 -mt-8 relative z-10">
+                                <div class="bg-white rounded-2xl p-6 shadow-xl border border-slate-50 mb-6">
+                                    <div class="flex items-center gap-4">
+                                        <img src="${v.skomda_student?.avatar ? `/storage/${v.skomda_student.avatar}` : `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(v.skomda_student?.name || 'User')}&background=0f766e&color=fff&size=48`}" class="w-12 h-12 rounded-xl shadow-sm border" />
+                                        <div>
+                                            <h3 class="text-[1.3rem] font-black text-slate-900 leading-tight">${v.skomda_student?.name || 'Tidak tersedia'}</h3>
+                                            <p class="text-xs font-semibold text-slate-400 uppercase mt-0.5">${v.skomda_student?.major || 'Siswa Skomda'}</p>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100 mb-6">
-                                <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Informasi Kontak</span>
-                                <div class="space-y-1.5 text-sm text-slate-700 font-medium">
-                                    <p><span class="text-slate-400 font-normal">Email Akun:</span> ${v.skomda_student?.email || '-'}</p>
-                                    <p><span class="text-slate-400 font-normal">Status Verifikasi:</span> <span class="px-2 py-0.5 bg-amber-100 text-amber-800 rounded text-xs font-bold font-sans">${v.status}</span></p>
+                                <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100 mb-6">
+                                    <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Informasi Kontak</span>
+                                    <div class="space-y-1.5 text-sm text-slate-700 font-medium">
+                                        <p><span class="text-slate-400 font-normal">Email Akun:</span> ${v.skomda_student?.email || '-'}</p>
+                                        <p><span class="text-slate-400 font-normal">Status Verifikasi:</span> <span class="px-2 py-0.5 bg-amber-100 text-amber-800 rounded text-xs font-bold font-sans">${v.status}</span></p>
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div class="mb-6">
-                                <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Pengenalan Diri (Bio)</span>
-                                <div class="bg-slate-50/50 p-4 rounded-2xl border border-slate-100/50">
-                                    <p class="text-[13px] text-slate-600 leading-relaxed font-medium max-h-[120px] overflow-y-auto custom-scrollbar">${v.bio || 'Freelancer belum mengisi kolom bio deskripsi diri.'}</p>
+                                <div class="mb-6">
+                                    <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Pengenalan Diri (Bio)</span>
+                                    <div class="bg-slate-50/50 p-4 rounded-2xl border border-slate-100/50">
+                                        <p class="text-[13px] text-slate-600 leading-relaxed font-medium max-h-[120px] overflow-y-auto custom-scrollbar">${v.bio || 'Freelancer belum mengisi kolom bio deskripsi diri.'}</p>
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div class="flex gap-3">
-                                <button type="button" onclick="window.processVerification(${v.id}, 'reject', event)" class="flex-1 py-4 bg-red-50 text-red-600 font-bold rounded-2xl text-[13px] hover:bg-red-600 hover:text-white transition-all">Tolak</button>
-                                <button type="button" onclick="window.processVerification(${v.id}, 'approve', event)" class="flex-1 py-4 bg-[#0f766e] text-white font-bold rounded-2xl text-[13px] hover:bg-[#0a5e58] transition-all shadow-lg shadow-teal-sm">Setujui</button>
+                                <div class="flex gap-3">
+                                    <button type="button" onclick="window.processVerification(${v.id}, 'reject', event)" class="flex-1 py-4 bg-red-50 text-red-600 font-bold rounded-2xl text-[13px] hover:bg-red-600 hover:text-white transition-all">Tolak</button>
+                                    <button type="button" onclick="window.processVerification(${v.id}, 'approve', event)" class="flex-1 py-4 bg-[#0f766e] text-white font-bold rounded-2xl text-[13px] hover:bg-[#0a5e58] transition-all shadow-lg shadow-teal-sm">Setujui</button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                `;
+                    `;
 
             overlay.classList.remove('opacity-0', 'pointer-events-none');
             box.classList.remove('scale-95');

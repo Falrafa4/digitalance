@@ -112,7 +112,7 @@
                     <tr class="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
                         <td class="px-6 py-4 font-medium">#{{ $trx->id }}</td>
                         <td class="px-6 py-4">#{{ $trx->order_id }}</td>
-                        <td class="px-6 py-4 font-bold text-emerald-700">Rp {{ number_format($trx->amount, 0, ',', '.') }}</td>
+                        <td class="px-6 py-4 font-bold text-emerald-700">Rp{{ number_format($trx->amount, 0, ',', '.') }}</td>
                         <td class="px-6 py-4"><span class="type-pill">{{ $trx->type ?? '-' }}</span></td>
                         <td class="px-6 py-4"><span
                                 class="status-pill @if(($trx->status ?? '') == 'Paid') status-paid @elseif(($trx->status ?? '') == 'Pending') status-pending @elseif(($trx->status ?? '') == 'Failed') status-failed @else status-refund @endif">{{ $trx->status ?? '-' }}</span>

@@ -249,6 +249,9 @@ class OrderController extends Controller
 
     public function updateStatusFreelancer(Request $request, string $id)
     {
+        if ($resp = $this->ensureFreelancerApproved())
+            return $resp;
+
         $validated = $request->validate($this->statusValidationRules());
 
         $order = Order::findOrFail($id);
@@ -264,6 +267,9 @@ class OrderController extends Controller
 
     public function updateAgreedPrice(Request $request, string $id)
     {
+        if ($resp = $this->ensureFreelancerApproved())
+            return $resp;
+
         $validated = $request->validate([
             'agreed_price' => 'required|numeric|min:0',
             'note' => 'nullable|string',
@@ -285,6 +291,9 @@ class OrderController extends Controller
 
     public function freelancerAccept(Request $request, Order $order)
     {
+        if ($resp = $this->ensureFreelancerApproved())
+            return $resp;
+
         $freelancer = auth('freelancer')->user();
         abort_unless(($order->freelancer_id ?? $order->service?->freelancer_id) === $freelancer->id, 403);
 
@@ -320,6 +329,9 @@ class OrderController extends Controller
 
     public function freelancerReject(Request $request, Order $order)
     {
+        if ($resp = $this->ensureFreelancerApproved())
+            return $resp;
+
         $freelancer = auth('freelancer')->user();
         abort_unless(($order->freelancer_id ?? $order->service?->freelancer_id) === $freelancer->id, 403);
 

@@ -38,12 +38,12 @@
                     <span class="flex items-center gap-1.5 font-bold text-[#0f766e]">
                         <i class="ri-money-rupee-circle-line"></i>
                         @if($loker->budget_min && $loker->budget_max)
-                            Rp {{ number_format((float) $loker->budget_min, 0, ',', '.') }} -
+                            Rp{{ number_format((float) $loker->budget_min, 0, ',', '.') }} -
                             {{ number_format((float) $loker->budget_max, 0, ',', '.') }}
                         @elseif($loker->budget_min)
-                            Min Rp {{ number_format((float) $loker->budget_min, 0, ',', '.') }}
+                            Min Rp{{ number_format((float) $loker->budget_min, 0, ',', '.') }}
                         @else
-                            Maks Rp {{ number_format((float) $loker->budget_max, 0, ',', '.') }}
+                            Maks Rp{{ number_format((float) $loker->budget_max, 0, ',', '.') }}
                         @endif
                     </span>
                 @endif
@@ -90,8 +90,8 @@
                     <div class="flex flex-col gap-1.5 mb-5">
                         <label class="text-[11px] font-bold text-slate-500 uppercase tracking-[.1em]">Harga yang Ditawarkan
                             (Rp)</label>
-                        <input type="number" name="proposed_price" value="{{ old('proposed_price') }}" min="1000"
-                            placeholder="Opsional"
+                        <input type="text" name="proposed_price" value="{{ old('proposed_price') }}" data-rupiah-input
+                            inputmode="numeric" placeholder="Opsional"
                             class="py-[10px] px-[13px] bg-slate-50 border-[1.5px] border-slate-200 rounded-[11px] text-[13.5px] outline-none transition-all focus:border-[#0f766e] focus:bg-white" />
                     </div>
                     <div class="flex justify-end gap-3">

@@ -56,6 +56,12 @@ class AuthController extends Controller
                 'password' => Hash::make($validated['password']),
                 'status' => 'Pending',
             ]);
+            // Remove the student entry from SkomdaStudent so it won't appear in the registrable list anymore.
+            try {
+                $student->delete();
+            } catch (\Throwable $e) {
+                // swallow — we don't want registration to fail because of cleanup
+            }
         } catch (\Exception $e) {
             return back()->withErrors(['student_id' => 'Gagal mendaftarkan freelancer karena masalah internal database.'])->withInput();
         }

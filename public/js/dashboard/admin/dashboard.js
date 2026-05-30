@@ -311,7 +311,7 @@
                         displayColors: false,
                         callbacks: {
                             label: function (context) {
-                                return ' Rp ' + context.parsed.y.toLocaleString('id-ID');
+                                return window.DigitalanceUtils.formatRupiah(context.parsed.y);
                             }
                         }
                     }
@@ -324,9 +324,7 @@
                             font: { size: 11, family: 'Plus Jakarta Sans' },
                             color: '#94a3b8',
                             callback: function (value) {
-                                if (value >= 1000000) return 'Rp' + (value / 1000000) + 'jt';
-                                if (value >= 1000) return 'Rp' + (value / 1000) + 'rb';
-                                return 'Rp' + value;
+                                return window.DigitalanceUtils.formatRupiah(value);
                             }
                         }
                     },

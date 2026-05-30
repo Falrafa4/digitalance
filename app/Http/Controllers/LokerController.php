@@ -161,8 +161,8 @@ class LokerController extends Controller
             $query->where(function ($sub) use ($q) {
                 $sub->where('title', 'like', "%{$q}%")
                     ->orWhere('description', 'like', "%{$q}%")
-                    ->orWhereHas('category', fn ($cq) => $cq->where('name', 'like', "%{$q}%"))
-                    ->orWhereHas('client', fn ($cq) => $cq->where('name', 'like', "%{$q}%"));
+                    ->orWhereHas('category', fn($cq) => $cq->where('name', 'like', "%{$q}%"))
+                    ->orWhereHas('client', fn($cq) => $cq->where('name', 'like', "%{$q}%"));
             });
         }
 
@@ -194,6 +194,9 @@ class LokerController extends Controller
 
     public function freelancerApply(Request $request, Loker $loker)
     {
+        if ($resp = $this->ensureFreelancerApproved())
+            return $resp;
+
         $freelancer = auth('freelancer')->user();
 
         if ($loker->status !== 'Open') {

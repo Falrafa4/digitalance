@@ -4,6 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\ServiceCategory;
 use App\Models\SkomdaStudent;
+use App\Models\Client;
+use App\Models\Freelancer;
+use App\Models\Order;
+use App\Models\Transaction;
+use App\Models\Review;
 use Illuminate\Http\RedirectResponse;
 
 class PageController
@@ -24,7 +29,27 @@ class PageController
             $userRole = 'freelancer';
         }
 
-        return view('public.home', compact('showLogoutModal', 'userRole'));
+        // Public stats for landing page
+        $usersCount = Client::count() + Freelancer::count();
+        $projectsCompleted = Order::where('status', 'Completed')->count();
+        $totalTurnover = Transaction::where('status', 'Paid')->sum('amount');
+        $avgRating = Review::avg('rating');
+        $avgRatingFormatted = $avgRating ? number_format((float) $avgRating, 1) : '0.0';
+
+        $testimonials = Review::with(['order.client', 'order.service.freelancer.skomda_student'])
+            ->latest()
+            ->take(6)
+            ->get();
+
+        return view('public.home', compact(
+            'showLogoutModal',
+            'userRole',
+            'usersCount',
+            'projectsCompleted',
+            'totalTurnover',
+            'avgRatingFormatted',
+            'testimonials'
+        ));
     }
 
     public function login()

@@ -118,15 +118,15 @@
                     <div class="space-y-4 pt-6 border-t border-slate-100">
                         <div class="flex justify-between items-center text-slate-600">
                             <span class="font-medium text-sm">Harga Jasa</span>
-                            <span class="font-bold">Rp {{ number_format($order->agreed_price, 0, ',', '.') }}</span>
+                            <span class="font-bold">Rp{{ number_format($order->agreed_price, 0, ',', '.') }}</span>
                         </div>
                         <div class="flex justify-between items-center text-slate-600">
                             <span class="font-medium text-sm">Biaya Platform (10%)</span>
-                            <span class="font-bold text-amber-600">+ Rp <span x-text="feeAmount().toLocaleString('id-ID')"></span></span>
+                            <span class="font-bold text-amber-600">+ <span x-text="window.DigitalanceUtils.formatRupiah(feeAmount())"></span></span>
                         </div>
                         <div class="flex justify-between items-center pt-4 border-t-2 border-dashed border-slate-100">
                             <span class="text-lg font-black text-slate-900">Total Pembayaran</span>
-                            <span class="text-2xl font-black text-[#0f766e]">Rp <span x-text="totalAmount().toLocaleString('id-ID')"></span></span>
+                            <span class="text-2xl font-black text-[#0f766e]"><span x-text="window.DigitalanceUtils.formatRupiah(totalAmount())"></span></span>
                         </div>
                     </div>
                 </div>
@@ -219,11 +219,11 @@
                     <div class="space-y-3 pt-6 border-t border-white/10 mb-8">
                         <div class="flex justify-between text-xs font-medium text-slate-400">
                             <span>Subtotal</span>
-                            <span>Rp <span x-text="price.toLocaleString('id-ID')"></span></span>
+                            <span><span x-text="window.DigitalanceUtils.formatRupiah(price)"></span></span>
                         </div>
                         <div class="flex justify-between text-sm font-black">
                             <span>Total Bayar</span>
-                            <span class="text-teal-400 text-lg">Rp <span x-text="totalAmount().toLocaleString('id-ID')"></span></span>
+                            <span class="text-teal-400 text-lg"><span x-text="window.DigitalanceUtils.formatRupiah(totalAmount())"></span></span>
                         </div>
                     </div>
 
@@ -270,15 +270,15 @@
                 </div>
                 <div class="flex justify-between text-sm">
                     <span class="text-slate-500 font-medium">Jumlah</span>
-                    <span class="font-bold text-[#0f766e]">Rp <span x-text="price.toLocaleString('id-ID')"></span></span>
+                    <span class="font-bold text-[#0f766e]"><span x-text="window.DigitalanceUtils.formatRupiah(price)"></span></span>
                 </div>
                 <div class="flex justify-between text-sm">
                     <span class="text-slate-500 font-medium">Biaya Admin</span>
-                    <span class="font-bold text-amber-600">Rp <span x-text="feeAmount().toLocaleString('id-ID')"></span></span>
+                    <span class="font-bold text-amber-600"><span x-text="window.DigitalanceUtils.formatRupiah(feeAmount())"></span></span>
                 </div>
                 <div class="pt-3 border-t border-slate-200 flex justify-between">
                     <span class="font-black text-slate-900">Total</span>
-                    <span class="font-black text-xl text-[#0f766e]">Rp <span x-text="totalAmount().toLocaleString('id-ID')"></span></span>
+                    <span class="font-black text-xl text-[#0f766e]"><span x-text="window.DigitalanceUtils.formatRupiah(totalAmount())"></span></span>
                 </div>
             </div>
 

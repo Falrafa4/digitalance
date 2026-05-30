@@ -26,12 +26,18 @@
             <div data-pager-item
               class="bg-white border border-slate-200 rounded-[22px] p-6 hover:shadow-xl hover:border-[#0f766e] hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
               <div class="flex items-start gap-4">
-                <img src="{{ asset('storage/' . $f->profile_photo) }}"
-                  loading="lazy" decoding="async"
-                  class="w-16 h-16 rounded-xl bg-slate-100 object-cover flex-shrink-0" />
+                <div class="shrink-0">
+                  @php
+                    $freelancerAvatarUrl = $f->profile_photo 
+                        ? asset('storage/' . $f->profile_photo) 
+                        : ($f->skomda_student->avatar 
+                            ? asset('storage/' . $f->skomda_student->avatar) 
+                            : 'https://api.dicebear.com/7.x/initials/svg?seed=' . urlencode($f->skomda_student->name ?? $f->skomda_student->email ?? 'Freelancer') . '&background=0f766e&color=fff&size=64');
+                  @endphp
+                  <img src="{{ $freelancerAvatarUrl }}" loading="lazy" decoding="async" class="w-16 h-16 rounded-xl bg-slate-100 object-cover flex-shrink-0" />
+                </div>
                 <div class="min-w-0 flex-1">
-                  <p class="font-black text-slate-900 text-base truncate">
-                    {{ optional($f->skomda_student)->name ?? 'Freelancer' }}</p>
+                  <p class="font-black text-slate-900 text-base truncate">{{ optional($f->skomda_student)->name ?? 'Freelancer' }}</p>
                   <p class="text-slate-400 text-[11px] font-bold uppercase tracking-tight mt-0.5">
                     {{ optional($f->skomda_student)->major ?? 'Siswa SKOMDA' }}</p>
                   <p class="text-slate-500 text-[13px] mt-3 line-clamp-2 leading-relaxed font-medium">

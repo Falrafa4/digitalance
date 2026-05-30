@@ -27,10 +27,18 @@
                     </div>
                     <div class="flex items-center gap-3 bg-white p-2 rounded-2xl border border-slate-200">
                         <div class="flex -space-x-2">
-                            <img src="https://ui-avatars.com/api/?name={{ urlencode($result->order->client->name ?? $result->order->client->email ?? 'User') }}&background=6366f1&color=fff"
-                                class="w-8 h-8 rounded-full border-2 border-white" title="Client" />
-                            <img src="https://ui-avatars.com/api/?name={{ urlencode($result->order->service->freelancer->skomda_student->name ?? $result->order->service->freelancer->skomda_student->email ?? 'User') }}&background=0f766e&color=fff"
-                                class="w-8 h-8 rounded-full border-2 border-white" title="Freelancer" />
+                            @php
+                                $clientAvatarUrl = $result->order->client->profile_photo 
+                                    ? asset('storage/' . $result->order->client->profile_photo) 
+                                    : 'https://api.dicebear.com/7.x/initials/svg?seed=' . urlencode($result->order->client->name ?? $result->order->client->email ?? 'User') . '&background=6366f1&color=fff&size=32';
+                                $freelancerAvatarUrl = $result->order->service->freelancer->profile_photo
+                                    ? asset('storage/' . $result->order->service->freelancer->profile_photo)
+                                    : ($result->order->service->freelancer->skomda_student->avatar
+                                        ? asset('storage/' . $result->order->service->freelancer->skomda_student->avatar)
+                                        : 'https://api.dicebear.com/7.x/initials/svg?seed=' . urlencode($result->order->service->freelancer->skomda_student->name ?? $result->order->service->freelancer->skomda_student->email ?? 'User') . '&background=0f766e&color=fff&size=32');
+                            @endphp
+                            <img src="{{ $clientAvatarUrl }}" class="w-8 h-8 rounded-full border-2 border-white" title="Client" />
+                            <img src="{{ $freelancerAvatarUrl }}" class="w-8 h-8 rounded-full border-2 border-white" title="Freelancer" />
                         </div>
                         <div class="pr-2">
                             <span class="text-[11px] font-bold text-slate-400 uppercase">Collaboration</span>
@@ -65,7 +73,8 @@
                                         class="text-[14px] font-black text-slate-900 group-hover:text-[#0f766e] transition-colors">
                                         Hasil_Pekerjaan_Final.zip</p>
                                     <p class="text-[11px] text-slate-400 font-bold uppercase">Diunggah pada
-                                        {{ $result->created_at->format('d M Y, H:i') }}</p>
+                                        {{ $result->created_at->format('d M Y, H:i') }}
+                                    </p>
                                 </div>
                             </div>
                             <a href="{{ asset('storage/' . $result->file_url) }}" target="_blank"
@@ -84,9 +93,9 @@
                             <div class="flex justify-between items-center text-[13px]">
                                 <span class="text-slate-500 font-medium">Status Pesanan</span>
                                 <span class="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase
-                                    @if($result->order->status == 'Completed') bg-emerald-100 text-emerald-700
-                                    @elseif($result->order->status == 'Revision') bg-amber-100 text-amber-700
-                                    @else bg-blue-100 text-blue-700 @endif">
+                                        @if($result->order->status == 'Completed') bg-emerald-100 text-emerald-700
+                                        @elseif($result->order->status == 'Revision') bg-amber-100 text-amber-700
+                                        @else bg-blue-100 text-blue-700 @endif">
                                     {{ $result->order->status }}
                                 </span>
                             </div>
@@ -99,7 +108,8 @@
                             <div class="pt-2">
                                 <p class="text-[10px] font-bold text-slate-400 uppercase mb-2">Layanan</p>
                                 <p class="text-[13px] font-bold text-slate-800 line-clamp-2 leading-snug">
-                                    {{ $result->order->service->title }}</p>
+                                    {{ $result->order->service->title }}
+                                </p>
                             </div>
                         </div>
                     </div>

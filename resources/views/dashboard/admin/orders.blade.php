@@ -172,44 +172,44 @@
             const overlay = document.getElementById('modal-order-overlay');
 
             box.innerHTML = `
-            <div class="p-8">
-                <div class="flex justify-between items-center mb-8">
-                    <div class="w-14 h-14 rounded-2xl bg-teal-50 text-[#0f766e] flex items-center justify-center text-2xl">
-                        <i class="ri-edit-line"></i>
+                <div class="p-8">
+                    <div class="flex justify-between items-center mb-8">
+                        <div class="w-14 h-14 rounded-2xl bg-teal-50 text-[#0f766e] flex items-center justify-center text-2xl">
+                            <i class="ri-edit-line"></i>
+                        </div>
+                        <button type="button" onclick="window.closeOrderModal()" class="w-10 h-10 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center hover:bg-red-50 hover:text-red-500 transition">
+                            <i class="ri-close-line text-xl"></i>
+                        </button>
                     </div>
-                    <button type="button" onclick="window.closeOrderModal()" class="w-10 h-10 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center hover:bg-red-50 hover:text-red-500 transition">
-                        <i class="ri-close-line text-xl"></i>
-                    </button>
-                </div>
-                <h2 class="text-[1.5rem] font-black text-slate-900 mb-1">Ubah Status Pesanan</h2>
-                <p class="text-slate-400 text-[11px] font-bold uppercase tracking-widest mb-8">Order ID: #ORD-${o.id}</p>
-                <form action="/admin/orders/${o.id}/status" method="POST">
-                    <input type="hidden" name="_token" value="${document.querySelector('meta[name="csrf-token"]').content}">
-                    <div class="space-y-6 mb-10">
-                        <div class="field-group">
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Status Baru</label>
-                            <div class="relative">
-                                <select name="status" class="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-700 font-bold focus:border-[#0f766e] focus:bg-white outline-none transition-all appearance-none">
-                                    ${['Pending', 'Negotiated', 'Paid', 'In Progress', 'Revision', 'Completed', 'Cancelled'].map(s => `
-                                    <option value="${s}" ${o.status === s ? 'selected' : ''}>${s}</option>
-                                    `).join('')}
-                                </select>
-                                <i class="ri-arrow-down-s-line absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
+                    <h2 class="text-[1.5rem] font-black text-slate-900 mb-1">Ubah Status Pesanan</h2>
+                    <p class="text-slate-400 text-[11px] font-bold uppercase tracking-widest mb-8">Order ID: #ORD-${o.id}</p>
+                    <form action="/admin/orders/${o.id}/status" method="POST">
+                        <input type="hidden" name="_token" value="${document.querySelector('meta[name="csrf-token"]').content}">
+                        <div class="space-y-6 mb-10">
+                            <div class="field-group">
+                                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Status Baru</label>
+                                <div class="relative">
+                                    <select name="status" class="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-700 font-bold focus:border-[#0f766e] focus:bg-white outline-none transition-all appearance-none">
+                                        ${['Pending', 'Negotiated', 'Paid', 'In Progress', 'Revision', 'Completed', 'Cancelled'].map(s => `
+                                        <option value="${s}" ${o.status === s ? 'selected' : ''}>${s}</option>
+                                        `).join('')}
+                                    </select>
+                                    <i class="ri-arrow-down-s-line absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
+                                </div>
+                            </div>
+                            <div class="p-4 bg-amber-50 rounded-2xl border border-amber-100">
+                                <p class="text-[11px] text-amber-700 font-bold leading-relaxed flex items-start gap-2">
+                                    <i class="ri-information-line mt-0.5"></i>
+                                    <span>Perubahan status akan langsung terlihat oleh Klien dan Freelancer.</span>
+                                </p>
                             </div>
                         </div>
-                        <div class="p-4 bg-amber-50 rounded-2xl border border-amber-100">
-                            <p class="text-[11px] text-amber-700 font-bold leading-relaxed flex items-start gap-2">
-                                <i class="ri-information-line mt-0.5"></i>
-                                <span>Perubahan status akan langsung terlihat oleh Klien dan Freelancer.</span>
-                            </p>
+                        <div class="flex gap-3">
+                            <button type="button" onclick="window.closeOrderModal()" class="flex-1 py-4 bg-slate-100 text-slate-500 font-bold rounded-2xl text-[13px] hover:bg-slate-200 transition-all">Batal</button>
+                            <button type="submit" class="flex-1 py-4 bg-[#0f766e] text-white font-bold rounded-2xl text-[13px] hover:bg-[#0a5e58] transition-all shadow-lg shadow-teal-sm">Perbarui Status</button>
                         </div>
-                    </div>
-                    <div class="flex gap-3">
-                        <button type="button" onclick="window.closeOrderModal()" class="flex-1 py-4 bg-slate-100 text-slate-500 font-bold rounded-2xl text-[13px] hover:bg-slate-200 transition-all">Batal</button>
-                        <button type="submit" class="flex-1 py-4 bg-[#0f766e] text-white font-bold rounded-2xl text-[13px] hover:bg-[#0a5e58] transition-all shadow-lg shadow-teal-sm">Perbarui Status</button>
-                    </div>
-                </form>
-            </div>`;
+                    </form>
+                </div>`;
             overlay.classList.remove('opacity-0', 'pointer-events-none');
             box.classList.remove('scale-95');
         };
@@ -243,62 +243,62 @@
             const date = new Date(o.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
 
             box.innerHTML = `
-            <div class="relative">
-                <div class="h-28 bg-gradient-to-r from-teal-600 to-emerald-600 flex items-center px-8">
-                    <div class="flex-1">
-                        <h2 class="text-white font-black text-xl tracking-tight">Detail Pesanan</h2>
-                        <p class="text-white/70 text-[10px] font-bold uppercase tracking-[0.2em]">Transaksi #ORD-${o.id}</p>
-                    </div>
-                    <button onclick="window.closeOrderModal()" class="w-10 h-10 bg-white/20 text-white rounded-full flex items-center justify-center hover:bg-white/30 transition">
-                        <i class="ri-close-line text-xl"></i>
-                    </button>
-                </div>
-                <div class="px-8 pb-8 -mt-8 relative z-10">
-                    <div class="bg-white rounded-2xl p-6 shadow-xl border border-slate-50 mb-6">
-                        <div class="flex justify-between items-start mb-4">
-                            <div>
-    <h3 class="text-[13px] font-bold text-slate-400 uppercase tracking-widest mb-1">Layanan yang Dibeli</h3>
-                            <p class="text-[1.1rem] font-black text-slate-900 line-clamp-2 leading-tight">${o.service?.title || 'N/A'}</p>
+                <div class="relative">
+                    <div class="h-28 bg-gradient-to-r from-teal-600 to-emerald-600 flex items-center px-8">
+                        <div class="flex-1">
+                            <h2 class="text-white font-black text-xl tracking-tight">Detail Pesanan</h2>
+                            <p class="text-white/70 text-[10px] font-bold uppercase tracking-[0.2em]">Transaksi #ORD-${o.id}</p>
                         </div>
-                        <span class="px-3 py-1 bg-teal-50 text-[#0f766e] text-[10px] font-black rounded-lg uppercase tracking-wider border border-teal-100">${o.status}</span>
-                    </div>
-                    <div class="flex items-center justify-between pt-4 border-t border-slate-50">
-                        <span class="text-[13px] font-bold text-slate-500">Total Pesanan</span>
-                        <span class="text-[1.3rem] font-black text-[#0f766e]">Rp${(o.agreed_price || 0).toLocaleString('id-ID')}</span>
-                    </div>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4 mb-6">
-                        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                            <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Pembeli</span>
-                            <div class="flex items-center gap-3">
-                                <div class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center font-black text-[11px]">C</div>
-                                <span class="text-[13px] font-bold text-slate-700 truncate">${o.client?.name || 'Klien'}</span>
-                            </div>
-                        </div>
-                        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                            <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Penyedia</span>
-                            <div class="flex items-center gap-3">
-                                <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center font-black text-[11px]">F</div>
-                                <span class="text-[13px] font-bold text-slate-700 truncate">${o.service?.freelancer?.skomda_student?.name || 'Freelancer'}</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 mb-8">
-                        <div class="flex justify-between items-center">
-                            <div class="flex items-center gap-2">
-                                <i class="ri-calendar-line text-slate-400"></i>
-                                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Tanggal Pesanan</span>
-                            </div>
-                            <span class="text-[13px] font-bold text-slate-700">${date}</span>
-                        </div>
-                    </div>
-                    <div class="flex gap-3">
-                        <button onclick="window.openOrderModal(${o.id})" class="flex-1 py-4 bg-slate-900 text-white font-bold rounded-2xl text-[13px] hover:bg-slate-800 transition-all flex items-center justify-center gap-2 shadow-lg shadow-slate-200">
-                            <i class="ri-edit-line"></i> Ubah Status
+                        <button onclick="window.closeOrderModal()" class="w-10 h-10 bg-white/20 text-white rounded-full flex items-center justify-center hover:bg-white/30 transition">
+                            <i class="ri-close-line text-xl"></i>
                         </button>
                     </div>
-                </div>
-            </div>`;
+                    <div class="px-8 pb-8 -mt-8 relative z-10">
+                        <div class="bg-white rounded-2xl p-6 shadow-xl border border-slate-50 mb-6">
+                            <div class="flex justify-between items-start mb-4">
+                                <div>
+        <h3 class="text-[13px] font-bold text-slate-400 uppercase tracking-widest mb-1">Layanan yang Dibeli</h3>
+                                <p class="text-[1.1rem] font-black text-slate-900 line-clamp-2 leading-tight">${o.service?.title || 'N/A'}</p>
+                            </div>
+                            <span class="px-3 py-1 bg-teal-50 text-[#0f766e] text-[10px] font-black rounded-lg uppercase tracking-wider border border-teal-100">${o.status}</span>
+                        </div>
+                        <div class="flex items-center justify-between pt-4 border-t border-slate-50">
+                            <span class="text-[13px] font-bold text-slate-500">Total Pesanan</span>
+                            <span class="text-[1.3rem] font-black text-[#0f766e]">${window.DigitalanceUtils.formatRupiah(o.agreed_price || 0)}</span>
+                        </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 mb-6">
+                            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                                <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Pembeli</span>
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center font-black text-[11px]">C</div>
+                                    <span class="text-[13px] font-bold text-slate-700 truncate">${o.client?.name || 'Klien'}</span>
+                                </div>
+                            </div>
+                            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                                <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Penyedia</span>
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center font-black text-[11px]">F</div>
+                                    <span class="text-[13px] font-bold text-slate-700 truncate">${o.service?.freelancer?.skomda_student?.name || 'Freelancer'}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 mb-8">
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center gap-2">
+                                    <i class="ri-calendar-line text-slate-400"></i>
+                                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Tanggal Pesanan</span>
+                                </div>
+                                <span class="text-[13px] font-bold text-slate-700">${date}</span>
+                            </div>
+                        </div>
+                        <div class="flex gap-3">
+                            <button onclick="window.openOrderModal(${o.id})" class="flex-1 py-4 bg-slate-900 text-white font-bold rounded-2xl text-[13px] hover:bg-slate-800 transition-all flex items-center justify-center gap-2 shadow-lg shadow-slate-200">
+                                <i class="ri-edit-line"></i> Ubah Status
+                            </button>
+                        </div>
+                    </div>
+                </div>`;
             overlay.classList.remove('opacity-0', 'pointer-events-none');
             box.classList.remove('scale-95');
         };
@@ -316,8 +316,8 @@
                 form.method = 'POST';
                 form.action = '/admin/orders/' + id;
                 form.innerHTML = `
-            <input type="hidden" name="_token" value="${document.querySelector('meta[name="csrf-token"]').content}">
-            <input type="hidden" name="_method" value="DELETE">`;
+                <input type="hidden" name="_token" value="${document.querySelector('meta[name="csrf-token"]').content}">
+                <input type="hidden" name="_method" value="DELETE">`;
                 document.body.appendChild(form);
                 form.submit();
             }

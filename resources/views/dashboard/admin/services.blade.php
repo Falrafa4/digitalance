@@ -69,10 +69,15 @@
                     </h3>
 
                     <div class="flex items-center gap-2 mb-6">
-                        <img src="https://ui-avatars.com/api/?name={{ urlencode($s->freelancer->skomda_student->name ?? $s->freelancer->skomda_student->email ?? 'User') }}&background=0f766e&color=fff"
-                            class="w-6 h-6 rounded-lg" />
-                        <span
-                            class="text-xs font-semibold text-slate-500">{{ $s->freelancer->skomda_student->name ?? 'Freelancer' }}</span>
+                        @php
+                            $avatarUrl = $s->freelancer->profile_photo 
+                                ? asset('storage/' . $s->freelancer->profile_photo) 
+                                : ($s->freelancer->skomda_student->avatar 
+                                    ? asset('storage/' . $s->freelancer->skomda_student->avatar)
+                                    : 'https://api.dicebear.com/7.x/initials/svg?seed=' . urlencode($s->freelancer->skomda_student->name ?? $s->freelancer->skomda_student->email ?? 'User') . '&background=0f766e&color=fff&size=24');
+                        @endphp
+                        <img src="{{ $avatarUrl }}" class="w-6 h-6 rounded-lg" />
+                        <span class="text-xs font-semibold text-slate-500">{{ $s->freelancer->skomda_student->name ?? 'Freelancer' }}</span>
                     </div>
 
                     <div class="bg-slate-50 p-4 rounded-lg border border-slate-100 mb-6 flex-1">
@@ -166,14 +171,14 @@
             const resolvedIcon = icon || icons[resolvedType];
 
             return `
-                    <div role="alert" class="rounded-xl border px-4 py-3 flex items-start gap-3 ${styles[resolvedType]}">
-                        <i class="ri-xl ${resolvedIcon} flex-shrink-0 mt-0.5"></i>
-                        <div class="flex-1 text-sm font-semibold">
-                            ${title ? `<p class="font-extrabold mb-0.5">${escapeHtml(title)}</p>` : ''}
-                            <span>${escapeHtml(message)}</span>
+                        <div role="alert" class="rounded-xl border px-4 py-3 flex items-start gap-3 ${styles[resolvedType]}">
+                            <i class="ri-xl ${resolvedIcon} flex-shrink-0 mt-0.5"></i>
+                            <div class="flex-1 text-sm font-semibold">
+                                ${title ? `<p class="font-extrabold mb-0.5">${escapeHtml(title)}</p>` : ''}
+                                <span>${escapeHtml(message)}</span>
+                            </div>
                         </div>
-                    </div>
-                `;
+                    `;
         }
 
         function askRejectReason(serviceId) {
@@ -185,22 +190,22 @@
                 box.className = 'w-full max-w-[460px] bg-white rounded-[24px] shadow-2xl border border-slate-200 overflow-hidden transform scale-95 transition-transform duration-200';
 
                 box.innerHTML = `
-                        <div class="px-6 py-5 bg-gradient-to-r from-rose-500 to-rose-600 text-white">
-                            <p class="text-[10px] font-black uppercase tracking-[0.2em] opacity-80 mb-1">Tinjau Layanan</p>
-                            <h3 class="font-display text-[1.1rem] font-extrabold leading-tight">Tolak Layanan #SRV-${serviceId}</h3>
-                        </div>
-                        <form id="reject-service-form" class="p-6">
-                            <label for="reject-reason-input" class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Alasan Penolakan</label>
-                            <textarea id="reject-reason-input" rows="4" maxlength="500" placeholder="Tuliskan alasan penolakan layanan agar freelancer bisa memperbaiki..." class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-3 text-[13px] text-slate-700 font-medium leading-relaxed outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition"></textarea>
-                            <p class="text-[11px] text-slate-400 mt-2">Alasan wajib diisi dan akan dikirim ke freelancer.</p>
-                            <div class="flex gap-3 mt-5">
-                                <button type="button" id="btn-reject-cancel" class="flex-1 py-2.5 rounded-xl bg-slate-100 text-slate-600 font-bold text-[13px] hover:bg-slate-200 transition">Batal</button>
-                                <button type="submit" class="flex-1 py-2.5 rounded-xl bg-rose-600 text-white font-bold text-[13px] hover:bg-rose-700 transition shadow-lg shadow-rose-100">
-                                    <i class="ri-close-circle-line mr-1"></i>Kirim Penolakan
-                                </button>
+                            <div class="px-6 py-5 bg-gradient-to-r from-rose-500 to-rose-600 text-white">
+                                <p class="text-[10px] font-black uppercase tracking-[0.2em] opacity-80 mb-1">Tinjau Layanan</p>
+                                <h3 class="font-display text-[1.1rem] font-extrabold leading-tight">Tolak Layanan #SRV-${serviceId}</h3>
                             </div>
-                        </form>
-                    `;
+                            <form id="reject-service-form" class="p-6">
+                                <label for="reject-reason-input" class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Alasan Penolakan</label>
+                                <textarea id="reject-reason-input" rows="4" maxlength="500" placeholder="Tuliskan alasan penolakan layanan agar freelancer bisa memperbaiki..." class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-3 text-[13px] text-slate-700 font-medium leading-relaxed outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition"></textarea>
+                                <p class="text-[11px] text-slate-400 mt-2">Alasan wajib diisi dan akan dikirim ke freelancer.</p>
+                                <div class="flex gap-3 mt-5">
+                                    <button type="button" id="btn-reject-cancel" class="flex-1 py-2.5 rounded-xl bg-slate-100 text-slate-600 font-bold text-[13px] hover:bg-slate-200 transition">Batal</button>
+                                    <button type="submit" class="flex-1 py-2.5 rounded-xl bg-rose-600 text-white font-bold text-[13px] hover:bg-rose-700 transition shadow-lg shadow-rose-100">
+                                        <i class="ri-close-circle-line mr-1"></i>Kirim Penolakan
+                                    </button>
+                                </div>
+                            </form>
+                        `;
 
                 overlay.appendChild(box);
                 document.body.appendChild(overlay);
@@ -270,30 +275,30 @@
                 });
             } else if (s.status === 'Pending') {
                 actionButtons = `
-                                <div class="flex gap-3">
-                                    <button onclick="window.updateServiceStatus(${s.id}, 'Rejected')" class="flex-1 py-4 bg-red-50 text-red-600 font-bold rounded-2xl text-[13px] hover:bg-red-600 hover:text-white transition-all">Tolak</button>
-                                    <button onclick="window.confirmApprove(${s.id})" class="flex-1 py-4 bg-[#0f766e] text-white font-bold rounded-2xl text-[13px] hover:bg-[#0a5e58] transition-all shadow-lg shadow-teal-sm">Setujui</button>
-                                </div>
-                            `;
+                                    <div class="flex gap-3">
+                                        <button onclick="window.updateServiceStatus(${s.id}, 'Rejected')" class="flex-1 py-4 bg-red-50 text-red-600 font-bold rounded-2xl text-[13px] hover:bg-red-600 hover:text-white transition-all">Tolak</button>
+                                        <button onclick="window.confirmApprove(${s.id})" class="flex-1 py-4 bg-[#0f766e] text-white font-bold rounded-2xl text-[13px] hover:bg-[#0a5e58] transition-all shadow-lg shadow-teal-sm">Setujui</button>
+                                    </div>
+                                `;
             } else if (s.status === 'Rejected') {
                 rejectionInfo = `
-                                ${renderInlineAlert({
+                                    ${renderInlineAlert({
                     type: 'error',
                     title: 'Layanan Ditolak',
                     message: 'Layanan ini ditolak dan dikembalikan ke freelancer.',
                     icon: 'ri-close-circle-line',
                 })}
-                                <div class="mt-4 rounded-xl border border-rose-100 bg-white/80 px-4 py-3 mb-6">
-                                    <p class="text-[10px] font-black text-rose-500 uppercase tracking-wider mb-2">Alasan Penolakan</p>
-                                    <p class="text-[13px] text-slate-700 font-medium leading-relaxed">${escapeHtml(s.reject_reason || 'Tidak ada alasan.')}</p>
-                                </div>
-                            `;
+                                    <div class="mt-4 rounded-xl border border-rose-100 bg-white/80 px-4 py-3 mb-6">
+                                        <p class="text-[10px] font-black text-rose-500 uppercase tracking-wider mb-2">Alasan Penolakan</p>
+                                        <p class="text-[13px] text-slate-700 font-medium leading-relaxed">${escapeHtml(s.reject_reason || 'Tidak ada alasan.')}</p>
+                                    </div>
+                                `;
                 actionButtons = `
-                                <div class="flex gap-3">
-                                    <button onclick="window.updateServiceStatus(${s.id}, 'Rejected')" class="flex-1 py-4 bg-orange-50 text-orange-600 font-bold rounded-2xl text-[13px] hover:bg-orange-600 hover:text-white transition-all"><i class="ri-refresh-line"></i> Reject Ulang</button>
-                                    <button onclick="window.updateServiceStatus(${s.id}, 'Approved')" class="flex-1 py-4 bg-[#0f766e] text-white font-bold rounded-2xl text-[13px] hover:bg-[#0a5e58] transition-all shadow-lg shadow-teal-sm">Setujui</button>
-                                </div>
-                            `;
+                                    <div class="flex gap-3">
+                                        <button onclick="window.updateServiceStatus(${s.id}, 'Rejected')" class="flex-1 py-4 bg-orange-50 text-orange-600 font-bold rounded-2xl text-[13px] hover:bg-orange-600 hover:text-white transition-all"><i class="ri-refresh-line"></i> Reject Ulang</button>
+                                        <button onclick="window.updateServiceStatus(${s.id}, 'Approved')" class="flex-1 py-4 bg-[#0f766e] text-white font-bold rounded-2xl text-[13px] hover:bg-[#0a5e58] transition-all shadow-lg shadow-teal-sm">Setujui</button>
+                                    </div>
+                                `;
             } else if (s.status === 'Approved') {
                 actionButtons = renderInlineAlert({
                     type: 'success',
@@ -304,43 +309,43 @@
             }
 
             box.innerHTML = `
-                            <div class="relative">
-                                <!-- Gradient Header -->
-                                <div class="h-28 bg-gradient-to-r from-[#0f766e] to-[#10b981] flex items-center px-8 relative">
-                                    <div class="flex-1">
-                                        <h2 class="text-white font-black text-xl tracking-tight">Detail Layanan</h2>
-                                        <p class="text-white/70 text-[10px] font-bold uppercase tracking-[0.2em]">ID Layanan: #SRV-${s.id}</p>
+                                <div class="relative">
+                                    <!-- Gradient Header -->
+                                    <div class="h-28 bg-gradient-to-r from-[#0f766e] to-[#10b981] flex items-center px-8 relative">
+                                        <div class="flex-1">
+                                            <h2 class="text-white font-black text-xl tracking-tight">Detail Layanan</h2>
+                                            <p class="text-white/70 text-[10px] font-bold uppercase tracking-[0.2em]">ID Layanan: #SRV-${s.id}</p>
+                                        </div>
+                                        <button onclick="window.closeServiceDetail()" class="w-10 h-10 bg-white/20 text-white rounded-full flex items-center justify-center hover:bg-white/30 transition">
+                                            <i class="ri-close-line text-xl"></i>
+                                        </button>
                                     </div>
-                                    <button onclick="window.closeServiceDetail()" class="w-10 h-10 bg-white/20 text-white rounded-full flex items-center justify-center hover:bg-white/30 transition">
-                                        <i class="ri-close-line text-xl"></i>
-                                    </button>
+
+                                    <!-- Content -->
+                                    <div class="px-8 pb-8 -mt-8 relative z-10">
+                                        <div class="bg-white rounded-2xl p-6 shadow-xl border border-slate-50 mb-6">
+                                            <div class="flex justify-between items-start mb-4">
+                                                <h3 class="text-[1.5rem] font-black text-slate-900 leading-tight flex-1 pr-4">${s.title}</h3>
+                                                <span class="px-3 py-1 bg-teal-50 text-[#0f766e] text-[10px] font-black rounded-lg uppercase tracking-wider border border-teal-100 shadow-sm">${s.status}</span>
+                                            </div>
+                                            <div class="flex items-center justify-between pt-4 border-t border-slate-50">
+                                                <span class="text-[13px] font-bold text-slate-500">Harga Mulai</span>
+                                                <span class="text-[1.5rem] font-black text-[#0f766e]">${window.DigitalanceUtils.formatRupiah(s.price_min || s.base_price)}</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100 mb-6">
+            <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Penyedia Layanan</span>
+                                            <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Deskripsi Layanan</span>
+                                            <p class="text-[13px] text-slate-600 leading-relaxed font-medium max-h-[120px] overflow-y-auto pr-2 custom-scrollbar">${s.description || 'Tidak ada deskripsi.'}</p>
+                                            </div>
+                                        </div>
+
+                                        ${rejectionInfo}
+                                        ${actionButtons}
+                                    </div>
                                 </div>
-
-                                <!-- Content -->
-                                <div class="px-8 pb-8 -mt-8 relative z-10">
-                                    <div class="bg-white rounded-2xl p-6 shadow-xl border border-slate-50 mb-6">
-                                        <div class="flex justify-between items-start mb-4">
-                                            <h3 class="text-[1.5rem] font-black text-slate-900 leading-tight flex-1 pr-4">${s.title}</h3>
-                                            <span class="px-3 py-1 bg-teal-50 text-[#0f766e] text-[10px] font-black rounded-lg uppercase tracking-wider border border-teal-100 shadow-sm">${s.status}</span>
-                                        </div>
-                                        <div class="flex items-center justify-between pt-4 border-t border-slate-50">
-                                            <span class="text-[13px] font-bold text-slate-500">Harga Mulai</span>
-                                            <span class="text-[1.5rem] font-black text-[#0f766e]">Rp${Number(s.price_min || s.base_price).toLocaleString('id-ID')}</span>
-                                        </div>
-                                    </div>
-
-                                    <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100 mb-6">
-        <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Penyedia Layanan</span>
-                                        <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Deskripsi Layanan</span>
-                                        <p class="text-[13px] text-slate-600 leading-relaxed font-medium max-h-[120px] overflow-y-auto pr-2 custom-scrollbar">${s.description || 'Tidak ada deskripsi.'}</p>
-                                        </div>
-                                    </div>
-
-                                    ${rejectionInfo}
-                                    ${actionButtons}
-                                </div>
-                            </div>
-                        `;
+                            `;
 
             overlay.classList.remove('opacity-0', 'pointer-events-none');
             box.classList.remove('scale-95');

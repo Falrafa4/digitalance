@@ -16,9 +16,9 @@
 
   const money = (v) => {
     if (v === null || v === undefined || v === '') return '—';
-    if (typeof v === 'string') return v;
     try {
-      return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(v);
+      if (window?.DigitalanceUtils?.formatRupiah) return window.DigitalanceUtils.formatRupiah(v);
+      return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(Number(String(v).replace(/[^0-9.-]/g, '')));
     } catch (e) {
       return String(v);
     }

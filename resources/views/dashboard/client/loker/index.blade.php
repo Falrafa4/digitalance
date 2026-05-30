@@ -91,11 +91,11 @@
                     @if($loker->budget_min || $loker->budget_max)
                         <p class="text-[12px] font-bold text-[#0f766e] mb-3">
                             Budget: @if($loker->budget_min && $loker->budget_max)
-                                Rp {{ number_format((float)$loker->budget_min, 0, ',', '.') }} - Rp {{ number_format((float)$loker->budget_max, 0, ',', '.') }}
+                                Rp{{ number_format((float)$loker->budget_min, 0, ',', '.') }} - Rp{{ number_format((float)$loker->budget_max, 0, ',', '.') }}
                             @elseif($loker->budget_min)
-                                Min Rp {{ number_format((float)$loker->budget_min, 0, ',', '.') }}
+                                Min Rp{{ number_format((float)$loker->budget_min, 0, ',', '.') }}
                             @else
-                                Maks Rp {{ number_format((float)$loker->budget_max, 0, ',', '.') }}
+                                Maks Rp{{ number_format((float)$loker->budget_max, 0, ',', '.') }}
                             @endif
                         </p>
                     @endif
@@ -125,7 +125,7 @@
                                         <div>
                                             <p class="text-[12px] font-bold text-slate-800">{{ $app->freelancer->skomda_student->name ?? 'Freelancer' }}</p>
                                             @if($app->proposed_price)
-                                                <p class="text-[10px] text-slate-400">Rp {{ number_format((float) $app->proposed_price, 0, ',', '.') }}</p>
+                                                <p class="text-[10px] text-slate-400">Rp{{ number_format((float) $app->proposed_price, 0, ',', '.') }}</p>
                                             @endif
                                         </div>
                                     </div>
@@ -228,7 +228,7 @@ window.__LOKKERS_DATA__ = @json($lokkersData);
 
 function formatRupiah(val) {
     if (!val) return '';
-    return 'Rp ' + Number(val).toLocaleString('id-ID');
+    return window.DigitalanceUtils.formatRupiah(val);
 }
 
 function openDetailModal(id) {
@@ -484,7 +484,7 @@ window.openApplicantsModal = function(lokerId) {
                                 `}
                             </div>
                         </div>
-                        ${app.proposed_price ? `<p class="text-[12px] font-bold text-[#0f766e] mb-2">Rp ${Number(app.proposed_price).toLocaleString('id-ID')}</p>` : ''}
+                        ${app.proposed_price ? `<p class="text-[12px] font-bold text-[#0f766e] mb-2">${window.DigitalanceUtils.formatRupiah(app.proposed_price)}</p>` : ''}
                         <p class="text-[12px] text-slate-600 leading-relaxed">${app.proposal}</p>
                     </div>
                 `).join('')}

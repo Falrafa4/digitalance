@@ -42,9 +42,7 @@
                     <div class="flex flex-col xl:flex-row xl:items-end xl:justify-between gap-6">
                         <div class="flex flex-col sm:flex-row gap-5 sm:items-center min-w-0">
                             <div class="shrink-0">
-                                <img src="{{ $avatarUrl }}" alt="{{ $displayName }}"
-                                    onerror="this.onerror=null;this.src='{{ $avatarFallbackUrl }}'"
-                                    class="w-28 h-28 sm:w-32 sm:h-32 rounded-[28px] object-cover border-4 border-white/20 shadow-2xl" />
+                                <x-avatar :user="$user" role="freelancer" :size="128" class="w-28 h-28 sm:w-32 sm:h-32 rounded-[28px] object-cover border-4 border-white/20 shadow-2xl" />
                             </div>
                             <div class="min-w-0">
                                 <p class="text-[11px] font-black uppercase tracking-[0.24em] text-teal-100/80">Freelancer
@@ -177,8 +175,8 @@
                                         {{ $service->description }}
                                     </p>
                                     <div class="flex flex-wrap gap-2 mt-4 text-[12px] text-slate-500 font-semibold">
-                                        <span class="px-3 py-1 rounded-full bg-slate-100">Rp {{ number_format((float) ($service->price_min ?? 0), 0, ',', '.') }}</span>
-                                        <span class="px-3 py-1 rounded-full bg-slate-100">Sampai Rp {{ number_format((float) ($service->price_max ?? 0), 0, ',', '.') }}</span>
+                                        <span class="px-3 py-1 rounded-full bg-slate-100">Rp{{ number_format((float) ($service->price_min ?? 0), 0, ',', '.') }}</span>
+                                        <span class="px-3 py-1 rounded-full bg-slate-100">Sampai Rp{{ number_format((float) ($service->price_max ?? 0), 0, ',', '.') }}</span>
                                         <span class="px-3 py-1 rounded-full bg-slate-100">{{ $service->delivery_time ?? '-' }} hari</span>
                                     </div>
                                 </div>
@@ -266,11 +264,9 @@
             <div class="lg:col-span-1">
                 <div
                     class="bg-white rounded-[18px] border border-slate-200 p-6 flex flex-col items-center text-center animate-fadeUp">
-                    <div class="relative mb-4">
-                        <img src="{{ $user->profile_photo ? asset('storage/' . $user->profile_photo) : 'https://ui-avatars.com/api/?name=' . urlencode($user->name) . '&background=0f766e&color=fff&size=128' }}"
-                            class="w-24 h-24 rounded-[18px] object-cover border-4 border-white shadow-teal-md"
-                            alt="{{ $user->name }}" />
-                    </div>
+<div class="relative mb-4">
+                            <x-avatar :user="$user" role="freelancer" :size="128" class="w-24 h-24 rounded-[18px] object-cover border-4 border-white shadow-teal-md" />
+                        </div>
                     <h3 class="font-display font-extrabold text-[1.15rem] text-slate-900">{{ $user->name }}</h3>
                     <p class="text-[13px] text-slate-400 mt-0.5">{{ $user->email }}</p>
                     <span
@@ -444,6 +440,22 @@
                         </form>
                     </div>
                 </div>
+
+                    {{-- Delete Account (Danger) --}}
+                    <div class="mt-6 bg-white rounded-[18px] border border-red-100 p-5">
+                        <h3 class="font-display font-bold text-red-600 mb-2">Hapus Akun Freelancer</h3>
+                        <p class="text-sm text-slate-500 mb-4">Menghapus akun akan mengembalikan data SkomdaStudent apabila email sekolah terdeteksi.</p>
+                        <form action="{{ route('freelancer.delete') }}" method="POST" onsubmit="event.preventDefault(); customConfirm('Yakin ingin menghapus akun? Semua data terkait akan dihapus.').then(res => { if(res) this.submit(); });">
+                            @csrf
+                            <div class="mb-3">
+                                <label class="text-[11px] font-bold text-slate-500 uppercase tracking-[.1em]">Masukkan Password</label>
+                                <input type="password" name="password" required class="w-full py-[10px] px-[13px] bg-slate-50 border-[1.5px] border-slate-200 rounded-[11px] text-[13.5px] outline-none" />
+                            </div>
+                            <button type="submit" class="inline-flex items-center gap-2 px-[18px] py-[10px] bg-red-50 text-red-600 font-bold text-[13px] rounded-[12px] border border-red-200 hover:bg-red-100 transition-all duration-150 cursor-pointer">
+                                <i class="ri-delete-bin-line"></i> Hapus Akun
+                            </button>
+                        </form>
+                    </div>
 
             </div>
         </div>
