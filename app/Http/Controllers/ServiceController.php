@@ -6,6 +6,7 @@ use App\Http\Requests\StoreServiceRequest;
 use App\Http\Requests\UpdateServiceRequest;
 use App\Models\Service;
 use App\Models\ServiceCategory;
+use App\Models\Review;
 use Illuminate\Http\Request;
 
 class ServiceController extends Controller
@@ -210,7 +211,14 @@ class ServiceController extends Controller
         $service->load([
             'category:id,name',
             'freelancer.skomda_student:id,name,email',
+            'freelancer.portofolios' => function ($query) {
+                $query->latest()->take(3);
+            },
         ]);
+
+        $freelancerReviewSummary = Review::whereHas('order.service', function ($query) use ($service) {
+            $query->where('freelancer_id', $service->freelancer_id);
+        })->selectRaw('COUNT(*) as total_reviews, COALESCE(AVG(rating), 0) as average_rating')->first();
 
         $otherServices = Service::with('category:id,name')
             ->where('freelancer_id', $service->freelancer_id)
@@ -222,7 +230,7 @@ class ServiceController extends Controller
             ->take(6)
             ->get();
 
-        return view('dashboard.client.services.show', compact('service', 'otherServices'));
+        return view('dashboard.client.services.show', compact('service', 'otherServices', 'freelancerReviewSummary'));
     }
 
     /**

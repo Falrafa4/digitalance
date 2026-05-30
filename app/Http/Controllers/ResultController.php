@@ -44,11 +44,18 @@ class ResultController extends Controller
             abort(403, 'Anda tidak memiliki izin untuk mengirim hasil untuk order ini.');
         }
 
-        if (!$request->hasFile('file')) {
-            return back()->with('error', 'File tidak ditemukan');
-        }
+        $resultMode = $validated['result_mode'] ?? 'file';
+        $filePath = null;
 
-        $filePath = $request->file('file')->store('results', 'public');
+        if ($resultMode === 'file') {
+            if (!$request->hasFile('file')) {
+                return back()->with('error', 'File tidak ditemukan');
+            }
+
+            $filePath = $request->file('file')->store('results', 'public');
+        } else {
+            $filePath = $validated['result_link'];
+        }
         $version = $validated['version'] ?? $validated['message'] ?? null;
         $note = $validated['note'] ?? '';
 

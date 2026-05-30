@@ -54,6 +54,9 @@
                 class="px-3 py-1 rounded-full text-[12px] font-extrabold bg-white text-slate-700 border border-slate-200">
                 Agreed: Rp{{ number_format((float) ($order->agreed_price ?? 0), 0, ',', '.') }}
               </span>
+              <span class="px-3 py-1 rounded-full text-[12px] font-extrabold bg-white text-slate-700 border border-slate-200">
+                Deadline: {{ $order->deadline ? \Carbon\Carbon::parse($order->deadline)->translatedFormat('d M Y') : '-' }}
+              </span>
             </div>
           </div>
 
@@ -315,7 +318,7 @@
             <form method="POST" action="{{ route('client.orders.attachments.store', $order->id) }}"
               enctype="multipart/form-data" class="flex flex-col sm:flex-row gap-3">
               @csrf
-              <input type="file" name="file"
+              <input type="file" name="file[]" multiple accept="image/*,.pdf,.zip,.doc,.docx,.rar"
                 class="flex-1 px-4 py-2.5 rounded-[12px] bg-slate-50 border border-slate-200" />
               <button
                 class="px-5 py-2.5 rounded-[12px] bg-slate-900 text-white font-bold text-[13px] hover:bg-black transition-all">
@@ -323,6 +326,31 @@
               </button>
             </form>
           </div>
+
+          @if($order->results->count() > 0)
+            <div class="mt-6 pt-5 border-t border-slate-100">
+              <p class="text-slate-400 text-[12px] font-extrabold uppercase tracking-widest mb-3">Hasil Freelancer</p>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                @foreach($order->results as $result)
+                  <div class="rounded-[14px] border border-slate-200 bg-slate-50 p-4">
+                    <div class="flex items-start justify-between gap-3">
+                      <div>
+                        <p class="font-extrabold text-slate-900">{{ $result->version ?? 'Version' }}</p>
+                        <p class="text-[12px] text-slate-500 mt-1">{{ optional($result->created_at)->format('d M Y, H:i') }}</p>
+                      </div>
+                      <a href="{{ route('client.results.show', $result->id) }}" class="text-[#0f766e] text-[12px] font-bold hover:underline">Detail</a>
+                    </div>
+                    @if($result->file_url)
+                      <a href="{{ asset('storage/' . $result->file_url) }}" target="_blank"
+                        class="mt-3 inline-flex items-center gap-2 text-[12px] font-semibold text-slate-600 hover:text-[#0f766e]">
+                        <i class="ri-external-link-line"></i> Preview file
+                      </a>
+                    @endif
+                  </div>
+                @endforeach
+              </div>
+            </div>
+          @endif
         </div>
 
         {{-- Messages / Negotiation --}}
@@ -430,7 +458,7 @@
 
             @if($order->results->count() > 0)
               <form action="{{ route('client.orders.complete', $order->id) }}" method="POST"
-                onsubmit="return confirm('Terima hasil kerja dan tandai order sebagai selesai?')">
+                onsubmit="event.preventDefault(); customConfirm('Terima hasil kerja dan tandai order sebagai selesai?').then(res => { if(res) this.submit(); });">
                 @csrf
                 <button type="submit"
                   class="px-5 py-3 rounded-[12px] bg-emerald-600 text-white font-bold text-[13px] hover:bg-emerald-700 transition-all">
@@ -451,25 +479,37 @@
           <h2 class="font-display font-extrabold text-slate-900 text-[1.25rem]">Review</h2>
           @if(!empty($order->review))
             <div class="mt-4 rounded-[16px] border border-slate-200 bg-slate-50 p-5">
-              <p class="font-extrabold text-slate-900">Rating: {{ $order->review->rating ?? '-' }}/5</p>
+              <p class="font-extrabold text-slate-900">Rating: {{ str_repeat('★', (int) ($order->review->rating ?? 0)) }}</p>
               <p class="text-slate-600 mt-2 italic">"{{ $order->review->comment ?? '-' }}"</p>
             </div>
-          @else
+          @elseif($order->status === 'Completed')
             <form method="POST" action="{{ route('client.reviews.store') }}" class="mt-4 space-y-4">
               @csrf
               <input type="hidden" name="order_id" value="{{ $order->id }}" />
-              <div class="flex gap-4 items-center">
-                <select name="rating" required class="px-4 py-2.5 rounded-[12px] bg-slate-50 border border-slate-200">
+              <div class="flex flex-col gap-2">
+                <label class="text-[11px] font-bold text-slate-500 uppercase tracking-[.1em]">Rating</label>
+                <div class="flex flex-wrap gap-2">
                   @for($i = 5; $i >= 1; $i--)
-                  <option value="{{ $i }}">{{ $i }} Bintang</option> @endfor
-                </select>
-                <input name="comment" class="flex-1 px-4 py-2.5 rounded-[12px] bg-slate-50 border border-slate-200"
-                  placeholder="Komentar singkat...">
+                    <label class="cursor-pointer">
+                      <input type="radio" name="rating" value="{{ $i }}" class="peer sr-only" {{ $i === 5 ? 'checked' : '' }}>
+                      <span class="inline-flex items-center gap-1 px-4 py-2 rounded-[12px] border border-slate-200 bg-white text-slate-500 font-bold text-[13px] peer-checked:bg-amber-50 peer-checked:text-amber-700 peer-checked:border-amber-200 transition-all">
+                        {{ str_repeat('★', $i) }}
+                      </span>
+                    </label>
+                  @endfor
+                </div>
               </div>
+              <textarea name="comment" rows="3" class="w-full px-4 py-2.5 rounded-[12px] bg-slate-50 border border-slate-200"
+                placeholder="Komentar singkat..."></textarea>
+              <p class="text-[12px] text-amber-600 font-semibold">Review hanya bisa diisi setelah order selesai.</p>
               <button
                 class="px-6 py-2.5 rounded-[12px] bg-slate-900 text-white font-bold text-[13px] hover:bg-black transition-all">Kirim
                 Ulas</button>
             </form>
+          @else
+            <div class="mt-4 rounded-[16px] border border-amber-100 bg-amber-50 p-4 text-amber-700 text-[13px] font-semibold">
+              Review baru bisa diisi ketika order berstatus selesai.
+            </div>
           @endif
         </div>
       </div>
@@ -503,12 +543,12 @@
 
           <div class="mt-6 pt-5 border-t border-slate-100 space-y-3">
             @if($order->freelancer)
-              <a href="{{ route('client.talents.show', $order->freelancer_id) }}"
+              <a href="{{ route('client.talents.show', ['freelancer' => $order->freelancer_id, 'return_to' => route('client.orders.show', $order->id)]) }}"
                 class="block w-full px-4 py-3 rounded-[12px] bg-slate-50 border border-slate-200 text-slate-700 font-bold text-[12.5px] hover:border-[#0f766e] hover:text-[#0f766e] transition-all text-center">
                 Lihat Profil
               </a>
             @elseif($order->service?->freelancer_id)
-              <a href="{{ route('client.talents.show', $order->service->freelancer_id) }}"
+              <a href="{{ route('client.talents.show', ['freelancer' => $order->service->freelancer_id, 'return_to' => route('client.orders.show', $order->id)]) }}"
                 class="block w-full px-4 py-3 rounded-[12px] bg-slate-50 border border-slate-200 text-slate-700 font-bold text-[12.5px] hover:border-[#0f766e] hover:text-[#0f766e] transition-all text-center">
                 Lihat Profil
               </a>

@@ -38,7 +38,7 @@
                 </div>
                 <div class="bg-slate-50 rounded-[14px] p-4 border border-slate-100">
                     <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Tanggal</p>
-                    <p class="font-semibold text-slate-800">{{ optional($review->created_at)->format('d M Y H:i') ?? '-' }}
+                    <p class="font-semibold text-slate-800">{{ optional($review->created_at)->timezone(config('app.timezone'))->format('d M Y H:i') ?? '-' }} WIB
                     </p>
                 </div>
             </div>

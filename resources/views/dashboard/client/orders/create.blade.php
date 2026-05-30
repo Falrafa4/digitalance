@@ -21,21 +21,25 @@
         @error('brief') <p class="text-red-600 text-[12px] font-bold mt-1">{{ $message }}</p> @enderror
       </div>
 
-      {{-- PERBAIKAN TASK 6: Input File Lampiran dengan Dynamic Live JS Preview Name --}}
+      <div>
+        <label class="block text-[11px] font-extrabold text-slate-400 uppercase tracking-widest mb-1.5 ml-0.5">Deadline</label>
+        <input type="date" name="deadline" value="{{ old('deadline') }}"
+               class="w-full px-4 py-3 rounded-[14px] bg-slate-50 border border-slate-200 focus:border-[#0f766e] outline-none transition-all @error('deadline') border-red-500 @enderror" />
+        @error('deadline') <p class="text-red-600 text-[12px] font-bold mt-1">{{ $message }}</p> @enderror
+      </div>
+
+      {{-- Lampiran awal dapat diunggah langsung dan dipreview sebelum order dikirim --}}
       <div>
         <label class="block text-[11px] font-extrabold text-slate-400 uppercase tracking-widest mb-1.5 ml-0.5">Dokumen Pendukung (Opsional)</label>
         <div class="border-2 border-dashed border-slate-200 rounded-[14px] p-4 text-center hover:border-[#0f766e] transition-all bg-slate-50/50 cursor-pointer relative" id="attachment-dropzone">
-          <input type="file" name="attachment_file" id="attachment_file_input" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full">
+            <input type="file" name="attachments[]" id="attachment_file_input" multiple accept="image/*,.pdf,.zip,.doc,.docx,.rar"
+                   class="absolute inset-0 opacity-0 cursor-pointer w-full h-full">
           <div id="file-upload-placeholder" class="space-y-1">
             <i class="ri-attachment-line text-2xl text-slate-400"></i>
             <p class="text-sm text-slate-600 font-bold">Pilih berkas lampiran</p>
-            <p class="text-xs text-slate-400">PDF, ZIP, DOCX, PNG, JPG (Maksimal 10MB)</p>
+            <p class="text-xs text-slate-400">PDF, ZIP, DOCX, PNG, JPG, RAR. Maksimal 10 file, 50MB per file.</p>
           </div>
-          <div id="file-upload-preview" class="hidden flex items-center justify-center gap-2 text-sm text-[#0f766e] font-bold bg-teal-50/50 p-2 rounded-xl border border-teal-100">
-            <i class="ri-file-check-line text-lg"></i>
-            <span id="selected-file-name">Nama_file.zip</span>
-            <button type="button" onclick="window.clearSelectedFile(event)" class="text-xs text-red-500 font-bold ml-2 hover:underline">Hapus</button>
-          </div>
+            <div id="file-upload-preview" class="hidden mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2 text-left"></div>
         </div>
       </div>
 
@@ -55,20 +59,28 @@
         var btn = document.getElementById('order-submit-btn');
         var spinner = document.getElementById('order-spinner');
         var btnText = document.getElementById('order-btn-text');
-        
         var fileInput = document.getElementById('attachment_file_input');
         var placeholder = document.getElementById('file-upload-placeholder');
         var preview = document.getElementById('file-upload-preview');
-        var fileNameSpan = document.getElementById('selected-file-name');
 
         if (fileInput) {
             fileInput.addEventListener('change', function() {
-                if (this.files && this.files.length > 0) {
-                    var file = this.files[0];
-                    fileNameSpan.textContent = file.name;
-                    placeholder.classList.add('hidden');
-                    preview.classList.remove('hidden');
-                }
+              var files = this.files ? Array.from(this.files) : [];
+              if (!files.length) {
+                placeholder.classList.remove('hidden');
+                preview.classList.add('hidden');
+                preview.innerHTML = '';
+                return;
+              }
+
+              placeholder.classList.add('hidden');
+              preview.classList.remove('hidden');
+              preview.innerHTML = files.map(function(file) {
+                return '<div class="flex items-center justify-between gap-2 px-3 py-2 rounded-xl bg-teal-50/70 border border-teal-100 text-[#0f766e] font-bold text-xs">' +
+                  '<span class="truncate">' + file.name + '</span>' +
+                  '<span class="text-slate-400 font-semibold">' + Math.ceil(file.size / 1024) + ' KB</span>' +
+                '</div>';
+              }).join('');
             });
         }
 
@@ -78,7 +90,7 @@
             fileInput.value = '';
             placeholder.classList.remove('hidden');
             preview.classList.add('hidden');
-            fileNameSpan.textContent = '';
+            preview.innerHTML = '';
         };
 
         if (form && btn) {

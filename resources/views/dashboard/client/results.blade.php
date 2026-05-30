@@ -41,7 +41,7 @@
                   oleh {{ $result->order->service->freelancer->skomda_student->name ?? 'Freelancer' }}
                 </p>
                 <p class="text-slate-400 text-[12px] font-bold mt-0.5">
-                  {{ $result->created_at->format('d M Y, H:i') }}
+                  {{ $result->created_at->timezone(config('app.timezone'))->format('d M Y, H:i') }} WIB
                 </p>
               </div>
               <div class="flex items-center gap-2 flex-shrink-0">
@@ -75,5 +75,5 @@
         @endforeach
       </div>
     @endif
-    </section>
+    </div>
 @endsection

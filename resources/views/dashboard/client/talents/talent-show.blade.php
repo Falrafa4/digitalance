@@ -12,9 +12,7 @@
         $displayNis = $student->nis ?? '-';
         $avatarUrl = $freelancer->profile_photo 
             ? asset('storage/' . $freelancer->profile_photo) 
-            : ($student->avatar 
-                ? asset('storage/' . $student->avatar) 
-                : 'https://api.dicebear.com/7.x/initials/svg?seed=' . urlencode($displayName . '-' . ($displayNis ?? '0')) . '&background=0f766e&color=fff&size=128');
+            : 'https://api.dicebear.com/7.x/initials/svg?seed=' . urlencode($displayName . '-' . ($displayNis ?? '0')) . '&background=0f766e&color=fff&size=128';
         $serviceItems = $services ?? collect();
         $portfolioItems = $portofolios ?? collect();
         $skillItems = $skillTags ?? collect();
@@ -29,7 +27,7 @@
 
     <section class="animate-fadeUp">
         <div class="mb-6">
-            <a href="{{ route('client.talents.index') }}" class="text-slate-500 font-bold text-[13px] hover:text-slate-900">
+            <a href="{{ $returnTo ?? route('client.talents.index') }}" class="text-slate-500 font-bold text-[13px] hover:text-slate-900">
                 <i class="ri-arrow-left-line mr-1"></i> Kembali
             </a>
         </div>

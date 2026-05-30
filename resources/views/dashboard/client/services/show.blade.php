@@ -58,9 +58,7 @@
             $freelancerName = optional(optional($service->freelancer)->skomda_student)->name ?? '-';
             $freelancerAvatarUrl = $service->freelancer->profile_photo
               ? asset('storage/' . $service->freelancer->profile_photo)
-              : ($service->freelancer->skomda_student->avatar
-                ? asset('storage/' . $service->freelancer->skomda_student->avatar)
-                : 'https://api.dicebear.com/7.x/initials/svg?seed=' . urlencode($freelancerName . '-' . ($service->freelancer_id ?? '0')) . '&background=0f766e&color=fff&size=48');
+              : 'https://api.dicebear.com/7.x/initials/svg?seed=' . urlencode($freelancerName . '-' . ($service->freelancer_id ?? '0')) . '&background=0f766e&color=fff&size=48';
           @endphp
           <a href="{{ $service->freelancer_id ? route('client.talents.show', $service->freelancer_id) : '#' }}"
             class="flex items-start gap-3 hover:bg-slate-50 -mx-2 px-2 py-2 rounded-lg transition-colors">
@@ -76,10 +74,36 @@
           </a>
 
           <div class="mt-4 pt-4 border-t border-slate-100">
+            @if(isset($freelancerReviewSummary))
+              <div class="grid grid-cols-2 gap-3 mb-4">
+                <div class="rounded-[14px] border border-slate-200 bg-slate-50 px-4 py-3">
+                  <p class="text-[10px] font-black text-slate-400 uppercase tracking-[.12em]">Review</p>
+                  <p class="text-slate-900 font-extrabold mt-1">{{ (int) ($freelancerReviewSummary->total_reviews ?? 0) }}</p>
+                </div>
+                <div class="rounded-[14px] border border-slate-200 bg-slate-50 px-4 py-3">
+                  <p class="text-[10px] font-black text-slate-400 uppercase tracking-[.12em]">Rating</p>
+                  <p class="text-slate-900 font-extrabold mt-1">{{ number_format((float) ($freelancerReviewSummary->average_rating ?? 0), 1) }}/5</p>
+                </div>
+              </div>
+            @endif
             <p class="text-slate-500 text-[13px]">
               {{ optional($service->freelancer)->bio ?? 'Belum ada bio.' }}
             </p>
           </div>
+
+          @if($service->freelancer->portofolios->isNotEmpty())
+            <div class="mt-5 pt-5 border-t border-slate-100">
+              <p class="text-[11px] font-black text-slate-400 uppercase tracking-[.12em] mb-3">Portofolio Terkait</p>
+              <div class="space-y-3">
+                @foreach($service->freelancer->portofolios->take(2) as $portfolio)
+                  <div class="rounded-[14px] border border-slate-200 bg-slate-50 p-3">
+                    <p class="font-bold text-slate-900 text-[13px] truncate">{{ $portfolio->title }}</p>
+                    <p class="text-[12px] text-slate-500 mt-1 line-clamp-2">{{ $portfolio->description ?? 'Portofolio terkait layanan ini.' }}</p>
+                  </div>
+                @endforeach
+              </div>
+            </div>
+          @endif
 
           <div class="mt-5 pt-5 border-t border-slate-100 flex flex-col gap-3">
             @if($service->freelancer_id)

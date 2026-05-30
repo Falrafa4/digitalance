@@ -28,11 +28,11 @@ class ClientController extends Controller
         $role = $request->query('role', 'all');
 
         $clientsQuery = Client::query()->select('id', 'name', 'email', 'phone', 'profile_photo', DB::raw('NULL as avatar'), DB::raw("'Client' as role"), DB::raw("'Active' as status"), 'created_at');
-        $skomdaQuery = SkomdaStudent::query()->select('id', 'name', 'email', 'phone', DB::raw('NULL as profile_photo'), 'avatar', DB::raw("'Skomda Student' as role"), DB::raw("'Active' as status"), 'created_at');
+        $skomdaQuery = SkomdaStudent::query()->select('id', 'name', 'email', 'phone', DB::raw('NULL as profile_photo'), DB::raw('NULL as avatar'), DB::raw("'Skomda Student' as role"), DB::raw("'Active' as status"), 'created_at');
         // Use the query builder so Freelancer::getNameAttribute() does not override the joined student name.
         $freelancersQuery = DB::table('freelancers')
             ->join('skomda_students', 'freelancers.student_id', '=', 'skomda_students.id')
-            ->select('freelancers.id', 'skomda_students.name', 'skomda_students.email', 'skomda_students.phone', 'freelancers.profile_photo', 'skomda_students.avatar', DB::raw("'Freelancer' as role"), 'freelancers.status', 'freelancers.created_at');
+            ->select('freelancers.id', 'skomda_students.name', 'skomda_students.email', 'skomda_students.phone', 'freelancers.profile_photo', DB::raw('NULL as avatar'), DB::raw("'Freelancer' as role"), 'freelancers.status', 'freelancers.created_at');
 
         if ($q !== '') {
             $clientsQuery->where(fn($query) => $query

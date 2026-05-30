@@ -134,6 +134,9 @@ class OrderController extends Controller
         $validated = $request->validate([
             'service_id' => 'required|integer|exists:services,id',
             'brief' => 'required|string',
+            'attachments' => 'nullable|array|max:10',
+            'attachments.*' => 'file|max:51200',
+            'deadline' => 'nullable|date',
         ]);
 
         $service = Service::findOrFail($validated['service_id']);
@@ -151,9 +154,12 @@ class OrderController extends Controller
             'client_id' => $client->id,
             'freelancer_id' => $service->freelancer_id,
             'brief' => $validated['brief'],
+            'deadline' => $validated['deadline'] ?? null,
             'status' => 'Pending',
             'agreed_price' => null,
         ]);
+
+        $this->storeUploadedAttachments($order, $request->file('attachments') ?? [], 'client');
 
         // NOTIFIKASI: Beritahu Freelancer bahwa ada pesanan masuk
         \App\Models\Notification::create([
@@ -174,20 +180,11 @@ class OrderController extends Controller
         abort_unless($order->client_id === $client->id, 403);
 
         $request->validate([
-            'file' => 'required|file|max:5120',
+            'file' => 'required|array|max:10',
+            'file.*' => 'file|max:51200',
         ]);
 
-        $file = $request->file('file');
-        $path = $file->store('order-attachments', 'public');
-
-        \App\Models\OrderAttachment::create([
-            'order_id' => $order->id,
-            'file_path' => $path,
-            'file_name' => $file->getClientOriginalName(),
-            'mime_type' => $file->getMimeType(),
-            'file_size' => $file->getSize(),
-            'uploaded_by' => 'client',
-        ]);
+        $this->storeUploadedAttachments($order, $request->file('file') ?? [], 'client');
 
         return back()->with('success', 'Attachment berhasil diupload');
     }
@@ -370,6 +367,29 @@ class OrderController extends Controller
         return [
             'status' => self::STATUS_RULE,
         ];
+    }
+
+    private function storeUploadedAttachments(Order $order, array $files, string $uploadedBy): void
+    {
+        $existingCount = $order->attachments()->count();
+        $remaining = max(0, 10 - $existingCount);
+
+        foreach (array_slice($files, 0, $remaining) as $file) {
+            if (!$file) {
+                continue;
+            }
+
+            $path = $file->store('order-attachments', 'public');
+
+            \App\Models\OrderAttachment::create([
+                'order_id' => $order->id,
+                'file_path' => $path,
+                'file_name' => $file->getClientOriginalName(),
+                'mime_type' => $file->getMimeType(),
+                'file_size' => $file->getSize(),
+                'uploaded_by' => $uploadedBy,
+            ]);
+        }
     }
 
     // =========================

@@ -33,7 +33,7 @@
         </div>
         <div class="bg-slate-50 rounded-xl p-4">
           <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Tanggal Kirim</p>
-          <p class="font-extrabold text-slate-900 text-[15px]">{{ $result->created_at->format('d M Y, H:i') }}</p>
+          <p class="font-extrabold text-slate-900 text-[15px]">{{ $result->created_at->timezone(config('app.timezone'))->format('d M Y, H:i') }} WIB</p>
         </div>
       </div>
 
@@ -48,20 +48,40 @@
     @if($result->file_url)
     <div class="bg-white border border-slate-200 rounded-[18px] p-6">
       <h2 class="font-display font-extrabold text-slate-900 text-[1.25rem] mb-4">File Hasil</h2>
-      <div class="flex items-center justify-between p-4 bg-blue-50 border border-blue-100 rounded-xl">
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center text-xl">
-            <i class="ri-file-zip-line"></i>
+      @php
+        $resultIsLink = is_string($result->file_url) && preg_match('/^https?:\/\//i', $result->file_url);
+        $resultFileUrl = $resultIsLink ? $result->file_url : asset('storage/' . $result->file_url);
+        $resultMime = (!$resultIsLink && $result->file_url && file_exists(storage_path('app/public/' . $result->file_url))) ? mime_content_type(storage_path('app/public/' . $result->file_url)) : null;
+      @endphp
+      <div class="rounded-xl border border-blue-100 bg-blue-50 overflow-hidden">
+        @if($resultIsLink)
+          <div class="p-5">
+            <p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2">Link Hasil</p>
+            <a href="{{ $resultFileUrl }}" target="_blank" class="text-[#0f766e] font-bold hover:underline break-all">{{ $resultFileUrl }}</a>
           </div>
-          <div>
-            <p class="text-[13px] font-bold text-slate-900">File Terlampir</p>
-            <p class="text-[11px] text-slate-500">Tersedia untuk diunduh</p>
+        @elseif(in_array($resultMime, ['image/jpeg', 'image/png', 'image/gif', 'image/webp']))
+          <a href="{{ $resultFileUrl }}" target="_blank" class="block">
+            <img src="{{ $resultFileUrl }}" alt="{{ $result->version ?? 'Result file' }}" class="w-full max-h-[420px] object-cover">
+          </a>
+        @elseif($resultMime === 'application/pdf')
+          <iframe src="{{ $resultFileUrl }}" class="w-full h-[520px] border-0"></iframe>
+        @else
+          <div class="flex items-center justify-between p-4">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center text-xl">
+                <i class="ri-file-zip-line"></i>
+              </div>
+              <div>
+                <p class="text-[13px] font-bold text-slate-900">File Terlampir</p>
+                <p class="text-[11px] text-slate-500">Tersedia untuk diunduh</p>
+              </div>
+            </div>
+            <a href="{{ $resultFileUrl }}" target="_blank"
+               class="px-4 py-2 bg-white text-blue-600 border border-blue-200 rounded-lg font-bold text-[12px] hover:bg-blue-600 hover:text-white transition-all shadow-sm">
+              Unduh
+            </a>
           </div>
-        </div>
-        <a href="{{ asset('storage/' . $result->file_url) }}" target="_blank"
-           class="px-4 py-2 bg-white text-blue-600 border border-blue-200 rounded-lg font-bold text-[12px] hover:bg-blue-600 hover:text-white transition-all shadow-sm">
-          Unduh
-        </a>
+        @endif
       </div>
     </div>
     @endif

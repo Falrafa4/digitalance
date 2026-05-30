@@ -30,9 +30,7 @@
                   @php
                     $freelancerAvatarUrl = $f->profile_photo 
                         ? asset('storage/' . $f->profile_photo) 
-                        : ($f->skomda_student->avatar 
-                            ? asset('storage/' . $f->skomda_student->avatar) 
-                            : 'https://api.dicebear.com/7.x/initials/svg?seed=' . urlencode($f->skomda_student->name ?? $f->skomda_student->email ?? 'Freelancer') . '&background=0f766e&color=fff&size=64');
+                        : 'https://api.dicebear.com/7.x/initials/svg?seed=' . urlencode($f->skomda_student->name ?? $f->skomda_student->email ?? 'Freelancer') . '&background=0f766e&color=fff&size=64';
                   @endphp
                   <img src="{{ $freelancerAvatarUrl }}" loading="lazy" decoding="async" class="w-16 h-16 rounded-xl bg-slate-100 object-cover flex-shrink-0" />
                 </div>

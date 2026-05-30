@@ -170,7 +170,6 @@ class FreelancerController extends Controller
                         'phone' => $freelancer->phone ?? null,
                         'class' => null,
                         'major' => null,
-                        'avatar' => $freelancer->profile_photo ?? null,
                     ]);
                 }
             }
@@ -359,14 +358,12 @@ class FreelancerController extends Controller
     {
         $freelancers = Freelancer::with('skomda_student')
             ->where('status', 'Approved')
-            ->latest()
+            ->withCount(['services as services_count' => function ($query) {
+                $query->where('status', 'Approved');
+            }])
+            ->orderByDesc('services_count')
+            ->orderByDesc('created_at')
             ->get();
-
-        foreach ($freelancers as $f) {
-            $f->services_count = Service::where('freelancer_id', $f->id)
-                ->where('status', 'Approved')
-                ->count();
-        }
 
         return view('dashboard.client.talents.find-talent', compact('freelancers'));
     }
@@ -388,6 +385,7 @@ class FreelancerController extends Controller
             'portofolios' => $profileData['portofolios'],
             'skillTags' => $profileData['skillTags'],
             'stats' => $profileData['stats'],
+            'returnTo' => request('return_to'),
         ]);
     }
 

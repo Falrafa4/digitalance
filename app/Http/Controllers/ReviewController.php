@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreReviewRequest;
+use App\Models\Order;
 use App\Models\Review;
 use Illuminate\Http\Request;
 
@@ -75,7 +76,15 @@ class ReviewController extends Controller
     {
         // Pastikan order tersebut milik client yang sedang login
         $client = auth('client')->user();
-        $order = $client->orders()->where('id', $orderId)->firstOrFail();
+        $order = Order::where('client_id', $client->id)->where('id', $orderId)->firstOrFail();
+
+        if ($order->status !== 'Completed') {
+            return redirect()->route('client.orders.show', $order->id)->with('warning', 'Review hanya bisa diisi ketika order sudah selesai.');
+        }
+
+        if ($order->review) {
+            return redirect()->route('client.orders.show', $order->id)->with('warning', 'Review untuk order ini sudah ada.');
+        }
 
         // Tampilkan form review untuk client
         return view('dashboard.client.reviews.create', compact('order'));
@@ -84,11 +93,16 @@ class ReviewController extends Controller
     public function clientStore(StoreReviewRequest $request)
     {
         // Logika simpan review
-        $request->validated();
+        $validated = $request->validated();
 
-        Review::create($request->only(['order_id', 'rating', 'comment']));
+        $order = \App\Models\Order::with('review')->findOrFail($validated['order_id']);
+        abort_unless($order->client_id === auth('client')->id(), 403);
+        abort_unless($order->status === 'Completed', 422, 'Review hanya bisa dikirim setelah order selesai.');
+        abort_unless(!$order->review, 422, 'Review untuk order ini sudah ada.');
 
-        return redirect()->back()->with('success', 'Review berhasil ditambahkan');
+        Review::create($validated);
+
+        return redirect()->route('client.orders.show', $order->id)->with('success', 'Review berhasil ditambahkan');
     }
 
     // FREELANCER ONLY

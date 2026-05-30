@@ -207,7 +207,7 @@
                                 <div class="relative group">
                                     <span
                                         class="absolute left-6 top-1/2 -translate-y-1/2 text-emerald-600 font-black text-xl">Rp</span>
-                                    <input type="text" name="agreed_price" id="agreed_price" required data-rupiah-input inputmode="numeric"
+                                    <input type="text" name="agreed_price" id="agreed_price_stage1" required data-rupiah-input inputmode="numeric"
                                         class="w-full pl-16 pr-6 py-5 bg-white border-2 border-emerald-100 rounded-2xl focus:border-emerald-500 focus:ring-8 focus:ring-emerald-500/10 outline-none transition-all font-black text-slate-900 text-2xl shadow-inner text-center md:text-left"
                                         value="{{ old('agreed_price', (int) ($order->agreed_price ?? $order->service?->price_min ?? 0)) }}">
                                 </div>
@@ -275,7 +275,7 @@
                                     Kesepakatan Baru (ACC)</label>
                                 <div class="relative">
                                     <span class="absolute left-4 top-1/2 -translate-y-1/2 text-teal-600 font-bold">Rp</span>
-                                    <input type="text" name="agreed_price" id="agreed_price" required data-rupiah-input inputmode="numeric"
+                                    <input type="text" name="agreed_price" id="agreed_price_stage2" required data-rupiah-input inputmode="numeric"
                                         class="w-full pl-12 pr-4 py-4 bg-white border-2 border-teal-100 rounded-xl focus:border-teal-500 outline-none font-bold text-slate-900 shadow-sm"
                                         value="{{ old('agreed_price', (int) ($order->agreed_price ?? $order->service?->price_min ?? 0)) }}">
                                 </div>
@@ -326,12 +326,12 @@
                                 Terima Revisi
                             </button>
                         </form>
-                        <form action="{{ route('freelancer.orders.revision.reject', $order->id) }}" method="POST"
+                        <form action="{{ route('freelancer.orders.revision.reject', $order->id) }}" method="POST" id="rejectRevisionForm{{ $order->id }}"
                             class="flex-1">
                             @csrf
                             <input type="hidden" name="reason" id="rejectReason{{ $order->id }}" value="">
                             <button type="button"
-                                onclick="const reason = prompt('Alasan penolakan:'); if(reason) { document.getElementById('rejectReason{{ $order->id }}').value = reason; this.closest('form').submit(); }"
+                                onclick="window.customConfirm('Yakin ingin menolak revisi ini?').then(function(ok) { if (ok) { const reason = prompt('Alasan penolakan:'); if(reason) { document.getElementById('rejectReason{{ $order->id }}').value = reason; document.getElementById('rejectRevisionForm{{ $order->id }}').submit(); } } })"
                                 class="w-full py-3.5 rounded-[14px] bg-white border border-red-200 text-red-600 font-bold text-[14px] hover:bg-red-50 transition-all flex items-center justify-center gap-2">
                                 <i class="ri-close-line"></i>
                                 Tolak Revisi
@@ -359,9 +359,22 @@
                     </div>
 
                     <form action="{{ route('freelancer.results.store', $order->id) }}" method="POST"
-                        enctype="multipart/form-data" class="space-y-4" x-data="{ isSubmitting: false }"
+                        enctype="multipart/form-data" class="space-y-4" x-data="{ isSubmitting: false, resultMode: 'file' }"
                         @submit="isSubmitting = true">
                         @csrf
+                        <div>
+                            <label class="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Mode Pengiriman</label>
+                            <div class="grid grid-cols-2 gap-3">
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="result_mode" value="file" class="peer sr-only" x-model="resultMode" checked>
+                                    <div class="rounded-[12px] border border-slate-200 px-4 py-3 text-center font-bold text-[13px] peer-checked:border-emerald-400 peer-checked:bg-emerald-50 peer-checked:text-emerald-700 transition-all">File</div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="result_mode" value="link" class="peer sr-only" x-model="resultMode">
+                                    <div class="rounded-[12px] border border-slate-200 px-4 py-3 text-center font-bold text-[13px] peer-checked:border-emerald-400 peer-checked:bg-emerald-50 peer-checked:text-emerald-700 transition-all">Link</div>
+                                </label>
+                            </div>
+                        </div>
                         <div>
                             <label
                                 class="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Versi/Version</label>
@@ -376,11 +389,20 @@
                                 class="w-full px-4 py-3 rounded-[12px] border border-slate-200 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 outline-none text-sm"
                                 placeholder="Catatan tambahan untuk klien..."></textarea>
                         </div>
-                        <div>
+                        <div x-show="resultMode === 'file'" x-cloak>
                             <label class="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">File Hasil
                                 <span class="text-red-500">*</span></label>
-                            <input type="file" name="file" required accept=".pdf,.doc,.docx,.zip,.rar,.jpg,.jpeg,.png"
+                            <input type="file" name="file" accept=".pdf,.doc,.docx,.zip,.rar,.jpg,.jpeg,.png"
                                 class="w-full px-4 py-3 rounded-[12px] border border-slate-200 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 outline-none text-sm">
+                            <p class="text-[12px] text-slate-400 mt-2">Maksimal 50MB per file.</p>
+                        </div>
+                        <div x-show="resultMode === 'link'" x-cloak>
+                            <label class="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Link Hasil
+                                <span class="text-red-500">*</span></label>
+                            <input type="url" name="result_link"
+                                class="w-full px-4 py-3 rounded-[12px] border border-slate-200 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 outline-none text-sm"
+                                placeholder="https://...">
+                            <p class="text-[12px] text-slate-400 mt-2">Gunakan jika hasil diletakkan di drive atau storage publik.</p>
                         </div>
                         <button type="submit" :disabled="isSubmitting"
                             class="w-full py-3.5 rounded-[14px] bg-emerald-500 text-white font-bold text-[14px] hover:bg-emerald-600 transition-all flex items-center justify-center gap-2 disabled:opacity-50">
@@ -388,6 +410,26 @@
                             <span x-show="isSubmitting"><i class="ri-loader-4-line animate-spin mr-1"></i> Memproses...</span>
                         </button>
                     </form>
+
+                    @if($order->results->count() > 0)
+                        <div class="mt-6 pt-6 border-t border-slate-100">
+                            <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">Hasil Terkirim</p>
+                            <div class="space-y-3">
+                                @foreach($order->results as $result)
+                                    <div class="rounded-[14px] border border-slate-200 bg-slate-50 p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                                        <div>
+                                            <p class="font-bold text-slate-900">{{ $result->version ?? 'Versi' }}</p>
+                                            <p class="text-[12px] text-slate-500 mt-1">{{ optional($result->created_at)->timezone(config('app.timezone'))->format('d M Y, H:i') }} WIB</p>
+                                        </div>
+                                        <a href="{{ asset('storage/' . $result->file_url) }}" target="_blank"
+                                            class="inline-flex items-center gap-2 px-4 py-2 rounded-[12px] bg-white border border-slate-200 text-slate-700 font-bold text-[12px] hover:border-[#0f766e] hover:text-[#0f766e] transition-all">
+                                            <i class="ri-external-link-line"></i> Preview File
+                                        </a>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
                 </div>
             </div>
         @endif

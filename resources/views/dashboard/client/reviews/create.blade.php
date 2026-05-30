@@ -26,12 +26,16 @@
 
                 <div class="flex flex-col gap-1.5">
                     <label class="text-[11px] font-bold text-slate-500 uppercase tracking-[.1em]">Rating</label>
-                    <select name="rating" required
-                        class="py-[10px] px-[13px] bg-slate-50 border-[1.5px] border-slate-200 rounded-[11px] text-[13.5px] outline-none transition-all focus:border-[#0f766e] focus:bg-white">
+                    <div class="flex flex-wrap gap-2">
                         @for($i = 5; $i >= 1; $i--)
-                            <option value="{{ $i }}">{{ $i }} Star</option>
+                            <label class="cursor-pointer">
+                                <input type="radio" name="rating" value="{{ $i }}" class="peer sr-only" {{ $i === 5 ? 'checked' : '' }}>
+                                <span class="inline-flex items-center px-4 py-2 rounded-[12px] border border-slate-200 bg-white text-slate-500 font-bold text-[13px] peer-checked:bg-amber-50 peer-checked:text-amber-700 peer-checked:border-amber-200 transition-all">
+                                    {{ str_repeat('★', $i) }}
+                                </span>
+                            </label>
                         @endfor
-                    </select>
+                    </div>
                 </div>
 
                 <div class="flex flex-col gap-1.5">
