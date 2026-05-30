@@ -18,14 +18,14 @@ body {
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
 }
 
-/* AUTH CONTAINER  */
+/* AUTH CONTAINER WITH COMPACT SIZE (OPTIMAL HORIZONTAL PROPORTIONS - REVISI 3) */
 #authContainer {
     position: relative;
     overflow: hidden;
     background: white;
 }
 
-/* OVERLAY SLIDE TRANSITION */
+/* OVERLAY SLIDE TRANSITION (PREMIUM DARK SKIN) */
 .auth-overlay {
     position: absolute;
     top: 0;
@@ -34,232 +34,34 @@ body {
     height: 100%;
     z-index: 20;
     overflow: hidden;
-    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    transform: translateX(0);
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: all;
 }
 
-.auth-overlay.register-mode {
-    transform: translateX(100%);
-}
-
-/* FORM PANEL TRANSITIONS */
-.form-panel {
-    position: absolute;
-    top: 0;
-    width: 50%;
+.hero-wrap {
+    position: relative;
+    width: 100%;
     height: 100%;
-    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    overflow-y: auto;
 }
 
-/* Login Panel */
-.login-panel {
-    right: 0;
-    opacity: 1;
-    visibility: visible;
-    z-index: 10;
-    pointer-events: auto;
-}
-
-.login-panel.active {
-    opacity: 1;
-    visibility: visible;
-    z-index: 10;
-    pointer-events: auto;
-}
-
-.login-panel.inactive {
-    opacity: 0;
-    visibility: hidden;
-    z-index: 5;
-    pointer-events: none;
-}
-
-/* Register Panel */
-.register-panel {
-    left: 0;
-    opacity: 0;
-    visibility: hidden;
-    z-index: 5;
-    pointer-events: none;
-}
-
-.register-panel.active {
-    opacity: 1;
-    visibility: visible;
-    z-index: 10;
-    pointer-events: auto;
-}
-
-/* IMAGE GRADIENT */
-.image-gradient {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(to top, rgba(0, 0, 0, 0.88) 0%, rgba(0, 0, 0, 0.4) 50%, rgba(0, 0, 0, 0.05) 100%);
-    pointer-events: none;
-}
-
-/* TAG POP ANIMATION */
-@keyframes popIn {
-    0% {
-        transform: scale(0.8);
-        opacity: 0;
-    }
-    100% {
-        transform: scale(1);
-        opacity: 1;
-    }
-}
-
-.tag-item {
-    animation: popIn 0.2s ease forwards;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background-color: #ecfdf5;
-    color: #047857;
-    padding: 4px 10px;
-    border-radius: 8px;
-    font-size: 0.75rem;
-    font-weight: 500;
-}
-
-.tag-close {
-    cursor: pointer;
-    margin-left: 4px;
-}
-
-.tag-close:hover {
-    color: #064e3b;
-}
-
-/* SKILL WRAPPER ANIMATION */
-.skill-wrapper-anim {
-    transition: opacity 0.3s ease, transform 0.3s ease;
-}
-
-@keyframes slideDown {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* INPUT FOCUS RING */
-.input-field:focus {
-    outline: none;
-    border-color: #0F766E;
-    box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.08);
-}
-
-/* HERO IMAGE */
-.hero-image-container {
-    overflow: hidden;
-}
-
-.hero-image {
+.hero-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
     transition: transform 1s ease, opacity 0.4s ease;
 }
 
-.hero-image-container:hover .hero-image {
-    transform: scale(1.05);
+.hero-img.active {
+    opacity: 1;
 }
 
-.hero-image.fade-out {
-    opacity: 0;
-}
-
-/* OVERLAY TEXT TRANSITION */
-.overlay-text-item {
-    transition: opacity 0.3s ease;
-}
-
-/* ROLE SLIDER */
-.role-toggle {
-    position: relative;
-    display: inline-flex;
-    background-color: #f1f5f9;
-    border-radius: 9999px;
-    padding: 4px;
-}
-
-.role-slider {
-    position: absolute;
-    top: 4px;
-    left: 4px;
-    height: calc(100% - 8px);
-    width: calc(50% - 4px);
-    background: white;
-    border-radius: 9999px;
-    z-index: 0;
-    transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
-}
-
-.role-toggle.freelancer-active .role-slider {
-    transform: translateX(100%);
-}
-
-.role-btn {
-    position: relative;
-    z-index: 10;
-    transition: all 0.3s ease;
-}
-
-.role-btn.active {
-    color: #0F766E !important;
-    font-weight: 800 !important;
-}
-
-/* Scrollbar */
-.register-panel::-webkit-scrollbar {
-    width: 4px;
-}
-
-.register-panel::-webkit-scrollbar-track {
-    background: #f1f5f9;
-    border-radius: 10px;
-}
-
-.register-panel::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
-    border-radius: 10px;
-}
-
-/* RESPONSIVE */
-@media (max-width: 1024px) {
-    #authContainer {
-        flex-direction: column !important;
-        height: auto !important;
-        min-height: auto !important;
-        max-width: 100% !important;
-        margin: 1rem;
-    }
-
-    /* Update di login.css */
-
-.auth-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 50%;
-    height: 100%;
-    z-index: 100; 
-    overflow: hidden;
-    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-    pointer-events: all; 
-}
-
+/* FORM PANEL STATE (DESKTOP) */
 .form-panel {
     position: absolute;
     top: 0;
     width: 50%;
     height: 100%;
-    z-index: 10; 
+    z-index: 10;
     transition: all 0.5s ease;
 }
 
@@ -274,39 +76,159 @@ body {
     visibility: visible;
     pointer-events: all;
 }
-    
-    .auth-overlay.register-mode {
-    transform: translateX(100%);
-}
 
-    .login-panel {
+.login-panel {
     right: 0;
-    z-index: 10;
 }
 
 .register-panel {
     left: 0;
-    z-index: 10;
-    display: block !important;
-}
-    .form-panel > div {
-        max-height: none !important;
-        overflow: visible !important;
-    }
 }
 
-@media (max-width: 640px) {
-    .form-panel > div {
+/* TRANSITION STATE (DESKTOP) */
+.auth-overlay.register-mode {
+    transform: translateX(100%);
+}
+
+/* STYLE DROPDOWN SISWA */
+#studentDropdown {
+    border: 1px solid #e2e8f0;
+    background: #ffffff;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+#studentList div:hover {
+    background-color: #f1f5f9;
+}
+
+/* TAGS CONTAINER */
+.tag-item {
+    background-color: #f8fafc;
+    color: #1e293b;
+    padding: 0.3rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    border: 1px solid #e2e8f0;
+    transition: all 0.15s ease;
+}
+
+.tag-item:hover {
+    border-color: #cbd5e1;
+}
+
+.tag-item button {
+    background: none;
+    border: none;
+    color: #ef4444;
+    cursor: pointer;
+    font-size: 0.9rem;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* CUSTOM SCROLLBAR UNTUK DROPDOWN & WRAPPERS */
+#studentList::-webkit-scrollbar,
+.overflow-y-auto::-webkit-scrollbar {
+    width: 4px;
+}
+
+#studentList::-webkit-scrollbar-track,
+.overflow-y-auto::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+#studentList::-webkit-scrollbar-thumb,
+.overflow-y-auto::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+/* ==========================================================================
+   📱 OVERRIDE RESPONSIVE UNTUK LAYAR HP (MOBILE & TABLET PORTRAIT)
+   ========================================================================== */
+@media (max-width: 1024px) {
+    #authContainer {
+        display: flex;
+        flex-direction: column !important;
+        height: auto !important;
+        min-height: 100vh !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        border-radius: 0 !important;
+    }
+
+    /* Ubah absolute sliding overlay menjadi banner gambar statis di atas form */
+    .auth-overlay {
+        position: relative !important;
+        transform: none !important; /* Nonaktifkan transisi slide di HP */
+        width: 100% !important;
+        height: 200px !important; /* Batasi tinggi banner di HP */
+        z-index: 5 !important;
+        pointer-events: auto !important;
+    }
+
+    /* Mengunci gambar agar proporsional tidak stretching */
+    .hero-img {
+        object-fit: cover !important;
+        height: 100% !important;
+    }
+
+    /* Konten Teks Overlay di HP */
+    .auth-overlay .absolute.inset-0.z-10 {
         padding: 1.25rem !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        align-items: center !important;
+        text-align: center !important;
     }
 
-    .grid.grid-cols-2 {
-        grid-template-columns: 1fr !important;
-        gap: 0.75rem !important;
+    .auth-overlay h2 {
+        font-size: 1.25rem !important;
+        line-height: 1.75rem !important;
+        margin-bottom: 0.25rem !important;
     }
-    
-    .px-10 {
-        padding-left: 1rem !important;
-        padding-right: 1rem !important;
+
+    .auth-overlay p {
+        font-size: 0.75rem !important;
+        line-height: 1.15rem !important;
+    }
+
+    /* Form Panel Melebar Penuh di HP */
+    .form-panel {
+        position: relative !important;
+        width: 100% !important;
+        height: auto !important;
+        padding: 2rem 1.25rem !important;
+        box-sizing: border-box !important;
+    }
+
+    /* Override Visibility di Mobile agar tidak tumpang tindih */
+    .form-panel.inactive {
+        display: none !important; /* Form yang tidak aktif disembunyikan penuh */
+        opacity: 0 !important;
+        visibility: hidden !important;
+    }
+
+    .form-panel.active {
+        display: flex !important; /* Form yang aktif berbaris tegak lurus */
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
+
+    /* Nonaktifkan pergeseran koordinat panel register kiri */
+    .register-panel {
+        left: 0 !important;
+    }
+
+    .login-panel {
+        right: 0 !important;
     }
 }

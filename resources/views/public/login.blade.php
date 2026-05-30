@@ -3,358 +3,341 @@
 @section('title', 'Masuk - Digitalance')
 
 @section('styles')
-    <style>
-        @keyframes popIn { from {transform: scale(0.8);opacity:0;} to {transform: scale(1);opacity:1;}}
-        .tag-item {animation: popIn 0.15s ease forwards;}
-        .hero-img {transition: transform 1s ease, opacity 0.4s ease;}\n        .hero-img.fade-out { opacity: 0;}
-        .hero-wrap:hover .hero-img {transform: scale(1.05);}
-        .panel {position:absolute;inset:0;transition: opacity 0.45s, visibility 0.45s;}
-        .panel-hidden {opacity:0; visibility:hidden; pointer-events:none;}
-        .panel-visible {opacity:1;visibility:visible;pointer-events:auto;}
-        #authContainer {position:relative;overflow:hidden;}
-        .auth-overlay {
-            position: absolute;
-            top: 0; left: 0; height: 100%; z-index: 10;
-            width: 50%;
-            transition: transform 0.7s cubic-bezier(.4,0,.2,1);
-            will-change: transform;
-            pointer-events: none;
-            display: block;
-        }
-
-        @media (min-width: 768px) {
-            .auth-overlay {
-                transform: translateX(0%);
-            }
-            .auth-overlay.register-mode {
-                transform: translateX(100%);
-            }
-            #loginPanel {width: 50%;left: 50%;}
-            #registerPanel {width: 50%;left: 0;}
-        }
-
-        @media (max-width: 767px) {
-            .auth-overlay {display: none;}
-            main {
-                align-items: flex-start;
-                padding-top: 1rem;
-                padding-bottom: 1rem;
-            }
-            #authContainer {
-                height: auto !important;
-                min-height: unset !important;
-                overflow: visible;
-                border-radius: 22px;
-            }
-            #authContainer > div.relative.w-full.h-full {
-                height: auto !important;
-                pointer-events: auto;
-            }
-            .panel {
-                position: relative;
-                inset: auto;
-                min-height: unset;
-                height: auto;
-            }
-            #loginPanel, #registerPanel {
-                width: 100%;
-                left: 0;
-                right: 0;
-            }
-        }
-
-        #overlayToggle {
-            position: relative; z-index: 100!important; pointer-events: auto!important;
-        }
-        #roleSlider {
-            transition: transform 0.35s;
-        }
-        .inp:focus {
-            outline: none; border-color: #0F766E; box-shadow: 0 0 0 3px rgba(15,118,110,0.1);
-        }
-        .grain {
-            position: fixed; inset: 0; pointer-events: none; z-index: 999; opacity: .03;
-            background-image: url("data:image/svg+xml,%3Csvg width='64' height='64' viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise' x='0' y='0'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='64' height='64' filter='url(%23noise)'/%3E%3C/svg%3E");
-        }
-         .input-error { border-color: #ef4444 !important; box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1); }
-         .req-item.met { color: #22c55e; }
-         .req-item.met .req-check { color: #22c55e; }
-         .req-check { font-size: 10px; }
-    </style>
-@endsection
-
-@section('additional-header')
-    <div class="grain"></div>
-    <div class="fixed inset-0 -z-10"
-        style="background:radial-gradient(at 0% 0%,rgba(16,185,129,.06) 0,transparent 50%),radial-gradient(at 100% 100%,rgba(249,115,22,.05) 0,transparent 50%);">
-    </div>
+    <!-- Menghubungkan secara rapi ke file CSS eksternal -->
+    <link rel="stylesheet" href="{{ asset('css/login.css') }}">
 @endsection
 
 @section('content')
-    <main class="flex-1 flex items-center justify-center px-4 py-12 overflow-hidden min-h-[calc(100vh-100px)]">
-        <div id="authContainer" class="w-full relative overflow-hidden flex rounded-[28px] border border-slate-100 bg-white"
-            style="max-width:960px; height:min(75vh,660px); min-height:500px; box-shadow:0 24px 48px -10px rgba(15,23,42,.12);">
+    <!-- Grain overlay -->
+    <div class="grain-overlay"></div>
 
-            {{-- OVERLAY --}}
-            <div class="auth-overlay" id="authOverlay">
-                <div class="relative h-full w-full">
-                    <div class="hero-wrap absolute inset-0 overflow-hidden">
-                        <img id="heroImage"
-                            src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&q=80&w=1000"
-                            alt="Ruang kerja" loading="lazy" decoding="async" class="hero-img w-full h-full object-cover" />
-                        <div class="absolute inset-0 z-10"
-                            style="background:linear-gradient(to top,rgba(0,0,0,.88) 0%,rgba(0,0,0,.4) 50%,rgba(0,0,0,.04) 100%);">
-                        </div>
-                    </div>
-                    <div class="absolute inset-0 flex flex-col justify-end p-8 z-20">
-                        <div class="inline-flex items-center gap-2 mb-4 w-fit text-emerald-400 font-extrabold text-[0.65rem] uppercase tracking-[0.15em] bg-white/10 backdrop-blur-sm px-3 py-1.5 rounded-full border border-white/20">
-                            <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                            </svg>
-                            <span>Standar Elite</span>
-                        </div>
-                        <h2 id="overlayTitle"
-                            class="text-white font-extrabold leading-[1.1] mb-3 transition-opacity duration-300"
-                            style="font-size:1.7rem;">Jaringan Presisi untuk Solusi Expert</h2>
-                        <p id="overlayDesc"
-                            class="text-white/80 text-[0.85rem] leading-relaxed mb-6 max-w-sm transition-opacity duration-300">
-                            Rasakan koneksi tanpa hambatan antara permintaan industri premium dan output kreatif elite.
+    <main class="min-h-screen bg-[#f8fafc] flex items-start justify-center p-0 md:p-6 lg:p-8">
+        <div class="w-full max-w-[840px] md:h-[590px] bg-white md:rounded-[32px] shadow-[0_24px_70px_rgba(15,118,110,0.07)] border border-slate-100 flex flex-col md:flex-row relative" id="authContainer">
+            
+            <!-- 1. PANEL OVERLAY (PREMIUM DARK GRADIENT - TANPA LOGO & ICON PETIR) -->
+            <div class="auth-overlay bg-slate-950 text-white" id="authOverlay">
+                <!-- Gradasi Gelap Latar Belakang (Charcoal & Black) -->
+                <div class="absolute inset-0 z-0 bg-gradient-to-br from-zinc-950 via-slate-900 to-neutral-950 opacity-95"></div>
+                
+                <!-- Pembungkus Gambar Slideshow -->
+                <div class="hero-wrap absolute inset-0 z-0 opacity-25 mix-blend-overlay">
+                    <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1471&auto=format&fit=crop" 
+                         class="hero-img active" id="heroImg1" alt="Digitalance Workspace">
+                    <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1470&auto=format&fit=crop" 
+                         class="hero-img absolute inset-0 opacity-0" id="heroImg2" alt="Digitalance Network">
+                </div>
+
+                <!-- Konten Teks dan Navigasi Dinamis (Dibersihkan dari Icon Petir & Logo Atas) -->
+                <div class="absolute inset-0 z-10 flex flex-col justify-between p-8 md:p-10 pointer-events-auto">
+                    <!-- Spacing Spacer pengganti logo atas agar konten teks tetap berada di tengah secara proporsional -->
+                    <div class="hidden md:block h-6"></div>
+
+                    <!-- Caption dinamis berganti otomatis via JS -->
+                    <div class="max-w-xs my-auto transform transition-all duration-500" id="overlayTextContent">
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-emerald-300 text-[10px] font-semibold tracking-wide uppercase mb-4 backdrop-blur-md">
+                            Selamat Datang di Digitalance!
+                        </span>
+                        <h2 class="font-display text-xl md:text-2xl font-extrabold tracking-tight mb-3 leading-snug" id="overlayTitle">
+                            Eksplorasi Talent Terbaik Skomda di Sini.
+                        </h2>
+                        <p class="text-white/70 text-xs leading-relaxed" id="overlayDesc">
+                            Temukan freelancer siswa berkompeten untuk menyelesaikan projek digital Anda dengan kualitas profesional.
                         </p>
-                        <button id="overlayToggle" type="button"
-                            class="inline-flex items-center gap-2.5 text-white font-bold text-[0.82rem] bg-white/15 border border-white/25 backdrop-blur-sm px-6 py-3 rounded-xl uppercase tracking-wide w-fit cursor-pointer hover:bg-white/25 transition-all duration-300">
-                            <span id="toggleText">Bergabung dengan Jaringan</span>
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
-                        </button>
+                    </div>
+
+                    <!-- Hak Cipta (Hanya tampil di Desktop) -->
+                    <div class="text-[10px] text-white/30 hidden md:block">
+                        &copy; {{ date('Y') }} Digitalance. All rights reserved.
                     </div>
                 </div>
             </div>
 
-            {{-- FORM AREA --}}
-            <div class="relative w-full h-full" style="pointer-events:none;">
-                {{-- LOGIN PANEL --}}
-                <div id="loginPanel" class="panel panel-visible overflow-y-auto flex items-center justify-center">
-                    <div class="w-full max-w-sm mx-auto px-5 sm:px-12 py-6" style="pointer-events:auto;">
-                        <div class="mb-3">
-                            <div class="w-8 h-8 bg-slate-100 rounded-xl flex items-center justify-center text-teal-700 mb-2 border border-slate-200">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" /><line x1="2" y1="12" x2="22" y2="12" /><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" /></svg>
-                            </div>
-                            <h2 class="text-[1.4rem] font-extrabold text-slate-900 mb-0.5">Masuk ke Akun Anda</h2>
-                            <p class="text-slate-500 text-[0.78rem]">Silakan masukkan email dan password Anda</p>
+            <!-- 2. PANEL FORM MASUK (LOGIN) -->
+            <div class="form-panel login-panel active flex flex-col justify-center items-center px-6 md:px-10 lg:px-12" id="loginPanel">
+                <div class="w-full max-w-sm space-y-5">
+                    <!-- TOGGLE ATAS UNTUK MINIMIZE SCROLLING -->
+                    <div class="flex justify-center md:justify-start mb-2">
+                        <div class="inline-flex p-1 bg-slate-100 rounded-xl w-full max-w-[200px]">
+                            <button type="button" class="switch-to-login-btn flex-1 py-1.5 text-xs font-bold rounded-lg transition-all text-center bg-white text-slate-900 shadow-sm">Masuk</button>
+                            <button type="button" class="switch-to-register-btn flex-1 py-1.5 text-xs font-semibold rounded-lg transition-all text-center text-slate-500 hover:text-slate-800">Daftar</button>
                         </div>
-
-                        <form id="loginForm" method="POST" action="{{ route('login-process') }}" class="flex flex-col gap-3">
-                            @csrf
-                            <div>
-                                <label class="block text-[0.55rem] font-extrabold text-slate-400 uppercase tracking-widest mb-1 ml-1">Alamat Email</label>
-                                <div class="relative">
-                                    <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" /></svg>
-                                    <input type="email" name="email" placeholder="nama@email.com"
-                                           value="{{ old('email') }}" required class="inp w-full sm:px-4 px-3 pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-[0.86rem] text-slate-900 transition-all" />
-                                  </div>
-                              </div>
-                              <div id="registerPasswordWrapper">
-                                <label class="block text-[0.55rem] font-extrabold text-slate-400 uppercase tracking-wide mb-1 ml-1">Password</label>
-                                <div class="relative">
-                                    <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none"
-                                         width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                         stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
-                                    <input id="registerPasswordInput" type="password" name="password" placeholder="••••••••"
-                                           class="inp w-full sm:px-4 px-3 pl-10 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-[0.86rem] transition-all" />
-                                </div>
-                            </div>
-                            <button type="submit" class="w-full sm:px-4 px-3 py-3 bg-slate-900 text-white font-bold rounded-xl text-[0.88rem] mt-2 flex items-center justify-center gap-2 hover:bg-black hover:-translate-y-0.5 transition-all shadow-md cursor-pointer">
-                                Masuk
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6" /></svg>
-                            </button>
-                            <div class="mt-2 text-center">
-                                <span class="text-sm font-medium text-slate-800">
-                                    Belum punya akun?
-                                    <button
-                                        type="button"
-                                        class="mobile-toggle align-baseline text-sm text-teal-700 font-bold hover:underline px-0 py-0 bg-transparent border-none focus:outline-none"
-                                        style="background: none; box-shadow: none;">
-                                        Daftar
-                                    </button>
-                                </span>
-                            </div>
-                        </form>
                     </div>
+
+                    <div class="text-center md:text-left">
+                        <h1 class="font-display text-xl font-extrabold text-slate-900 tracking-tight">Selamat Datang</h1>
+                        <p class="mt-1 text-xs text-slate-500">Masuk ke dashboard Digitalance Anda</p>
+                    </div>
+
+                    <!-- Alert khusus Validasi error Login Laravel -->
+                    @if ($errors->has('email') && session('login_error'))
+                        <div class="bg-red-50 border-l-4 border-red-500 p-3 rounded-xl">
+                            <div class="flex items-start">
+                                <!-- Warning SVG Icon -->
+                                <svg width="16" height="16" class="w-4 h-4 text-red-500 mr-2 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                </svg>
+                                <p class="text-xs text-red-700 font-semibold">{{ $errors->first('email') }}</p>
+                            </div>
+                        </div>
+                    @endif
+
+                    <form action="{{ route('login-process') }}" method="POST" class="space-y-4" id="loginForm">
+                        @csrf
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1.5">Alamat Email</label>
+                            <input type="email" name="email" value="{{ old('email') }}" required
+                                class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-950 focus:border-transparent text-xs transition-all placeholder:text-slate-400"
+                                placeholder="nama@email.com">
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between items-center mb-1.5">
+                                <label class="block text-xs font-semibold text-slate-700 m-0">Kata Sandi</label>
+                                <button type="button" id="forgotPasswordBtn" class="text-xs font-bold text-teal-700 hover:underline bg-transparent border-none p-0 focus:outline-none">Lupa sandi?</button>
+                            </div>
+                            <input type="password" name="password" required
+                                class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-950 focus:border-transparent text-xs transition-all placeholder:text-slate-400"
+                                placeholder="••••••••">
+                        </div>
+
+                        <button type="submit"
+                            class="w-full py-3 px-5 rounded-xl text-white font-bold bg-gradient-to-r from-slate-900 to-zinc-800 hover:shadow-lg hover:shadow-slate-900/10 active:scale-[0.98] transition-all text-xs">
+                            Masuk Sekarang
+                        </button>
+                    </form>
                 </div>
+            </div>
 
-                {{-- REGISTER PANEL --}}
-                <div id="registerPanel" class="panel panel-hidden overflow-y-auto flex items-center justify-center">
-                    <div class="w-full max-w-sm mx-auto px-5 sm:px-12 py-4" style="pointer-events:auto;">
-                         <div class="mb-1.5">
-                            <div class="inline-flex items-center gap-1.5 mb-1 text-teal-700 text-[0.55rem] font-extrabold uppercase tracking-widest">
-                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                    stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /><path d="m9 12 2 2 4-4" /></svg>
-                                <span>Protokol Aman</span>
-                            </div>
-                            <h2 class="text-[1.4rem] font-extrabold text-slate-900 mb-0.5">Daftar ke Digitalance</h2>
-                            <p class="text-slate-500 text-[0.78rem]">Bergabunglah dengan jaringan elite digital.</p>
+            <!-- 3. PANEL FORM DAFTAR (REGISTER) -->
+            <div class="form-panel register-panel inactive flex flex-col justify-center items-center px-6 md:px-10 lg:px-12" id="registerPanel">
+                <div class="w-full max-w-sm space-y-4">
+                    <!-- TOGGLE ATAS UNTUK MINIMIZE SCROLLING -->
+                    <div class="flex justify-center md:justify-start mb-2">
+                        <div class="inline-flex p-1 bg-slate-100 rounded-xl w-full max-w-[200px]">
+                            <button type="button" class="switch-to-login-btn flex-1 py-1.5 text-xs font-semibold rounded-lg transition-all text-center text-slate-500 hover:text-slate-800">Masuk</button>
+                            <button type="button" class="switch-to-register-btn flex-1 py-1.5 text-xs font-bold rounded-lg transition-all text-center bg-white text-slate-900 shadow-sm">Daftar</button>
                         </div>
+                    </div>
 
-                        <div class="relative inline-flex p-1 bg-slate-100 rounded-full border border-slate-200 mb-1.5" id="roleToggleContainer">
-                            <div id="roleSlider"
-                                class="absolute top-1 left-1 bg-white rounded-full shadow-sm transition-transform duration-300"
-                                style="height:calc(100% - 8px); width:calc(50% - 4px);"></div>
-                            <button type="button" id="btnClient"
-                                class="relative z-10 px-5 py-1 min-w-[90px] text-[0.78rem] font-extrabold text-teal-700 cursor-pointer rounded-full transition-colors duration-300">Klien</button>
-                            <button type="button" id="btnFreelancer"
-                                class="relative z-10 px-5 py-1 min-w-[90px] text-[0.78rem] font-semibold text-slate-400 cursor-pointer rounded-full transition-colors duration-300">Freelancer</button>
-                        </div>
-                        <form id="registerForm" method="POST" action="{{ route('register-process') }}"
-                            data-action-client="{{ route('register-process') }}"
-                            data-action-freelancer="{{ route('register-freelancer-process') }}"
-                            class="flex flex-col gap-1.5">
-                            @csrf
-                            {{-- CLIENT FIELDS --}}
-                            <div id="clientFields">
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                    <div>
-                                        <label
-                                            class="block text-[0.55rem] font-extrabold text-slate-400 uppercase tracking-wide mb-1 ml-1">Nama Depan</label>
-                                        <div class="relative">
-                                            <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none"
-                                                width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
-                                            <input type="text" name="name" placeholder="John" value="{{ old('name') }}"
-                                                class="inp w-full sm:px-4 px-3 pl-10 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-[0.86rem] transition-all" />
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <label
-                                            class="block text-[0.55rem] font-extrabold text-slate-400 uppercase tracking-wide mb-1 ml-1">Telepon (WA)</label>
-                                        <div class="relative">
-                                            <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none"
-                                                width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" /></svg>
-                                            <input type="text" name="phone" placeholder="0812..." value="{{ old('phone') }}"
-                                                class="inp w-full sm:px-4 px-3 pl-10 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-[0.86rem] transition-all" />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="mt-1.5">
-                                    <label
-                                        class="block text-[0.55rem] font-extrabold text-slate-400 uppercase tracking-wide mb-1 ml-1">Email</label>
-                                    <div class="relative">
-                                        <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none"
-                                            width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                            stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" /></svg>
-                                        <input type="email" name="email" placeholder="john@digitalance.io"
-                                            value="{{ old('email') }}"
-                                            class="inp w-full sm:px-4 px-3 pl-10 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-[0.86rem] transition-all" />
-                                    </div>
-                                </div>
-                            </div>
-                            {{-- FREELANCER FIELDS --}}
-                            <div id="freelancerFields" class="hidden">
+                    <div class="text-center md:text-left">
+                        <h1 class="font-display text-xl font-extrabold text-slate-900 tracking-tight">Buat Akun</h1>
+                        <p class="mt-1 text-xs text-slate-500">Pilih jenis akun Digitalance Anda</p>
+                    </div>
+
+                    <!-- Alert khusus Validasi error Registrasi Laravel -->
+                    @if ($errors->any() && !session('login_error'))
+                        <div class="bg-red-50 border-l-4 border-red-500 p-3 rounded-xl">
+                            <div class="flex items-start">
+                                <svg width="16" height="16" class="w-4 h-4 text-red-500 mr-2 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                </svg>
                                 <div>
-                                    <label class="block text-[0.55rem] font-extrabold text-slate-400 uppercase tracking-wide mb-1 ml-1">Identitas Siswa (NIS)</label>
-                                    <div class="relative">
-                                        <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z" /><path d="M8 8h8" /><path d="M8 12h8" /><path d="M8 16h6" /></svg>
-                                        <input id="studentSelect" name="student_display" list="studentList"
-                                            class="inp w-full sm:px-4 px-3 pl-10 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-[0.86rem] transition-all"
-                                            placeholder="Ketik nama / NIS..." autocomplete="off" />
-                                        <datalist id="studentList">
-                                            @foreach(($students ?? []) as $s)
-                                                @php /** @var \App\Models\SkomdaStudent $s */ @endphp
-                                                @if($s)
-                                                <option value="{{ $s->name ?? '' }} ({{ $s->nis ?? '' }})" data-id="{{ $s->id ?? '' }}"
-                                                    data-nis="{{ $s->nis ?? '' }}" data-email="{{ $s->email ?? '' }}"></option>
-                                                @endif
-                                            @endforeach
-                                        </datalist>
-                                    </div>
-                                    <input type="hidden" id="studentIdInput" name="student_id" value="{{ old('student_id') }}" />
-                                    <input type="hidden" id="nisInput" name="nis" value="{{ old('nis') }}" />
-                                </div>
-                                <div class="mt-1.5">
-                                    <label class="block text-[0.55rem] font-extrabold text-slate-400 uppercase tracking-wide mb-1 ml-1">Email Siswa</label>
-                                    <div class="relative">
-                                        <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none"
-                                            width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                            stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" /></svg>
-                                        <input type="text" id="studentEmail" value="" placeholder="Email siswa" readonly tabindex="-1"
-                                            class="inp w-full sm:px-4 px-3 pl-10 pr-3 py-2 bg-slate-100 border border-slate-200 rounded-xl text-[0.86rem] transition-all text-slate-600" />
-                                    </div>
-                                    <p class="text-[0.62rem] text-slate-400 mt-0.5 ml-1">
-                                        Gunakan email ini untuk login setelah registrasi.
-                                    </p>
-                                </div>
-                                <div class="mt-1.5">
-                                    <label class="block text-[0.55rem] font-extrabold text-slate-400 uppercase tracking-wide mb-1 ml-1">Keahlian Utama</label>
-                                    <div class="relative w-full">
-                                        <div id="tagsContainer"
-                                            class="bg-slate-50 border border-slate-200 rounded-xl px-2 py-0.5 flex flex-wrap gap-1 min-h-[36px] cursor-text transition-all duration-200 focus-within:border-teal-600 relative">
-                                            <input id="skillInput" type="text" autocomplete="off"
-                                                class="border-none bg-transparent outline-none flex-1 min-w-[80px] text-[0.86rem] py-0"
-                                                placeholder="Ketik lalu Enter..." />
-                                        </div>
-                                        <ul id="skillSuggestions"
-                                            class="absolute top-full left-0 right-0 z-50 bg-white border border-slate-200 rounded-xl mt-1 shadow-xl hidden max-h-40 overflow-y-auto text-sm font-medium text-slate-700">
-                                        </ul>
-                                    </div>
-                                    <input type="hidden" id="hiddenSkillsInput" name="skills" value="[]" />
-                                    <p id="tagLimitMsg" class="text-[0.6rem] text-slate-400 text-right mt-0.5">0/5 Keahlian</p>
+                                    <p class="text-xs text-red-700 font-bold mb-1">Pendaftaran gagal:</p>
+                                    <ul class="list-disc list-inside text-[11px] text-red-600 space-y-0.5 p-0 m-0">
+                                        @foreach ($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
                                 </div>
                             </div>
+                        </div>
+                    @endif
+
+                    <!-- Tab Pilihan Peran (Client / Freelancer) -->
+                    <div class="grid grid-cols-2 gap-2 p-1 bg-slate-100 rounded-2xl" id="roleSelector">
+                        <button type="button" data-role="client" class="role-tab py-2 text-xs font-bold rounded-xl transition-all bg-white text-slate-900 shadow-sm flex items-center justify-center gap-1.5">
+                            <svg width="14" height="14" class="w-3.5 h-3.5 text-slate-700 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
+                            Client
+                        </button>
+                        <button type="button" data-role="freelancer" class="role-tab py-2 text-xs font-bold rounded-xl transition-all text-slate-500 hover:text-slate-800 flex items-center justify-center gap-1.5">
+                            <svg width="14" height="14" class="w-3.5 h-3.5 text-slate-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                            Freelancer
+                        </button>
+                    </div>
+
+                    <!-- Scroll Form Container untuk Mencegah Overflow pada Ketinggian 620px -->
+                    <div class="overflow-y-auto max-h-[340px] pr-1 -mr-2">
+                        <form action="{{ route('register-client') }}" method="POST" class="space-y-3" id="registerForm">
+                            @csrf
+                            <input type="hidden" name="role" id="roleInput" value="client">
+
+                            <!-- INPUT BIDANG KHUSUS UNTUK CLIENT -->
+                            <div id="clientFields" class="space-y-3">
+                                <div>
+                                    <label class="block text-[11px] font-semibold text-slate-700 mb-1">Nama Lengkap / Perusahaan</label>
+                                    <input type="text" name="name" value="{{ old('name') }}"
+                                        class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-950 text-xs transition-all"
+                                        placeholder="John Doe">
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-semibold text-slate-700 mb-1">Nomor WhatsApp</label>
+                                    <input type="tel" name="phone" value="{{ old('phone') }}"
+                                        class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-950 text-xs transition-all"
+                                        placeholder="08123456789">
+                                </div>
+                            </div>
+
+                            <!-- INPUT BIDANG KHUSUS UNTUK FREELANCER (SISWA SKOMDA) -->
+                            <div id="freelancerFields" class="space-y-3 hidden">
+                                <div>
+                                    <label class="block text-[11px] font-semibold text-slate-700 mb-1">Data Siswa Skomda</label>
+                                    <div class="relative">
+                                        <button type="button" id="studentSelectBtn" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-left text-xs text-slate-400 flex justify-between items-center focus:outline-none focus:ring-2 focus:ring-slate-950">
+                                            <span id="selectedStudentLabel">-- Cari nama atau NISN Anda --</span>
+                                            <!-- Chevron Icon -->
+                                            <svg width="16" height="16" class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                            </svg>
+                                        </button>
+                                        <input type="hidden" name="student_id" id="studentIdInput" value="{{ old('student_id') }}">
+                                        
+                                        <!-- Dropdown Pencarian Siswa -->
+                                        <div id="studentDropdown" class="absolute z-50 left-0 right-0 mt-1 bg-white border border-slate-100 rounded-2xl shadow-xl p-3 space-y-2 hidden">
+                                            <input type="text" id="studentSearch" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-slate-950" placeholder="Ketik nama untuk mencari...">
+                                            <div id="studentList" class="max-h-36 overflow-y-auto space-y-1 text-xs">
+                                                <!-- List siswa di-inject otomatis lewat JS -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Seleksi Skill/Keahlian -->
+                                <div id="skillsWrapper" class="space-y-2 hidden">
+                                    <div class="flex justify-between items-center">
+                                        <label class="block text-[11px] font-semibold text-slate-700">Keahlian Anda (Maks 5)</label>
+                                        <span class="text-[9px] text-slate-400 font-medium" id="skillsCountText">0/5 Terpilih</span>
+                                    </div>
+
+                                    <div id="skillsContainer" class="flex flex-wrap gap-1 p-2 bg-slate-50 border border-slate-200 rounded-xl min-h-[40px]">
+                                        <!-- Skill tag aktif akan disisipkan di sini -->
+                                    </div>
+                                    
+                                    <!-- Input Keahlian Kustom Manual -->
+                                    <div class="flex gap-1">
+                                        <input type="text" id="customSkillInput" class="flex-1 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-slate-900 placeholder:text-slate-400" placeholder="Ketik keahlian kustom...">
+                                        <button type="button" id="addCustomSkillBtn" class="px-3 py-1.5 bg-slate-900 border border-slate-800 text-white rounded-xl text-xs font-bold hover:bg-slate-800 transition-all flex items-center gap-1">
+                                            Tambah
+                                        </button>
+                                    </div>
+
+                                    <div id="availableSkills" class="flex flex-wrap gap-1 mt-1 max-h-16 overflow-y-auto p-1 border-t border-slate-100 pt-1.5">
+                                        <!-- Opsi kategori keahlian -->
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- EMAIL DAN PASSWORD (DI-SHARE ANTARA CLIENT & FREELANCER) -->
                             <div>
-                                <label class="block text-[0.55rem] font-extrabold text-slate-400 uppercase tracking-wide mb-1 ml-1">Kode Sandi</label>
+                                <label class="block text-[11px] font-semibold text-slate-700 mb-1">Alamat Email</label>
                                 <div class="relative">
-                                    <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none"
-                                        width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                        stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
-                                    <input id="registerPasswordField" type="password" name="password" placeholder="Isi dengan password kuat" required
-                                        class="inp w-full sm:px-4 px-3 pl-10 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-[0.86rem] transition-all" />
-                                </div>
-                                <div class="mt-1">
-                                    <div class="flex items-center gap-2 mb-1">
-                                        <div class="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                                            <div class="password-strength-bar h-full transition-all duration-300" style="width: 0%"></div>
-                                        </div>
-                                        <span class="password-strength-label text-[10px] font-extrabold uppercase tracking-wide w-16 text-right"></span>
-                                    </div>
-                                    <div class="password-requirements grid grid-cols-2 gap-x-4 gap-y-0.5">
-                                        <div class="req-item flex items-center gap-1.5 text-[10px] text-slate-400" data-req="length">
-                                            <span class="req-check">○</span> Min. 8 karakter
-                                        </div>
-                                        <div class="req-item flex items-center gap-1.5 text-[10px] text-slate-400" data-req="upper">
-                                            <span class="req-check">○</span> Huruf besar (A-Z)
-                                        </div>
-                                        <div class="req-item flex items-center gap-1.5 text-[10px] text-slate-400" data-req="lower">
-                                            <span class="req-check">○</span> Huruf kecil (a-z)
-                                        </div>
-                                        <div class="req-item flex items-center gap-1.5 text-[10px] text-slate-400" data-req="number">
-                                            <span class="req-check">○</span> Angka (0-9)
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <button type="submit"
-                                class="w-full sm:px-4 px-3 py-2.5 bg-slate-900 text-white font-bold rounded-xl text-[0.88rem] mt-1 flex items-center justify-center gap-2 hover:bg-black hover:-translate-y-0.5 transition-all shadow-md cursor-pointer">
-                                Daftar
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                    stroke-width="2"><polyline points="9 18 15 12 9 6" /></svg>
-                            </button>
-                            <div class="mt-2 text-center">
-                                <span class="text-sm font-medium text-slate-800">
-                                    Sudah punya akun?
-                                    <button
-                                        type="button"
-                                        class="mobile-toggle align-baseline text-sm text-teal-700 font-bold hover:underline px-0 py-0 bg-transparent border-none focus:outline-none"
-                                        style="background: none; box-shadow: none;">
-                                        Masuk
+                                    <input type="email" name="email" id="registerEmail" value="{{ old('email') }}" required
+                                        class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-950 text-xs transition-all placeholder:text-slate-400"
+                                        placeholder="ex@email.com">
+                                    <!-- Tombol Salin Email -->
+                                    <button type="button" id="copyEmailBtn" class="absolute right-3 top-1/2 -translate-y-1/2 text-teal-700 hover:text-teal-900 text-[10px] font-bold hidden focus:outline-none">
+                                        Salin
                                     </button>
-                                </span>
+                                </div>
                             </div>
+
+                            <div>
+                                <label class="block text-[11px] font-semibold text-slate-700 mb-1">Kata Sandi</label>
+                                <input type="password" name="password" id="registerPassword" required
+                                    class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-950 text-xs transition-all"
+                                    placeholder="Minimal 8 karakter">
+                                
+                                <!-- PASSWORD STRENGTH WITH CRITERIA CHECKLIST (REVISI DETAIL VERIFIKASI) -->
+                                <div id="passwordStrengthWrapper" class="mt-2 space-y-2 hidden bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                                    <div class="h-1.5 w-full bg-slate-200 rounded-full overflow-hidden flex gap-1">
+                                        <div id="strengthBar1" class="h-full w-1/3 bg-slate-300 transition-all rounded-full"></div>
+                                        <div id="strengthBar2" class="h-full w-1/3 bg-slate-300 transition-all rounded-full"></div>
+                                        <div id="strengthBar3" class="h-full w-1/3 bg-slate-300 transition-all rounded-full"></div>
+                                    </div>
+                                    <p id="strengthText" class="text-[10px] font-bold text-slate-500">Kekuatan Sandi: Terlalu Pendek</p>
+                                    
+                                    <!-- Detil Parameter yang Diperlukan (Tanpa Emoji) -->
+                                    <div class="grid grid-cols-2 gap-x-2 gap-y-1 pt-1.5 border-t border-slate-200/50 text-[9px]">
+                                        <div id="req-length" class="flex items-center gap-1 text-slate-400 font-medium transition-colors">
+                                            <span class="icon inline-block text-[8px]">●</span> Min. 8 karakter
+                                        </div>
+                                        <div id="req-case" class="flex items-center gap-1 text-slate-400 font-medium transition-colors">
+                                            <span class="icon inline-block text-[8px]">●</span> Huruf besar & kecil
+                                        </div>
+                                        <div id="req-number" class="flex items-center gap-1 text-slate-400 font-medium transition-colors">
+                                            <span class="icon inline-block text-[8px]">●</span> Angka (0-9)
+                                        </div>
+                                        <div id="req-special" class="flex items-center gap-1 text-slate-400 font-medium transition-colors">
+                                            <span class="icon inline-block text-[8px]">●</span> Simbol khusus (!@#)
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button type="submit"
+                                class="w-full py-3 px-5 rounded-xl text-white font-bold bg-gradient-to-r from-slate-900 to-zinc-800 hover:shadow-lg transition-all text-xs mt-2">
+                                Daftar Akun
+                            </button>
                         </form>
                     </div>
                 </div>
             </div>
         </div>
     </main>
+
+    <div id="forgotPasswordModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm hidden">
+        <div class="relative w-full max-w-sm bg-white rounded-2xl p-6 shadow-2xl border border-slate-100 transform transition-all scale-100 duration-200">
+            <div class="flex justify-between items-start mb-4">
+                <h3 class="text-base font-bold text-slate-900 flex items-center gap-1.5">
+                    <!-- Lock Icon SVG -->
+                    <svg width="20" height="20" class="w-5 h-5 text-slate-800 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                    </svg>
+                    Lupa Kata Sandi?
+                </h3>
+                <button type="button" id="closeForgotPasswordBtn" class="text-slate-400 hover:text-slate-600 focus:outline-none">
+                    <svg width="16" height="16" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="space-y-4">
+                <p class="text-xs text-slate-600 leading-relaxed">
+                    Untuk alasan keamanan data siswa Skomda, pemulihan akun serta perubahan kata sandi wajib diproses secara langsung oleh administrator sistem.
+                </p>
+                <!-- KOTAK INFORMASI DENGAN IKON PROPORSIONAL (REVISI DESIGN OVERFLOW) -->
+                <div class="p-4 bg-slate-50 rounded-xl border border-slate-100 flex items-start gap-3">
+                    <div class="flex-shrink-0 mt-0.5">
+                        <!-- Info Icon dengan dimensi terproteksi tinggi/lebar agar tidak meledak di CSS -->
+                        <svg width="20" height="20" class="w-5 h-5 text-teal-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <div class="text-[11px] text-slate-600 leading-relaxed">
+                        <strong class="text-slate-900 block mb-1">Langkah Pemulihan:</strong>
+                        Hubungi Unit IT Skomda atau Admin Digitalance melalui tautan WhatsApp untuk verifikasi NISN atau data identitas Anda.
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-5 flex gap-2.5">
+                <button type="button" id="cancelForgotPasswordBtn" class="flex-1 py-2 px-3 rounded-xl border border-slate-200 text-slate-700 font-semibold text-xs hover:bg-slate-50 transition-all">
+                    Tutup
+                </button>
+                <a href="https://wa.me/6281234567890?text=Halo%20Admin%20Digitalance,%20saya%20lupa%20kata%20sandi%20akun%20saya" target="_blank" class="flex-1 py-2 px-3 rounded-xl bg-slate-900 text-white text-center font-semibold text-xs hover:bg-slate-800 transition-all shadow-md shadow-slate-950/10 no-underline flex justify-center items-center gap-1.5">
+                    <!-- WhatsApp Icon SVG -->
+                    <svg width="14" height="14" class="w-3.5 h-3.5 fill-current flex-shrink-0" viewBox="0 0 24 24">
+                        <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.513 2.262 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.455L0 24zm6.59-4.846c1.665.989 3.3 1.503 4.94 1.505 5.548 0 10.064-4.512 10.068-10.066.002-2.69-1.043-5.216-2.943-7.114C16.756 1.58 14.236.536 11.99.536c-5.556 0-10.072 4.514-10.076 10.067-.001 1.887.49 3.723 1.422 5.344L1.758 22.21l6.33-1.657c-1.12.63-1.4 1.05-.14-1.4z"/>
+                    </svg>
+                    Hubungi Admin
+                </a>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @section('scripts')

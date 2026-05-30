@@ -40,677 +40,567 @@ document.addEventListener("DOMContentLoaded", () => {
         };
     }
 
-    window.serviceCategories = loginPageData.serviceCategories;
-    window.skomdaStudents = loginPageData.skomdaStudents;
-    window.hasRegistrationErrors = loginPageData.hasRegistrationErrors;
-    window.registrationErrors = loginPageData.registrationErrors;
-    window.oldRole = loginPageData.oldRole;
-    window.panelShowMode = loginPageData.panelShowMode;
-
-    // DATA KATEGORI DIAMBIL DARI BACKEND
-    let availableCategories = [];
-    if (window.serviceCategories && Array.isArray(window.serviceCategories)) {
-        if (typeof window.serviceCategories[0] === "object") {
-            availableCategories = window.serviceCategories
-                .map((cat) => cat.name || cat.title || "")
-                .filter(Boolean);
-        } else {
-            availableCategories = window.serviceCategories.filter(Boolean);
-        }
-    }
-
-    // ELEMENTS
+    // DOM ELEMENTS
     const authOverlay = document.getElementById("authOverlay");
-    const overlayToggle = document.getElementById("overlayToggle");
-    const toggleText = document.getElementById("toggleText");
-    const overlayTitle = document.getElementById("overlayTitle");
-    const overlayDesc = document.getElementById("overlayDesc");
-    const heroImage = document.getElementById("heroImage");
-
     const loginPanel = document.getElementById("loginPanel");
     const registerPanel = document.getElementById("registerPanel");
-
-    const btnClient = document.getElementById("btnClient");
-    const btnFreelancer = document.getElementById("btnFreelancer");
-    const roleSlider = document.getElementById("roleSlider");
-
+    const registerForm = document.getElementById("registerForm");
+    const roleInput = document.getElementById("roleInput");
+    
     const clientFields = document.getElementById("clientFields");
     const freelancerFields = document.getElementById("freelancerFields");
-
-    const tagsContainer = document.getElementById("tagsContainer");
-    const skillInput = document.getElementById("skillInput");
-    const skillSuggestions = document.getElementById("skillSuggestions");
-    const tagLimitMsg = document.getElementById("tagLimitMsg");
-    const hiddenSkills = document.getElementById("hiddenSkillsInput");
-    const registerForm = document.getElementById("registerForm");
-
-    const registerSubmitBtn = registerForm?.querySelector('button[type="submit"]');
-
-    const studentSelect = document.getElementById("studentSelect");
-    const studentList = document.getElementById("studentList");
+    
+    const studentSelectBtn = document.getElementById("studentSelectBtn");
+    const selectedStudentLabel = document.getElementById("selectedStudentLabel");
     const studentIdInput = document.getElementById("studentIdInput");
-    const nisInput = document.getElementById("nisInput");
-    const studentEmailInput = document.getElementById("studentEmail");
-    const mobileToggles = document.querySelectorAll(".mobile-toggle");
+    const studentDropdown = document.getElementById("studentDropdown");
+    const studentSearch = document.getElementById("studentSearch");
+    const studentList = document.getElementById("studentList");
+    
+    const skillsWrapper = document.getElementById("skillsWrapper");
+    const skillsContainer = document.getElementById("skillsContainer");
+    const availableSkills = document.getElementById("availableSkills");
+    const skillsCountText = document.getElementById("skillsCountText");
 
-    if (!authOverlay || !loginPanel || !registerPanel || !registerForm) return;
+    // DYNAMIC OVERLAY CONTENT ELEMENTS
+    const overlayTitle = document.getElementById("overlayTitle");
+    const overlayDesc = document.getElementById("overlayDesc");
+    const heroImg1 = document.getElementById("heroImg1");
+    const heroImg2 = document.getElementById("heroImg2");
 
-    const content = {
-        login: {
-            title: "Jaringan Presisi untuk Solusi Expert",
-            desc: "Rasakan koneksi tanpa hambatan antara permintaan industri premium dan output kreatif elite.",
-            btnText: "Bergabung dengan Jaringan",
-            img: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&q=80&w=1000",
-        },
-        register: {
-            title: "Gerbang Premium Menuju Kesuksesan Global",
-            desc: "Buka akses ke proyek berskala tinggi dan komunitas pembangun digital kelas dunia.",
-            btnText: "Kembali ke Akses",
-            img: "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&q=80&w=1000",
-        },
-    };
+    // AUTO-FILL EMAIL & COPY BUTTON
+    const registerEmail = document.getElementById("registerEmail");
+    const copyEmailBtn = document.getElementById("copyEmailBtn");
 
-    // PASSWORD STRENGTH
-    const calculateStrength = (password) => {
-        let score = 0;
-        if (!password) return 0;
-        if (password.length >= 8) score++;
-        if (password.length >= 12) score++;
-        if (/[A-Z]/.test(password)) score++;
-        if (/[a-z]/.test(password)) score++;
-        if (/[0-9]/.test(password)) score++;
-        if (/[^A-Za-z0-9]/.test(password)) score++;
-        return Math.min(score, 5);
-    };
+    // PASSWORD STRENGTH INDICATION ELEMENTS (UPGRADED FOR DETAILS)
+    const registerPassword = document.getElementById("registerPassword");
+    const passwordStrengthWrapper = document.getElementById("passwordStrengthWrapper");
+    const strengthText = document.getElementById("strengthText");
+    const bar1 = document.getElementById("strengthBar1");
+    const bar2 = document.getElementById("strengthBar2");
+    const bar3 = document.getElementById("strengthBar3");
 
-    const getStrengthLabel = (score) => {
-        if (score <= 1) return { label: 'Lemah', color: '#ef4444' };
-        if (score <= 2) return { label: 'Cukup', color: '#f97316' };
-        if (score <= 3) return { label: 'Sedang', color: '#eab308' };
-        if (score <= 4) return { label: 'Kuat', color: '#22c55e' };
-        return { label: 'Sangat Kuat', color: '#0f766e' };
-    };
+    // LUPA SANDI MODAL ELEMENTS
+    const forgotPasswordBtn = document.getElementById("forgotPasswordBtn");
+    const forgotPasswordModal = document.getElementById("forgotPasswordModal");
+    const closeForgotPasswordBtn = document.getElementById("closeForgotPasswordBtn");
+    const cancelForgotPasswordBtn = document.getElementById("cancelForgotPasswordBtn");
 
-    const updatePasswordStrength = (input) => {
-        const wrapper = input.closest('.relative')?.parentElement;
-        const strengthBar = wrapper?.querySelector('.password-strength-bar');
-        const strengthLabel = wrapper?.querySelector('.password-strength-label');
-        const strengthReqs = wrapper?.querySelector('.password-requirements');
+    // CUSTOM SKILL INPUT ELEMENTS
+    const customSkillInput = document.getElementById("customSkillInput");
+    const addCustomSkillBtn = document.getElementById("addCustomSkillBtn");
 
-        if (!strengthBar || !strengthLabel) return;
+    // ==========================================================================
+    // RESPONSIVE SEGMENTED SWITCH TOGGLES (REVISI DESIGN SEGMENTED SWITCH DI ATAS)
+    // ==========================================================================
+    const switchLoginButtons = document.querySelectorAll(".switch-to-login-btn");
+    const switchRegisterButtons = document.querySelectorAll(".switch-to-register-btn");
 
-        const password = input.value;
-        const score = calculateStrength(password);
-        const { label, color } = getStrengthLabel(score);
-        const percentage = (score / 5) * 100;
-
-        strengthBar.style.width = `${percentage}%`;
-        strengthBar.style.backgroundColor = color;
-        strengthLabel.textContent = password ? label : '';
-        strengthLabel.style.color = color;
-
-        // Update requirements checkmarks
-        if (strengthReqs) {
-            const reqs = strengthReqs.querySelectorAll('.req-item');
-            reqs.forEach(req => {
-                const reqType = req.dataset.req;
-                let met = false;
-                switch(reqType) {
-                    case 'length': met = password.length >= 8; break;
-                    case 'upper': met = /[A-Z]/.test(password); break;
-                    case 'lower': met = /[a-z]/.test(password); break;
-                    case 'number': met = /[0-9]/.test(password); break;
-                    case 'special': met = /[^A-Za-z0-9]/.test(password); break;
-                }
-                req.classList.toggle('met', met);
+    const updateToggleState = (mode) => {
+        if (mode === "login") {
+            switchLoginButtons.forEach(btn => {
+                btn.className = "flex-1 py-1.5 text-xs font-bold rounded-lg transition-all text-center bg-white text-slate-900 shadow-sm";
+            });
+            switchRegisterButtons.forEach(btn => {
+                btn.className = "flex-1 py-1.5 text-xs font-semibold rounded-lg transition-all text-center text-slate-500 hover:text-slate-800";
+            });
+        } else {
+            switchLoginButtons.forEach(btn => {
+                btn.className = "flex-1 py-1.5 text-xs font-semibold rounded-lg transition-all text-center text-slate-500 hover:text-slate-800";
+            });
+            switchRegisterButtons.forEach(btn => {
+                btn.className = "flex-1 py-1.5 text-xs font-bold rounded-lg transition-all text-center bg-white text-slate-900 shadow-sm";
             });
         }
     };
 
-    // CLIENT-SIDE VALIDATION
-    const validators = {
-        name: (val) => {
-            if (!val?.trim()) return 'Nama wajib diisi';
-            if (val.trim().length < 2) return 'Nama minimal 2 karakter';
-            return null;
-        },
-        email: (val) => {
-            if (!val?.trim()) return 'Email wajib diisi';
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(val)) return 'Format email tidak valid';
-            return null;
-        },
-        phone: (val) => {
-            if (!val?.trim()) return 'Nomor telepon wajib diisi';
-            const phoneRegex = /^[\d\s\-\+]{10,}$/;
-            if (!phoneRegex.test(val.replace(/\s/g, ''))) return 'Nomor telepon tidak valid';
-            return null;
-        },
-        password: (val) => {
-            if (!val) return 'Password wajib diisi';
-            if (val.length < 8) return 'Password minimal 8 karakter';
-            return null;
-        },
-        student_id: (val) => {
-            if (!val?.trim()) return 'Pilih siswa dari daftar';
-            return null;
-        }
-    };
-
-    const showFieldError = (input, message) => {
-        if (!input) return;
-        const wrapper = input.closest('div');
-        let errorEl = wrapper?.querySelector('.field-error');
-
-        if (!errorEl) {
-            errorEl = document.createElement('p');
-            errorEl.className = 'field-error text-xs text-red-600 mt-1.5 font-bold';
-            wrapper?.appendChild(errorEl);
-        }
-
-        errorEl.textContent = message;
-        input.classList.add('input-error');
-        input.classList.remove('border-slate-200');
-        input.classList.add('border-red-300');
-    };
-
-    const clearFieldError = (input) => {
-        if (!input) return;
-        const wrapper = input.closest('div');
-        const errorEl = wrapper?.querySelector('.field-error');
-        if (errorEl) errorEl.remove();
-        input.classList.remove('input-error');
-        input.classList.remove('border-red-300');
-        input.classList.add('border-slate-200');
-    };
-
-    const validateField = (name, value) => {
-        const validator = validators[name];
-        if (!validator) return null;
-        return validator(value);
-    };
-
-    const setupFieldValidation = (input, fieldName) => {
-        if (!input) return;
-
-        input.addEventListener('blur', () => {
-            const error = validateField(fieldName, input.value);
-            if (error) {
-                showFieldError(input, error);
-            } else {
-                clearFieldError(input);
-            }
+    switchLoginButtons.forEach(btn => {
+        btn.addEventListener("click", () => {
+            switchToLogin();
+            updateToggleState("login");
         });
-
-        input.addEventListener('input', () => {
-            if (fieldName === 'password') {
-                updatePasswordStrength(input);
-            }
-            const wrapper = input.closest('div');
-            const errorEl = wrapper?.querySelector('.field-error');
-            if (errorEl && input.value) {
-                const error = validateField(fieldName, input.value);
-                if (!error) clearFieldError(input);
-            }
-        });
-    };
-
-    const validateForm = (form) => {
-        let isValid = true;
-        const errors = {};
-
-        const fields = form.querySelectorAll('input:not([type="hidden"]), select, textarea');
-        fields.forEach(field => {
-            const name = field.name;
-            if (!validators[name]) return;
-            if (field.disabled || field.type === 'hidden') return;
-
-            const error = validateField(fieldNameFromInput(field), field.value);
-            if (error) {
-                showFieldError(field, error);
-                errors[name] = error;
-                isValid = false;
-            } else {
-                clearFieldError(field);
-            }
-        });
-
-        return { isValid, errors };
-    };
-
-    const fieldNameFromInput = (input) => {
-        return input.name || input.id;
-    };
-
-    function showPanel(el) {
-        el.classList.remove("panel-hidden");
-        el.classList.add("panel-visible");
-    }
-    function hidePanel(el) {
-        el.classList.remove("panel-visible");
-        el.classList.add("panel-hidden");
-    }
-    function setDisabled(selector, disabled) {
-        document.querySelectorAll(selector).forEach((el) => {
-            el.disabled = disabled;
-        });
-    }
-    function getStudents() {
-        return Array.isArray(window.skomdaStudents) ? window.skomdaStudents : [];
-    }
-    function formatStudentLabel(student) {
-        if (!student) return "";
-        return `${student.name} (${student.nis})`;
-    }
-    function getStudentById(id) {
-        return getStudents().find((s) => String(s.id) === String(id));
-    }
-    function getStudentFromInput() {
-        if (!studentSelect) return null;
-        const rawValue = (studentSelect.value || "").trim();
-        if (!rawValue) return null;
-        if (studentList) {
-            const options = Array.from(studentList.options || []);
-            const match = options.find((opt) => opt.value === rawValue);
-            if (match && match.dataset && match.dataset.id) {
-                return getStudentById(match.dataset.id) || null;
-            }
-        }
-        const nisMatch = rawValue.match(/\(([^)]+)\)\s*$/);
-        if (nisMatch && nisMatch[1]) {
-            const byNis = getStudents().find(
-                (s) => String(s.nis) === String(nisMatch[1])
-            );
-            if (byNis) return byNis;
-        }
-        const byNis = getStudents().find(
-            (s) => String(s.nis) === String(rawValue)
-        );
-        if (byNis) return byNis;
-        const byId = getStudents().find(
-            (s) => String(s.id) === String(rawValue)
-        );
-        if (byId) return byId;
-        const byName = getStudents().find(
-            (s) => (s.name || "").toLowerCase() === rawValue.toLowerCase()
-        );
-        return byName || null;
-    }
-    function updateStudentUI() {
-        if (!studentSelect) return;
-        const selectedStudent = getStudentFromInput();
-        if (studentIdInput) studentIdInput.value = selectedStudent ? selectedStudent.id : "";
-        if (nisInput) nisInput.value = selectedStudent ? selectedStudent.nis : "";
-        if (studentEmailInput) studentEmailInput.value = selectedStudent ? selectedStudent.email || "" : "";
-    }
-    function checkFormValidity() {
-        if (!registerSubmitBtn) return;
-        if (currentRole === "freelancer") {
-            const ok = !!(studentIdInput && String(studentIdInput.value || "").trim());
-            registerSubmitBtn.disabled = !ok;
-            registerSubmitBtn.classList.toggle("opacity-50", !ok);
-            registerSubmitBtn.classList.toggle("cursor-not-allowed", !ok);
-        } else {
-            registerSubmitBtn.disabled = false;
-            registerSubmitBtn.classList.remove("opacity-50", "cursor-not-allowed");
-        }
-    }
-
-    // PENTING: PANEL ERROR HANDLER
-    function showCorrectPanelFromError() {
-        if (window.panelShowMode === 'register') {
-            currentMode = "register";
-            authOverlay.classList.add("register-mode");
-            hidePanel(loginPanel);
-            showPanel(registerPanel);
-            updateRole(window.oldRole || "client");
-        } else if (window.panelShowMode === 'login') {
-            currentMode = "login";
-            authOverlay.classList.remove("register-mode");
-            hidePanel(registerPanel);
-            showPanel(loginPanel);
-        }
-    }
-
-    function toggleMode() {
-        currentMode = currentMode === "login" ? "register" : "login";
-        const isRegister = currentMode === "register";
-        authOverlay.classList.toggle("register-mode", isRegister);
-
-        if (isRegister) {
-            hidePanel(loginPanel);
-            showPanel(registerPanel);
-            updateRole("client");
-        } else {
-            hidePanel(registerPanel);
-            showPanel(loginPanel);
-        }
-
-        const data = content[currentMode];
-        overlayTitle.style.opacity = "0";
-        overlayDesc.style.opacity = "0";
-        toggleText.style.opacity = "0";
-        heroImage.classList.add("fade-out");
-
-        setTimeout(() => {
-            overlayTitle.textContent = data.title;
-            overlayDesc.textContent = data.desc;
-            toggleText.textContent = data.btnText;
-            heroImage.src = data.img;
-            heroImage.classList.remove("fade-out");
-            overlayTitle.style.opacity = "1";
-            overlayDesc.style.opacity = "1";
-            toggleText.style.opacity = "1";
-        }, 300);
-    }
-
-    function updateRole(role) {
-        currentRole = role;
-        const isFreelancer = role === "freelancer";
-        if (roleSlider) {
-            roleSlider.style.transform = isFreelancer ? "translateX(100%)" : "translateX(0%)";
-        }
-        if (btnClient) {
-            btnClient.style.color = isFreelancer ? "#94A3B8" : "#0F766E";
-            btnClient.style.fontWeight = isFreelancer ? "600" : "800";
-        }
-        if (btnFreelancer) {
-            btnFreelancer.style.color = isFreelancer ? "#0F766E" : "#94A3B8";
-            btnFreelancer.style.fontWeight = isFreelancer ? "800" : "600";
-        }
-        if (clientFields) clientFields.classList.toggle("hidden", isFreelancer);
-        if (freelancerFields)
-            freelancerFields.classList.toggle("hidden", !isFreelancer);
-
-        if (studentSelect) studentSelect.required = isFreelancer;
-        document.querySelectorAll("#clientFields input").forEach((input) => {
-            input.required = !isFreelancer;
-        });
-        setDisabled("#clientFields input", isFreelancer);
-        if (registerForm)
-            registerForm.action = isFreelancer
-                ? registerForm.dataset.actionFreelancer
-                : registerForm.dataset.actionClient;
-        if (isFreelancer) updateStudentUI();
-        if (!isFreelancer && studentEmailInput) studentEmailInput.value = "";
-
-        checkFormValidity();
-    }
-
-    overlayToggle?.addEventListener("click", (e) => {
-        e.preventDefault();
-        toggleMode();
     });
 
-    mobileToggles.forEach((toggle) => {
-        toggle.addEventListener("click", (e) => {
+    switchRegisterButtons.forEach(btn => {
+        btn.addEventListener("click", () => {
+            switchToRegister();
+            updateToggleState("register");
+        });
+    });
+
+    function switchToRegister() {
+        currentMode = "register";
+        
+        // Desktop overlay slide
+        authOverlay.classList.add("register-mode");
+        
+        // Switch Active Panels
+        loginPanel.classList.remove("active");
+        loginPanel.classList.add("inactive");
+        
+        registerPanel.classList.remove("inactive");
+        registerPanel.classList.add("active");
+
+        // Swap Dynamic Overlay Texts
+        if (overlayTitle) overlayTitle.textContent = "Mulai Langkah Profesionalmu Di Sini.";
+        if (overlayDesc) overlayDesc.textContent = "Bergabunglah bersama ribuan ekosistem digital Skomda untuk menciptakan projek besar bersama.";
+        
+        if (heroImg1 && heroImg2) {
+            heroImg1.classList.remove("active");
+            heroImg1.classList.add("opacity-0");
+            heroImg2.classList.add("active");
+            heroImg2.classList.remove("opacity-0");
+        }
+        updateToggleState("register");
+    }
+
+    function switchToLogin() {
+        currentMode = "login";
+        
+        // Desktop overlay slide
+        authOverlay.classList.remove("register-mode");
+        
+        // Switch Active Panels
+        registerPanel.classList.remove("active");
+        registerPanel.classList.add("inactive");
+        
+        loginPanel.classList.remove("inactive");
+        loginPanel.classList.add("active");
+
+        // Swap Dynamic Overlay Texts
+        if (overlayTitle) overlayTitle.textContent = "Eksplorasi Talent Terbaik Skomda di Sini.";
+        if (overlayDesc) overlayDesc.textContent = "Temukan freelancer siswa berkompeten untuk menyelesaikan projek digital Anda dengan kualitas profesional.";
+        
+        if (heroImg1 && heroImg2) {
+            heroImg2.classList.remove("active");
+            heroImg2.classList.add("opacity-0");
+            heroImg1.classList.add("active");
+            heroImg1.classList.remove("opacity-0");
+        }
+        updateToggleState("login");
+    }
+
+    // ==========================================================================
+    // ROLE SELECTOR & FIELD INTERACTION (CLIENT vs FREELANCER)
+    // ==========================================================================
+    const roleTabs = document.querySelectorAll(".role-tab");
+    
+    roleTabs.forEach(tab => {
+        tab.addEventListener("click", () => {
+            const selectedRole = tab.dataset.role;
+            if (selectedRole === currentRole) return;
+
+            currentRole = selectedRole;
+            roleInput.value = selectedRole;
+
+            // Perubahan Desain Tab Aktif
+            roleTabs.forEach(t => {
+                t.classList.remove("bg-white", "text-slate-900", "shadow-sm");
+                t.classList.add("text-slate-500", "hover:text-slate-800");
+                const svg = t.querySelector("svg");
+                if (svg) svg.classList.replace("text-slate-700", "text-slate-400");
+            });
+            tab.classList.remove("text-slate-500", "hover:text-slate-800");
+            tab.classList.add("bg-white", "text-slate-900", "shadow-sm");
+            const activeSvg = tab.querySelector("svg");
+            if (activeSvg) activeSvg.classList.replace("text-slate-400", "text-slate-700");
+
+            // Toggle Tampilan Form Input Sesuai Role
+            if (selectedRole === "client") {
+                clientFields.classList.remove("hidden");
+                freelancerFields.classList.add("hidden");
+                skillsWrapper.classList.add("hidden");
+                registerForm.action = "/register-client";
+
+                // Reset field email ketika berpindah kembali ke Client
+                if (registerEmail) {
+                    registerEmail.value = "";
+                    registerEmail.readOnly = false;
+                    registerEmail.classList.remove("bg-slate-100", "cursor-not-allowed", "text-slate-500");
+                    if (copyEmailBtn) copyEmailBtn.classList.add("hidden");
+                }
+            } else {
+                clientFields.classList.add("hidden");
+                freelancerFields.classList.remove("hidden");
+                skillsWrapper.classList.remove("hidden");
+                registerForm.action = "/register-freelancer";
+                
+                // Load ulang data siswa dan kategori jika belum ada
+                initFreelancerRequirements();
+            }
+        });
+    });
+
+    // ==========================================================================
+    // SISWA SKOMDA DROPDOWN LOGIC
+    // ==========================================================================
+    function initFreelancerRequirements() {
+        renderStudentList(loginPageData.skomdaStudents);
+        renderAvailableSkills(loginPageData.serviceCategories);
+    }
+
+    if (studentSelectBtn) {
+        studentSelectBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            studentDropdown.classList.toggle("hidden");
+            if (!studentDropdown.classList.contains("hidden")) {
+                studentSearch.focus();
+            }
+        });
+    }
+
+    // Pencarian Siswa secara Realtime
+    if (studentSearch) {
+        studentSearch.addEventListener("input", (e) => {
+            const query = e.target.value.toLowerCase();
+            const filtered = loginPageData.skomdaStudents.filter(student => 
+                (student.name && student.name.toLowerCase().includes(query)) || 
+                (student.nisn && String(student.nisn).includes(query)) ||
+                (student.nis && String(student.nis).includes(query))
+            );
+            renderStudentList(filtered);
+        });
+    }
+
+    function renderStudentList(studentsList) {
+        if (!studentList) return;
+        studentList.innerHTML = "";
+
+        if (studentsList.length === 0) {
+            studentList.innerHTML = `<div class="p-3 text-slate-400 text-center">Siswa tidak ditemukan</div>`;
+            return;
+        }
+
+        studentsList.forEach(student => {
+            const item = document.createElement("div");
+            item.className = "p-3 cursor-pointer rounded-xl transition-all hover:bg-slate-50 font-medium text-slate-700 flex justify-between items-center";
+            
+            const nisnVal = student.nisn || student.nis || 'N/A';
+            
+            item.innerHTML = `
+                <span>${student.name}</span>
+                <span class="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full font-bold">NISN: ${nisnVal}</span>
+            `;
+            item.addEventListener("click", () => {
+                selectedStudentLabel.textContent = student.name;
+                selectedStudentLabel.classList.remove("text-slate-400");
+                selectedStudentLabel.classList.add("text-slate-800", "font-bold");
+                studentIdInput.value = student.id;
+                studentDropdown.classList.add("hidden");
+
+                // Auto-fill email dan buat read-only tapi copiable
+                if (registerEmail && student.email) {
+                    registerEmail.value = student.email;
+                    registerEmail.readOnly = true;
+                    registerEmail.classList.add("bg-slate-100", "cursor-not-allowed", "text-slate-500");
+                    if (copyEmailBtn) copyEmailBtn.classList.remove("hidden");
+                }
+            });
+            studentList.appendChild(item);
+        });
+    }
+
+    // Sembunyikan dropdown siswa jika klik di luar area
+    document.addEventListener("click", (e) => {
+        if (studentDropdown && !studentDropdown.contains(e.target) && e.target !== studentSelectBtn) {
+            studentDropdown.classList.add("hidden");
+        }
+    });
+
+    // ==========================================================================
+    // TOUGH FALLBACK SALIN EMAIL (REVISI FITUR SALIN YANG TIDAK BERFUNGSI)
+    // ==========================================================================
+    if (copyEmailBtn && registerEmail) {
+        copyEmailBtn.addEventListener("click", () => {
+            const emailValue = registerEmail.value;
+            if (!emailValue) return;
+
+            // Gunakan metode textarea cadangan yang dijamin bekerja dalam modul iframe/canvas
+            const textarea = document.createElement("textarea");
+            textarea.value = emailValue;
+            textarea.style.position = "fixed";
+            textarea.style.opacity = "0";
+            textarea.style.left = "-9999px";
+            document.body.appendChild(textarea);
+            textarea.select();
+            textarea.setSelectionRange(0, 99999);
+
+            let successfulCopy = false;
+            try {
+                successfulCopy = document.execCommand("copy");
+            } catch (err) {
+                console.error("Metode execCommand gagal:", err);
+            }
+
+            document.body.removeChild(textarea);
+
+            // Coba API Navigator sebagai backup kedua jika execCommand ditolak
+            if (!successfulCopy && navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(emailValue)
+                    .then(() => handleCopySuccess())
+                    .catch(err => console.error("Clipboard API gagal:", err));
+            } else if (successfulCopy) {
+                handleCopySuccess();
+            }
+        });
+
+        function handleCopySuccess() {
+            const originalText = copyEmailBtn.textContent;
+            copyEmailBtn.textContent = "Tersalin!";
+            copyEmailBtn.classList.add("text-emerald-700");
+            
+            setTimeout(() => {
+                copyEmailBtn.textContent = originalText;
+                copyEmailBtn.classList.remove("text-emerald-700");
+            }, 2000);
+        }
+    }
+
+    // ==========================================================================
+    // DETAIL VERIFIKASI SANDI INTERAKTIF (TANPA EMOJI)
+    // ==========================================================================
+    if (registerPassword) {
+        registerPassword.addEventListener("input", (e) => {
+            const val = e.target.value;
+            if (!val) {
+                passwordStrengthWrapper.classList.add("hidden");
+                return;
+            }
+            passwordStrengthWrapper.classList.remove("hidden");
+
+            // Evaluasi Kriteria Individual
+            const metLength = val.length >= 8;
+            const metCase = /[A-Z]/.test(val) && /[a-z]/.test(val);
+            const metNumber = /[0-9]/.test(val);
+            const metSpecial = /[^A-Za-z0-9]/.test(val);
+
+            // Update UI Checklist secara Real-Time
+            updateRequirementUI("req-length", metLength);
+            updateRequirementUI("req-case", metCase);
+            updateRequirementUI("req-number", metNumber);
+            updateRequirementUI("req-special", metSpecial);
+
+            // Hitung skor total yang dipenuhi (Skor 0-4)
+            let score = 0;
+            if (metLength) score++;
+            if (metCase) score++;
+            if (metNumber) score++;
+            if (metSpecial) score++;
+
+            // Reset seluruh bar kekuatan ke kondisi default
+            bar1.className = "h-full w-1/3 transition-all rounded-full bg-slate-200";
+            bar2.className = "h-full w-1/3 transition-all rounded-full bg-slate-200";
+            bar3.className = "h-full w-1/3 transition-all rounded-full bg-slate-200";
+
+            if (val.length < 6) {
+                strengthText.textContent = "Sandi terlalu pendek (Min. 8 Karakter)";
+                strengthText.className = "text-[10px] font-bold text-red-500";
+                bar1.classList.add("bg-red-500");
+            } else if (score <= 1) {
+                strengthText.textContent = "Kekuatan Sandi: Lemah";
+                strengthText.className = "text-[10px] font-bold text-red-500";
+                bar1.classList.add("bg-red-500");
+            } else if (score === 2 || score === 3) {
+                strengthText.textContent = "Kekuatan Sandi: Sedang";
+                strengthText.className = "text-[10px] font-bold text-amber-500";
+                bar1.classList.add("bg-amber-500");
+                bar2.classList.add("bg-amber-500");
+            } else if (score === 4) {
+                strengthText.textContent = "Kekuatan Sandi: Sangat Kuat (Sandi Aman)";
+                strengthText.className = "text-[10px] font-bold text-emerald-500";
+                bar1.classList.add("bg-emerald-500");
+                bar2.classList.add("bg-emerald-500");
+                bar3.classList.add("bg-emerald-500");
+            }
+        });
+    }
+
+    // Fungsi utilitas untuk mengupdate status visual tiap kriteria password
+    function updateRequirementUI(elementId, isMet) {
+        const reqEl = document.getElementById(elementId);
+        if (!reqEl) return;
+        const iconSpan = reqEl.querySelector(".icon");
+        
+        if (isMet) {
+            reqEl.classList.remove("text-slate-400");
+            reqEl.classList.add("text-emerald-600", "font-bold");
+            if (iconSpan) {
+                iconSpan.innerHTML = "✓";
+                iconSpan.className = "icon text-emerald-600 font-extrabold";
+            }
+        } else {
+            reqEl.classList.remove("text-emerald-600", "font-bold");
+            reqEl.classList.add("text-slate-400");
+            if (iconSpan) {
+                iconSpan.innerHTML = "●";
+                iconSpan.className = "icon text-slate-300";
+            }
+        }
+    }
+
+    // ==========================================================================
+    // SKILLS SELECTION / TAGS LOGIC (Maksimal 5)
+    // ==========================================================================
+    function renderAvailableSkills(categories) {
+        if (!availableSkills) return;
+        availableSkills.innerHTML = "";
+
+        categories.forEach(category => {
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.className = "px-2 py-1 text-[10px] font-semibold rounded-lg bg-slate-100 text-slate-700 border border-slate-200 hover:bg-slate-200 transition-all m-0.5 flex items-center gap-1";
+            btn.innerHTML = `
+                <svg width="10" height="10" class="w-2.5 h-2.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
+                </svg>
+                ${category}
+            `;
+            
+            btn.addEventListener("click", () => {
+                addSkill(category);
+            });
+            availableSkills.appendChild(btn);
+        });
+    }
+
+    function addSkill(skillName) {
+        const cleanedSkillName = skillName.trim();
+        if (!cleanedSkillName) return;
+
+        // Cegah duplikasi
+        if (skills.some(s => s.toLowerCase() === cleanedSkillName.toLowerCase())) {
+            return;
+        }
+
+        if (skills.length >= MAX_SKILLS) {
+            alert("Maksimal keahlian yang dapat dipilih adalah 5.");
+            return;
+        }
+
+        skills.push(cleanedSkillName);
+        renderSkillsTags();
+    }
+
+    function removeSkill(skillName) {
+        skills = skills.filter(s => s !== skillName);
+        renderSkillsTags();
+    }
+
+    function renderSkillsTags() {
+        if (!skillsContainer) return;
+        skillsContainer.innerHTML = "";
+
+        // Hapus input hidden skill yang lama di form
+        const oldHiddenInputs = registerForm.querySelectorAll("input[name='skills[]']");
+        oldHiddenInputs.forEach(el => el.remove());
+
+        // Update counter teks
+        if (skillsCountText) {
+            skillsCountText.textContent = `${skills.length}/${MAX_SKILLS} Terpilih`;
+        }
+
+        if (skills.length === 0) {
+            skillsContainer.innerHTML = `<span class="text-[11px] text-slate-400 my-auto">Pilih keahlian di bawah...</span>`;
+            return;
+        }
+
+        skills.forEach(skill => {
+            // Tampilkan Tag visual
+            const tag = document.createElement("div");
+            tag.className = "tag-item";
+            tag.innerHTML = `
+                <span>${skill}</span>
+                <button type="button" class="remove-tag">
+                    <svg width="12" height="12" class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            `;
+            tag.querySelector(".remove-tag").addEventListener("click", () => {
+                removeSkill(skill);
+            });
+            skillsContainer.appendChild(tag);
+
+            // Sisipkan input hidden ke form register agar terkirim ke Laravel
+            const hiddenInput = document.createElement("input");
+            hiddenInput.type = "hidden";
+            hiddenInput.name = "skills[]";
+            hiddenInput.value = skill;
+            registerForm.appendChild(hiddenInput);
+        });
+    }
+
+    // ==========================================================================
+    // HANDLER KEAHLIAN KUSTOM MANUAL
+    // ==========================================================================
+    if (addCustomSkillBtn && customSkillInput) {
+        const handleAddCustomSkill = () => {
+            const val = customSkillInput.value.trim();
+            if (val) {
+                if (skills.length >= MAX_SKILLS) {
+                    alert("Maksimal keahlian yang dapat dipilih adalah 5.");
+                    return;
+                }
+                addSkill(val);
+                customSkillInput.value = "";
+                customSkillInput.focus();
+            }
+        };
+
+        addCustomSkillBtn.addEventListener("click", handleAddCustomSkill);
+
+        customSkillInput.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                handleAddCustomSkill();
+            }
+        });
+    }
+
+    // ==========================================================================
+    // MODAL LUPA SANDI 
+    // ==========================================================================
+    if (forgotPasswordBtn && forgotPasswordModal) {
+        forgotPasswordBtn.addEventListener("click", (e) => {
             e.preventDefault();
-            toggleMode();
+            forgotPasswordModal.classList.remove("hidden");
         });
-    });
+    }
 
-    btnClient?.addEventListener("click", () => updateRole("client"));
-    btnFreelancer?.addEventListener("click", () => updateRole("freelancer"));
-
-    if (studentSelect && studentIdInput) {
-        studentSelect.addEventListener("input", () => {
-            updateStudentUI();
-            checkFormValidity();
-        });
-        if (studentIdInput.value && !studentSelect.value) {
-            const existingStudent = getStudentById(studentIdInput.value);
-            if (existingStudent) {
-                studentSelect.value = formatStudentLabel(existingStudent);
-            }
+    const hideForgotPasswordModal = () => {
+        if (forgotPasswordModal) {
+            forgotPasswordModal.classList.add("hidden");
         }
-
-        updateStudentUI();
-        checkFormValidity();
-    }
-
-    if (
-        tagsContainer &&
-        skillInput &&
-        skillSuggestions &&
-        tagLimitMsg &&
-        hiddenSkills
-    ) {
-        function hideSuggestions() {
-            skillSuggestions.innerHTML = "";
-            skillSuggestions.classList.add("hidden");
-        }
-
-        function renderTags() {
-            tagsContainer.querySelectorAll(".tag-item").forEach((t) => t.remove());
-            skills.forEach((skill) => {
-                const tag = document.createElement("span");
-                tag.className = "tag-item inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 px-2 py-1 rounded border border-emerald-100 text-xs font-semibold";
-                tag.innerHTML = `${skill}<span class="tag-close cursor-pointer ml-1 text-emerald-500 hover:text-emerald-900 flex items-center" data-val="${skill}">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
-        </span>`;
-                tagsContainer.insertBefore(tag, skillInput);
-            });
-            tagLimitMsg.textContent = `${skills.length}/${MAX_SKILLS} Keahlian`;
-            tagLimitMsg.style.color = skills.length >= MAX_SKILLS ? "#ef4444" : "#94A3B8";
-            skillInput.placeholder = skills.length >= MAX_SKILLS ? "Penuh" : "Ketik lalu Enter...";
-            skillInput.disabled = skills.length >= MAX_SKILLS;
-            hiddenSkills.value = JSON.stringify(skills);
-            hideSuggestions();
-        }
-
-        function addSkill(val) {
-            if (!val) return;
-            if (skills.length >= MAX_SKILLS) return;
-            if (skills.includes(val)) {
-                hideSuggestions();
-                skillInput.value = "";
-                return;
-            }
-            skills.push(val);
-            skillInput.value = "";
-            renderTags();
-        }
-
-        function showSuggestions(val) {
-            if (
-                !val ||
-                skills.length >= MAX_SKILLS ||
-                availableCategories.length === 0
-            ) {
-                hideSuggestions();
-                return;
-            }
-
-            const matches = availableCategories.filter(
-                (cat) =>
-                    cat.toLowerCase().includes(val.toLowerCase()) &&
-                    !skills.includes(cat)
-            );
-
-            if (matches.length === 0) {
-                hideSuggestions();
-                return;
-            }
-
-            skillSuggestions.innerHTML = matches
-                .map(
-                    (match) =>
-                        `<li class="px-4 py-2 hover:bg-emerald-50 cursor-pointer transition-colors" data-val="${match}">${match}</li>`
-                )
-                .join("");
-
-            skillSuggestions.classList.remove("hidden");
-        }
-
-        skillInput.addEventListener("input", (e) => {
-            showSuggestions(e.target.value.trim());
-        });
-
-        skillInput.addEventListener("keydown", (e) => {
-            if (e.key === "Enter" || e.key === ",") {
-                e.preventDefault();
-                addSkill(skillInput.value.trim());
-            }
-            if (
-                e.key === "Backspace" &&
-                skillInput.value === "" &&
-                skills.length > 0
-            ) {
-                skills.pop();
-                renderTags();
-            }
-        });
-
-        skillSuggestions.addEventListener("click", (e) => {
-            if (e.target.tagName.toLowerCase() === "li") {
-                addSkill(e.target.dataset.val);
-                skillInput.focus();
-            }
-        });
-
-        tagsContainer.addEventListener("click", (e) => {
-            const close = e.target.closest(".tag-close");
-            if (close) {
-                skills = skills.filter((s) => s !== close.dataset.val);
-                renderTags();
-            } else {
-                skillInput.focus();
-            }
-        });
-
-        document.addEventListener("click", (e) => {
-            if (
-                !tagsContainer.contains(e.target) &&
-                !skillSuggestions.contains(e.target)
-            ) {
-                hideSuggestions();
-            }
-        });
-    }
-
-    // LOGIN FORM LOADING STATE
-    const loginForm = document.getElementById('loginForm');
-    if (loginForm) {
-        const loginSubmitBtn = loginForm.querySelector('button[type="submit"]');
-        loginForm.addEventListener('submit', function() {
-            if (loginSubmitBtn) {
-                loginSubmitBtn.disabled = true;
-                loginSubmitBtn.innerHTML = '<svg class="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" stroke-opacity="0.25"/><path d="M12 2a10 10 0 0 1 10 10"/></svg> Memproses...';
-                loginSubmitBtn.classList.add('opacity-75', 'cursor-not-allowed');
-            }
-        });
-    }
-
-    // REGISTER FORM LOADING STATE
-    if (registerForm) {
-        registerForm.addEventListener('submit', function() {
-            if (registerSubmitBtn) {
-                registerSubmitBtn.disabled = true;
-                registerSubmitBtn.innerHTML = '<svg class="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" stroke-opacity="0.25"/><path d="M12 2a10 10 0 0 1 10 10"/></svg> Memproses...';
-                registerSubmitBtn.classList.add('opacity-75', 'cursor-not-allowed');
-            }
-        });
-    }
-
-    // INIT panel logic
-    let initMode = "login";
-    let initRole = "client";
-    const urlParams = new URLSearchParams(window.location.search);
-
-    if (urlParams.get('mode') === 'register') initMode = "register";
-    if (urlParams.get('role')) initRole = urlParams.get('role');
-    if (window.hasRegistrationErrors) {
-        initMode = "register";
-        if (window.oldRole) initRole = window.oldRole;
-    }
-        updateRole(initRole);
-
-    if(window.panelShowMode){
-        showCorrectPanelFromError();
-    } else {
-        if (initMode === "register") {
-            currentMode = "register";
-            authOverlay.classList.add("register-mode");
-            hidePanel(loginPanel);
-            showPanel(registerPanel);
-            const data = content["register"];
-            overlayTitle.textContent = data.title;
-            overlayDesc.textContent = data.desc;
-            toggleText.textContent = data.btnText;
-            heroImage.src = data.img;
-        } else {
-            currentMode = "login";
-            authOverlay.classList.remove("register-mode");
-            hidePanel(registerPanel);
-            showPanel(loginPanel);
-        }
-    }
-
-    // SETUP PASSWORD STRENGTH & VALIDATION
-    const registerPasswordField = document.getElementById('registerPasswordField');
-    if (registerPasswordField) {
-        registerPasswordField.addEventListener('input', () => {
-            updatePasswordStrength(registerPasswordField);
-        });
-        registerPasswordField.addEventListener('blur', () => {
-            const error = validateField('password', registerPasswordField.value);
-            if (error) {
-                showFieldError(registerPasswordField, error);
-            }
-        });
-    }
-
-    // Setup field validations
-    const setupValidations = () => {
-        const nameInput = document.querySelector('#clientFields input[name="name"]');
-        const emailInput = document.querySelector('#clientFields input[name="email"]');
-        const phoneInput = document.querySelector('#clientFields input[name="phone"]');
-        const studentSelect = document.getElementById('studentSelect');
-
-        setupFieldValidation(nameInput, 'name');
-        setupFieldValidation(emailInput, 'email');
-        setupFieldValidation(phoneInput, 'phone');
-        setupFieldValidation(studentSelect, 'student_id');
     };
 
-    setupValidations();
+    if (closeForgotPasswordBtn) {
+        closeForgotPasswordBtn.addEventListener("click", hideForgotPasswordModal);
+    }
 
-    // FORM SUBMISSION VALIDATION
-    registerForm?.addEventListener('submit', (e) => {
-        if (currentRole === 'client') {
-            const nameInput = document.querySelector('#clientFields input[name="name"]');
-            const emailInput = document.querySelector('#clientFields input[name="email"]');
-            const phoneInput = document.querySelector('#clientFields input[name="phone"]');
-            const passwordInput = registerPasswordField;
+    if (cancelForgotPasswordBtn) {
+        cancelForgotPasswordBtn.addEventListener("click", hideForgotPasswordModal);
+    }
 
-            let hasError = false;
-
-            [nameInput, emailInput, phoneInput, passwordInput].forEach(input => {
-                if (!input) return;
-                clearFieldError(input);
-                const error = validateField(input.name, input.value);
-                if (error) {
-                    showFieldError(input, error);
-                    hasError = true;
-                }
-            });
-
-            if (hasError) {
-                e.preventDefault();
-                registerForm.querySelector('button[type="submit"]')?.classList.remove('btn-loading');
-                registerForm.querySelector('button[type="submit"]')?.removeAttribute('disabled');
+    // Tutup modal jika area background diklik
+    if (forgotPasswordModal) {
+        forgotPasswordModal.addEventListener("click", (e) => {
+            if (e.target === forgotPasswordModal) {
+                hideForgotPasswordModal();
             }
-        } else {
-            const studentIdInput = document.getElementById('studentIdInput');
-            if (!studentIdInput?.value) {
-                e.preventDefault();
-                showFieldError(studentSelect, 'Pilih siswa dari daftar');
-                registerForm.querySelector('button[type="submit"]')?.classList.remove('btn-loading');
-                registerForm.querySelector('button[type="submit"]')?.removeAttribute('disabled');
-            }
-        }
-    });
+        });
+    }
+
+    // ==========================================================================
+    // INITIAL LOAD / SESSION OLD VALUES
+    // ==========================================================================
+    if (loginPageData.panelShowMode === "register") {
+        switchToRegister();
+    } else {
+        switchToLogin();
+    }
+
+    if (loginPageData.oldRole === "freelancer") {
+        const freelancerTab = document.querySelector(".role-tab[data-role='freelancer']");
+        if (freelancerTab) freelancerTab.click();
+    }
 });

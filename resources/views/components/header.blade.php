@@ -23,8 +23,9 @@
     }
 @endphp
 
-<header class="flex items-center justify-between mb-9">
-    <form action="{{ url($segment . '/search') }}" method="GET" class="relative w-[380px] flex items-center gap-2">
+<header class="flex items-center justify-between gap-3 mb-6 lg:mb-9 pl-20 lg:pl-0">
+    <form action="{{ url($segment . '/search') }}" method="GET"
+    class="relative flex-1 flex items-center gap-2 min-w-0">
         <div class="relative flex-1">
             <i
                 class="ri-search-line absolute left-[15px] top-[11px] text-slate-400 text-[17px] pointer-events-none z-10"></i>
@@ -38,9 +39,7 @@
         </button>
     </form>
 
-    <div class="flex items-center gap-3.5">
-
-        <div class="relative">
+    <div class="flex items-center gap-3.5 shrink-0">        <div class="relative">
             <button id="notif-btn" aria-label="Notifikasi" onclick="openNotificationDrawer()"
                 class="w-11 h-11 rounded-xl border-[1.5px] border-slate-200 bg-white cursor-pointer flex items-center justify-center text-slate-500 text-[19px] transition-all duration-200 hover:border-[#0f766e] hover:text-[#0f766e]">
                 <i class="ri-notification-3-line pointer-events-none"></i>
@@ -54,10 +53,10 @@
         <a href="{{ $urlProfil }}"
             class="flex items-center gap-[11px] cursor-pointer hover:opacity-80 transition-opacity">
 
-<x-avatar :user="$user" :role="$role" :size="42" class="w-[42px] h-[42px] rounded-xl object-cover" alt="{{ $user?->name ?? 'Profile' }}" loading="lazy" decoding="async" />
+            <x-avatar :user="$user" :role="$role" :size="42" class="w-[42px] h-[42px] rounded-xl object-cover"
+                alt="{{ $user?->name ?? 'Profile' }}" loading="lazy" decoding="async" />
 
-            <div class="hidden sm:flex flex-col">
-                <span class="font-bold text-[13.5px] text-slate-800 leading-none">
+            <div class="hidden md:flex flex-col"> <span class="font-bold text-[13.5px] text-slate-800 leading-none">
                     {{ $user?->name ?? $user?->email }}
                 </span>
                 <span class="text-[11px] text-slate-500 mt-1">

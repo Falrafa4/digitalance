@@ -80,8 +80,8 @@
                         </p>
                         <p class="text-[22px] sm:text-[24px] font-extrabold text-slate-900 leading-tight mt-1"
                             data-client-stat="totalSpent"
-                            data-default="Rp{{ number_format((float) $statsData['totalSpent'], 0, ',', '.') }}">
-                            Rp{{ number_format((float) $statsData['totalSpent'], 0, ',', '.') }}
+                            data-default="Rp {{ number_format((float) $statsData['totalSpent'], 0, ',', '.') }}">
+                            Rp {{ number_format((float) $statsData['totalSpent'], 0, ',', '.') }}
                         </p>
                     </div>
                 </div>
@@ -128,7 +128,7 @@
                                             </span>
                                             <span
                                                 class="px-3 py-1 rounded-full text-[12px] font-bold bg-white text-slate-600 border border-slate-200">
-                                                Rp{{ number_format((float) ($o->agreed_price ?? 0), 0, ',', '.') }}
+                                                Rp {{ number_format((float) ($o->agreed_price ?? 0), 0, ',', '.') }}
                                             </span>
                                         </div>
                                     </div>

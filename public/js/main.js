@@ -17,10 +17,12 @@ roleBtns.forEach(btn => {
         btn.classList.add('active');
         
         const searchInput = document.querySelector('.search-input');
-        if (btn.dataset.role === 'client') {
-            searchInput.placeholder = "Cari jasa: Web Design, Video Editing...";
-        } else {
-            searchInput.placeholder = "Cari projek: Redesign Landing Page...";
+        if (searchInput) {
+            if (btn.dataset.role === 'client') {
+                searchInput.placeholder = "Cari jasa: Web Design, Video Editing...";
+            } else {
+                searchInput.placeholder = "Cari projek: Redesign Landing Page...";
+            }
         }
     });
 });
@@ -101,21 +103,25 @@ window.addEventListener('scroll', () => {
 // Intersection Observer
 const observerOptions = {
     threshold: 0.1,
-    rootMargin: '0px 0px -100px 0px'
+    rootMargin: '0px 0px -50px 0px' // Diperkecil sedikit untuk responsivitas mobile yang lebih cepat trigger
 };
 
 const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
         if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
             entry.target.style.opacity = '1';
             entry.target.style.transform = 'translateY(0)';
         }
     });
 }, observerOptions);
 
-document.querySelectorAll('.stat-card, .flow-step, .testimonial-card, .feature-card').forEach(el => {
-    el.style.opacity = '0';
-    el.style.transform = 'translateY(30px)';
-    el.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+// Mengamati elemen stat-card, flow-step, testimonial-card, feature-card, serta elemen .reveal utama
+document.querySelectorAll('.stat-card, .flow-step, .testimonial-card, .feature-card, .reveal').forEach(el => {
+    if (!el.classList.contains('reveal')) {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(30px)';
+        el.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+    }
     observer.observe(el);
 });

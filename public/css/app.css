@@ -6,6 +6,7 @@
 
 body {
     font-family: "Plus Jakarta Sans", sans-serif;
+    overflow-x: hidden; /* Mencegah bug geser horizontal pada layar handphone */
 }
 
 h1,
@@ -22,6 +23,7 @@ h3,
 
 html {
     scroll-behavior: smooth;
+    overflow-x: hidden;
 }
 
 .gradient-text {
@@ -51,15 +53,19 @@ html {
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
 }
 
-@keyframes float {
+@media (max-width: 1024px) {
+    .glass-card:hover {
+        transform: none; /* Nonaktifkan hover transform pada mobile/tablet untuk UX sentuhan yang lebih baik */
+    }
+}
 
+@keyframes float {
     0%,
     100% {
         transform: translateY(0);
     }
-
     50% {
-        transform: translateY(-16px);
+        transform: translateY(-12px); /* Dipersempit sedikit agar tetap proporsional di tablet */
     }
 }
 
@@ -74,9 +80,8 @@ html {
 @keyframes heroUp {
     from {
         opacity: 0;
-        transform: translateY(28px);
+        transform: translateY(20px);
     }
-
     to {
         opacity: 1;
         transform: translateY(0);
@@ -105,12 +110,10 @@ html {
 }
 
 @keyframes blink {
-
     0%,
     100% {
         opacity: 1;
     }
-
     50% {
         opacity: 0;
     }
@@ -126,7 +129,7 @@ html {
 
 .reveal {
     opacity: 0;
-    transform: translateY(36px);
+    transform: translateY(24px); /* Dikurangi dari 36px agar transisi di ponsel terlihat lebih halus */
     transition:
         opacity 0.65s cubic-bezier(0.4, 0, 0.2, 1),
         transform 0.65s cubic-bezier(0.4, 0, 0.2, 1);
@@ -183,7 +186,7 @@ html {
 }
 
 .accordion-item.active .accordion-content {
-    max-height: 200px;
+    max-height: 300px; /* Ditambah sedikit untuk membungkus konten teks yang melar di mobile */
     margin-top: 0.75rem;
 }
 
@@ -215,7 +218,6 @@ html {
         opacity: 0;
         transform: translateY(14px);
     }
-
     to {
         opacity: 1;
         transform: translateY(0);
@@ -238,7 +240,7 @@ html {
 }
 
 .faq-item.active .faq-answer {
-    max-height: 240px;
+    max-height: 320px; /* Ditingkatkan agar paragraf deskripsi panjang di HP tidak terpotong */
     padding-bottom: 1.25rem;
 }
 

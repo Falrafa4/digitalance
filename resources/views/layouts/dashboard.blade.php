@@ -34,10 +34,31 @@
             }
         }
     </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+            const sidebar = document.getElementById('sidebar');
+            const toggle = document.getElementById('sidebarToggle');
+            const overlay = document.getElementById('sidebarOverlay');
+
+            if (!sidebar || !toggle || !overlay) return;
+
+            toggle.addEventListener('click', () => {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+            });
+
+            overlay.addEventListener('click', () => {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            });
+
+        });
+    </script>
     <script src="{{ asset('js/utils.js') }}"></script>
 
     {{-- Alpine (used by various dashboard pages for interactive UI) --}}
-    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
     @yield('styles')
     @stack('styles')
@@ -70,12 +91,22 @@
         Lewati ke konten utama
     </a>
 
-    <div class="flex h-screen">
+    <div class="flex h-screen overflow-hidden">
+        <button id="sidebarToggle"
+            class="lg:hidden fixed top-4 left-4 z-50 p-3 rounded-xl border border-slate-200 bg-white shadow-md">
+            <i class="ri-menu-line text-xl"></i>
+        </button>
+
+        <!-- Mobile Overlay -->
+        <div id="sidebarOverlay" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-30 lg:hidden">
+        </div>
+        
         <!-- Sidebar (role-aware) -->
         <x-sidebar />
 
         <!-- Main -->
-        <main id="main-content" tabindex="-1" class="flex-1 px-11 py-7 overflow-y-auto min-w-0 focus:outline-none">
+        <main id="main-content"
+            class="flex-1 px-4 md:px-6 lg:px-11 py-5 lg:py-7 overflow-y-auto min-w-0 focus:outline-none">
             <!-- Header (role-aware) -->
             <x-header />
 
@@ -113,14 +144,14 @@
     @endphp
     <script id="__FLASH_JSON__" type="application/json">{{ base64_encode(json_encode($__flash_messages)) }}</script>
     <script>
-            (function () {
-                try {
-                    var b = document.getElementById('__FLASH_JSON__') && document.getElementById('__FLASH_JSON__').textContent || '';
-                    window.__FLASH_MESSAGES__ = b ? JSON.parse(atob(b)) : [];
-                } catch (e) {
-                    window.__FLASH_MESSAGES__ = [];
-                }
-            })();
+        (function () {
+            try {
+                var b = document.getElementById('__FLASH_JSON__') && document.getElementById('__FLASH_JSON__').textContent || '';
+                window.__FLASH_MESSAGES__ = b ? JSON.parse(atob(b)) : [];
+            } catch (e) {
+                window.__FLASH_MESSAGES__ = [];
+            }
+        })();
     </script>
 
     @yield('scripts')
