@@ -68,6 +68,8 @@
                                         <img
                                             src="{{ asset('storage/' . $user->profile_photo) }}"
                                             class="w-10 h-10 rounded-xl object-cover border border-slate-200 shadow-sm"
+                                            loading="lazy"
+                                            decoding="async"
                                             alt="{{ $user->name }}"
                                         >
                                     @else
@@ -418,6 +420,8 @@
                                     <img
                                         src="{{ asset('storage') }}/${u.profile_photo}"
                                         class="w-full h-full rounded-[22px] object-cover"
+                                        loading="lazy"
+                                        decoding="async"
                                         alt="${u.name}"
                                     >
                                 ` : `

@@ -85,7 +85,7 @@
                         <p class="text-slate-400 text-xs mt-1">PNG, JPG, GIF, WebP (Maks. 5MB)</p>
                     </div>
                     <div id="dropzone-preview" class="hidden">
-                        <img id="dropzone-preview-img" src="" alt="Preview" class="max-h-40 mx-auto rounded-lg mb-2">
+                        <img id="dropzone-preview-img" src="" loading="lazy" decoding="async" alt="Preview" class="max-h-40 mx-auto rounded-lg mb-2">
                         <p id="dropzone-filename" class="text-sm text-slate-600 font-medium"></p>
                         <button type="button" onclick="clearPortofolioFile()" class="text-xs text-red-500 font-bold mt-1 hover:underline">Hapus</button>
                     </div>

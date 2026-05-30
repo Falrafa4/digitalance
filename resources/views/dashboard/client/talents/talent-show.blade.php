@@ -41,6 +41,7 @@
                         <div class="shrink-0">
                             <img src="{{ $avatarUrl }}" alt="{{ $displayName }}"
                                 onerror="this.onerror=null;this.src='{{ $avatarFallbackUrl }}'"
+                                loading="lazy" decoding="async"
                                 class="w-28 h-28 sm:w-32 sm:h-32 rounded-[28px] object-cover border-4 border-white/20 shadow-2xl" />
                         </div>
                         <div class="min-w-0">

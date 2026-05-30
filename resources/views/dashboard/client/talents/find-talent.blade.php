@@ -26,10 +26,9 @@
             <div data-pager-item
               class="bg-white border border-slate-200 rounded-[22px] p-6 hover:shadow-xl hover:border-[#0f766e] hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
               <div class="flex items-start gap-4">
-                <div
-                  class="w-12 h-12 rounded-2xl bg-teal-50 border border-teal-100 flex items-center justify-center text-[#0f766e] shrink-0">
-                  <i class="ri-user-3-line text-[22px]"></i>
-                </div>
+                <img src="{{ asset('storage/' . $f->profile_photo) }}"
+                  loading="lazy" decoding="async"
+                  class="w-16 h-16 rounded-xl bg-slate-100 object-cover flex-shrink-0" />
                 <div class="min-w-0 flex-1">
                   <p class="font-black text-slate-900 text-base truncate">
                     {{ optional($f->skomda_student)->name ?? 'Freelancer' }}</p>

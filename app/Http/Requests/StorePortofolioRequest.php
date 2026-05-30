@@ -26,7 +26,7 @@ class StorePortofolioRequest extends FormRequest
             'title' => 'required|string|max:255',
             'description' => 'required|string|max:2000',
             'media_url' => 'nullable|url',
-            'media_file' => 'nullable|file|mimes:jpeg,png,jpg,gif,webp|max:5120',
+            'media_file' => 'nullable|file|mimes:jpeg,png,jpg,webp|max:5120',
         ];
     }
 }
