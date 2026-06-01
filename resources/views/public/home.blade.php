@@ -15,7 +15,7 @@
                         <path
                             d="M12 21.75c-4.694 0-8.5-3.51-8.5-7.75 0-.5 4.203-1.273 9.663-1.273 5.46 0 9.663.773 9.663 1.273 0 4.24-3.806 7.75-8.5 7.75z" />
                     </svg>
-                    <span class="truncate">Platform Freelance Terbaik untuk Mahasiswa SKOMDA</span>
+                    <span class="truncate">Platform Freelance Terbaik untuk Siswa SMK Telkom Sidoarjo</span>
                 </div>
 
                 <h1
