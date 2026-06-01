@@ -46,6 +46,8 @@ Digitalance dibuat untuk:
 - Dashboard berbeda untuk setiap role
 - Attachment upload pada order
 - Upload gambar profil dan portofolio dengan konversi WebP
+- Avatar user di dashboard dan halaman publik
+- Navbar publik dengan efek floating saat scroll
 - Dokumentasi API sederhana
 - Realtime infrastructure (persiapan negotiation/chat)
 
@@ -109,9 +111,10 @@ Digitalance dibuat untuk:
 
 ## Frontend
 - Blade Templates
-- Tailwind CSS melalui Vite/PostCSS
+- Tailwind CSS via CDN pada layout saat ini
+- CSS statis di `public/css`
 - Vanilla JavaScript
-- Vite (`vite`, `laravel-vite-plugin`)
+- Vite scaffold (`vite`, `laravel-vite-plugin`) untuk bundle `resources/css/app.css` dan `resources/js/app.js`
 
 ## Supporting Packages
 - `laravel/sanctum`
@@ -210,13 +213,21 @@ Pastikan file tersebut tersedia sebelum menjalankan seeder. File `.xlsx` pada fo
 php artisan migrate --seed
 ```
 
-### 8. Install Dependency Frontend
+### 8. Buat Storage Symlink
+
+Upload gambar profil, portofolio, attachment, dan hasil pekerjaan disajikan melalui disk `public`.
+
+```bash
+php artisan storage:link
+```
+
+### 9. Install Dependency Frontend
 
 ```bash
 npm install
 ```
 
-### 9. Build Asset Frontend
+### 10. Jalankan Asset Frontend
 
 Development:
 
@@ -230,7 +241,9 @@ Production:
 npm run build
 ```
 
-### 10. Jalankan Aplikasi
+> Catatan: layout publik dan dashboard saat ini masih memuat Tailwind CDN serta beberapa CSS/JS statis dari `public/`. Vite tetap tersedia untuk bundle `resources/*` dan workflow development.
+
+### 11. Jalankan Aplikasi
 
 Rekomendasi:
 
@@ -245,7 +258,7 @@ php artisan serve
 npm run dev
 ```
 
-### 11. Akses Aplikasi
+### 12. Akses Aplikasi
 
 ```text
 http://localhost:8000
@@ -328,6 +341,7 @@ app/Support/        # Helper pendukung seperti optimasi upload gambar
 routes/             # web.php dan api.php
 resources/views/    # Blade templates
 resources/css/      # Input Tailwind/Vite
+resources/js/       # Entry Vite, bootstrap Axios/Echo
 public/js/          # Vanilla JavaScript
 public/css/         # Styling dashboard
 database/           # Migrations, factories, seeders
@@ -340,6 +354,7 @@ docs/               # Dokumentasi internal
 # ⚠️ Keterbatasan Saat Ini
 
 - Surface API masih terbatas
+- Layout masih hybrid: Tailwind CDN + CSS statis + Vite scaffold
 - Realtime negotiation/chat belum sepenuhnya selesai end-to-end
 - Payment gateway belum diimplementasikan
 - Test coverage masih minimal dan membutuhkan perluasan feature testing
@@ -348,10 +363,33 @@ docs/               # Dokumentasi internal
 
 # 🖼️ Optimasi Gambar
 
-- Upload gambar profil dan portofolio disimpan sebagai WebP di disk `public`.
+- Upload gambar profil dan portofolio dikonversi dan disimpan sebagai WebP di disk `public`.
+- Konversi gambar memakai helper `App\Support\ImageStorage` dan PHP GD.
 - Path yang disimpan di database tetap relatif terhadap `storage/app/public`, contohnya `profiles/xxxxx.webp`.
 - Placeholder default foto profil menggunakan `profiles/placeholder.webp`.
 - Beberapa gambar list/card memakai lazy loading agar halaman lebih ringan saat discroll.
+
+---
+
+# 🧪 Testing
+
+Jalankan seluruh test:
+
+```bash
+php artisan test
+```
+
+Atau melalui script Composer:
+
+```bash
+composer test
+```
+
+Coverage yang sudah ada mencakup:
+- smoke test halaman publik dan layout frontend,
+- flow Skomda Student menjadi Freelancer,
+- notification drawer/composer,
+- helper konversi gambar ke WebP.
 
 ---
 
