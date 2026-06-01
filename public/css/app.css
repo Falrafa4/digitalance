@@ -322,12 +322,8 @@ html {
     width: 100%;
     margin-inline: auto;
     border-radius: 0;
-    transform: none;
     transition:
-        top 0.28s ease,
-        left 0.28s ease,
         width 0.28s ease,
-        transform 0.28s ease,
         padding 0.28s ease,
         border-radius 0.28s ease,
         background-color 0.28s ease,
@@ -340,7 +336,8 @@ html {
     left: 50%;
     top: 0.75rem;
     width: min(calc(100% - 2rem), 1180px);
-    transform: translateX(-50%);
+    transform: translateX(-50%) translateY(-0.35rem);
+    animation: navbarFloatUp 0.28s ease both;
     padding-block: 0.75rem;
     border: 1px solid rgba(15, 118, 110, 0.12);
     border-radius: 1.5rem;
@@ -367,6 +364,16 @@ html {
         left: 0;
         right: 0;
         border-radius: 1.1rem;
+    }
+}
+
+@keyframes navbarFloatUp {
+    from {
+        transform: translateX(-50%) translateY(0.35rem);
+    }
+
+    to {
+        transform: translateX(-50%) translateY(-0.35rem);
     }
 }
 
