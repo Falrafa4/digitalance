@@ -176,10 +176,20 @@ window.DigitalanceUtils = {
             if (!form || form.dataset.rupiahSubmitBound === '1') return;
 
             form.dataset.rupiahSubmitBound = '1';
-            form.addEventListener('submit', function() {
+            var sanitizeFields = function() {
                 form.querySelectorAll('input[data-rupiah-input]').forEach(function(field) {
                     var parsed = window.DigitalanceUtils.parseRupiahValue(field.value);
                     field.value = parsed === '' ? '' : String(parsed);
+                });
+            };
+
+            form.addEventListener('submit', sanitizeFields);
+
+            // Some scripts call form.submit() directly, bypassing submit event listeners.
+            // Also sanitize when submit buttons are clicked.
+            Array.from(form.querySelectorAll('button[type="submit"], input[type="submit"]')).forEach(function(btn) {
+                btn.addEventListener('click', function () {
+                    sanitizeFields();
                 });
             });
         });

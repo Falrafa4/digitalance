@@ -25,10 +25,12 @@ class ClientController extends Controller
     public function index(Request $request)
     {
         $q = trim($request->query('q', ''));
-        $role = $request->query('role', 'all');
+        $role = $this->normalizeAdminUserRole($request->query('role', 'all'));
 
         $clientsQuery = Client::query()->select('id', 'name', 'email', 'phone', 'profile_photo', DB::raw('NULL as avatar'), DB::raw("'Client' as role"), DB::raw("'Active' as status"), 'created_at');
-        $skomdaQuery = SkomdaStudent::query()->select('id', 'name', 'email', 'phone', DB::raw('NULL as profile_photo'), DB::raw('NULL as avatar'), DB::raw("'Skomda Student' as role"), DB::raw("'Active' as status"), 'created_at');
+        $skomdaQuery = SkomdaStudent::query()
+            ->whereDoesntHave('freelancer')
+            ->select('id', 'name', 'email', 'phone', DB::raw('NULL as profile_photo'), DB::raw('NULL as avatar'), DB::raw("'Skomda Student' as role"), DB::raw("'Active' as status"), 'created_at');
         // Use the query builder so Freelancer::getNameAttribute() does not override the joined student name.
         $freelancersQuery = DB::table('freelancers')
             ->join('skomda_students', 'freelancers.student_id', '=', 'skomda_students.id')
@@ -75,6 +77,17 @@ class ClientController extends Controller
             'q' => $q,
             'skomdaAll' => $skomdaAll,
         ]);
+    }
+
+    private function normalizeAdminUserRole(?string $role): string
+    {
+        $normalized = trim((string) $role);
+
+        return match ($normalized) {
+            'Client', 'Freelancer', 'Skomda Student', 'all' => $normalized,
+            'Siswa Skomda', 'Skomda Students', 'Skomda', 'skomda student' => 'Skomda Student',
+            default => 'all',
+        };
     }
 
     public function store(StoreClientRequest $request)

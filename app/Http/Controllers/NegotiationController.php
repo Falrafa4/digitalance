@@ -41,7 +41,7 @@ class NegotiationController extends Controller
         $freelancer = auth('freelancer')->user();
         $order = Order::with('service')->find($request->order_id);
 
-        if (! $order) {
+        if (!$order) {
             if ($request->expectsJson()) {
                 return response()->json([
                     'success' => false,
@@ -103,7 +103,7 @@ class NegotiationController extends Controller
         $client = auth('client')->user();
 
         $negotiations = Negotiation::with('order.service.freelancer.skomda_student')
-            ->whereHas('order', fn ($q) => $q->where('client_id', $client->id))
+            ->whereHas('order', fn($q) => $q->where('client_id', $client->id))
             ->get();
 
         return view('dashboard.client.messages', compact('negotiations'));
@@ -165,15 +165,19 @@ class NegotiationController extends Controller
             return redirect()->back()->with('error', 'Penawaran yang sudah diproses tidak bisa dinegosiasikan.');
         }
 
+        // Sanitize possible localized rupiah input (e.g. "2.220.000") before validation
+        $sanitized = $this->sanitizeRupiahInput($request->input('new_price'));
+        $request->merge(['new_price' => $sanitized === null ? null : (int) $sanitized]);
+
         $validated = $request->validate([
             'reason' => 'required|string|max:1000',
             'new_price' => 'required|integer|min:1000',
             'description' => 'nullable|string|max:2000',
         ]);
 
-        $message = 'Negosiasi harga: '.$validated['reason'].
-                   "\nHarga tawaran: Rp ".number_format($validated['new_price'], 0, ',', '.').
-                   "\nDeskripsi: ".($validated['description'] ?? '-');
+        $message = 'Negosiasi harga: ' . $validated['reason'] .
+            "\nHarga tawaran: Rp " . number_format($validated['new_price'], 0, ',', '.') .
+            "\nDeskripsi: " . ($validated['description'] ?? '-');
 
         $negotiation = Negotiation::create([
             'order_id' => $offer->order_id,
@@ -181,7 +185,11 @@ class NegotiationController extends Controller
             'message' => $message,
         ]);
 
-        $offer->order->update(['status' => 'Negotiated']);
+        // Update order status and set proposed price so freelancer sees the new offer
+        $offer->order->update([
+            'status' => 'Negotiated',
+            'agreed_price' => $validated['new_price'],
+        ]);
 
         return redirect()->route('client.offers.show', $offer->id)->with('success', 'Negosiasi berhasil dikirim');
     }
@@ -198,7 +206,7 @@ class NegotiationController extends Controller
         }
 
         $negotiation->update([
-            'message' => $negotiation->message."\n\n[SISTEM: Negosiasi harga diterima oleh Freelancer]",
+            'message' => $negotiation->message . "\n\n[SISTEM: Negosiasi harga diterima oleh Freelancer]",
         ]);
 
         return redirect()->back()->with('success', 'Negosiasi diterima.');
@@ -216,7 +224,7 @@ class NegotiationController extends Controller
         }
 
         $negotiation->update([
-            'message' => $negotiation->message."\n\n[SISTEM: Negosiasi harga ditolak oleh Freelancer]",
+            'message' => $negotiation->message . "\n\n[SISTEM: Negosiasi harga ditolak oleh Freelancer]",
         ]);
 
         return redirect()->back()->with('success', 'Negosiasi ditolak.');
@@ -237,4 +245,31 @@ class NegotiationController extends Controller
 
         return view('dashboard.freelancer.negotiation-view', compact('negotiation'));
     }
+
+    /**
+     * Sanitize localized Rupiah input into plain numeric value.
+     */
+    private function sanitizeRupiahInput($value)
+    {
+        if ($value === null)
+            return null;
+        if (is_numeric($value))
+            return $value;
+
+        $raw = trim((string) $value);
+        if ($raw === '')
+            return null;
+
+        $clean = preg_replace('/[^0-9,\.\-]/u', '', $raw);
+
+        if (strpos($clean, ',') !== false && preg_match('/,[0-9]{1,2}$/', $clean)) {
+            $normalized = str_replace('.', '', $clean);
+            $normalized = str_replace(',', '.', $normalized);
+            return is_numeric($normalized) ? $normalized : null;
+        }
+
+        $normalized = str_replace(['.', ','], '', $clean);
+        return is_numeric($normalized) ? $normalized : null;
+    }
+
 }

@@ -17,8 +17,9 @@ class OrderController extends Controller
     {
         $status = $request->query('status');
         $search = $request->query('q');
+        $payout = strtolower(trim((string) $request->query('payout', 'all')));
 
-        $query = Order::with(['service.freelancer.skomda_student', 'client']);
+        $query = Order::with(['service.freelancer.skomda_student', 'client', 'transactions']);
 
         if ($status) {
             $query->where('status', $status);
@@ -36,6 +37,17 @@ class OrderController extends Controller
             });
         }
 
+        if ($payout === 'paid') {
+            $query->whereHas('transactions', function ($trx) {
+                $trx->where('type', 'Full')->where('status', 'Paid');
+            });
+        } elseif ($payout === 'pending') {
+            $query->where('status', 'Completed')
+                ->whereDoesntHave('transactions', function ($trx) {
+                    $trx->where('type', 'Full')->where('status', 'Paid');
+                });
+        }
+
         $orders = $query->latest()->paginate(12)->withQueryString();
 
         // Data for dropdowns in Add Order modal (if still needed)
@@ -43,7 +55,7 @@ class OrderController extends Controller
         $freelancers = \App\Models\Freelancer::with('skomda_student')->get();
         $services = Service::where('status', 'Approved')->orderBy('title')->get();
 
-        return view('dashboard.admin.orders', compact('orders', 'clients', 'freelancers', 'services'));
+        return view('dashboard.admin.orders', compact('orders', 'clients', 'freelancers', 'services', 'payout'));
     }
 
     public function updateStatus(Request $request, string $id)
@@ -267,6 +279,9 @@ class OrderController extends Controller
         if ($resp = $this->ensureFreelancerApproved())
             return $resp;
 
+        // Sanitize possible localized Rupiah input (e.g. "2.220.000") before validation
+        $request->merge(['agreed_price' => $this->sanitizeRupiahInput($request->input('agreed_price'))]);
+
         $validated = $request->validate([
             'agreed_price' => 'required|numeric|min:0',
             'note' => 'nullable|string',
@@ -293,6 +308,9 @@ class OrderController extends Controller
 
         $freelancer = auth('freelancer')->user();
         abort_unless(($order->freelancer_id ?? $order->service?->freelancer_id) === $freelancer->id, 403);
+
+        // Sanitize rupiah formatted input before validation
+        $request->merge(['agreed_price' => $this->sanitizeRupiahInput($request->input('agreed_price'))]);
 
         $validated = $request->validate([
             'agreed_price' => 'required|numeric|min:0',
@@ -390,6 +408,37 @@ class OrderController extends Controller
                 'uploaded_by' => $uploadedBy,
             ]);
         }
+    }
+
+    /**
+     * Sanitize localized Rupiah input into plain numeric value.
+     * Accepts strings like "2.220.000", "2,220,000" or "2220000.00" and returns numeric string or null.
+     */
+    private function sanitizeRupiahInput($value)
+    {
+        if ($value === null)
+            return null;
+
+        if (is_numeric($value))
+            return $value;
+
+        $raw = trim((string) $value);
+        if ($raw === '')
+            return null;
+
+        // Remove currency symbol and spaces
+        $clean = preg_replace('/[^0-9,\.\-]/u', '', $raw);
+
+        // If contains comma and comma likely decimal separator (e.g. '1234,56')
+        if (strpos($clean, ',') !== false && preg_match('/,[0-9]{1,2}$/', $clean)) {
+            $normalized = str_replace('.', '', $clean); // remove thousand sep
+            $normalized = str_replace(',', '.', $normalized); // make decimal dot
+            return is_numeric($normalized) ? $normalized : null;
+        }
+
+        // Otherwise treat comma as thousand separator as well: remove dots and commas
+        $normalized = str_replace(['.', ','], '', $clean);
+        return is_numeric($normalized) ? $normalized : null;
     }
 
     // =========================

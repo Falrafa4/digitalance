@@ -201,13 +201,13 @@
                             </div>
 
                             <div>
-                                <label for="agreed_price"
+                                <label for="agreed_price_stage1"
                                     class="block text-[0.65rem] font-black text-emerald-600 uppercase tracking-widest mb-3 text-center md:text-left">Harga
                                     Penawaran Anda</label>
                                 <div class="relative group">
                                     <span
                                         class="absolute left-6 top-1/2 -translate-y-1/2 text-emerald-600 font-black text-xl">Rp</span>
-                                    <input type="text" name="agreed_price" id="agreed_price_stage1" required data-rupiah-input inputmode="numeric"
+                                    <input type="text" name="agreed_price" id="agreed_price_stage1" required data-rupiah-input inputmode="numeric" aria-label="Harga Penawaran Anda"
                                         class="w-full pl-16 pr-6 py-5 bg-white border-2 border-emerald-100 rounded-2xl focus:border-emerald-500 focus:ring-8 focus:ring-emerald-500/10 outline-none transition-all font-black text-slate-900 text-2xl shadow-inner text-center md:text-left"
                                         value="{{ old('agreed_price', (int) ($order->agreed_price ?? $order->service?->price_min ?? 0)) }}">
                                 </div>
@@ -270,12 +270,12 @@
                                 </div>
                             </div>
                             <div>
-                                <label for="agreed_price"
+                                <label for="agreed_price_stage2"
                                     class="block text-[10px] font-black text-teal-600 uppercase tracking-widest mb-2">Harga
                                     Kesepakatan Baru (ACC)</label>
                                 <div class="relative">
                                     <span class="absolute left-4 top-1/2 -translate-y-1/2 text-teal-600 font-bold">Rp</span>
-                                    <input type="text" name="agreed_price" id="agreed_price_stage2" required data-rupiah-input inputmode="numeric"
+                                    <input type="text" name="agreed_price" id="agreed_price_stage2" required data-rupiah-input inputmode="numeric" aria-label="Harga Kesepakatan Baru"
                                         class="w-full pl-12 pr-4 py-4 bg-white border-2 border-teal-100 rounded-xl focus:border-teal-500 outline-none font-bold text-slate-900 shadow-sm"
                                         value="{{ old('agreed_price', (int) ($order->agreed_price ?? $order->service?->price_min ?? 0)) }}">
                                 </div>
@@ -430,6 +430,29 @@
                             </div>
                         </div>
                     @endif
+
+                @push('scripts')
+                <script>
+                    document.addEventListener('DOMContentLoaded', function () {
+                        document.querySelectorAll('form').forEach(function (form) {
+                            form.addEventListener('submit', function () {
+                                form.querySelectorAll('input[data-rupiah-input]').forEach(function (field) {
+                                    try {
+                                        if (window.DigitalanceUtils && typeof window.DigitalanceUtils.parseRupiahValue === 'function') {
+                                            var parsed = window.DigitalanceUtils.parseRupiahValue(field.value);
+                                            field.value = parsed === '' ? '' : String(parsed);
+                                        } else {
+                                            field.value = field.value.replace(/\./g, '').replace(/[^0-9.-]/g, '');
+                                        }
+                                    } catch (e) {
+                                        field.value = field.value.replace(/\./g, '').replace(/[^0-9.-]/g, '');
+                                    }
+                                });
+                            });
+                        });
+                    });
+                </script>
+                @endpush
                 </div>
             </div>
         @endif

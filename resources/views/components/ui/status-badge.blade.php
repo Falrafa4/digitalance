@@ -9,6 +9,10 @@
     $statusKey = strtolower(trim((string) $status));
     $statusLabel = $statusKey === '' || $statusKey === '-' ? 'Tidak Diketahui' : \Illuminate\Support\Str::headline($status);
 
+    if (in_array($statusKey, ['skomda student', 'skomda'], true)) {
+        $statusLabel = 'Skomda Students';
+    }
+
     $map = [
         'draft' => ['bg' => 'bg-slate-100', 'text' => 'text-slate-700', 'border' => 'border-slate-200', 'icon' => 'ri-draft-line'],
         'pending' => ['bg' => 'bg-amber-50', 'text' => 'text-amber-700', 'border' => 'border-amber-100', 'icon' => 'ri-time-line'],

@@ -8,19 +8,22 @@
     <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8 animate-fadeUp">
         <div>
             <h1 class="font-display text-[2.1rem] font-extrabold text-slate-900">Manajemen Pengguna</h1>
-            <p class="text-slate-500 text-[0.95rem] mt-1">Kelola seluruh pengguna platform: Client, Freelancer, dan Siswa Skomda.</p>
+            <p class="text-slate-500 text-[0.95rem] mt-1">Kelola seluruh pengguna platform: Client, Freelancer, dan Siswa
+                Skomda.</p>
         </div>
         <div class="flex items-center gap-3">
-             <div class="bg-white px-5 py-3 rounded-2xl border border-slate-100 flex items-center gap-3 shadow-sm">
-                <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg shadow-sm">
+            <div class="bg-white px-5 py-3 rounded-2xl border border-slate-100 flex items-center gap-3 shadow-sm">
+                <div
+                    class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg shadow-sm">
                     <i class="ri-group-line"></i>
                 </div>
                 <div>
-<div class="text-[1.2rem] font-black text-slate-900 leading-none">{{ $users->total() }}</div>
-                        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Total Pengguna</div>
+                    <div class="text-[1.2rem] font-black text-slate-900 leading-none">{{ $users->total() }}</div>
+                    <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Total Pengguna</div>
                 </div>
             </div>
-            <button id="btn-add-user" class="px-6 py-3.5 bg-[#0f766e] text-white font-black text-[13px] rounded-2xl shadow-teal-md hover:bg-[#0a5e58] transition-all flex items-center gap-2">
+            <button id="btn-add-user"
+                class="px-6 py-3.5 bg-[#0f766e] text-white font-black text-[13px] rounded-2xl shadow-teal-md hover:bg-[#0a5e58] transition-all flex items-center gap-2">
                 <i class="ri-user-add-line"></i> Tambah User
             </button>
         </div>
@@ -28,23 +31,29 @@
 
     <div class="flex items-center justify-between gap-4 mb-8 flex-wrap animate-fadeUp-2">
         <div class="flex gap-2 flex-wrap">
-             <a href="{{ route('admin.clients.index', ['role' => 'all']) }}" 
-               class="px-[18px] py-2 rounded-full border-[1.5px] font-bold text-[12.5px] transition-all {{ $role === 'all' ? 'border-[#0f766e] bg-[#0f766e] text-white shadow-teal-sm' : 'border-slate-200 bg-white text-slate-500 hover:border-[#0f766e]' }}">
+            <a href="{{ route('admin.clients.index', ['role' => 'all']) }}"
+                class="px-[18px] py-2 rounded-full border-[1.5px] font-bold text-[12.5px] transition-all {{ $role === 'all' ? 'border-[#0f766e] bg-[#0f766e] text-white shadow-teal-sm' : 'border-slate-200 bg-white text-slate-500 hover:border-[#0f766e]' }}">
                 Semua User
             </a>
-            @foreach(['Client', 'Freelancer', 'Siswa Skomda'] as $r)
-                <a href="{{ route('admin.clients.index', ['role' => $r]) }}" 
-                   class="px-[18px] py-2 rounded-full border-[1.5px] font-bold text-[12.5px] transition-all {{ $role === $r ? 'border-[#0f766e] bg-[#0f766e] text-white shadow-teal-sm' : 'border-slate-200 bg-white text-slate-500 hover:border-[#0f766e]' }}">
-                    {{ $r }}
-                </a>
-            @endforeach
+            <a href="{{ route('admin.clients.index', ['role' => 'Client']) }}"
+                class="px-[18px] py-2 rounded-full border-[1.5px] font-bold text-[12.5px] transition-all {{ $role === 'Client' ? 'border-[#0f766e] bg-[#0f766e] text-white shadow-teal-sm' : 'border-slate-200 bg-white text-slate-500 hover:border-[#0f766e]' }}">
+                Client
+            </a>
+            <a href="{{ route('admin.clients.index', ['role' => 'Freelancer']) }}"
+                class="px-[18px] py-2 rounded-full border-[1.5px] font-bold text-[12.5px] transition-all {{ $role === 'Freelancer' ? 'border-[#0f766e] bg-[#0f766e] text-white shadow-teal-sm' : 'border-slate-200 bg-white text-slate-500 hover:border-[#0f766e]' }}">
+                Freelancer
+            </a>
+            <a href="{{ route('admin.clients.index', ['role' => 'Skomda Student']) }}"
+                class="px-[18px] py-2 rounded-full border-[1.5px] font-bold text-[12.5px] transition-all {{ $role === 'Skomda Student' ? 'border-[#0f766e] bg-[#0f766e] text-white shadow-teal-sm' : 'border-slate-200 bg-white text-slate-500 hover:border-[#0f766e]' }}">
+                Siswa Skomda
+            </a>
         </div>
 
         <form action="{{ route('admin.clients.index') }}" method="GET" class="relative">
             <input type="hidden" name="role" value="{{ $role }}">
             <i class="ri-search-line absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-[15px]"></i>
-            <input type="text" name="q" value="{{ $q }}" placeholder="Cari nama atau email..." 
-                   class="pl-10 pr-4 py-[9px] w-[260px] border-[1.5px] border-slate-200 rounded-[14px] text-[13px] font-semibold text-slate-700 bg-white outline-none focus:border-[#0f766e] transition-all" />
+            <input type="text" name="q" value="{{ $q }}" placeholder="Cari nama atau email..."
+                class="pl-10 pr-4 py-[9px] w-[260px] border-[1.5px] border-slate-200 rounded-[14px] text-[13px] font-semibold text-slate-700 bg-white outline-none focus:border-[#0f766e] transition-all" />
         </form>
     </div>
 
@@ -53,10 +62,13 @@
             <table class="w-full text-left border-collapse">
                 <thead>
                     <tr class="bg-slate-50/50 border-b border-slate-100">
-                        <th class="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">Detail Pengguna</th>
+                        <th class="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">Detail Pengguna
+                        </th>
                         <th class="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">Role</th>
-                        <th class="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">Tanggal Bergabung</th>
-                        <th class="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest text-center">Aksi</th>
+                        <th class="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">Tanggal
+                            Bergabung</th>
+                        <th class="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest text-center">
+                            Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-50">
@@ -64,10 +76,12 @@
                         <tr class="hover:bg-slate-50/50 transition-colors group">
                             <td class="px-6 py-4">
                                 <div class="flex items-center gap-3">
-                                    <x-avatar :user="$user" :role="strtolower($user->role)" size="40" class="w-10 h-10 rounded-xl object-cover border border-slate-200 shadow-sm" />
+                                    <x-avatar :user="$user" :role="strtolower($user->role)" size="40"
+                                        class="w-10 h-10 rounded-xl object-cover border border-slate-200 shadow-sm" />
                                     <div class="flex flex-col">
                                         <span class="text-[13.5px] font-black text-slate-900">{{ $user->name }}</span>
-                                        <span class="text-[11px] text-slate-400 font-bold tracking-tight">{{ $user->email }}</span>
+                                        <span
+                                            class="text-[11px] text-slate-400 font-bold tracking-tight">{{ $user->email }}</span>
                                     </div>
                                 </div>
                             </td>
@@ -75,20 +89,28 @@
                                 <x-ui.status-badge :status="$user->role" />
                             </td>
                             <td class="px-6 py-4">
-                                <span class="text-[12px] text-slate-500 font-bold uppercase tracking-widest">{{ \Carbon\Carbon::parse($user->created_at)->format('d M Y') }}</span>
+                                <span
+                                    class="text-[12px] text-slate-500 font-bold uppercase tracking-widest">{{ \Carbon\Carbon::parse($user->created_at)->format('d M Y') }}</span>
                             </td>
                             <td class="px-6 py-4">
                                 <div class="flex items-center justify-center gap-2">
-                                    <button onclick="window.openUserDetail('{{ $user->role }}', {{ $user->id }})" class="w-9 h-9 rounded-xl bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-indigo-500 hover:text-white transition-all" title="View Detail">
+                                    <button onclick="window.openUserDetail('{{ $user->role }}', {{ $user->id }})"
+                                        class="w-9 h-9 rounded-xl bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-indigo-500 hover:text-white transition-all"
+                                        title="View Detail">
                                         <i class="ri-eye-line"></i>
                                     </button>
-                                    <button onclick="window.openUserModal('{{ $user->role }}', {{ $user->id }})" class="w-9 h-9 rounded-xl bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-[#0f766e] hover:text-white transition-all" title="Edit User">
+                                    <button onclick="window.openUserModal('{{ $user->role }}', {{ $user->id }})"
+                                        class="w-9 h-9 rounded-xl bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-[#0f766e] hover:text-white transition-all"
+                                        title="Edit User">
                                         <i class="ri-edit-line"></i>
                                     </button>
                                     @if($user->role === 'Client')
-                                        <form id="delete-user-{{ $user->id }}" action="{{ route('admin.clients.destroy', $user->id) }}" method="POST">
+                                        <form id="delete-user-{{ $user->id }}"
+                                            action="{{ route('admin.clients.destroy', $user->id) }}" method="POST">
                                             @csrf @method('DELETE')
-                                            <button type="button" onclick="window.confirmDeleteUser({{ $user->id }}, '{{ $user->name }}')" class="w-9 h-9 rounded-xl bg-red-50 text-red-400 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all">
+                                            <button type="button"
+                                                onclick="window.confirmDeleteUser({{ $user->id }}, '{{ $user->name }}')"
+                                                class="w-9 h-9 rounded-xl bg-red-50 text-red-400 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all">
                                                 <i class="ri-delete-bin-line"></i>
                                             </button>
                                         </form>
@@ -99,7 +121,8 @@
                     @empty
                         <tr>
                             <td colspan="4">
-                                <x-ui.empty-state icon="ri-user-search-line" title="No Users Found" description="Tidak ada pengguna yang ditemukan dengan kriteria ini." />
+                                <x-ui.empty-state icon="ri-user-search-line" title="No Users Found"
+                                    description="Tidak ada pengguna yang ditemukan dengan kriteria ini." />
                             </td>
                         </tr>
                     @endforelse
@@ -115,39 +138,50 @@
 
 @section('modals')
     <!-- Edit User Modal (Dynamic based on role) -->
-    <div class="fixed inset-0 z-[100] bg-slate-900/40 backdrop-blur-sm flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300" id="modal-user-overlay">
-        <div class="bg-white rounded-[32px] w-full max-w-[620px] shadow-2xl overflow-hidden transform scale-95 transition-all duration-300" id="modal-user-box">
-             <!-- Content filled by JS -->
+    <div class="fixed inset-0 z-[100] bg-slate-900/40 backdrop-blur-sm flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300"
+        id="modal-user-overlay">
+        <div class="bg-white rounded-[32px] w-full max-w-[620px] shadow-2xl overflow-hidden transform scale-95 transition-all duration-300"
+            id="modal-user-box">
+            <!-- Content filled by JS -->
         </div>
     </div>
 
     <!-- Change Password Modal -->
-    <div class="fixed inset-0 z-[100] bg-slate-900/40 backdrop-blur-sm flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300" id="modal-password-overlay">
-        <div class="bg-white rounded-[32px] w-full max-w-[450px] shadow-2xl overflow-hidden transform scale-95 transition-all duration-300" id="modal-password-box">
-             <!-- Content filled by JS -->
+    <div class="fixed inset-0 z-[100] bg-slate-900/40 backdrop-blur-sm flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300"
+        id="modal-password-overlay">
+        <div class="bg-white rounded-[32px] w-full max-w-[450px] shadow-2xl overflow-hidden transform scale-95 transition-all duration-300"
+            id="modal-password-box">
+            <!-- Content filled by JS -->
         </div>
     </div>
 
     <!-- Add User Modal (Dynamic Roles) -->
-    <div class="fixed inset-0 z-[100] bg-slate-900/40 backdrop-blur-sm flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300" id="modal-add-overlay">
-        <div class="bg-white rounded-[32px] w-full max-w-[620px] shadow-2xl overflow-hidden transform scale-95 transition-all duration-300" id="modal-add-box">
-             <div class="p-7">
+    <div class="fixed inset-0 z-[100] bg-slate-900/40 backdrop-blur-sm flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300"
+        id="modal-add-overlay">
+        <div class="bg-white rounded-[32px] w-full max-w-[620px] shadow-2xl overflow-hidden transform scale-95 transition-all duration-300"
+            id="modal-add-box">
+            <div class="p-7">
                 <div class="flex justify-between items-center mb-8">
                     <div>
                         <h2 class="text-[1.5rem] font-black text-slate-900">Tambah User Baru</h2>
                         <p class="text-slate-400 text-sm font-medium mt-1">Daftarkan pengguna baru ke platform.</p>
                     </div>
-                    <button onclick="window.closeAddModal()" class="w-10 h-10 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center hover:bg-red-50 hover:text-red-500 transition">
+                    <button onclick="window.closeAddModal()"
+                        class="w-10 h-10 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center hover:bg-red-50 hover:text-red-500 transition">
                         <i class="ri-close-line text-xl"></i>
                     </button>
                 </div>
-                
+
                 <div class="mb-8">
-                    <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3">Pilih Peran User</label>
+                    <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3">Pilih Peran
+                        User</label>
                     <div class="grid grid-cols-3 gap-3">
-                        <button type="button" onclick="window.setAddRole('Client')" id="role-btn-Client" class="role-selector py-3 rounded-2xl border-2 border-slate-100 font-black text-[11px] uppercase tracking-wider text-slate-400 hover:border-[#0f766e] hover:text-[#0f766e] transition-all active">Client</button>
-                        <button type="button" onclick="window.setAddRole('Freelancer')" id="role-btn-Freelancer" class="role-selector py-3 rounded-2xl border-2 border-slate-100 font-black text-[11px] uppercase tracking-wider text-slate-400 hover:border-[#0f766e] hover:text-[#0f766e] transition-all">Freelancer</button>
-                        <button type="button" onclick="window.setAddRole('Skomda Student')" id="role-btn-Student" class="role-selector py-3 rounded-2xl border-2 border-slate-100 font-black text-[11px] uppercase tracking-wider text-slate-400 hover:border-[#0f766e] hover:text-[#0f766e] transition-all">Siswa</button>
+                        <button type="button" onclick="window.setAddRole('Client')" id="role-btn-Client"
+                            class="role-selector py-3 rounded-2xl border-2 border-slate-100 font-black text-[11px] uppercase tracking-wider text-slate-400 hover:border-[#0f766e] hover:text-[#0f766e] transition-all active">Client</button>
+                        <button type="button" onclick="window.setAddRole('Freelancer')" id="role-btn-Freelancer"
+                            class="role-selector py-3 rounded-2xl border-2 border-slate-100 font-black text-[11px] uppercase tracking-wider text-slate-400 hover:border-[#0f766e] hover:text-[#0f766e] transition-all">Freelancer</button>
+                        <button type="button" onclick="window.setAddRole('Skomda Student')" id="role-btn-Student"
+                            class="role-selector py-3 rounded-2xl border-2 border-slate-100 font-black text-[11px] uppercase tracking-wider text-slate-400 hover:border-[#0f766e] hover:text-[#0f766e] transition-all">Siswa</button>
                     </div>
                 </div>
 
@@ -158,75 +192,124 @@
                     <div id="fields-common" class="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-4">
                         <!-- Client & Common Fields -->
                         <div class="field-group" id="group-name">
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Nama Lengkap</label>
-                            <input type="text" name="name" value="{{ old('name') }}" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700" placeholder="e.g. Budi Santoso">
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Nama
+                                Lengkap</label>
+                            <input type="text" name="name" value="{{ old('name') }}"
+                                class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700"
+                                placeholder="e.g. Budi Santoso">
                         </div>
 
                         <div class="field-group" id="group-email">
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Alamat Email</label>
-                            <input type="email" name="email" id="input-email" value="{{ old('email') }}" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700" placeholder="name@example.com">
+                            <label
+                                class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Alamat
+                                Email</label>
+                            <input type="email" name="email" id="input-email" value="{{ old('email') }}"
+                                class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700"
+                                placeholder="name@example.com">
                         </div>
 
                         <div class="field-group" id="group-phone">
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Nomor Telepon</label>
-                            <input type="text" name="phone" value="{{ old('phone') }}" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700" placeholder="+62...">
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Nomor
+                                Telepon</label>
+                            <input type="text" name="phone" value="{{ old('phone') }}"
+                                class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700"
+                                placeholder="+62...">
                         </div>
 
                         <div class="field-group" id="group-password">
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Kata Sandi</label>
-                            <input type="password" name="password" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700" placeholder="Min. 8 characters">
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Kata
+                                Sandi</label>
+                            <input type="password" name="password"
+                                class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700"
+                                placeholder="Min. 8 characters">
                         </div>
 
                         <!-- Freelancer specific: Select Student -->
                         <div class="field-group hidden" id="group-student">
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Pilih Siswa <span class="text-red-400">*</span></label>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Pilih
+                                Siswa <span class="text-red-400">*</span></label>
                             <div class="relative" id="student-combobox">
-                                <input type="text" id="student-search-input" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700" placeholder="Cari nama atau NIS..." autocomplete="off">
+                                <input type="text" id="student-search-input"
+                                    class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700"
+                                    placeholder="Cari nama atau NIS..." autocomplete="off">
                                 <input type="hidden" name="student_id" id="student-id-input">
-                                <div id="student-search-list" class="hidden absolute z-[120] mt-2 w-full max-h-56 overflow-y-auto rounded-2xl border border-slate-200 bg-white shadow-2xl shadow-slate-200/60 p-1.5"></div>
+                                <div id="student-search-list"
+                                    class="hidden absolute z-[120] mt-2 w-full max-h-56 overflow-y-auto rounded-2xl border border-slate-200 bg-white shadow-2xl shadow-slate-200/60 p-1.5">
+                                </div>
                             </div>
                             <p class="text-[9px] text-slate-400 mt-1.5">Pilih siswa dari daftar agar ID siswa tersimpan.</p>
                         </div>
 
                         <div class="field-group hidden md:col-span-2" id="group-bio">
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Bio</label>
-                            <textarea name="bio" value="{{ old('bio') }}" rows="2" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700 resize-none" placeholder="Freelancer bio..."></textarea>
+                            <label
+                                class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Bio</label>
+                            <textarea name="bio" value="{{ old('bio') }}" rows="2"
+                                class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700 resize-none"
+                                placeholder="Freelancer bio..."></textarea>
                         </div>
 
                         <!-- Student specific fields - Split into 2 columns -->
                         <div class="hidden md:col-span-2" id="group-student-fields">
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2.5">Informasi Siswa</label>
+                            <label
+                                class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2.5">Informasi
+                                Siswa</label>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-3.5">
                                 <div>
-                                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Nama Lengkap <span class="text-red-400">*</span></label>
-                                    <input type="text" name="name" value="{{ old('name') }}" id="input-student-name" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700" placeholder="Nama Lengkap">
+                                    <label
+                                        class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Nama
+                                        Lengkap <span class="text-red-400">*</span></label>
+                                    <input type="text" name="name" value="{{ old('name') }}" id="input-student-name"
+                                        class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700"
+                                        placeholder="Nama Lengkap">
                                 </div>
                                 <div>
-                                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">NIS <span class="text-red-400">*</span></label>
-                                    <input type="text" name="nis" value="{{ old('nis') }}" id="input-student-nis" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700" placeholder="123456789">
+                                    <label
+                                        class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">NIS
+                                        <span class="text-red-400">*</span></label>
+                                    <input type="text" name="nis" value="{{ old('nis') }}" id="input-student-nis"
+                                        class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700"
+                                        placeholder="123456789">
                                 </div>
                                 <div>
-                                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Kelas <span class="text-red-400">*</span></label>
-                                    <input type="text" name="class" value="{{ old('class') }}" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700" placeholder="XI SIJA 1">
+                                    <label
+                                        class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Kelas
+                                        <span class="text-red-400">*</span></label>
+                                    <input type="text" name="class" value="{{ old('class') }}"
+                                        class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700"
+                                        placeholder="XI SIJA 1">
                                 </div>
                                 <div>
-                                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Jurusan <span class="text-red-400">*</span></label>
-<select name="major" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700 appearance-none">
-    <option value="SIJA" {{ old('major') == 'SIJA' ? 'selected' : '' }}>SIJA</option>
-    <option value="TJAT" {{ old('major') == 'TJAT' ? 'selected' : '' }}>TJAT</option>
-</select>
+                                    <label
+                                        class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Jurusan
+                                        <span class="text-red-400">*</span></label>
+                                    <select name="major"
+                                        class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700 appearance-none">
+                                        <option value="SIJA" {{ old('major') == 'SIJA' ? 'selected' : '' }}>SIJA</option>
+                                        <option value="TJAT" {{ old('major') == 'TJAT' ? 'selected' : '' }}>TJAT</option>
+                                    </select>
                                 </div>
                                 <div class="md:col-span-2">
-                                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Nomor Telepon <span class="text-red-400">*</span></label>
-<input type="text" name="phone" value="{{ old('phone') }}" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700" placeholder="+62...">
+                                    <label
+                                        class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Nomor
+                                        Telepon <span class="text-red-400">*</span></label>
+                                    <input type="text" name="phone" value="{{ old('phone') }}"
+                                        class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700"
+                                        placeholder="+62...">
                                 </div>
                                 <div class="md:col-span-2 mt-1">
-                                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Email <span class="text-red-400">*</span></label>
-                                    <div class="flex items-center bg-teal-50 border border-teal-200 rounded-xl overflow-hidden">
-                                        <input type="text" name="email_prefix" id="input-email-prefix" class="flex-1 px-4 py-2.5 bg-white border border-slate-200 rounded-l-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700" placeholder="username" oninput="updateStudentEmail()">
-                                        <span class="px-4 py-2.5 bg-teal-100 text-[#0f766e] font-bold text-[11px] whitespace-nowrap border-l border-teal-200">@student.smktelkom-sda.sch.id</span>
+                                    <label
+                                        class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Email
+                                        <span class="text-red-400">*</span></label>
+                                    <div
+                                        class="flex items-center bg-teal-50 border border-teal-200 rounded-xl overflow-hidden">
+                                        <input type="text" name="email_prefix" id="input-email-prefix"
+                                            class="flex-1 px-4 py-2.5 bg-white border border-slate-200 rounded-l-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700"
+                                            placeholder="username" oninput="updateStudentEmail()">
+                                        <span
+                                            class="px-4 py-2.5 bg-teal-100 text-[#0f766e] font-bold text-[11px] whitespace-nowrap border-l border-teal-200">@student.smktelkom-sda.sch.id</span>
                                     </div>
-                                    <p class="text-[9px] text-slate-400 mt-1.5">Email otomatis: @student.smktelkom-sda.sch.id</p>
+                                    <p class="text-[9px] text-slate-400 mt-1.5">Email otomatis:
+                                        @student.smktelkom-sda.sch.id</p>
                                     <input type="hidden" name="email" id="input-email-full">
                                 </div>
                             </div>
@@ -234,11 +317,14 @@
                     </div>
 
                     <div class="flex gap-4 mt-10">
-                        <button type="button" onclick="window.closeAddModal()" class="flex-1 py-4 bg-slate-100 text-slate-500 font-bold rounded-2xl hover:bg-slate-200 transition-all">Cancel</button>
-                        <button type="submit" class="flex-1 py-4 bg-[#0f766e] text-white font-bold rounded-2xl shadow-xl shadow-teal-sm hover:bg-[#0a5e58] transition-all">Buat Akun</button>
+                        <button type="button" onclick="window.closeAddModal()"
+                            class="flex-1 py-4 bg-slate-100 text-slate-500 font-bold rounded-2xl hover:bg-slate-200 transition-all">Cancel</button>
+                        <button type="submit"
+                            class="flex-1 py-4 bg-[#0f766e] text-white font-bold rounded-2xl shadow-xl shadow-teal-sm hover:bg-[#0a5e58] transition-all">Buat
+                            Akun</button>
                     </div>
                 </form>
-             </div>
+            </div>
         </div>
     </div>
 @endsection
@@ -248,7 +334,7 @@
         window.__USERS_DATA__ = @json($users->items());
         window.__SKOMDA_STUDENTS__ = @json($skomdaAll);
 
-        window.openUserModal = function(role, id) {
+        window.openUserModal = function (role, id) {
             const u = window.__USERS_DATA__.find(x => x.id == id && x.role == role);
             if (!u) return;
 
@@ -256,127 +342,127 @@
 
             if (role === 'Client') {
                 box.innerHTML = `
-                    <div class="p-7">
-                        <div class="flex justify-between items-center mb-8">
-                            <h2 class="text-[1.5rem] font-black text-slate-900">Edit Klien</h2>
-                            <button onclick="window.closeUserModal()" class="w-10 h-10 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center hover:bg-red-50 hover:text-red-500 transition">
-                                <i class="ri-close-line text-xl"></i>
-                            </button>
+                        <div class="p-7">
+                            <div class="flex justify-between items-center mb-8">
+                                <h2 class="text-[1.5rem] font-black text-slate-900">Edit Klien</h2>
+                                <button onclick="window.closeUserModal()" class="w-10 h-10 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center hover:bg-red-50 hover:text-red-500 transition">
+                                    <i class="ri-close-line text-xl"></i>
+                                </button>
+                            </div>
+                            <form action="/admin/clients/${id}" method="POST">
+                                @csrf @method('PUT')
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-4 mb-10">
+                                    <div>
+                                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Nama Lengkap</label>
+                                        <input type="text" name="name" value="${u.name || ''}" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Alamat Email</label>
+                                        <input type="email" name="email" value="${u.email || ''}" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700">
+                                    </div>
+                                    <div class="md:col-span-2">
+                                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Nomor Telepon</label>
+                                        <input type="text" name="phone" value="${u.phone || ''}" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700">
+                                    </div>
+                                </div>
+                                <div class="flex gap-4">
+                                    <button type="button" onclick="window.closeUserModal()" class="flex-1 py-4 bg-slate-100 text-slate-500 font-bold rounded-2xl">Batal</button>
+                                    <button type="submit" class="flex-1 py-4 bg-[#0f766e] text-white font-bold rounded-2xl shadow-xl shadow-teal-sm hover:bg-[#0a5e58] transition-all">Simpan Perubahan</button>
+                                </div>
+                            </form>
                         </div>
-                        <form action="/admin/clients/${id}" method="POST">
-                            @csrf @method('PUT')
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-4 mb-10">
-                                <div>
-                                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Nama Lengkap</label>
-                                    <input type="text" name="name" value="${u.name || ''}" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700">
-                                </div>
-                                <div>
-                                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Alamat Email</label>
-                                    <input type="email" name="email" value="${u.email || ''}" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700">
-                                </div>
-                                <div class="md:col-span-2">
-                                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Nomor Telepon</label>
-                                    <input type="text" name="phone" value="${u.phone || ''}" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700">
-                                </div>
-                            </div>
-                            <div class="flex gap-4">
-                                <button type="button" onclick="window.closeUserModal()" class="flex-1 py-4 bg-slate-100 text-slate-500 font-bold rounded-2xl">Batal</button>
-                                <button type="submit" class="flex-1 py-4 bg-[#0f766e] text-white font-bold rounded-2xl shadow-xl shadow-teal-sm hover:bg-[#0a5e58] transition-all">Simpan Perubahan</button>
-                            </div>
-                        </form>
-                    </div>
-                `;
+                    `;
             } else if (role === 'Freelancer') {
                 box.innerHTML = `
-                    <div class="p-7">
-                        <div class="flex justify-between items-center mb-8">
-                            <h2 class="text-[1.5rem] font-black text-slate-900">Edit Freelancer</h2>
-                            <button onclick="window.closeUserModal()" class="w-10 h-10 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center hover:bg-red-50 hover:text-red-500 transition">
-                                <i class="ri-close-line text-xl"></i>
-                            </button>
+                        <div class="p-7">
+                            <div class="flex justify-between items-center mb-8">
+                                <h2 class="text-[1.5rem] font-black text-slate-900">Edit Freelancer</h2>
+                                <button onclick="window.closeUserModal()" class="w-10 h-10 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center hover:bg-red-50 hover:text-red-500 transition">
+                                    <i class="ri-close-line text-xl"></i>
+                                </button>
+                            </div>
+                            <form action="/admin/freelancers/${id}" method="POST">
+                                @csrf @method('PUT')
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-4 mb-10">
+                                    <div>
+                                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Nama</label>
+                                        <input type="text" value="${u.name || ''}" class="w-full px-4 py-2.5 bg-slate-100 border border-slate-200 rounded-xl font-bold text-slate-500" disabled>
+                                        <p class="text-[9px] text-slate-400 mt-1">Nama diatur oleh data siswa SKOMDA</p>
+                                    </div>
+                                    <div class="md:col-start-1 md:col-span-2">
+                                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Bio</label>
+                                        <textarea name="bio" rows="3" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700 resize-none" placeholder="Bio freelancer...">${u.bio || ''}</textarea>
+                                    </div>
+                                </div>
+                                <div class="flex gap-4">
+                                    <button type="button" onclick="window.closeUserModal()" class="flex-1 py-4 bg-slate-100 text-slate-500 font-bold rounded-2xl">Batal</button>
+                                    <button type="submit" class="flex-1 py-4 bg-[#0f766e] text-white font-bold rounded-2xl shadow-xl shadow-teal-sm hover:bg-[#0a5e58] transition-all">Update Account</button>
+                                </div>
+                            </form>
                         </div>
-                        <form action="/admin/freelancers/${id}" method="POST">
-                            @csrf @method('PUT')
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-4 mb-10">
-                                <div>
-                                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Nama</label>
-                                    <input type="text" value="${u.name || ''}" class="w-full px-4 py-2.5 bg-slate-100 border border-slate-200 rounded-xl font-bold text-slate-500" disabled>
-                                    <p class="text-[9px] text-slate-400 mt-1">Nama diatur oleh data siswa SKOMDA</p>
-                                </div>
-                                <div class="md:col-start-1 md:col-span-2">
-                                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Bio</label>
-                                    <textarea name="bio" rows="3" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700 resize-none" placeholder="Bio freelancer...">${u.bio || ''}</textarea>
-                                </div>
-                            </div>
-                            <div class="flex gap-4">
-                                <button type="button" onclick="window.closeUserModal()" class="flex-1 py-4 bg-slate-100 text-slate-500 font-bold rounded-2xl">Batal</button>
-                                <button type="submit" class="flex-1 py-4 bg-[#0f766e] text-white font-bold rounded-2xl shadow-xl shadow-teal-sm hover:bg-[#0a5e58] transition-all">Update Account</button>
-                            </div>
-                        </form>
-                    </div>
-                `;
+                    `;
             } else if (role === 'Skomda Student') {
                 box.innerHTML = `
-                    <div class="p-7">
-                        <div class="flex justify-between items-center mb-8">
-                            <h2 class="text-[1.5rem] font-black text-slate-900">Edit Siswa</h2>
-                            <button onclick="window.closeUserModal()" class="w-10 h-10 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center hover:bg-red-50 hover:text-red-500 transition">
-                                <i class="ri-close-line text-xl"></i>
-                            </button>
+                        <div class="p-7">
+                            <div class="flex justify-between items-center mb-8">
+                                <h2 class="text-[1.5rem] font-black text-slate-900">Edit Siswa</h2>
+                                <button onclick="window.closeUserModal()" class="w-10 h-10 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center hover:bg-red-50 hover:text-red-500 transition">
+                                    <i class="ri-close-line text-xl"></i>
+                                </button>
+                            </div>
+                            <form action="/admin/skomda-students/${id}" method="POST">
+                                @csrf @method('PUT')
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-3.5 mb-8">
+                                    <div>
+                                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Nama Lengkap</label>
+                                        <input type="text" name="name" value="${u.name || ''}" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">NIS</label>
+                                        <input type="text" value="${u.nis || ''}" class="w-full px-4 py-2.5 bg-slate-100 border border-slate-200 rounded-xl font-bold text-slate-500" disabled>
+                                        <p class="text-[9px] text-slate-400 mt-1">NIS tidak dapat diubah</p>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Kelas</label>
+                                        <input type="text" value="${u.class || ''}" class="w-full px-4 py-2.5 bg-slate-100 border border-slate-200 rounded-xl font-bold text-slate-500" disabled>
+                                        <p class="text-[9px] text-slate-400 mt-1">Kelas tidak dapat diubah</p>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Jurusan</label>
+                                        <select name="major" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700 appearance-none">
+                                            <option value="SIJA" ${u.major === 'SIJA' ? 'selected' : ''}>SIJA</option>
+                                            <option value="TJAT" ${u.major === 'TJAT' ? 'selected' : ''}>TJAT</option>
+                                        </select>
+                                    </div>
+                                    <div class="md:col-span-2">
+                                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Email</label>
+                                        <input type="text" value="${u.email || ''}" class="w-full px-4 py-2.5 bg-slate-100 border border-slate-200 rounded-xl font-bold text-slate-500" disabled>
+                                    </div>
+                                    <div class="md:col-span-2">
+                                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Telepon</label>
+                                        <input type="text" name="phone" value="${u.phone || ''}" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700">
+                                    </div>
+                                </div>
+                                <div class="flex gap-4">
+                                    <button type="button" onclick="window.closeUserModal()" class="flex-1 py-4 bg-slate-100 text-slate-500 font-bold rounded-2xl">Batal</button>
+                                    <button type="submit" class="flex-1 py-4 bg-[#0f766e] text-white font-bold rounded-2xl shadow-xl shadow-teal-sm hover:bg-[#0a5e58] transition-all">Simpan Perubahan</button>
+                                </div>
+                            </form>
                         </div>
-                        <form action="/admin/skomda-students/${id}" method="POST">
-                            @csrf @method('PUT')
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-3.5 mb-8">
-                                <div>
-                                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Nama Lengkap</label>
-                                    <input type="text" name="name" value="${u.name || ''}" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700">
-                                </div>
-                                <div>
-                                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">NIS</label>
-                                    <input type="text" value="${u.nis || ''}" class="w-full px-4 py-2.5 bg-slate-100 border border-slate-200 rounded-xl font-bold text-slate-500" disabled>
-                                    <p class="text-[9px] text-slate-400 mt-1">NIS tidak dapat diubah</p>
-                                </div>
-                                <div>
-                                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Kelas</label>
-                                    <input type="text" value="${u.class || ''}" class="w-full px-4 py-2.5 bg-slate-100 border border-slate-200 rounded-xl font-bold text-slate-500" disabled>
-                                    <p class="text-[9px] text-slate-400 mt-1">Kelas tidak dapat diubah</p>
-                                </div>
-                                <div>
-                                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Jurusan</label>
-                                    <select name="major" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700 appearance-none">
-                                        <option value="SIJA" ${u.major === 'SIJA' ? 'selected' : ''}>SIJA</option>
-                                        <option value="TJAT" ${u.major === 'TJAT' ? 'selected' : ''}>TJAT</option>
-                                    </select>
-                                </div>
-                                <div class="md:col-span-2">
-                                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Email</label>
-                                    <input type="text" value="${u.email || ''}" class="w-full px-4 py-2.5 bg-slate-100 border border-slate-200 rounded-xl font-bold text-slate-500" disabled>
-                                </div>
-                                <div class="md:col-span-2">
-                                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Telepon</label>
-                                    <input type="text" name="phone" value="${u.phone || ''}" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700">
-                                </div>
-                            </div>
-                            <div class="flex gap-4">
-                                <button type="button" onclick="window.closeUserModal()" class="flex-1 py-4 bg-slate-100 text-slate-500 font-bold rounded-2xl">Batal</button>
-                                <button type="submit" class="flex-1 py-4 bg-[#0f766e] text-white font-bold rounded-2xl shadow-xl shadow-teal-sm hover:bg-[#0a5e58] transition-all">Simpan Perubahan</button>
-                            </div>
-                        </form>
-                    </div>
-                `;
+                    `;
             }
 
             window.openModal('modal-user-overlay');
         };
 
         window.closeUserModal = () => window.closeModal('modal-user-overlay');
-        window.openAddModal = function() {
+        window.openAddModal = function () {
             window.resetStudentCombobox?.();
             window.openModal('modal-add-overlay');
         };
         window.closeAddModal = () => window.closeModal('modal-add-overlay');
 
-        window.openUserDetail = function(role, id) {
+        window.openUserDetail = function (role, id) {
             const u = window.__USERS_DATA__.find(x => x.id == id && x.role == role);
             if (!u) return;
 
@@ -388,93 +474,93 @@
             const joinedDate = new Date(u.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
 
             box.innerHTML = `
-                <div class="relative">
-                    <!-- Gradient Header -->
-                    <div class="h-28 bg-gradient-to-r ${gradientClass} flex items-center px-8 relative">
-                        <div class="flex-1">
-                            <h2 class="text-white font-black text-xl tracking-tight">${role === 'Client' ? 'Profil Klien' : (role === 'Freelancer' ? 'Profil Freelancer' : 'Profil Siswa SKOMDA')}</h2>
-                            <p class="text-white/70 text-[10px] font-bold uppercase tracking-[0.2em]">ID Pengguna: #UID-${u.id}</p>
-                        </div>
-                        <button onclick="window.closeUserModal()" class="w-10 h-10 bg-white/20 text-white rounded-full flex items-center justify-center hover:bg-white/30 transition">
-                            <i class="ri-close-line text-xl"></i>
-                        </button>
-                    </div>
-
-                    <!-- Profile Info -->
-                    <div class="px-8 pb-8 -mt-8 relative z-10">
-                        <div class="flex items-end gap-5 mb-8">
-                            <div class="w-24 h-24 rounded-[28px] bg-white p-1.5 shadow-xl">
-                                ${u.profile_photo || u.avatar ? `
-                                    <img
-                                        src="{{ asset('storage') }}/${u.profile_photo || u.avatar}"
-                                        class="w-full h-full rounded-[22px] object-cover"
-                                        loading="lazy"
-                                        decoding="async"
-                                        alt="${u.name}"
-                                    >
-                                ` : `
-                                    <img
-                                        src="https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(u.name || u.email || 'User')}&background=0f766e&color=fff&size=96"
-                                        class="w-full h-full rounded-[22px] object-cover"
-                                        loading="lazy"
-                                        decoding="async"
-                                        alt="${u.name}"
-                                    >
-                                `}
+                    <div class="relative">
+                        <!-- Gradient Header -->
+                        <div class="h-28 bg-gradient-to-r ${gradientClass} flex items-center px-8 relative">
+                            <div class="flex-1">
+                                <h2 class="text-white font-black text-xl tracking-tight">${role === 'Client' ? 'Profil Klien' : (role === 'Freelancer' ? 'Profil Freelancer' : 'Profil Siswa SKOMDA')}</h2>
+                                <p class="text-white/70 text-[10px] font-bold uppercase tracking-[0.2em]">ID Pengguna: #UID-${u.id}</p>
                             </div>
-                            </div>
-                            <div class="pb-2">
-                                <h3 class="text-[1.5rem] font-black text-slate-900 leading-tight">${u.name}</h3>
-                                <div class="flex items-center gap-2 text-slate-400 font-bold text-[11px] uppercase tracking-widest mt-1">
-                                    <i class="ri-calendar-line text-[#0f766e]"></i> Joined ${joinedDate}
-                                </div>
-                            </div>
+                            <button onclick="window.closeUserModal()" class="w-10 h-10 bg-white/20 text-white rounded-full flex items-center justify-center hover:bg-white/30 transition">
+                                <i class="ri-close-line text-xl"></i>
+                            </button>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-4 mb-8">
-                            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 group hover:border-[#0f766e]/30 transition-all">
-                                <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Alamat Email</span>
-                                <span class="text-[13px] font-bold text-slate-700 block truncate">${u.email}</span>
+                        <!-- Profile Info -->
+                        <div class="px-8 pb-8 -mt-8 relative z-10">
+                            <div class="flex items-end gap-5 mb-8">
+                                <div class="w-24 h-24 rounded-[28px] bg-white p-1.5 shadow-xl">
+                                    ${u.profile_photo || u.avatar ? `
+                                        <img
+                                            src="{{ asset('storage') }}/${u.profile_photo || u.avatar}"
+                                            class="w-full h-full rounded-[22px] object-cover"
+                                            loading="lazy"
+                                            decoding="async"
+                                            alt="${u.name}"
+                                        >
+                                    ` : `
+                                        <img
+                                            src="https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(u.name || u.email || 'User')}&background=0f766e&color=fff&size=96"
+                                            class="w-full h-full rounded-[22px] object-cover"
+                                            loading="lazy"
+                                            decoding="async"
+                                            alt="${u.name}"
+                                        >
+                                    `}
+                                </div>
+                                </div>
+                                <div class="pb-2">
+                                    <h3 class="text-[1.5rem] font-black text-slate-900 leading-tight">${u.name}</h3>
+                                    <div class="flex items-center gap-2 text-slate-400 font-bold text-[11px] uppercase tracking-widest mt-1">
+                                        <i class="ri-calendar-line text-[#0f766e]"></i> Joined ${joinedDate}
+                                    </div>
+                                </div>
                             </div>
-                            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 group hover:border-[#0f766e]/30 transition-all">
-                                <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Nomor Telepon</span>
-                                <span class="text-[13px] font-bold text-slate-700 block truncate">${u.phone || 'Tidak tersedia'}</span>
-                            </div>
-                            
-                            ${role === 'Skomda Student' ? `
+
+                            <div class="grid grid-cols-2 gap-4 mb-8">
                                 <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 group hover:border-[#0f766e]/30 transition-all">
-                                    <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">NIS / ID Siswa</span>
-                                    <span class="text-[13px] font-bold text-slate-700 block truncate">${u.nis || '-'}</span>
+                                    <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Alamat Email</span>
+                                    <span class="text-[13px] font-bold text-slate-700 block truncate">${u.email}</span>
                                 </div>
                                 <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 group hover:border-[#0f766e]/30 transition-all">
-                                    <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Kelas & Jurusan</span>
-                                    <span class="text-[13px] font-bold text-slate-700 block truncate">${u.class || ''} ${u.major || ''}</span>
+                                    <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Nomor Telepon</span>
+                                    <span class="text-[13px] font-bold text-slate-700 block truncate">${u.phone || 'Tidak tersedia'}</span>
+                                </div>
+
+                                ${role === 'Skomda Student' ? `
+                                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 group hover:border-[#0f766e]/30 transition-all">
+                                        <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">NIS / ID Siswa</span>
+                                        <span class="text-[13px] font-bold text-slate-700 block truncate">${u.nis || '-'}</span>
+                                    </div>
+                                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 group hover:border-[#0f766e]/30 transition-all">
+                                        <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Kelas & Jurusan</span>
+                                        <span class="text-[13px] font-bold text-slate-700 block truncate">${u.class || ''} ${u.major || ''}</span>
+                                    </div>
+                                ` : ''}
+                            </div>
+
+                            ${role === 'Freelancer' && u.bio ? `
+                                <div class="bg-slate-50 p-5 rounded-2xl border border-slate-100 mb-8">
+                                    <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2.5">Bio Freelancer</span>
+                                    <p class="text-[13px] text-slate-600 leading-relaxed font-medium">${u.bio}</p>
                                 </div>
                             ` : ''}
-                        </div>
 
-                        ${role === 'Freelancer' && u.bio ? `
-                            <div class="bg-slate-50 p-5 rounded-2xl border border-slate-100 mb-8">
-                                <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2.5">Bio Freelancer</span>
-                                <p class="text-[13px] text-slate-600 leading-relaxed font-medium">${u.bio}</p>
+                            <div class="flex gap-3">
+                                <button onclick="window.openPasswordModal('${role}', ${u.id})" class="flex-1 py-3.5 bg-amber-50 text-amber-600 font-bold rounded-xl text-[12px] hover:bg-amber-500 hover:text-white transition-all flex items-center justify-center gap-2">
+                                    <i class="ri-lock-password-line"></i> Ubah Kata Sandi
+                                </button>
+                                <button onclick="window.openUserModal('${role}', ${u.id})" class="flex-1 py-3.5 bg-slate-900 text-white font-bold rounded-xl text-[12px] hover:bg-slate-800 transition-all flex items-center justify-center gap-2">
+                                    <i class="ri-edit-line"></i> Edit Detail
+                                </button>
                             </div>
-                        ` : ''}
-
-                        <div class="flex gap-3">
-                            <button onclick="window.openPasswordModal('${role}', ${u.id})" class="flex-1 py-3.5 bg-amber-50 text-amber-600 font-bold rounded-xl text-[12px] hover:bg-amber-500 hover:text-white transition-all flex items-center justify-center gap-2">
-                                <i class="ri-lock-password-line"></i> Ubah Kata Sandi
-                            </button>
-                            <button onclick="window.openUserModal('${role}', ${u.id})" class="flex-1 py-3.5 bg-slate-900 text-white font-bold rounded-xl text-[12px] hover:bg-slate-800 transition-all flex items-center justify-center gap-2">
-                                <i class="ri-edit-line"></i> Edit Detail
-                            </button>
                         </div>
                     </div>
-                </div>
-            `;
+                `;
             window.openModal('modal-user-overlay');
         };
 
-        window.openPasswordModal = function(role, id) {
+        window.openPasswordModal = function (role, id) {
             const u = window.__USERS_DATA__.find(x => x.id == id && x.role == role);
             if (!u) return;
 
@@ -494,38 +580,38 @@
             }
 
             box.innerHTML = `
-                <div class="p-8">
-                    <div class="flex justify-between items-center mb-8">
-                        <h2 class="text-[1.5rem] font-black text-slate-900">Ubah Kata Sandi</h2>
-                        <button onclick="window.closePasswordModal()" class="w-10 h-10 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center hover:bg-red-50 hover:text-red-500 transition">
-                            <i class="ri-close-line text-xl"></i>
-                        </button>
+                    <div class="p-8">
+                        <div class="flex justify-between items-center mb-8">
+                            <h2 class="text-[1.5rem] font-black text-slate-900">Ubah Kata Sandi</h2>
+                            <button onclick="window.closePasswordModal()" class="w-10 h-10 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center hover:bg-red-50 hover:text-red-500 transition">
+                                <i class="ri-close-line text-xl"></i>
+                            </button>
+                        </div>
+                        <form action="${actionUrl}" method="POST">
+                            @csrf
+                            <input type="hidden" name="_method" value="PUT">
+                            <div class="space-y-5 mb-6">
+                                <div class="bg-slate-50 p-4 rounded-2xl">
+                                    <p class="text-[12px] font-bold text-slate-500 uppercase tracking-wider mb-1">Pengguna</p>
+                                    <p class="font-bold text-slate-800">${u.name || 'N/A'}</p>
+                                    <p class="text-[12px] text-slate-400">${u.email || ''}</p>
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2.5">Kata Sandi Baru</label>
+                                    <input type="password" name="password" required minlength="8" class="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700" placeholder="Minimal 8 karakter">
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2.5">Konfirmasi Kata Sandi</label>
+                                    <input type="password" name="password_confirmation" required minlength="8" class="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700" placeholder="Masukkan ulang kata sandi baru">
+                                </div>
+                            </div>
+                            <div class="flex gap-4">
+                                <button type="button" onclick="window.closePasswordModal()" class="flex-1 py-4 bg-slate-100 text-slate-500 font-bold rounded-2xl">Batal</button>
+                                <button type="submit" class="flex-1 py-4 bg-amber-500 text-white font-bold rounded-2xl shadow-xl hover:bg-amber-600 transition-all">Ubah Kata Sandi</button>
+                            </div>
+                        </form>
                     </div>
-                    <form action="${actionUrl}" method="POST">
-                        @csrf
-                        <input type="hidden" name="_method" value="PUT">
-                        <div class="space-y-5 mb-6">
-                            <div class="bg-slate-50 p-4 rounded-2xl">
-                                <p class="text-[12px] font-bold text-slate-500 uppercase tracking-wider mb-1">Pengguna</p>
-                                <p class="font-bold text-slate-800">${u.name || 'N/A'}</p>
-                                <p class="text-[12px] text-slate-400">${u.email || ''}</p>
-                            </div>
-                            <div>
-                                <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2.5">Kata Sandi Baru</label>
-                                <input type="password" name="password" required minlength="8" class="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700" placeholder="Minimal 8 karakter">
-                            </div>
-                            <div>
-                                <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2.5">Konfirmasi Kata Sandi</label>
-                                <input type="password" name="password_confirmation" required minlength="8" class="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700" placeholder="Masukkan ulang kata sandi baru">
-                            </div>
-                        </div>
-                        <div class="flex gap-4">
-                            <button type="button" onclick="window.closePasswordModal()" class="flex-1 py-4 bg-slate-100 text-slate-500 font-bold rounded-2xl">Batal</button>
-                            <button type="submit" class="flex-1 py-4 bg-amber-500 text-white font-bold rounded-2xl shadow-xl hover:bg-amber-600 transition-all">Ubah Kata Sandi</button>
-                        </div>
-                    </form>
-                </div>
-            `;
+                `;
             window.openModal('modal-password-overlay');
         };
 
@@ -541,25 +627,25 @@
             nis: student.nis || '',
         }));
 
-        const closeStudentList = function() {
+        const closeStudentList = function () {
             studentSearchList?.classList.add('hidden');
         };
 
-        const selectStudent = function(student) {
-            if (! studentSearchInput || ! studentIdInput) return;
+        const selectStudent = function (student) {
+            if (!studentSearchInput || !studentIdInput) return;
 
             studentSearchInput.value = `${student.name} (${student.nis})`;
             studentIdInput.value = student.id;
             closeStudentList();
         };
 
-        const renderStudentList = function(query = '') {
-            if (! studentSearchList) return;
+        const renderStudentList = function (query = '') {
+            if (!studentSearchList) return;
 
             const normalizedQuery = query.trim().toLowerCase();
             const matches = skomdaStudents
                 .filter(student => {
-                    if (! normalizedQuery) return true;
+                    if (!normalizedQuery) return true;
 
                     return student.name.toLowerCase().includes(normalizedQuery)
                         || student.nis.toLowerCase().includes(normalizedQuery);
@@ -596,7 +682,7 @@
             studentSearchList.classList.remove('hidden');
         };
 
-        window.resetStudentCombobox = function() {
+        window.resetStudentCombobox = function () {
             if (studentSearchInput) studentSearchInput.value = '';
             if (studentIdInput) studentIdInput.value = '';
             closeStudentList();
@@ -620,12 +706,12 @@
         });
 
         document.addEventListener('click', event => {
-            if (! studentCombobox?.contains(event.target)) {
+            if (!studentCombobox?.contains(event.target)) {
                 closeStudentList();
             }
         });
 
-        window.setAddRole = function(role) {
+        window.setAddRole = function (role) {
             // Update UI
             document.querySelectorAll('.role-selector').forEach(btn => {
                 btn.classList.remove('active', 'border-[#0f766e]', 'text-[#0f766e]');
@@ -650,12 +736,12 @@
             const groupBio = document.getElementById('group-bio');
             const groupStudentFields = document.getElementById('group-student-fields');
 
-            const setGroupActive = function(group, isActive) {
-                if (! group) return;
+            const setGroupActive = function (group, isActive) {
+                if (!group) return;
 
-                group.classList.toggle('hidden', ! isActive);
+                group.classList.toggle('hidden', !isActive);
                 group.querySelectorAll('input, select, textarea').forEach(field => {
-                    field.disabled = ! isActive;
+                    field.disabled = !isActive;
                 });
             };
 
@@ -686,7 +772,7 @@
         };
 
         // Update student email with domain
-        window.updateStudentEmail = function() {
+        window.updateStudentEmail = function () {
             const prefix = document.getElementById('input-email-prefix')?.value || '';
             const emailFull = document.getElementById('input-email-full');
             if (emailFull) {
@@ -695,7 +781,7 @@
         };
 
         // Delete Confirmation
-        window.confirmDeleteUser = async function(id, name) {
+        window.confirmDeleteUser = async function (id, name) {
             if (await window.customConfirm(`Yakin ingin menghapus ${name} secara permanen? Data yang berkaitan akan ikut terhapus.`)) {
                 document.getElementById(`delete-user-${id}`).submit();
             }

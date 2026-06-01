@@ -156,27 +156,6 @@ class FreelancerController extends Controller
             return redirect()->route('freelancer.profile')->with('error', 'Password salah');
         }
 
-        // Before deleting, if the freelancer's email domain indicates they're a Skomda student,
-        // recreate a SkomdaStudent record so they can register again as a student.
-        try {
-            $email = strtolower($freelancer->email ?? '');
-            if ($email && (str_contains($email, 'telkom') || str_contains($email, 'skomda') || str_contains($email, 'smk'))) {
-                $exists = \App\Models\SkomdaStudent::where('email', $freelancer->email)->exists();
-                if (!$exists) {
-                    \App\Models\SkomdaStudent::create([
-                        'nis' => null,
-                        'name' => $freelancer->name ?? ($freelancer->skomda_student->name ?? 'Siswa'),
-                        'email' => $freelancer->email,
-                        'phone' => $freelancer->phone ?? null,
-                        'class' => null,
-                        'major' => null,
-                    ]);
-                }
-            }
-        } catch (\Throwable $e) {
-            // ignore failures during fallback recreation
-        }
-
         $this->deleteProfilePhoto($freelancer->profile_photo);
         $freelancer->delete();
 

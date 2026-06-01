@@ -59,6 +59,14 @@
 
     {{-- Alpine (used by various dashboard pages for interactive UI) --}}
     <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    {{-- Pusher + Echo bootstrap for realtime chat (uses env meta tags) --}}
+    <meta name="pusher-key" content="{{ env('PUSHER_APP_KEY') }}">
+    <meta name="pusher-cluster" content="{{ env('PUSHER_APP_CLUSTER') }}">
+    <meta name="pusher-host" content="{{ env('PUSHER_HOST') }}">
+    <meta name="pusher-scheme" content="{{ env('PUSHER_SCHEME', 'https') }}">
+    <script src="https://js.pusher.com/8.5.0/pusher.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/laravel-echo@1.11.0/dist/echo.iife.js" defer></script>
+    <script src="{{ asset('js/dashboard/echo-bootstrap.js') }}" defer></script>
 
     @yield('styles')
     @stack('styles')

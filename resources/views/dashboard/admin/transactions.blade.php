@@ -43,6 +43,29 @@
             background: #e2e8f0;
             color: #475569;
         }
+
+        .action-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .action-btn.secondary {
+            background-color: #f1f5f9;
+            color: #64748b;
+            border: 1px solid #e2e8f0;
+        }
+
+        .action-btn.secondary:hover {
+            background-color: #e2e8f0;
+        }
     </style>
 @endsection
 @section('content')
@@ -81,15 +104,21 @@
                 class="filter-tab px-[18px] py-2 rounded-full border-[1.5px] {{ $currentStatus === 'failed' ? 'border-[#0f766e] bg-[#0f766e] text-white shadow-teal-sm' : 'border-slate-200 bg-white text-slate-500' }} font-bold text-[12.5px] cursor-pointer transition-all duration-150">Gagal</a>
         </div>
 
-        <form action="{{ route('admin.transactions.index') }}" method="GET" class="relative">
-            @if(request('status'))
-                <input type="hidden" name="status" value="{{ request('status') }}">
-            @endif
-            <i
-                class="ri-search-line absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[15px] pointer-events-none"></i>
-            <input type="text" name="q" value="{{ request('q') }}" placeholder="Cari ID, Order ID…"
-                class="pl-9 pr-4 py-[9px] w-[260px] border-[1.5px] border-slate-200 rounded-[11px] text-[13px] font-semibold text-slate-700 bg-white outline-none transition-all duration-200 placeholder:font-normal placeholder:text-slate-400 focus:border-[#0f766e] focus:shadow-[0_0_0_3px_rgba(15,118,110,0.08)]" />
-        </form>
+        <div class="flex items-center gap-3">
+            <form action="{{ route('admin.transactions.index') }}" method="GET" class="relative">
+                @if(request('status'))
+                    <input type="hidden" name="status" value="{{ request('status') }}">
+                @endif
+                <i
+                    class="ri-search-line absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[15px] pointer-events-none"></i>
+                <input type="text" name="q" value="{{ request('q') }}" placeholder="Cari ID, Order ID…"
+                    class="pl-9 pr-4 py-[9px] w-[260px] border-[1.5px] border-slate-200 rounded-[11px] text-[13px] font-semibold text-slate-700 bg-white outline-none transition-all duration-200 placeholder:font-normal placeholder:text-slate-400 focus:border-[#0f766e] focus:shadow-[0_0_0_3px_rgba(15,118,110,0.08)]" />
+            </form>
+            <a href="{{ route('admin.transactions.export', array_filter([ 'status' => request('status') !== 'all' ? request('status') : null, 'q' => request('q') !== '' ? request('q') : null ])) }}"
+               class="action-btn secondary">
+                <i class="ri-file-download-line"></i> Ekspor
+            </a>
+        </div>
     </div>
 
     <!-- Table -->

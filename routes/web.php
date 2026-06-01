@@ -186,6 +186,8 @@ Route::middleware('auth:administrator')->prefix('admin')->name('admin.')->group(
     Route::get('/orders/{id}/dispute', [DashboardController::class, 'getDisputeDetail'])->name('orders.dispute');
     Route::get('/freelancers/{id}/detail', [DashboardController::class, 'getFreelancerDetail'])->name('freelancers.detail');
     Route::post('/orders/{id}/status', [OrderController::class, 'updateStatus'])->name('orders.updateStatus');
+    Route::post('/orders/{order}/transfer', [\App\Http\Controllers\TransactionController::class, 'adminTransfer'])->name('orders.transfer');
+    Route::get('/orders/{order}/payout', [\App\Http\Controllers\TransactionController::class, 'adminPayoutDetail'])->name('orders.payout');
     Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
     Route::delete('/orders/{id}', [OrderController::class, 'destroy'])->name('orders.destroy');
 
@@ -194,6 +196,7 @@ Route::middleware('auth:administrator')->prefix('admin')->name('admin.')->group(
 
     // Transactions (CRUD)
     Route::get('/transactions', [TransactionController::class, 'index'])->name('transactions.index');
+    Route::get('/transactions/export', [TransactionController::class, 'export'])->name('transactions.export');
 
     // Reviews (CRUD)
     Route::get('/reviews', [ReviewController::class, 'index'])->name('reviews.index');

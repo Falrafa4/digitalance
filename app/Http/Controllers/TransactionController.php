@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreTransactionRequest;
+use App\Models\Notification;
 use App\Models\Order;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class TransactionController extends Controller
 {
@@ -51,6 +53,54 @@ class TransactionController extends Controller
         ];
 
         return view('dashboard.admin.transactions', compact('transactions', 'transactionStats', 'status', 'search'));
+    }
+
+    public function export(Request $request)
+    {
+        $status = strtolower(trim((string) $request->query('status', 'all')));
+        $search = trim((string) $request->query('q', ''));
+
+        $baseQuery = Transaction::with(['order.client', 'order.service.freelancer.skomda_student'])
+            ->whereHas('order.service', function ($query) {
+                $query->whereNotNull('freelancer_id')
+                    ->whereHas('freelancer');
+            });
+
+        if ($status !== 'all' && in_array($status, ['paid', 'pending', 'failed', 'refund'], true)) {
+            $baseQuery->whereRaw('LOWER(status) = ?', [$status]);
+        }
+
+        if ($search !== '') {
+            $baseQuery->where(function ($query) use ($search) {
+                $query->where('id', 'like', '%' . $search . '%')
+                    ->orWhere('order_id', 'like', '%' . $search . '%');
+            });
+        }
+
+        $rows = (clone $baseQuery)->latest()->get();
+        $filename = 'payout-report-' . now()->format('Ymd-His') . '.csv';
+
+        return response()->streamDownload(function () use ($rows) {
+            $handle = fopen('php://output', 'w');
+            fputcsv($handle, ['transaction_id', 'order_id', 'client', 'freelancer', 'amount', 'type', 'status', 'created_at']);
+
+            foreach ($rows as $trx) {
+                fputcsv($handle, [
+                    $trx->id,
+                    $trx->order_id,
+                    $trx->order?->client?->name ?? '-',
+                    $trx->order?->service?->freelancer?->skomda_student?->name ?? '-',
+                    $trx->amount,
+                    $trx->type,
+                    $trx->status,
+                    optional($trx->created_at)->toDateTimeString(),
+                ]);
+            }
+
+            fclose($handle);
+        }, $filename, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+        ]);
     }
 
     // FREELANCER ONLY
@@ -131,5 +181,70 @@ class TransactionController extends Controller
         ]);
 
         return redirect()->back()->with('success', 'Transaksi berhasil dibuat');
+    }
+
+    public function adminTransfer(Request $request, Order $order)
+    {
+        $validated = $request->validate([
+            'amount' => 'nullable|numeric|min:0',
+            'note' => 'nullable|string|max:2000',
+        ]);
+
+        abort_unless($order->status === 'Completed', 422, 'Transfer hanya tersedia untuk order yang sudah completed.');
+
+        if (!$order->service?->freelancer_id) {
+            return back()->with('error', 'Freelancer untuk order ini tidak ditemukan.');
+        }
+
+        $alreadyTransferred = Transaction::where('order_id', $order->id)
+            ->where('type', 'Full')
+            ->where('status', 'Paid')
+            ->exists();
+
+        if ($alreadyTransferred) {
+            return back()->with('warning', 'Transfer untuk order ini sudah pernah dicatat.');
+        }
+
+        $amount = $validated['amount'] ?? (float) ($order->agreed_price ?? 0);
+
+        DB::transaction(function () use ($order, $amount, $validated) {
+            Transaction::create([
+                'order_id' => $order->id,
+                'amount' => $amount,
+                'type' => 'Full',
+                'status' => 'Paid',
+            ]);
+
+            $order->update([
+                'status' => 'Completed',
+            ]);
+
+            Notification::create([
+                'title' => 'Transfer ke Freelancer Sudah Dicatat',
+                'message' => 'Transfer untuk order #' . $order->id . ' sebesar Rp ' . number_format($amount, 0, ',', '.') . ' sudah dicatat oleh admin.',
+                'type' => 'success',
+                'role' => 'freelancer',
+                'user_id' => $order->service?->freelancer_id,
+                'link' => route('freelancer.transactions.showByOrderId', $order->id),
+            ]);
+        });
+
+        // No rekening in admin: this records the payout as completed in the system.
+        return back()->with('success', 'Transfer ke freelancer berhasil dicatat.');
+    }
+
+    public function adminPayoutDetail(Order $order)
+    {
+        $order->load(['client', 'service.freelancer.skomda_student', 'transactions']);
+
+        $payoutTransactions = $order->transactions
+            ->where('type', 'Full')
+            ->where('status', 'Paid')
+            ->values();
+
+        $payoutDone = $payoutTransactions->isNotEmpty();
+        $payoutAmount = $payoutDone ? (float) $payoutTransactions->first()->amount : (float) ($order->agreed_price ?? 0);
+
+        return view('dashboard.admin.order-payout-detail', compact('order', 'payoutTransactions', 'payoutDone', 'payoutAmount'));
     }
 }
