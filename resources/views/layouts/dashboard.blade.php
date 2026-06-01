@@ -65,26 +65,6 @@
 </head>
 
 <body class="bg-slate-50 text-slate-900 font-sans h-screen overflow-hidden">
-    @php
-        $notifUser = Auth::guard('administrator')->user()
-            ?? Auth::guard('client')->user()
-            ?? Auth::guard('freelancer')->user();
-        $notifRole = Auth::guard('administrator')->check() ? 'admin' : (Auth::guard('client')->check() ? 'client' : (Auth::guard('freelancer')->check() ? 'freelancer' : null));
-
-        \App\Models\Notification::where('created_at', '<', now()->subDays(30))
-            ->where('is_kept', false)
-            ->delete();
-
-        $notifNotifications = $notifRole
-            ? \App\Models\Notification::where('role', $notifRole)
-                ->where('user_id', $notifUser->id)
-                ->latest()
-                ->take(30)
-                ->get()
-            : collect();
-
-        $notifUnreadCount = $notifNotifications->where('is_read', false)->count();
-    @endphp
     {{-- Skip to main content link for accessibility --}}
     <a href="#main-content"
         class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[9999] focus:px-4 focus:py-2 focus:bg-[#0f766e] focus:text-white focus:rounded-lg focus:font-bold focus:text-sm">
@@ -100,7 +80,7 @@
         <!-- Mobile Overlay -->
         <div id="sidebarOverlay" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-30 lg:hidden">
         </div>
-        
+
         <!-- Sidebar (role-aware) -->
         <x-sidebar />
 
@@ -108,7 +88,7 @@
         <main id="main-content"
             class="flex-1 px-4 md:px-6 lg:px-11 py-5 lg:py-7 overflow-y-auto min-w-0 focus:outline-none">
             <!-- Header (role-aware) -->
-            <x-header />
+            <x-header :notif-unread-count="$notifUnreadCount" />
 
             @yield('content')
         </main>
@@ -120,7 +100,7 @@
     <div id="toast-container" role="region" aria-label="Notifications" aria-live="polite"></div>
 
     <!-- Notification Drawer -->
-    <x-notification-drawer />
+    <x-notification-drawer :notif-notifications="$notifNotifications" :notif-unread-count="$notifUnreadCount" />
 
     <script src="{{ asset('js/dashboard/confirm-modal.js') }}"></script>
     <script src="{{ asset('js/dashboard/search.js') }}"></script>
