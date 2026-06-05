@@ -7,63 +7,63 @@
     // Map types to classes and icons
     $typeClasses = [
         'success' => [
-            'bg' => 'bg-emerald-50 to-white',
-            'border' => 'border-emerald-200/60',
-            'shadow' => 'shadow-emerald-500/10',
-            'iconBg' => 'bg-emerald-500',
-            'iconText' => 'text-white',
+            'bg' => 'bg-emerald-50',
+            'border' => 'border-emerald-200',
+            'shadow' => 'shadow-emerald-500/20',
+            'iconBg' => 'bg-emerald-500/20',
+            'iconText' => 'text-emerald-600',
             'text' => 'text-emerald-800',
             'closeText' => 'text-emerald-400',
-            'closeHoverBg' => 'hover:bg-emerald-100/50',
-            'closeHoverText' => 'hover:text-emerald-700',
+            'closeHoverBg' => 'hover:bg-emerald-100',
+            'closeHoverText' => 'hover:text-emerald-800',
             'icon' => 'ri-check-line',
         ],
         'warning' => [
-            'bg' => 'bg-amber-50 to-white',
-            'border' => 'border-amber-200/60',
-            'shadow' => 'shadow-amber-500/10',
-            'iconBg' => 'bg-amber-500',
-            'iconText' => 'text-white',
+            'bg' => 'bg-amber-50',
+            'border' => 'border-amber-200',
+            'shadow' => 'shadow-amber-500/20',
+            'iconBg' => 'bg-amber-500/20',
+            'iconText' => 'text-amber-600',
             'text' => 'text-amber-800',
             'closeText' => 'text-amber-400',
-            'closeHoverBg' => 'hover:bg-amber-100/50',
-            'closeHoverText' => 'hover:text-amber-700',
+            'closeHoverBg' => 'hover:bg-amber-100',
+            'closeHoverText' => 'hover:text-amber-800',
             'icon' => 'ri-alert-line',
         ],
         'error' => [
-            'bg' => 'bg-red-50 to-white',
-            'border' => 'border-red-200/60',
-            'shadow' => 'shadow-red-500/10',
-            'iconBg' => 'bg-red-500',
-            'iconText' => 'text-white',
+            'bg' => 'bg-red-50',
+            'border' => 'border-red-200',
+            'shadow' => 'shadow-red-500/20',
+            'iconBg' => 'bg-red-500/20',
+            'iconText' => 'text-red-600',
             'text' => 'text-red-800',
             'closeText' => 'text-red-400',
-            'closeHoverBg' => 'hover:bg-red-100/50',
-            'closeHoverText' => 'hover:text-red-700',
+            'closeHoverBg' => 'hover:bg-red-100',
+            'closeHoverText' => 'hover:text-red-800',
             'icon' => 'ri-error-warning-line',
         ],
         'validation' => [
-            'bg' => 'bg-red-50 to-white',
-            'border' => 'border-red-200/60',
-            'shadow' => 'shadow-red-500/10',
-            'iconBg' => 'bg-red-500',
-            'iconText' => 'text-white',
+            'bg' => 'bg-red-50',
+            'border' => 'border-red-200',
+            'shadow' => 'shadow-red-500/20',
+            'iconBg' => 'bg-red-500/20',
+            'iconText' => 'text-red-600',
             'text' => 'text-red-800',
             'closeText' => 'text-red-400',
-            'closeHoverBg' => 'hover:bg-red-100/50',
-            'closeHoverText' => 'hover:text-red-700',
+            'closeHoverBg' => 'hover:bg-red-100',
+            'closeHoverText' => 'hover:text-red-800',
             'icon' => 'ri-error-warning-line',
         ],
         'info' => [
-            'bg' => 'bg-blue-50 to-white',
-            'border' => 'border-blue-200/60',
-            'shadow' => 'shadow-blue-500/10',
-            'iconBg' => 'bg-blue-500',
-            'iconText' => 'text-white',
+            'bg' => 'bg-blue-50',
+            'border' => 'border-blue-200',
+            'shadow' => 'shadow-blue-500/20',
+            'iconBg' => 'bg-blue-500/20',
+            'iconText' => 'text-blue-600',
             'text' => 'text-blue-800',
             'closeText' => 'text-blue-400',
-            'closeHoverBg' => 'hover:bg-blue-100/50',
-            'closeHoverText' => 'hover:text-blue-700',
+            'closeHoverBg' => 'hover:bg-blue-100',
+            'closeHoverText' => 'hover:text-blue-800',
             'icon' => 'ri-information-line',
         ],
     ];
@@ -98,26 +98,26 @@
             $classes = $typeClasses[$flash['type']] ?? $typeClasses['info'];
         @endphp
         <div data-flash="{{ $flash['type'] }}"
-             class="group max-w-sm flex items-start gap-3 px-5 py-4 rounded-2xl shadow-xl {{ $classes['shadow'] }} border {{ $classes['border'] }} bg-gradient-to-r {{ $classes['bg'] }} backdrop-blur-sm pointer-events-auto"
+             class="group max-w-sm flex items-start gap-4 px-6 py-4 rounded-xl shadow-lg {{ $classes['shadow'] }} border {{ $classes['border'] }} bg-white/90 backdrop-blur-md pointer-events-auto"
              role="{{ $flash['type'] === 'error' || $flash['type'] === 'validation' ? 'alert' : 'status' }}">
-            <div class="w-8 h-8 rounded-xl {{ $classes['iconBg'] }} {{ $classes['iconText'] }} flex items-center justify-center flex-shrink-0 shadow-sm">
-                <i class="{{ $classes['icon'] }} text-[16px]"></i>
+            <div class="w-9 h-9 rounded-xl {{ $classes['iconBg'] }} {{ $classes['iconText'] }} flex items-center justify-center flex-shrink-0 shadow-inner">
+                <i class="{{ $classes['icon'] }} text-[18px]"></i>
             </div>
             <div class="flex-1 min-w-0">
                 @if ($flash['type'] === 'validation' && is_array($flash['message']))
-                    <p class="text-[13px] font-bold {{ $classes['text'] }} leading-snug">Validation errors:</p>
-                    <ul class="list-disc list-inside text-[11px] text-red-600 space-y-0.5 p-0 m-0 mt-2">
+                    <p class="text-[13px] font-semibold {{ $classes['text'] }} leading-snug">Validation errors:</p>
+                    <ul class="list-disc list-inside text-[12px] text-red-600 space-y-1 pl-4">
                         @foreach ($flash['message'] as $msg)
                             <li>{{ $msg }}</li>
                         @endforeach
                     </ul>
                 @else
-                    <p class="text-[13px] font-bold {{ $classes['text'] }} leading-snug">{{ $flash['message'] }}</p>
+                    <p class="text-[13px] font-semibold {{ $classes['text'] }} leading-snug">{{ $flash['message'] }}</p>
                 @endif
             </div>
             <button type="button" aria-label="Tutup" onclick="this.closest('[data-flash]').remove()"
-                class="w-7 h-7 rounded-lg flex items-center justify-center {{ $classes['closeText'] }} {{ $classes['closeHoverBg'] }} {{ $classes['closeHoverText'] }} transition-all flex-shrink-0 opacity-0 group-hover:opacity-100">
-                <i class="ri-close-line text-[14px]"></i>
+                class="w-8 h-8 rounded-lg flex items-center justify-center {{ $classes['closeText'] }} {{ $classes['closeHoverBg'] }} {{ $classes['closeHoverText'] }} transition-all hover:shadow-md">
+                <i class="ri-close-line text-[16px]"></i>
             </button>
         </div>
     @endforeach

@@ -58,6 +58,7 @@
     <script src="{{ asset('js/utils.js') }}"></script>
     <script src="{{ asset('js/dashboard/shared/notification-drawer.js') }}"></script>
     <script src="{{ asset('js/dashboard/shared/flash.js') }}"></script>
+    <script src="{{ asset('js/dashboard/confirm-modal.js') }}"></script>
 
     {{-- Alpine (used by various dashboard pages for interactive UI) --}}
     <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>

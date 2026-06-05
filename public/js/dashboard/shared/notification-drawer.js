@@ -118,3 +118,8 @@ document.addEventListener('click', function (e) {
     if (!id) return;
     toggleNotificationKeep(id, btn);
 });
+
+// Attach functions to window for use in HTML onclick attributes
+window.openNotificationDrawer = openNotificationDrawer;
+window.closeNotificationDrawer = closeNotificationDrawer;
+window.markAllNotificationsRead = markAllNotificationsRead;
