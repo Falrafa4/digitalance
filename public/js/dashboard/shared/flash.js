@@ -2,7 +2,7 @@
  * Flash message animation logic — extracted from flash.blade.php
  * Handles slide-in entrance and auto-dismiss.
  */
-(function () {
+document.addEventListener('DOMContentLoaded', function () {
     try {
         var wrapper = document.getElementById('global-flash');
         if (!wrapper) return;
@@ -28,4 +28,4 @@
             }, 4000 + i * 200);
         });
     } catch (e) { console.error(e); }
-})();
+});

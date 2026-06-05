@@ -2,6 +2,7 @@
 @section('title', 'Manajemen Hasil | Digitalance')
 @section('styles')
     <link rel="stylesheet" href="{{ asset('css/dashboard/admin/results.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet"/>
 @endsection
 
 @section('content')

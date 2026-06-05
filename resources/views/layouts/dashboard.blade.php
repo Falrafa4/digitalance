@@ -56,6 +56,8 @@
         });
     </script>
     <script src="{{ asset('js/utils.js') }}"></script>
+    <script src="{{ asset('js/dashboard/shared/notification-drawer.js') }}"></script>
+    <script src="{{ asset('js/dashboard/shared/flash.js') }}"></script>
 
     {{-- Alpine (used by various dashboard pages for interactive UI) --}}
     <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -95,55 +97,21 @@
         <!-- Main -->
         <main id="main-content"
             class="flex-1 px-4 md:px-6 lg:px-11 py-5 lg:py-7 overflow-y-auto min-w-0 focus:outline-none">
-            <!-- Header (role-aware) -->
-            <x-header :notif-unread-count="$notifUnreadCount" />
+     <!-- Header (role-aware) -->
+     <x-header :notif-unread-count="$notifUnreadCount" />
+     <x-flash />
 
-            @yield('content')
+     @yield('content')
         </main>
     </div>
 
     @yield('modals')
 
-    <!-- Toast Container -->
-    <div id="toast-container" role="region" aria-label="Notifications" aria-live="polite"></div>
+     <!-- Toast Container -->
+     <div id="toast-container" role="region" aria-label="Notifications" aria-live="polite"></div>
 
-    <!-- Notification Drawer -->
-    <x-notification-drawer :notif-notifications="$notifNotifications" :notif-unread-count="$notifUnreadCount" />
-
-    <script src="{{ asset('js/dashboard/confirm-modal.js') }}"></script>
-    <script src="{{ asset('js/dashboard/search.js') }}"></script>
-    <script src="{{ asset('js/dashboard/shared/notification-drawer.js') }}"></script>
-    <script src="{{ asset('js/dashboard/global.js') }}"></script>
-    <script src="{{ asset('js/dashboard/shared/notification-listener.js') }}"></script>
-
-    {{-- Flash messages injected by controller or set inline --}}
-    @php
-        $__flash_messages = [];
-        if (session('success'))
-            $__flash_messages[] = ['message' => session('success'), 'type' => 'success'];
-        if (session('error'))
-            $__flash_messages[] = ['message' => session('error'), 'type' => 'danger'];
-        if (session('warning'))
-            $__flash_messages[] = ['message' => session('warning'), 'type' => 'warning'];
-        if (session('info'))
-            $__flash_messages[] = ['message' => session('info'), 'type' => 'info'];
-        if ($errors->any())
-            $__flash_messages[] = ['message' => $errors->first(), 'type' => 'danger'];
-    @endphp
-    <script id="__FLASH_JSON__" type="application/json">{{ base64_encode(json_encode($__flash_messages)) }}</script>
-    <script>
-        (function () {
-            try {
-                var b = document.getElementById('__FLASH_JSON__') && document.getElementById('__FLASH_JSON__').textContent || '';
-                window.__FLASH_MESSAGES__ = b ? JSON.parse(atob(b)) : [];
-            } catch (e) {
-                window.__FLASH_MESSAGES__ = [];
-            }
-        })();
-    </script>
-
-    @yield('scripts')
-    @stack('scripts')
+     @yield('scripts')
+     @stack('scripts')
 </body>
 
 </html>

@@ -289,14 +289,7 @@
                         <h2 class="font-display font-bold text-[1.05rem] text-slate-900">Informasi Umum</h2>
                         <p class="text-[12px] text-slate-400 mt-0.5">Perbarui bio dan nomor telepon.</p>
                     </div>
-                    <div class="px-7 py-6">
-                        @if(session('success'))
-                            <div
-                                class="flex items-center gap-3 mb-5 px-4 py-3 bg-emerald-50 border border-emerald-200 rounded-2xl text-emerald-800 text-[13px] font-semibold">
-                                <i class="ri-check-double-line text-emerald-500 text-[17px]"></i>
-                                {{ session('success') }}
-                            </div>
-                        @endif
+                         <div class="px-7 py-6">
 
                         <form action="{{ route('freelancer.profile.update') }}" method="POST" enctype="multipart/form-data">
                             @csrf

@@ -18,14 +18,7 @@
 @endsection
 
 @section('content')
-  @if(session('success'))
-    <script>
-      document.addEventListener('DOMContentLoaded', () => {
-        window.showToast('Brief berhasil dikirim! Silakan tunggu respons freelancer.', 'success');
-      });
-    </script>
-  @endif
-  <section class="animate-fadeUp">
+   <section class="animate-fadeUp">
     <div class="flex flex-col lg:flex-row gap-6">
       <div class="flex-1 min-w-0 space-y-6">
 

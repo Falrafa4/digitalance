@@ -133,7 +133,6 @@ body {
     justify-content: center;
 }
 
-/* CUSTOM SCROLLBAR UNTUK DROPDOWN & WRAPPERS */
 #studentList::-webkit-scrollbar,
 .overflow-y-auto::-webkit-scrollbar {
     width: 4px;
@@ -150,9 +149,6 @@ body {
     border-radius: 10px;
 }
 
-/* ==========================================================================
-   📱 OVERRIDE RESPONSIVE UNTUK LAYAR HP (MOBILE & TABLET PORTRAIT)
-   ========================================================================== */
 @media (max-width: 1024px) {
     #authContainer {
         display: flex;
@@ -164,7 +160,6 @@ body {
         border-radius: 0 !important;
     }
 
-    /* Ubah absolute sliding overlay menjadi banner gambar statis di atas form */
     .auth-overlay {
         position: relative !important;
         transform: none !important; /* Nonaktifkan transisi slide di HP */
@@ -174,7 +169,6 @@ body {
         pointer-events: auto !important;
     }
 
-    /* Mengunci gambar agar proporsional tidak stretching */
     .hero-img {
         object-fit: cover !important;
         height: 100% !important;

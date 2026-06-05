@@ -10,17 +10,19 @@
 @section('content')
     <!-- Grain overlay -->
     <div class="grain-overlay"></div>
+    
+    <!-- Flash messages -->
+    <x-flash />
 
     <main class="min-h-screen bg-[#f8fafc] flex items-start justify-center p-0 md:p-6 lg:p-8">
         <div class="w-full max-w-[840px] md:h-[590px] bg-white md:rounded-[32px] shadow-[0_24px_70px_rgba(15,118,110,0.07)] border border-slate-100 flex flex-col md:flex-row relative" id="authContainer">
             
             <!-- 1. PANEL OVERLAY (PREMIUM DARK GRADIENT - TANPA LOGO & ICON PETIR) -->
             <div class="auth-overlay bg-slate-950 text-white" id="authOverlay">
-                <!-- Gradasi Gelap Latar Belakang (Charcoal & Black) -->
-                <div class="absolute inset-0 z-0 bg-gradient-to-br from-zinc-950 via-slate-900 to-neutral-950 opacity-95"></div>
+                <div class="absolute inset-0 z-0 bg-gradient-to-br from-slate-950/60 via-slate-900/50 to-slate-950/60"></div>
                 
                 <!-- Pembungkus Gambar Slideshow -->
-                <div class="hero-wrap absolute inset-0 z-0 opacity-25 mix-blend-overlay">
+                <div class="hero-wrap absolute inset-0 z-0 opacity-35">
                     <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1471&auto=format&fit=crop" 
                          class="hero-img active" id="heroImg1" alt="Digitalance Workspace">
                     <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1470&auto=format&fit=crop" 
@@ -95,9 +97,18 @@
                                 <label class="block text-xs font-semibold text-slate-700 m-0">Kata Sandi</label>
                                 <button type="button" id="forgotPasswordBtn" class="text-xs font-bold text-teal-700 hover:underline bg-transparent border-none p-0 focus:outline-none">Lupa sandi?</button>
                             </div>
-                            <input type="password" name="password" required
-                                class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-950 focus:border-transparent text-xs transition-all placeholder:text-slate-400"
-                                placeholder="••••••••">
+                            <div class="relative">
+                                <input type="password" name="password" id="loginPassword" required
+                                    class="w-full pl-4 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-950 focus:border-transparent text-xs transition-all placeholder:text-slate-400"
+                                    placeholder="••••••••">
+                                <button type="button" id="toggleLoginPassword" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none flex items-center justify-center">
+                                    <!-- Default: Mata Terbuka -->
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                </button>
+                            </div>
                         </div>
 
                         <button type="submit"
@@ -246,9 +257,18 @@
 
                             <div>
                                 <label class="block text-[11px] font-semibold text-slate-700 mb-1">Kata Sandi</label>
-                                <input type="password" name="password" id="registerPassword" required
-                                    class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-950 text-xs transition-all"
-                                    placeholder="Minimal 8 karakter">
+                                <div class="relative">
+                                    <input type="password" name="password" id="registerPassword" required
+                                        class="w-full pl-4 pr-10 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-950 text-xs transition-all"
+                                        placeholder="Minimal 8 karakter">
+                                    <button type="button" id="toggleRegisterPassword" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none flex items-center justify-center">
+                                        <!-- Default: Mata Terbuka -->
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        </svg>
+                                    </button>
+                                </div>
                                 
                                 <!-- PASSWORD STRENGTH WITH CRITERIA CHECKLIST (REVISI DETAIL VERIFIKASI) -->
                                 <div id="passwordStrengthWrapper" class="mt-2 space-y-2 hidden bg-slate-50 p-2.5 rounded-xl border border-slate-100">
@@ -357,4 +377,42 @@
     @json($loginPageData)
 </script>
 <script src="{{ asset('js/sign-in.js') }}"></script>
+
+<!-- Script JavaScript Khusus untuk fungsionalitas Show/Hide Password -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const eyeOpenSvg = `
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+        `;
+        
+        const eyeCloseSvg = `
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+            </svg>
+        `;
+
+        function setupPasswordToggle(buttonId, inputId) {
+            const btn = document.getElementById(buttonId);
+            const input = document.getElementById(inputId);
+            if (btn && input) {
+                btn.addEventListener('click', function() {
+                    if (input.type === 'password') {
+                        input.type = 'text';
+                        btn.innerHTML = eyeCloseSvg;
+                    } else {
+                        input.type = 'password';
+                        btn.innerHTML = eyeOpenSvg;
+                    }
+                });
+            }
+        }
+
+        // Jalankan toggle untuk form login dan register
+        setupPasswordToggle('toggleLoginPassword', 'loginPassword');
+        setupPasswordToggle('toggleRegisterPassword', 'registerPassword');
+    });
+</script>
 @endsection
