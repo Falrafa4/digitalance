@@ -33,7 +33,7 @@ Route::prefix('v1')->group(function() {
     });
     
     Route::middleware('auth:sanctum', 'role:administrator')->group(function () {
-        Route::apiResource('clients', ClientControllerApi::class);
+        Route::get('/users', [ClientControllerApi::class, 'index']);
         Route::put('/freelancers/{id}/password', [ClientControllerApi::class, 'updateFreelancerPassword']);
         Route::put('/skomda-students/{id}/password', [ClientControllerApi::class, 'updateSkomdaPassword']);
         Route::put('/clients/{id}/password', [ClientControllerApi::class, 'updateClientPassword']);
