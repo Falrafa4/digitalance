@@ -12,6 +12,7 @@ use App\Models\SkomdaStudent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
@@ -56,11 +57,13 @@ class AuthController extends Controller
                 'password' => Hash::make($validated['password']),
                 'status' => 'Pending',
             ]);
-            // Remove the student entry from SkomdaStudent so it won't appear in the registrable list anymore.
+            // Mark the student as registered so they won't appear in the registrable list anymore.
             try {
-                $student->delete();
+                $student->is_registered = true;
+                $student->save();
             } catch (\Throwable $e) {
-                // swallow — we don't want registration to fail because of cleanup
+                // Log the error but don't fail the registration if this part fails
+                Log::error('Failed to update SkomdaStudent after freelancer registration: ' . $e->getMessage());
             }
         } catch (\Exception $e) {
             return back()->withErrors(['student_id' => 'Gagal mendaftarkan freelancer karena masalah internal database.'])->withInput();

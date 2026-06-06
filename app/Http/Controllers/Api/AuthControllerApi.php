@@ -17,11 +17,12 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class AuthControllerApi extends Controller
 {
     use ApiResponse;
-    
+
     /**
      * Get the authenticated user's profile.
      */
@@ -45,10 +46,7 @@ class AuthControllerApi extends Controller
 
         Client::create($validated);
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Akun client berhasil dibuat',
-        ], 201);
+        return $this->successResponse(null, 'Registrasi client berhasil. Silakan login.', 201);
     }
 
     /**
@@ -60,29 +58,32 @@ class AuthControllerApi extends Controller
         $student = SkomdaStudent::where('id', $validated['student_id'])->first();
 
         if (! $student) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Siswa dengan ID Student tersebut tidak ditemukan',
-            ], 404);
+            return $this->errorResponse('Siswa dengan ID Student tersebut tidak ditemukan', 404);
         }
 
-        if ($student->freelancer) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Akun freelancer untuk ID Student ini sudah terdaftar. Silakan login.',
-            ], 400);
+        if ($student->is_registered || Freelancer::where('student_id', $validated['student_id'])->exists()) {
+            return $this->errorResponse('Akun freelancer untuk ID Student ini sudah terdaftar. Silakan login.', 400);
         }
 
-        $student->freelancer()->create([
-            'student_id' => $validated['student_id'],
-            'password' => Hash::make($validated['password']),
-            'status' => 'Pending',
-        ]);
+        try {
+            $student->freelancer()->create([
+                'student_id' => $validated['student_id'],
+                'password' => Hash::make($validated['password']),
+                'status' => 'Pending',
+            ]);
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Registrasi freelancer berhasil. Silakan login.',
-        ], 201);
+            try {
+                $student->is_registered = true;
+                $student->save();
+            } catch (\Exception $e) {
+                // Log the error but don't fail the registration if this part fails
+                Log::error('Failed to update SkomdaStudent after freelancer registration: ' . $e->getMessage());
+            }
+        } catch (\Exception $e) {
+            return $this->errorResponse('Terjadi kesalahan saat mendaftarkan freelancer. Silakan coba lagi.', 500);
+        }
+
+        return $this->successResponse(null, 'Registrasi freelancer berhasil. Silakan login.', 201);
     }
 
     /**
