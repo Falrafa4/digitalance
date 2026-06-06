@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -21,30 +22,39 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        $exceptions->render(function(ValidationException $e, Request $request) {
-            if ($request->expectsJson()) {
+        $exceptions->render(function (AuthenticationException $e, Request $request) {
+            if ($request->is('api/*')) {
                 return response()->json([
-                    'status' => 'error',
-                    'message' => 'Validation failed',
+                    'success' => false,
+                    'message' => 'Tidak terautentikasi',
+                ], 401);
+            }
+        });
+        
+        $exceptions->render(function(ValidationException $e, Request $request) {
+            if ($request->is('api/*')) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validasi gagal',
                     'errors' => $e->errors(),
                 ], 422);
             }
         });
 
         $exceptions->render(function(Exception $e, Request $request) {
-            if ($request->expectsJson()) {
+            if ($request->is('api/*')) {
                 return response()->json([
-                    'status' => 'error',
+                    'success' => false,
                     'message' => $e->getMessage(),
                 ], 500);
             }
         });
 
         $exceptions->render(function(ModelNotFoundException $e, Request $request) {
-            if ($request->expectsJson()) {
+            if ($request->is('api/*')) {
                 return response()->json([
-                    'status' => 'error',
-                    'message' => 'Resource not found',
+                    'success' => false,
+                    'message' => 'Endpoint tidak ditemukan',
                 ], 404);
             }
         });

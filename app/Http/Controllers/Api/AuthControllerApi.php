@@ -6,14 +6,20 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterClientRequest;
 use App\Http\Requests\RegisterFreelancerRequest;
+use App\Http\Resources\AdministratorResource;
+use App\Http\Resources\FreelancerResource;
 use App\Models\Client;
+use App\Models\Freelancer;
 use App\Models\SkomdaStudent;
+use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class AuthControllerApi extends Controller
 {
+    use ApiResponse;
+    
     /**
      * Get the authenticated user's profile.
      */
@@ -21,14 +27,10 @@ class AuthControllerApi extends Controller
     {
         $user = $request->user();
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Data profil berhasil diambil',
-            'data' => [
-                'user' => $user,
-                'role' => $user->getRoleNames()->first() ?? 'Unknown',
-            ],
-        ], 200);
+        return $this->successResponse([
+            'user' => $user,
+            'role' => Auth::guard('administrator')->check() ? 'administrator' : (Auth::guard('client')->check() ? 'client' : (Auth::guard('freelancer')->check() ? 'freelancer' : null)),
+        ], 'Profil berhasil diambil');
     }
 
     /**
@@ -88,26 +90,47 @@ class AuthControllerApi extends Controller
     {
         $credentials = $request->validated();
 
-        if (! Auth::attempt($credentials)) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Login gagal, pastikan email dan password benar',
-            ], 401);
+        if (Auth::guard('administrator')->attempt($credentials)) {
+            $admin = $request->user('administrator');
+            $token = $admin->createToken('api-token')->plainTextToken;
+            
+            return $this->successResponse([
+                'user' => new AdministratorResource($admin),
+                'role' => 'administrator',
+                'token' => $token,
+            ], 'Login sebagai administrator berhasil');
         }
 
-        $user = Auth::user();
-        $token = $user->createToken('auth_token')->plainTextToken;
+        if (Auth::guard('client')->attempt($credentials)) {
+            $token = $request->user('client')->createToken('api-token')->plainTextToken;
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Login berhasil',
-            'data' => [
-                'user' => $user,
-                'role' => $user->getRoleNames()->first() ?? 'Unknown',
-                'access_token' => $token,
-                'token_type' => 'Bearer',
-            ],
-        ], 200);
+            return $this->successResponse([
+                'user' => $request->user('client'),
+                'role' => 'client',
+                'token' => $token,
+            ], 'Login sebagai client berhasil');
+        }
+
+        $freelancer = Freelancer::with('skomda_student')->whereHas('skomda_student', function ($query) use ($credentials) {
+            $query->where('email', $credentials['email']);
+        })->first();
+
+        if ($freelancer && $freelancer->status !== 'Approved') {
+            return $this->errorResponse('Akun freelancer Anda sedang dalam status ' . $freelancer->status . '. Silakan tunggu konfirmasi dari administrator.', 403);
+        }
+
+        if ($freelancer && Hash::check($credentials['password'], $freelancer->password)) {
+            Auth::guard('freelancer')->login($freelancer);
+            $token = $request->user('freelancer')->createToken('api-token')->plainTextToken;
+
+            return $this->successResponse([
+                'user' => new FreelancerResource($freelancer),
+                'role' => 'freelancer',
+                'token' => $token,
+            ], 'Login sebagai freelancer berhasil');
+        }
+
+        return $this->errorResponse('Email atau password salah. Silakan coba lagi.', 401);
     }
 
     /**
@@ -117,9 +140,6 @@ class AuthControllerApi extends Controller
     {
         $request->user()->currentAccessToken()->delete();
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Logout berhasil',
-        ], 200);
+        return $this->successResponse(null, 'Logout berhasil');
     }
 }
