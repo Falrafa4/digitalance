@@ -1,15 +1,9 @@
 <?php
 
-// use App\Http\Controllers\AdministratorController;
-// use App\Http\Controllers\AuthController;
-// use App\Http\Controllers\ClientController;
-// use App\Http\Controllers\FreelancerController;
-// use App\Http\Controllers\ServiceCategoryController;
-// use App\Http\Controllers\ServiceController;
-// use App\Http\Controllers\SkomdaStudentController;
 use App\Http\Controllers\Api\AuthControllerApi;
 use App\Http\Controllers\Api\AdministratorControllerApi;
 use App\Http\Controllers\Api\ClientControllerApi;
+use App\Http\Controllers\Api\FreelancerControllerApi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -37,7 +31,13 @@ Route::prefix('v1')->group(function () {
         Route::get('/users', [ClientControllerApi::class, 'index']);
         Route::apiResource('/clients', ClientControllerApi::class)->only(['store', 'show', 'update', 'destroy']);
         Route::put('/clients/{id}/password', [ClientControllerApi::class, 'updateClientPassword']);
+        
         Route::put('/freelancers/{id}/password', [ClientControllerApi::class, 'updateFreelancerPassword']);
+        Route::get('/freelancers/{freelancer}/services', [FreelancerControllerApi::class, 'showServices'])->whereNumber('freelancer');
+        Route::post('/freelancers/{freelancer}/verify', [FreelancerControllerApi::class, 'verify'])->whereNumber('freelancer');
+        Route::post('/freelancers/{freelancer}/suspend', [FreelancerControllerApi::class, 'suspend'])->whereNumber('freelancer');
+        Route::post('/freelancers/{freelancer}/unsuspend', [FreelancerControllerApi::class, 'unsuspend'])->whereNumber('freelancer');
+        Route::apiResource('/freelancers', FreelancerControllerApi::class)->whereNumber('freelancer');
 
         Route::put('/administrators/profile', [AdministratorControllerApi::class, 'updateProfile']);
         Route::put('/administrators/{administrator}/password', [AdministratorControllerApi::class, 'updateAdminPassword']);
@@ -47,62 +47,19 @@ Route::prefix('v1')->group(function () {
 
     Route::middleware(['auth:sanctum', 'role:freelancer'])->group(function () {
         Route::get('/freelancers/clients', [ClientControllerApi::class, 'freelancerIndex']);
+        
+        Route::get('/freelancers/profile', [FreelancerControllerApi::class, 'profile']);
+        Route::put('/freelancers/profile', [FreelancerControllerApi::class, 'updateProfile']);
+        Route::put('/freelancers/password', [FreelancerControllerApi::class, 'updatePassword']);
+        Route::delete('/freelancers/account', [FreelancerControllerApi::class, 'deleteAccount']);
+        Route::post('/freelancers/verification', [FreelancerControllerApi::class, 'applyForVerification']);
     });
 
     Route::middleware(['auth:sanctum', 'role:client'])->group(function () {
         Route::get('/clients/profile', [ClientControllerApi::class, 'profile']);
         Route::put('/clients/profile', [ClientControllerApi::class, 'updateProfile']);
         Route::put('/clients/password', [ClientControllerApi::class, 'updatePassword']);
+        Route::get('/talents', [FreelancerControllerApi::class, 'clientFindTalent']);
+        Route::get('/talents/{freelancer}', [FreelancerControllerApi::class, 'clientTalentShow'])->whereNumber('freelancer');
     });
 });
-
-// Route::prefix('auth')->group(function () {
-//     Route::post('/register-client', [AuthController::class, 'register_client']);
-//     Route::post('/register-freelancer', [AuthController::class, 'register_freelancer']);
-//     Route::post('/login', [AuthController::class, 'login']);
-//     Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
-// });
-
-// Route::get('/me', [AuthController::class, 'me'])->middleware('auth:sanctum');
-
-// // Administrator (public)
-// Route::apiResource('administrators', AdministratorController::class)->only(['index', 'show']);
-
-// // Administrator only
-// Route::middleware('auth:sanctum', 'role:administrator')->group(function () {
-//     Route::apiResource('clients', ClientController::class);
-//     Route::apiResource('freelancers', FreelancerController::class)->only(['store', 'update', 'destroy']);
-//     Route::apiResource('skomda-students', SkomdaStudentController::class);
-//     Route::apiResource('services', ServiceController::class);
-//     Route::apiResource('service-categories', ServiceCategoryController::class)->only(['store', 'update', 'destroy']);
-// });
-
-// // Client only
-// Route::middleware('auth:sanctum', 'role:client')->group(function () {
-//     Route::put('/clients/profile', [ClientController::class, 'update_profile']);
-//     Route::put('/clients/password', [ClientController::class, 'update_password']);
-//     Route::apiResource('clients', ClientController::class)->only(['show', 'update']);
-// });
-
-// // Freelancer only
-// Route::middleware('auth:sanctum', 'role:freelancer')->group(function () {
-//     Route::put('/freelancers/profile', [FreelancerController::class, 'update_profile']);
-//     Route::put('/freelancers/password', [FreelancerController::class, 'update_password']);
-// });
-
-// // Administrator + Freelancer
-// Route::middleware('auth:sanctum', 'role:administrator,freelancer')->group(function () {
-//     Route::apiResource('service-categories', ServiceCategoryController::class)->only(['index', 'show']);
-//     Route::apiResource('services', ServiceController::class)->only(['store', 'update', 'destroy']);
-// });
-
-// // Administrator + Client
-// Route::middleware('auth:sanctum', 'role:administrator,client')->group(function () {
-//     Route::apiResource('freelancers', FreelancerController::class)->only(['index', 'show']);
-//     Route::get('freelancers/{id}/services', [FreelancerController::class, 'show_services']);
-// });
-
-// // Administrator + Client + Freelancer
-// Route::middleware('auth:sanctum', 'role:administrator,client,freelancer')->group(function () {
-//     Route::apiResource('services', ServiceController::class)->only(['index', 'show']);
-// });
