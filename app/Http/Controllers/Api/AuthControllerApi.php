@@ -8,10 +8,12 @@ use App\Http\Requests\RegisterClientRequest;
 use App\Http\Requests\RegisterFreelancerRequest;
 use App\Http\Resources\AdministratorResource;
 use App\Http\Resources\FreelancerResource;
+use App\Models\Administrator;
 use App\Models\Client;
 use App\Models\Freelancer;
 use App\Models\SkomdaStudent;
 use App\Traits\ApiResponse;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -89,48 +91,89 @@ class AuthControllerApi extends Controller
     public function login(LoginRequest $request)
     {
         $credentials = $request->validated();
+        $email = $credentials['email'];
+        $password = $credentials['password'];
+        $role = $credentials['role'] ?? null;
 
-        if (Auth::guard('administrator')->attempt($credentials)) {
-            $admin = $request->user('administrator');
-            $token = $admin->createToken('api-token')->plainTextToken;
-            
-            return $this->successResponse([
-                'user' => new AdministratorResource($admin),
-                'role' => 'administrator',
-                'token' => $token,
-            ], 'Login sebagai administrator berhasil');
+        if ($role) {
+            return match ($role) {
+                'administrator' => $this->loginAdministrator($email, $password),
+                'client' => $this->loginClient($email, $password),
+                'freelancer' => $this->loginFreelancer($email, $password),
+            } ?? $this->errorResponse('Email atau password salah. Silakan coba lagi.', 401);
         }
 
-        if (Auth::guard('client')->attempt($credentials)) {
-            $token = $request->user('client')->createToken('api-token')->plainTextToken;
+        foreach (['administrator', 'client', 'freelancer'] as $attemptRole) {
+            $response = match ($attemptRole) {
+                'administrator' => $this->loginAdministrator($email, $password),
+                'client' => $this->loginClient($email, $password),
+                'freelancer' => $this->loginFreelancer($email, $password),
+            };
 
-            return $this->successResponse([
-                'user' => $request->user('client'),
-                'role' => 'client',
-                'token' => $token,
-            ], 'Login sebagai client berhasil');
-        }
-
-        $freelancer = Freelancer::with('skomda_student')->whereHas('skomda_student', function ($query) use ($credentials) {
-            $query->where('email', $credentials['email']);
-        })->first();
-
-        if ($freelancer && $freelancer->status !== 'Approved') {
-            return $this->errorResponse('Akun freelancer Anda sedang dalam status ' . $freelancer->status . '. Silakan tunggu konfirmasi dari administrator.', 403);
-        }
-
-        if ($freelancer && Hash::check($credentials['password'], $freelancer->password)) {
-            Auth::guard('freelancer')->login($freelancer);
-            $token = $request->user('freelancer')->createToken('api-token')->plainTextToken;
-
-            return $this->successResponse([
-                'user' => new FreelancerResource($freelancer),
-                'role' => 'freelancer',
-                'token' => $token,
-            ], 'Login sebagai freelancer berhasil');
+            if ($response) {
+                return $response;
+            }
         }
 
         return $this->errorResponse('Email atau password salah. Silakan coba lagi.', 401);
+    }
+
+    private function loginAdministrator(string $email, string $password): ?JsonResponse
+    {
+        $admin = Administrator::where('email', $email)->first();
+
+        if (! $admin || ! Hash::check($password, $admin->password)) {
+            return null;
+        }
+
+        $token = $admin->createToken('api-token')->plainTextToken;
+
+        return $this->successResponse([
+            'user' => new AdministratorResource($admin),
+            'role' => 'administrator',
+            'token' => $token,
+        ], 'Login sebagai administrator berhasil');
+    }
+
+    private function loginClient(string $email, string $password): ?JsonResponse
+    {
+        $client = Client::where('email', $email)->first();
+
+        if (! $client || ! Hash::check($password, $client->password)) {
+            return null;
+        }
+
+        $token = $client->createToken('api-token')->plainTextToken;
+
+        return $this->successResponse([
+            'user' => $client,
+            'role' => 'client',
+            'token' => $token,
+        ], 'Login sebagai client berhasil');
+    }
+
+    private function loginFreelancer(string $email, string $password): ?JsonResponse
+    {
+        $freelancer = Freelancer::whereHas('skomda_student', function ($query) use ($email) {
+            $query->where('email', $email);
+        })->first();
+
+        if (! $freelancer || ! Hash::check($password, $freelancer->password)) {
+            return null;
+        }
+
+        if ($freelancer->status !== 'Approved') {
+            return $this->errorResponse('Akun freelancer Anda sedang dalam status ' . $freelancer->status . '. Silakan tunggu konfirmasi dari administrator.', 403);
+        }
+
+        $token = $freelancer->createToken('api-token')->plainTextToken;
+        $freelancer->load('skomda_student');
+
+        return $this->successResponse([
+            'user' => new FreelancerResource($freelancer),
+            'role' => 'freelancer',
+            'token' => $token,
+        ], 'Login sebagai freelancer berhasil');
     }
 
     /**
