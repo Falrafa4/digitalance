@@ -26,6 +26,7 @@ class UserStoreRequest extends FormRequest
             'email' => 'required|email|unique:clients,email',
             'phone' => 'required|string',
             'password' => 'required|string|min:6',
+            'profile_photo' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:5120',
         ];
     }
 }

@@ -30,6 +30,10 @@ class ClientControllerApi extends Controller
 
     private const DEFAULT_PROFILE_PHOTO = 'profiles/placeholder.webp';
 
+    // ==========================================
+    // ADMIN-ONLY (MANAGE ANY CLIENT)
+    // ==========================================
+
     /**
      * Get All Data for User Management (Admin Dashboard)
      */
@@ -44,7 +48,7 @@ class ClientControllerApi extends Controller
         $skomdaQuery = SkomdaStudent::query()
             ->whereDoesntHave('freelancer')
             ->select('id', 'name', 'email', 'phone', DB::raw('NULL as profile_photo'), 'avatar', DB::raw("'Skomda Student' as role"), DB::raw("'Active' as status"), 'created_at');
-        
+
         // Use the query builder so Freelancer::getNameAttribute() does not override the joined student name.
         $freelancersQuery = DB::table('freelancers')
             ->join('skomda_students', 'freelancers.student_id', '=', 'skomda_students.id')
@@ -109,10 +113,15 @@ class ClientControllerApi extends Controller
     public function store(UserStoreRequest $request): JsonResponse
     {
         $validated = $request->validated();
+
+        if ($profilePhoto = $this->storeProfilePhoto($request)) {
+            $validated['profile_photo'] = $profilePhoto;
+        }
+
         $validated['password'] = Hash::make($validated['password']);
         $client = Client::create($validated);
 
-        return $this->successResponse(new ClientResource($client), 'Klien berhasil ditambahkan', 201);
+        return $this->successResponse(new ClientResource($client->fresh()), 'Klien berhasil ditambahkan', 201);
     }
 
     /**
@@ -143,6 +152,32 @@ class ClientControllerApi extends Controller
 
         return $this->successResponse(null, 'Akun klien berhasil dihapus');
     }
+
+    /**
+     * Update a client's password.
+     */
+    public function updateClientPassword(UpdateUserPasswordRequest $request, string $id): JsonResponse
+    {
+        $client = Client::findOrFail($id);
+        $this->updateHashedPassword($client, $request->password);
+
+        return $this->successResponse(null, 'Password ' . $client->name . ' berhasil diperbarui');
+    }
+
+    /**
+     * Update a freelancer's password.
+     */
+    public function updateFreelancerPassword(UpdateUserPasswordRequest $request, string $id): JsonResponse
+    {
+        $freelancer = Freelancer::findOrFail($id);
+        $this->updateHashedPassword($freelancer, $request->password);
+
+        return $this->successResponse(null, 'Password ' . ($freelancer->skomda_student->name ?? 'Freelancer') . ' berhasil diperbarui');
+    }
+
+    // ==========================================
+    // CLIENT ONLY (MANAGE OWN ACCOUNT)
+    // ==========================================
 
     /**
      * Update the client's profile.
@@ -181,45 +216,6 @@ class ClientControllerApi extends Controller
     }
 
     // ==========================================
-    // ADMIN-ONLY (MANAGE ANY CLIENT)
-    // ==========================================
-    /**
-     * Update a client's password.
-     */
-    public function updateClientPassword(UpdateUserPasswordRequest $request, string $id): JsonResponse
-    {
-        $client = Client::findOrFail($id);
-        $this->updateHashedPassword($client, $request->password);
-
-        return $this->successResponse(null, 'Password ' . $client->name . ' berhasil diperbarui');
-    }
-
-    /**
-     * Update a freelancer's password.
-     */
-    public function updateFreelancerPassword(UpdateUserPasswordRequest $request, string $id): JsonResponse
-    {
-        $freelancer = Freelancer::findOrFail($id);
-        $this->updateHashedPassword($freelancer, $request->password);
-
-        return $this->successResponse(null, 'Password ' . ($freelancer->skomda_student->name ?? 'Freelancer') . ' berhasil diperbarui');
-    }
-
-    /**
-     * Update a Skomda student's password.
-     */
-    public function updateSkomdaPassword(UpdateUserPasswordRequest $request, string $id): JsonResponse
-    {
-        $skomdaStudent = SkomdaStudent::findOrFail($id);
-
-        if (! $this->updateHashedPassword($skomdaStudent, $request->password)) {
-            return $this->errorResponse('Perubahan password untuk akun Skomda Student belum didukung.', 422);
-        }
-
-        return $this->successResponse(null, 'Password ' . $skomdaStudent->name . ' berhasil diperbarui');
-    }
-
-    // ==========================================
     // FREELANCER ONLY
     // ==========================================
 
@@ -236,6 +232,10 @@ class ClientControllerApi extends Controller
 
         return $this->successResponse($clients, 'Data klien berhasil diambil');
     }
+
+    // ==========================================
+    // HELPER METHODS
+    // ==========================================
 
     private function normalizeAdminUserRole(?string $role): string
     {

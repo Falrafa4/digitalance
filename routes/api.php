@@ -32,18 +32,18 @@ Route::prefix('v1')->group(function() {
         Route::get('/me', [AuthControllerApi::class, 'me'])->middleware('auth:sanctum');
     });
     
-    Route::middleware('auth:sanctum', 'role:administrator')->group(function () {
+    Route::middleware(['auth:sanctum', 'role:administrator'])->group(function () {
         Route::get('/users', [ClientControllerApi::class, 'index']);
-        Route::put('/freelancers/{id}/password', [ClientControllerApi::class, 'updateFreelancerPassword']);
-        Route::put('/skomda-students/{id}/password', [ClientControllerApi::class, 'updateSkomdaPassword']);
+        Route::apiResource('/clients', ClientControllerApi::class)->only(['store', 'show', 'update', 'destroy']);
         Route::put('/clients/{id}/password', [ClientControllerApi::class, 'updateClientPassword']);
+        Route::put('/freelancers/{id}/password', [ClientControllerApi::class, 'updateFreelancerPassword']);
     });
 
-    Route::middleware('auth:sanctum', 'role:freelancer')->group(function () {
+    Route::middleware(['auth:sanctum', 'role:freelancer'])->group(function () {
         Route::get('/freelancers/clients', [ClientControllerApi::class, 'freelancerIndex']);
     });
 
-    Route::middleware('auth:sanctum', 'role:client')->group(function () {
+    Route::middleware(['auth:sanctum', 'role:client'])->group(function () {
         Route::get('/clients/profile', [ClientControllerApi::class, 'profile']);
         Route::put('/clients/profile', [ClientControllerApi::class, 'updateProfile']);
         Route::put('/clients/password', [ClientControllerApi::class, 'updatePassword']);
