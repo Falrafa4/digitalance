@@ -39,17 +39,19 @@ Digitalance dibuat untuk:
 - Manajemen layanan (`services`)
 - Sistem pemesanan (`orders`)
 - Sistem penawaran & negosiasi (`offers`)
+- Inbox chat negosiasi realtime antara `Client` dan `Freelancer`
 - Manajemen transaksi
 - Upload hasil pekerjaan
 - Sistem review (one-to-one per order)
 - Kategori layanan
+- Fitur lowongan kerja (`loker`) dan lamaran freelancer
 - Dashboard berbeda untuk setiap role
 - Attachment upload pada order
 - Upload gambar profil dan portofolio dengan konversi WebP
 - Avatar user di dashboard dan halaman publik
 - Navbar publik dengan efek floating saat scroll
 - Dokumentasi API sederhana
-- Realtime infrastructure (persiapan negotiation/chat)
+- Status visual pesan pada inbox chat (`Perlu Respons` / `Sudah Dibaca`)
 
 ---
 
@@ -251,10 +253,17 @@ Rekomendasi:
 composer dev
 ```
 
+Untuk fitur realtime negotiation/chat pada local development, jalankan Laravel Reverb di terminal terpisah:
+
+```bash
+php artisan reverb:start
+```
+
 Alternatif manual:
 
 ```bash
 php artisan serve
+php artisan reverb:start
 npm run dev
 ```
 
@@ -355,7 +364,7 @@ docs/               # Dokumentasi internal
 
 - Surface API masih terbatas
 - Layout masih hybrid: Tailwind CDN + CSS statis + Vite scaffold
-- Realtime negotiation/chat belum sepenuhnya selesai end-to-end
+- Realtime negotiation/chat membutuhkan proses `Laravel Reverb` aktif saat development lokal
 - Payment gateway belum diimplementasikan
 - Test coverage masih minimal dan membutuhkan perluasan feature testing
 

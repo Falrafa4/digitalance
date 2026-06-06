@@ -38,6 +38,7 @@
                 @endphp
                 <div class="msg-card bg-white border {{ $needsResponse ? 'border-amber-300 bg-amber-50/30' : 'border-slate-200' }} rounded-[20px] p-5 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer" 
                      data-order-id="{{ $orderId }}"
+                     data-needs-response="{{ $needsResponse ? '1' : '0' }}"
                      data-type="{{ $isLog ? 'log' : 'chat' }}"
                      onclick="openChatModal({{ $orderId }}, '{{ addslashes($clientName) }}')">
                     <div class="flex items-center gap-4 mb-4 pb-4 border-b border-slate-100">
@@ -46,11 +47,17 @@
                                 <i class="ri-user-smile-line"></i>
                             </div>
                             @if($needsResponse)
-                                <div class="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-amber-500 border-2 border-white flex items-center justify-center">
+                                <div data-role="attention-indicator" class="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-amber-500 border-2 border-white flex items-center justify-center">
                                     <i class="ri-error-warning-fill text-[8px] text-white"></i>
                                 </div>
                             @else
-                                <div class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-emerald-500 border-2 border-white"></div>
+                                <div data-role="attention-indicator" class="hidden absolute -top-1 -right-1 w-5 h-5 rounded-full bg-amber-500 border-2 border-white items-center justify-center">
+                                    <i class="ri-error-warning-fill text-[8px] text-white"></i>
+                                </div>
+                                <div data-role="normal-indicator" class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-emerald-500 border-2 border-white"></div>
+                            @endif
+                            @if($needsResponse)
+                                <div data-role="normal-indicator" class="hidden absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-emerald-500 border-2 border-white"></div>
                             @endif
                         </div>
                         <div class="min-w-0 flex-1">
@@ -58,8 +65,18 @@
                                 <h3 class="font-bold text-slate-900 truncate">{{ $clientName }}</h3>
                                 <div class="flex items-center gap-1.5 flex-shrink-0">
                                     @if($needsResponse)
-                                        <span class="px-2 py-0.5 rounded-md text-[9px] font-extrabold uppercase bg-amber-100 text-amber-700 animate-pulse">
+                                        <span data-role="attention-badge" class="px-2 py-0.5 rounded-md text-[9px] font-extrabold uppercase bg-amber-100 text-amber-700 animate-pulse">
                                             Perlu Respons
+                                        </span>
+                                        <span data-role="seen-badge" class="hidden px-2 py-0.5 rounded-md text-[9px] font-extrabold uppercase bg-teal-50 text-teal-700">
+                                            Sudah Dibaca
+                                        </span>
+                                    @else
+                                        <span data-role="attention-badge" class="hidden px-2 py-0.5 rounded-md text-[9px] font-extrabold uppercase bg-amber-100 text-amber-700 animate-pulse">
+                                            Perlu Respons
+                                        </span>
+                                        <span data-role="seen-badge" class="hidden px-2 py-0.5 rounded-md text-[9px] font-extrabold uppercase bg-teal-50 text-teal-700">
+                                            Sudah Dibaca
                                         </span>
                                     @endif
                                     <span class="px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase bg-teal-50 text-teal-700">
@@ -75,7 +92,9 @@
                         <div class="flex items-center justify-between mb-1.5">
                             <p data-role="preview-time" class="text-[11px] font-bold text-slate-400">{{ $latestMsg->created_at->diffForHumans() }}</p>
                             @if(!$isLog && $needsResponse)
-                                <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+                                <span data-role="preview-unread-dot" class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+                            @else
+                                <span data-role="preview-unread-dot" class="hidden w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
                             @endif
                         </div>
                         <p data-role="preview-message" class="text-[13px] text-slate-600 line-clamp-2">
@@ -148,8 +167,16 @@
 
 <script>
     const threadData = @json($negotiations->groupBy('order_id'));
+    const chatOrderIds = @json(($chatOrderIds ?? collect())->values());
     let activeOrderId = null;
     const mySender = 'freelancer';
+    const threadSeenStoragePrefix = 'digitalance:messages:freelancer:seen:';
+
+    function getSocketId() {
+        return window.Echo && typeof window.Echo.socketId === 'function'
+            ? window.Echo.socketId()
+            : null;
+    }
 
     function renderMessageBubble(m) {
         const isMe = m.sender === mySender;
@@ -167,6 +194,108 @@
         `;
     }
 
+    function getSeenStorageKey(orderId) {
+        return threadSeenStoragePrefix + orderId;
+    }
+
+    function getSeenThreadTimestamp(orderId) {
+        try {
+            return window.localStorage.getItem(getSeenStorageKey(orderId));
+        } catch (error) {
+            return null;
+        }
+    }
+
+    function setSeenThreadTimestamp(orderId, timestamp) {
+        if (!timestamp) return;
+
+        try {
+            window.localStorage.setItem(getSeenStorageKey(orderId), timestamp);
+        } catch (error) {
+            // Ignore storage failures; unread state will still work in-memory.
+        }
+    }
+
+    function getThreadMessages(orderId) {
+        return [...(threadData[String(orderId)] || [])].sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+    }
+
+    function getLatestIncomingMessage(orderId) {
+        const messages = getThreadMessages(orderId);
+
+        for (let index = messages.length - 1; index >= 0; index -= 1) {
+            if (messages[index].sender !== mySender) {
+                return messages[index];
+            }
+        }
+
+        return null;
+    }
+
+    function threadNeedsResponse(orderId) {
+        const latestIncoming = getLatestIncomingMessage(orderId);
+
+        if (!latestIncoming) {
+            return false;
+        }
+
+        return !getThreadMessages(orderId).some((message) => (
+            message.sender === mySender
+            && new Date(message.created_at) > new Date(latestIncoming.created_at)
+        ));
+    }
+
+    function threadHasBeenSeen(orderId) {
+        const latestIncoming = getLatestIncomingMessage(orderId);
+        const seenAt = getSeenThreadTimestamp(orderId);
+
+        if (!latestIncoming || !seenAt) {
+            return false;
+        }
+
+        return new Date(seenAt) >= new Date(latestIncoming.created_at);
+    }
+
+    function syncThreadState(orderId) {
+        const card = document.querySelector(`.msg-card[data-order-id="${orderId}"]`);
+        if (!card) return;
+
+        const needsResponse = threadNeedsResponse(orderId);
+        const hasBeenSeen = needsResponse && threadHasBeenSeen(orderId);
+        const showAttention = needsResponse && !hasBeenSeen;
+        const showSeen = needsResponse && hasBeenSeen;
+
+        card.dataset.needsResponse = needsResponse ? '1' : '0';
+        card.classList.toggle('border-amber-300', showAttention);
+        card.classList.toggle('bg-amber-50/30', showAttention);
+        card.classList.toggle('border-slate-200', !showAttention);
+
+        const attentionIndicator = card.querySelector('[data-role="attention-indicator"]');
+        const normalIndicator = card.querySelector('[data-role="normal-indicator"]');
+        const attentionBadge = card.querySelector('[data-role="attention-badge"]');
+        const seenBadge = card.querySelector('[data-role="seen-badge"]');
+        const unreadDot = card.querySelector('[data-role="preview-unread-dot"]');
+
+        attentionIndicator?.classList.toggle('hidden', !showAttention);
+        attentionIndicator?.classList.toggle('flex', showAttention);
+        normalIndicator?.classList.toggle('hidden', showAttention);
+        attentionBadge?.classList.toggle('hidden', !showAttention);
+        seenBadge?.classList.toggle('hidden', !showSeen);
+        unreadDot?.classList.toggle('hidden', !showAttention);
+    }
+
+    function markThreadAsSeen(orderId, timestamp = null) {
+        const latestIncoming = getLatestIncomingMessage(orderId);
+        const seenTimestamp = timestamp || latestIncoming?.created_at;
+
+        if (!seenTimestamp) {
+            return;
+        }
+
+        setSeenThreadTimestamp(orderId, seenTimestamp);
+        syncThreadState(orderId);
+    }
+
     function appendMessage(orderId, message) {
         const key = String(orderId);
 
@@ -179,9 +308,14 @@
             const body = document.getElementById('chat-body');
             body.insertAdjacentHTML('beforeend', renderMessageBubble(message));
             body.scrollTop = body.scrollHeight;
+
+            if (message.sender !== mySender) {
+                markThreadAsSeen(orderId, message.created_at);
+            }
         }
 
         updateThreadPreview(orderId, message);
+        syncThreadState(orderId);
     }
 
     function updateThreadPreview(orderId, message) {
@@ -199,6 +333,8 @@
         if (messageEl) {
             messageEl.textContent = `${isMe ? 'Kamu: ' : ''}${message.message}`;
         }
+
+        syncThreadState(orderId);
     }
 
     function subscribeOrderChannel(orderId) {
@@ -208,6 +344,23 @@
             .listen('NegotiationSent', (e) => {
                 appendMessage(orderId, e);
             });
+    }
+
+    function replaceTempMessage(orderId, tempId, realMessage) {
+        const key = String(orderId);
+        const messages = threadData[key] || [];
+        const index = messages.findIndex((message) => message.id === tempId);
+
+        if (index !== -1) {
+            messages[index] = realMessage;
+        }
+
+        const body = document.getElementById('chat-body');
+        const tempEl = body.querySelector(`[data-temp-id="${tempId}"]`);
+
+        if (tempEl) {
+            tempEl.outerHTML = renderMessageBubble(realMessage);
+        }
     }
 
     function openChatModal(orderId, clientName) {
@@ -224,6 +377,8 @@
             const msgs = [...threadData[key]].sort((a,b) => new Date(a.created_at) - new Date(b.created_at));
             msgs.forEach(m => body.insertAdjacentHTML('beforeend', renderMessageBubble(m)));
         }
+
+        markThreadAsSeen(orderId);
 
         const modal = document.getElementById('modal-chat');
         modal.classList.add('open');
@@ -278,6 +433,7 @@
                     'Accept': 'application/json',
                     'X-Requested-With': 'XMLHttpRequest',
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    ...(getSocketId() ? { 'X-Socket-ID': getSocketId() } : {}),
                 },
                 body: formData,
             });
@@ -287,11 +443,19 @@
             if (!response.ok || !payload.success) {
                 throw new Error(payload.message || 'Gagal mengirim pesan.');
             }
+
+            if (payload.data) {
+                replaceTempMessage(tempMsg.order_id, tempId, payload.data);
+                updateThreadPreview(tempMsg.order_id, payload.data);
+            }
         } catch (error) {
             // Rollback optimistic UI
             const body = document.getElementById('chat-body');
             const tempEl = body.querySelector(`[data-temp-id="${tempId}"]`);
             if (tempEl) tempEl.remove();
+
+            const key = String(tempMsg.order_id);
+            threadData[key] = (threadData[key] || []).filter((message) => message.id !== tempId);
 
             // Restore textarea
             textarea.value = msg;
@@ -305,13 +469,28 @@
         }
     }
 
+    function handleComposerKeydown(event) {
+        if (event.key !== 'Enter' || event.shiftKey || event.isComposing) {
+            return;
+        }
+
+        event.preventDefault();
+        event.currentTarget.form?.requestSubmit();
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
-        Object.keys(threadData).forEach(orderId => subscribeOrderChannel(orderId));
+        const orderIdsToSubscribe = chatOrderIds.length ? chatOrderIds : Object.keys(threadData);
+        orderIdsToSubscribe.forEach(orderId => subscribeOrderChannel(orderId));
 
         const sendForm = document.getElementById('chat-send-form-freelancer');
         if (sendForm) {
             sendForm.addEventListener('submit', handleSendMessage);
+
+            const textarea = sendForm.querySelector('textarea[name="message"]');
+            textarea?.addEventListener('keydown', handleComposerKeydown);
         }
+
+        orderIdsToSubscribe.forEach(orderId => syncThreadState(orderId));
     });
 </script>
 @endsection

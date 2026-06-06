@@ -33,7 +33,11 @@ class NegotiationController extends Controller
                 $query->where('freelancer_id', $freelancer->id);
             })->get();
 
-        return view('dashboard.freelancer.messages', compact('negotiations'));
+        $chatOrderIds = Order::whereHas('service', function ($query) use ($freelancer) {
+            $query->where('freelancer_id', $freelancer->id);
+        })->pluck('id');
+
+        return view('dashboard.freelancer.messages', compact('negotiations', 'chatOrderIds'));
     }
 
     public function freelancerSendMessage(SendMessageRequest $request)
@@ -106,7 +110,9 @@ class NegotiationController extends Controller
             ->whereHas('order', fn($q) => $q->where('client_id', $client->id))
             ->get();
 
-        return view('dashboard.client.messages', compact('negotiations'));
+        $chatOrderIds = Order::where('client_id', $client->id)->pluck('id');
+
+        return view('dashboard.client.messages', compact('negotiations', 'chatOrderIds'));
     }
 
     public function clientSendMessage(Request $request)
