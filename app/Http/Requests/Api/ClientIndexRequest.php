@@ -3,9 +3,8 @@
 namespace App\Http\Requests\Api;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
-class UserUpdateRequest extends FormRequest
+class ClientIndexRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,13 +21,10 @@ class UserUpdateRequest extends FormRequest
      */
     public function rules(): array
     {
-        $client = $this->route('client') ?? $this->route('id');
-        $clientId = is_object($client) ? $client->id : $client;
-
         return [
-            'name' => ['required', 'string'],
-            'email' => ['required', 'email', Rule::unique('clients', 'email')->ignore($clientId)],
-            'phone' => ['required', 'string'],
+            'q' => ['nullable', 'string', 'max:255'],
+            'role' => ['nullable', 'string'],
+            'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],
         ];
     }
 }
