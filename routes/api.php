@@ -8,6 +8,7 @@
 // use App\Http\Controllers\ServiceController;
 // use App\Http\Controllers\SkomdaStudentController;
 use App\Http\Controllers\Api\AuthControllerApi;
+use App\Http\Controllers\Api\AdministratorControllerApi;
 use App\Http\Controllers\Api\ClientControllerApi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -23,7 +24,7 @@ Route::get('/test', function () {
     ]);
 });
 
-Route::prefix('v1')->group(function() {
+Route::prefix('v1')->group(function () {
     Route::prefix('auth')->group(function () {
         Route::post('/register/client', [AuthControllerApi::class, 'registerClient']);
         Route::post('/register/freelancer', [AuthControllerApi::class, 'registerFreelancer']);
@@ -31,12 +32,17 @@ Route::prefix('v1')->group(function() {
         Route::post('/logout', [AuthControllerApi::class, 'logout'])->middleware('auth:sanctum');
         Route::get('/me', [AuthControllerApi::class, 'me'])->middleware('auth:sanctum');
     });
-    
+
     Route::middleware(['auth:sanctum', 'role:administrator'])->group(function () {
         Route::get('/users', [ClientControllerApi::class, 'index']);
         Route::apiResource('/clients', ClientControllerApi::class)->only(['store', 'show', 'update', 'destroy']);
         Route::put('/clients/{id}/password', [ClientControllerApi::class, 'updateClientPassword']);
         Route::put('/freelancers/{id}/password', [ClientControllerApi::class, 'updateFreelancerPassword']);
+
+        Route::put('/administrators/profile', [AdministratorControllerApi::class, 'updateProfile']);
+        Route::put('/administrators/{administrator}/password', [AdministratorControllerApi::class, 'updateAdminPassword']);
+        Route::put('/administrators/password', [AdministratorControllerApi::class, 'updatePassword']);
+        Route::apiResource('/administrators', AdministratorControllerApi::class);
     });
 
     Route::middleware(['auth:sanctum', 'role:freelancer'])->group(function () {

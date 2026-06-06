@@ -7,6 +7,7 @@ use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterClientRequest;
 use App\Http\Requests\RegisterFreelancerRequest;
 use App\Http\Resources\AdministratorResource;
+use App\Http\Resources\ClientResource;
 use App\Http\Resources\FreelancerResource;
 use App\Models\Administrator;
 use App\Models\Client;
@@ -29,10 +30,22 @@ class AuthControllerApi extends Controller
     public function me(Request $request)
     {
         $user = $request->user();
+        $role = null;
+
+        if ($user instanceof Administrator) {
+            $user = new AdministratorResource($user);
+            $role = 'administrator';
+        } elseif ($user instanceof Client) {
+            $user = new ClientResource($user);
+            $role = 'client';
+        } elseif ($user instanceof Freelancer) {
+            $user = new FreelancerResource($user);
+            $role = 'freelancer';
+        }
 
         return $this->successResponse([
             'user' => $user,
-            'role' => Auth::guard('administrator')->check() ? 'administrator' : (Auth::guard('client')->check() ? 'client' : (Auth::guard('freelancer')->check() ? 'freelancer' : null)),
+            'role' => $role,
         ], 'Profil berhasil diambil');
     }
 
