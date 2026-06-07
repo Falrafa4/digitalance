@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AuthControllerApi;
 use App\Http\Controllers\Api\AdministratorControllerApi;
 use App\Http\Controllers\Api\ClientControllerApi;
 use App\Http\Controllers\Api\FreelancerControllerApi;
+use App\Http\Controllers\Api\OrderControllerApi;
 use App\Http\Controllers\Api\PortofolioControllerApi;
 use App\Http\Controllers\Api\ServiceCategoryControllerApi;
 use App\Http\Controllers\Api\ServiceControllerApi;
@@ -51,6 +52,12 @@ Route::prefix('v1')->group(function () {
         Route::get('/portofolios/{portofolio}', [PortofolioControllerApi::class, 'adminShow'])->whereNumber('portofolio');
         Route::put('/portofolios/{portofolio}', [PortofolioControllerApi::class, 'adminUpdate'])->whereNumber('portofolio');
         Route::delete('/portofolios/{portofolio}', [PortofolioControllerApi::class, 'adminDestroy'])->whereNumber('portofolio');
+
+        Route::get('/orders', [OrderControllerApi::class, 'index']);
+        Route::post('/orders', [OrderControllerApi::class, 'store']);
+        Route::get('/orders/{order}', [OrderControllerApi::class, 'show'])->whereNumber('order');
+        Route::post('/orders/{order}/status', [OrderControllerApi::class, 'updateStatus'])->whereNumber('order');
+        Route::delete('/orders/{order}', [OrderControllerApi::class, 'destroy'])->whereNumber('order');
         
         Route::put('/freelancers/{id}/password', [ClientControllerApi::class, 'updateFreelancerPassword']);
         Route::get('/freelancers/{freelancer}/services', [FreelancerControllerApi::class, 'showServices'])->whereNumber('freelancer');
@@ -88,6 +95,15 @@ Route::prefix('v1')->group(function () {
         Route::get('/freelancers/portofolios/{portofolio}', [PortofolioControllerApi::class, 'show'])->whereNumber('portofolio');
         Route::put('/freelancers/portofolios/{portofolio}', [PortofolioControllerApi::class, 'update'])->whereNumber('portofolio');
         Route::delete('/freelancers/portofolios/{portofolio}', [PortofolioControllerApi::class, 'destroy'])->whereNumber('portofolio');
+
+        Route::get('/freelancers/orders', [OrderControllerApi::class, 'freelancerIndex']);
+        Route::get('/freelancers/orders/{order}', [OrderControllerApi::class, 'freelancerShow'])->whereNumber('order');
+        Route::patch('/freelancers/orders/{order}/status', [OrderControllerApi::class, 'updateStatusFreelancer'])->whereNumber('order');
+        Route::patch('/freelancers/orders/{order}/price', [OrderControllerApi::class, 'updateAgreedPrice'])->whereNumber('order');
+        Route::post('/freelancers/orders/{order}/accept', [OrderControllerApi::class, 'freelancerAccept'])->whereNumber('order');
+        Route::post('/freelancers/orders/{order}/reject', [OrderControllerApi::class, 'freelancerReject'])->whereNumber('order');
+        Route::post('/freelancers/orders/{order}/revision/approve', [OrderControllerApi::class, 'freelancerApproveRevision'])->whereNumber('order');
+        Route::post('/freelancers/orders/{order}/revision/reject', [OrderControllerApi::class, 'freelancerRejectRevision'])->whereNumber('order');
     });
 
     Route::middleware(['auth:sanctum', 'role:client'])->group(function () {
@@ -104,5 +120,17 @@ Route::prefix('v1')->group(function () {
         
         Route::get('/talents/{freelancer}/portofolios', [PortofolioControllerApi::class, 'showAllFreelancerPortofolios'])->whereNumber('freelancer');
         Route::get('/client/portofolios/{portofolio}', [PortofolioControllerApi::class, 'showFreelancerPortofolio'])->whereNumber('portofolio');
+
+        Route::get('/clients/orders', [OrderControllerApi::class, 'clientIndex']);
+        Route::post('/clients/orders', [OrderControllerApi::class, 'clientStore']);
+        Route::get('/clients/orders/{order}', [OrderControllerApi::class, 'clientShow'])->whereNumber('order');
+        Route::post('/clients/orders/{order}/attachments', [OrderControllerApi::class, 'uploadAttachment'])->whereNumber('order');
+        Route::post('/clients/orders/{order}/accept', [OrderControllerApi::class, 'clientAccept'])->whereNumber('order');
+        Route::get('/clients/orders/{order}/checkout', [OrderControllerApi::class, 'checkout'])->whereNumber('order');
+        Route::post('/clients/orders/{order}/checkout', [OrderControllerApi::class, 'processPayment'])->whereNumber('order');
+        Route::post('/clients/orders/{order}/reject', [OrderControllerApi::class, 'clientReject'])->whereNumber('order');
+        Route::post('/clients/orders/{order}/nego', [OrderControllerApi::class, 'clientNegotiate'])->whereNumber('order');
+        Route::post('/clients/orders/{order}/revision', [OrderControllerApi::class, 'clientRequestRevision'])->whereNumber('order');
+        Route::post('/clients/orders/{order}/complete', [OrderControllerApi::class, 'clientComplete'])->whereNumber('order');
     });
 });
