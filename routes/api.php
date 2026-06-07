@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AuthControllerApi;
 use App\Http\Controllers\Api\AdministratorControllerApi;
 use App\Http\Controllers\Api\ClientControllerApi;
 use App\Http\Controllers\Api\FreelancerControllerApi;
+use App\Http\Controllers\Api\PortofolioControllerApi;
 use App\Http\Controllers\Api\ServiceCategoryControllerApi;
 use App\Http\Controllers\Api\ServiceControllerApi;
 use App\Http\Controllers\Api\SkomdaStudentControllerApi;
@@ -43,6 +44,10 @@ Route::prefix('v1')->group(function () {
         Route::get('/service-categories/{serviceCategory}', [ServiceCategoryControllerApi::class, 'show'])->whereNumber('serviceCategory');
         Route::put('/service-categories/{serviceCategory}', [ServiceCategoryControllerApi::class, 'update'])->whereNumber('serviceCategory');
         Route::delete('/service-categories/{serviceCategory}', [ServiceCategoryControllerApi::class, 'destroy'])->whereNumber('serviceCategory');
+        Route::get('/portofolios', [PortofolioControllerApi::class, 'index']);
+        Route::get('/portofolios/{portofolio}', [PortofolioControllerApi::class, 'adminShow'])->whereNumber('portofolio');
+        Route::put('/portofolios/{portofolio}', [PortofolioControllerApi::class, 'adminUpdate'])->whereNumber('portofolio');
+        Route::delete('/portofolios/{portofolio}', [PortofolioControllerApi::class, 'adminDestroy'])->whereNumber('portofolio');
         
         Route::put('/freelancers/{id}/password', [ClientControllerApi::class, 'updateFreelancerPassword']);
         Route::get('/freelancers/{freelancer}/services', [FreelancerControllerApi::class, 'showServices'])->whereNumber('freelancer');
@@ -73,6 +78,11 @@ Route::prefix('v1')->group(function () {
         Route::delete('/freelancers/services/{service}', [ServiceControllerApi::class, 'destroy'])->whereNumber('service');
         Route::post('/freelancers/services/{service}/submit', [ServiceControllerApi::class, 'submit'])->whereNumber('service');
         Route::get('/freelancers/service-categories', [ServiceCategoryControllerApi::class, 'freelancerIndex']);
+        Route::get('/freelancers/portofolios', [PortofolioControllerApi::class, 'freelancerIndex']);
+        Route::post('/freelancers/portofolios', [PortofolioControllerApi::class, 'store']);
+        Route::get('/freelancers/portofolios/{portofolio}', [PortofolioControllerApi::class, 'show'])->whereNumber('portofolio');
+        Route::put('/freelancers/portofolios/{portofolio}', [PortofolioControllerApi::class, 'update'])->whereNumber('portofolio');
+        Route::delete('/freelancers/portofolios/{portofolio}', [PortofolioControllerApi::class, 'destroy'])->whereNumber('portofolio');
     });
 
     Route::middleware(['auth:sanctum', 'role:client'])->group(function () {
@@ -84,5 +94,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/client/service-categories', [ServiceCategoryControllerApi::class, 'clientIndex']);
         Route::get('/talents', [FreelancerControllerApi::class, 'clientFindTalent']);
         Route::get('/talents/{freelancer}', [FreelancerControllerApi::class, 'clientTalentShow'])->whereNumber('freelancer');
+        Route::get('/talents/{freelancer}/portofolios', [PortofolioControllerApi::class, 'showAllFreelancerPortofolios'])->whereNumber('freelancer');
+        Route::get('/client/portofolios/{portofolio}', [PortofolioControllerApi::class, 'showFreelancerPortofolio'])->whereNumber('portofolio');
     });
 });
