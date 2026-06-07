@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\ReviewControllerApi;
 use App\Http\Controllers\Api\ServiceCategoryControllerApi;
 use App\Http\Controllers\Api\ServiceControllerApi;
 use App\Http\Controllers\Api\SkomdaStudentControllerApi;
+use App\Http\Controllers\Api\TransactionControllerApi;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/test', function () {
@@ -74,6 +75,7 @@ Route::prefix('v1')->group(function () {
 
         Route::apiResource('results', ResultControllerApi::class);
         Route::apiResource('reviews', ReviewControllerApi::class);
+        Route::apiResource('transactions', TransactionControllerApi::class);
     });
 
     Route::middleware(['auth:sanctum', 'role:administrator'])->group(function () {

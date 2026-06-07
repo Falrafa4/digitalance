@@ -13,6 +13,7 @@ use App\Models\Review;
 use App\Models\Service;
 use App\Models\ServiceCategory;
 use App\Models\SkomdaStudent;
+use App\Models\Transaction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Hash;
@@ -418,6 +419,96 @@ class RestApiCanonicalRoutesTest extends TestCase
         ]);
     }
 
+    public function test_admin_can_create_transaction_on_canonical_route(): void
+    {
+        [$admin, , , $order] = $this->makeOrderFixture();
+
+        Sanctum::actingAs($admin);
+
+        $this->postJson('/api/v1/transactions', [
+            'order_id' => $order->id,
+            'amount' => 1500000,
+            'type' => 'Full',
+            'status' => 'Paid',
+        ])
+            ->assertCreated()
+            ->assertJsonPath('data.order_id', $order->id)
+            ->assertJsonPath('data.amount', 1500000)
+            ->assertJsonPath('data.type', 'Full')
+            ->assertJsonPath('data.status', 'Paid');
+
+        $this->assertDatabaseHas('transactions', [
+            'order_id' => $order->id,
+            'type' => 'Full',
+            'status' => 'Paid',
+        ]);
+    }
+
+    public function test_client_can_view_transaction_owned_by_their_order(): void
+    {
+        [, $client, , $order] = $this->makeOrderFixture();
+        $transaction = $this->makeTransaction($order);
+
+        Sanctum::actingAs($client);
+
+        $this->getJson('/api/v1/transactions/'.$transaction->id)
+            ->assertOk()
+            ->assertJsonPath('data.id', $transaction->id)
+            ->assertJsonPath('data.order.client.id', $client->id);
+    }
+
+    public function test_other_freelancer_cannot_view_transaction_owned_by_different_order(): void
+    {
+        [, , , $order] = $this->makeOrderFixture();
+        $transaction = $this->makeTransaction($order);
+        $otherFreelancer = $this->makeFreelancer('other-transaction-freelancer@example.com');
+
+        Sanctum::actingAs($otherFreelancer);
+
+        $this->getJson('/api/v1/transactions/'.$transaction->id)
+            ->assertForbidden();
+    }
+
+    public function test_admin_can_update_transaction_with_put_on_canonical_route(): void
+    {
+        [$admin, , , $order] = $this->makeOrderFixture();
+        $transaction = $this->makeTransaction($order);
+
+        Sanctum::actingAs($admin);
+
+        $this->putJson('/api/v1/transactions/'.$transaction->id, [
+            'amount' => 1750000,
+            'type' => 'Refund',
+            'status' => 'Failed',
+        ])
+            ->assertOk()
+            ->assertJsonPath('data.amount', 1750000)
+            ->assertJsonPath('data.type', 'Refund')
+            ->assertJsonPath('data.status', 'Failed');
+
+        $this->assertDatabaseHas('transactions', [
+            'id' => $transaction->id,
+            'amount' => 1750000,
+            'type' => 'Refund',
+            'status' => 'Failed',
+        ]);
+    }
+
+    public function test_admin_can_delete_transaction_on_canonical_route(): void
+    {
+        [$admin, , , $order] = $this->makeOrderFixture();
+        $transaction = $this->makeTransaction($order);
+
+        Sanctum::actingAs($admin);
+
+        $this->deleteJson('/api/v1/transactions/'.$transaction->id)
+            ->assertOk();
+
+        $this->assertDatabaseMissing('transactions', [
+            'id' => $transaction->id,
+        ]);
+    }
+
     private function makeOrderFixture(): array
     {
         $admin = Administrator::create([
@@ -528,6 +619,16 @@ class RestApiCanonicalRoutesTest extends TestCase
             'order_id' => $order->id,
             'rating' => 5,
             'comment' => 'Review untuk test API.',
+        ]);
+    }
+
+    private function makeTransaction(Order $order): Transaction
+    {
+        return Transaction::create([
+            'order_id' => $order->id,
+            'amount' => 1500000,
+            'type' => 'Full',
+            'status' => 'Paid',
         ]);
     }
 }
