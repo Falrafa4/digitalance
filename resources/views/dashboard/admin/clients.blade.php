@@ -793,5 +793,18 @@
             // Default Role: Client
             window.setAddRole('Client');
         });
+
+        // Modal wrapper functions for backward compatibility
+        window.openModal = function(overlayId) {
+            if (window.DigitalanceUtils && typeof window.DigitalanceUtils.openModal === 'function') {
+                window.DigitalanceUtils.openModal(overlayId);
+            }
+        };
+
+        window.closeModal = function(overlayId) {
+            if (window.DigitalanceUtils && typeof window.DigitalanceUtils.closeModal === 'function') {
+                window.DigitalanceUtils.closeModal(overlayId);
+            }
+        };
     </script>
 @endsection
