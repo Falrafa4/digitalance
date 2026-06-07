@@ -131,8 +131,8 @@ class OrderController extends Controller
             return redirect()->route('client.services.index')->with('warning', 'Layanan tidak tersedia untuk diorder.');
         }
 
-        if (!$service->freelancer_id || !$service->freelancer) {
-            return redirect()->route('client.services.index')->with('warning', 'Layanan ini tidak memiliki freelancer yang tertaut.');
+        if (!$service->freelancer_id || !$service->freelancer || $service->freelancer->status !== 'Approved') {
+            return redirect()->route('client.services.index')->with('warning', 'Layanan tidak tersedia untuk diorder.');
         }
 
         $service->load(['category:id,name', 'freelancer.skomda_student']);
@@ -140,6 +140,9 @@ class OrderController extends Controller
         $freelancerServices = Service::with('category:id,name')
             ->where('freelancer_id', $service->freelancer_id)
             ->where('status', 'Approved')
+            ->whereHas('freelancer', function ($query) {
+                $query->where('status', 'Approved');
+            })
             ->orderByRaw('CASE WHEN id = ? THEN 0 ELSE 1 END', [$service->id])
             ->latest()
             ->get();
@@ -164,8 +167,8 @@ class OrderController extends Controller
             return redirect()->route('client.services.index')->with('error', 'Layanan tidak tersedia.');
         }
 
-        if (!$service->freelancer_id || !$service->freelancer) {
-            return redirect()->route('client.services.index')->with('error', 'Layanan ini tidak memiliki freelancer yang tertaut.');
+        if (!$service->freelancer_id || !$service->freelancer || $service->freelancer->status !== 'Approved') {
+            return redirect()->route('client.services.index')->with('error', 'Layanan tidak tersedia.');
         }
 
         $order = Order::create([

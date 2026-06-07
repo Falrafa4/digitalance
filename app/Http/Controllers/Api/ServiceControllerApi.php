@@ -72,7 +72,8 @@ class ServiceControllerApi extends Controller
         $categories = ServiceCategory::query()
             ->where('is_active', true)
             ->withCount([
-                'services as approved_services_count' => fn($query) => $query->where('status', 'Approved'),
+                'services as approved_services_count' => fn($query) => $query->where('status', 'Approved')
+                    ->whereHas('freelancer', fn($freelancerQuery) => $freelancerQuery->where('status', 'Approved')),
             ])
             ->orderBy('name')
             ->get();
@@ -190,7 +191,12 @@ class ServiceControllerApi extends Controller
      */
     public function clientShow(Service $service): JsonResponse
     {
-        if ($service->status !== 'Approved' || ! $service->freelancer_id || ! $service->freelancer) {
+        if (
+            $service->status !== 'Approved'
+            || ! $service->freelancer_id
+            || ! $service->freelancer
+            || $service->freelancer->status !== 'Approved'
+        ) {
             return $this->errorResponse('Layanan tidak tersedia.', 404);
         }
 
@@ -210,7 +216,7 @@ class ServiceControllerApi extends Controller
             ->where('id', '!=', $service->id)
             ->where('status', 'Approved')
             ->whereNotNull('freelancer_id')
-            ->whereHas('freelancer')
+            ->whereHas('freelancer', fn($query) => $query->where('status', 'Approved'))
             ->latest()
             ->take(6)
             ->get()
@@ -345,7 +351,7 @@ class ServiceControllerApi extends Controller
             ->with(['category:id,name', 'freelancer.skomda_student:id,name,email'])
             ->where('status', 'Approved')
             ->whereNotNull('freelancer_id')
-            ->whereHas('freelancer');
+            ->whereHas('freelancer', fn($query) => $query->where('status', 'Approved'));
     }
 
     private function applySearch($query, string $search)
