@@ -36,14 +36,17 @@ Route::prefix('v1')->group(function () {
         Route::apiResource('/clients', ClientControllerApi::class)->only(['store', 'show', 'update', 'destroy']);
         Route::put('/clients/{id}/password', [ClientControllerApi::class, 'updateClientPassword']);
         Route::apiResource('/skomda-students', SkomdaStudentControllerApi::class);
+        
         Route::get('/services', [ServiceControllerApi::class, 'index']);
         Route::get('/services/{service}', [ServiceControllerApi::class, 'adminShow'])->whereNumber('service');
         Route::post('/services/{service}/status', [ServiceControllerApi::class, 'updateStatus'])->whereNumber('service');
+        
         Route::get('/service-categories', [ServiceCategoryControllerApi::class, 'index']);
         Route::post('/service-categories', [ServiceCategoryControllerApi::class, 'store']);
         Route::get('/service-categories/{serviceCategory}', [ServiceCategoryControllerApi::class, 'show'])->whereNumber('serviceCategory');
         Route::put('/service-categories/{serviceCategory}', [ServiceCategoryControllerApi::class, 'update'])->whereNumber('serviceCategory');
         Route::delete('/service-categories/{serviceCategory}', [ServiceCategoryControllerApi::class, 'destroy'])->whereNumber('serviceCategory');
+        
         Route::get('/portofolios', [PortofolioControllerApi::class, 'index']);
         Route::get('/portofolios/{portofolio}', [PortofolioControllerApi::class, 'adminShow'])->whereNumber('portofolio');
         Route::put('/portofolios/{portofolio}', [PortofolioControllerApi::class, 'adminUpdate'])->whereNumber('portofolio');
@@ -71,6 +74,7 @@ Route::prefix('v1')->group(function () {
         Route::put('/freelancers/password', [FreelancerControllerApi::class, 'updatePassword']);
         Route::delete('/freelancers/account', [FreelancerControllerApi::class, 'deleteAccount']);
         Route::post('/freelancers/verification', [FreelancerControllerApi::class, 'applyForVerification']);
+        
         Route::get('/freelancers/services', [ServiceControllerApi::class, 'freelancerIndex']);
         Route::post('/freelancers/services', [ServiceControllerApi::class, 'store']);
         Route::get('/freelancers/services/{service}', [ServiceControllerApi::class, 'show'])->whereNumber('service');
@@ -78,6 +82,7 @@ Route::prefix('v1')->group(function () {
         Route::delete('/freelancers/services/{service}', [ServiceControllerApi::class, 'destroy'])->whereNumber('service');
         Route::post('/freelancers/services/{service}/submit', [ServiceControllerApi::class, 'submit'])->whereNumber('service');
         Route::get('/freelancers/service-categories', [ServiceCategoryControllerApi::class, 'freelancerIndex']);
+        
         Route::get('/freelancers/portofolios', [PortofolioControllerApi::class, 'freelancerIndex']);
         Route::post('/freelancers/portofolios', [PortofolioControllerApi::class, 'store']);
         Route::get('/freelancers/portofolios/{portofolio}', [PortofolioControllerApi::class, 'show'])->whereNumber('portofolio');
@@ -89,11 +94,14 @@ Route::prefix('v1')->group(function () {
         Route::get('/clients/profile', [ClientControllerApi::class, 'profile']);
         Route::put('/clients/profile', [ClientControllerApi::class, 'updateProfile']);
         Route::put('/clients/password', [ClientControllerApi::class, 'updatePassword']);
+        
         Route::get('/service-catalog', [ServiceControllerApi::class, 'catalog']);
         Route::get('/service-catalog/{service}', [ServiceControllerApi::class, 'clientShow'])->whereNumber('service');
         Route::get('/client/service-categories', [ServiceCategoryControllerApi::class, 'clientIndex']);
+        
         Route::get('/talents', [FreelancerControllerApi::class, 'clientFindTalent']);
         Route::get('/talents/{freelancer}', [FreelancerControllerApi::class, 'clientTalentShow'])->whereNumber('freelancer');
+        
         Route::get('/talents/{freelancer}/portofolios', [PortofolioControllerApi::class, 'showAllFreelancerPortofolios'])->whereNumber('freelancer');
         Route::get('/client/portofolios/{portofolio}', [PortofolioControllerApi::class, 'showFreelancerPortofolio'])->whereNumber('portofolio');
     });
