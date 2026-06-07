@@ -23,7 +23,7 @@ class LoginRequest extends FormRequest
     {
         return [
             'email' => 'required|email',
-            'password' => 'required|string',
+            'password' => 'required|string|confirmed',
             'role' => 'nullable|in:administrator,client,freelancer',
         ];
     }

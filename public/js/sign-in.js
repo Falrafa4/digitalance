@@ -74,6 +74,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // PASSWORD STRENGTH INDICATION ELEMENTS (UPGRADED FOR DETAILS)
     const registerPassword = document.getElementById("registerPassword");
+    const registerPasswordConfirmation = document.getElementById("registerPasswordConfirmation");
     const passwordStrengthWrapper = document.getElementById("passwordStrengthWrapper");
     const strengthText = document.getElementById("strengthText");
     const bar1 = document.getElementById("strengthBar1");

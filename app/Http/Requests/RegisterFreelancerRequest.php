@@ -28,7 +28,7 @@ class RegisterFreelancerRequest extends FormRequest
                 Rule::exists('skomda_students', 'id')->where('is_registered', false),
                 'unique:freelancers,student_id',
             ],
-            'password' => 'required|string',
+            'password' => 'required|string|confirmed',
         ];
     }
 
