@@ -135,9 +135,16 @@ class OrderController extends Controller
             return redirect()->route('client.services.index')->with('warning', 'Layanan ini tidak memiliki freelancer yang tertaut.');
         }
 
-        $service->load(['freelancer.skomda_student', 'service_category']);
+        $service->load(['category:id,name', 'freelancer.skomda_student']);
 
-        return view('dashboard.client.orders.create', compact('service'));
+        $freelancerServices = Service::with('category:id,name')
+            ->where('freelancer_id', $service->freelancer_id)
+            ->where('status', 'Approved')
+            ->orderByRaw('CASE WHEN id = ? THEN 0 ELSE 1 END', [$service->id])
+            ->latest()
+            ->get();
+
+        return view('dashboard.client.orders.create', compact('service', 'freelancerServices'));
     }
 
     public function storePage(Request $request)
