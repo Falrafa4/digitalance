@@ -29,6 +29,7 @@ class SkomdaStudentStoreRequest extends FormRequest
             'class' => ['required', 'string', 'max:255'],
             'major' => ['required', 'in:SIJA,TJAT'],
             'avatar' => ['nullable', 'string', 'max:255'],
+            'is_registered' => ['sometimes', 'boolean'],
         ];
     }
 }

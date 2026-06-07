@@ -46,6 +46,7 @@ class ClientControllerApi extends Controller
 
         $clientsQuery = Client::query()->select('id', 'name', 'email', 'phone', 'profile_photo', DB::raw('NULL as avatar'), DB::raw("'Client' as role"), DB::raw("'Active' as status"), 'created_at');
         $skomdaQuery = SkomdaStudent::query()
+            ->where('is_registered', false)
             ->whereDoesntHave('freelancer')
             ->select('id', 'name', 'email', 'phone', DB::raw('NULL as profile_photo'), 'avatar', DB::raw("'Skomda Student' as role"), DB::raw("'Active' as status"), 'created_at');
 

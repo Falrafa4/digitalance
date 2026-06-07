@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Api;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class FreelancerStoreRequest extends FormRequest
 {
@@ -22,7 +23,12 @@ class FreelancerStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'student_id' => ['required', 'integer', 'exists:skomda_students,id', 'unique:freelancers,student_id'],
+            'student_id' => [
+                'required',
+                'integer',
+                Rule::exists('skomda_students', 'id')->where('is_registered', false),
+                'unique:freelancers,student_id',
+            ],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'bio' => ['nullable', 'string', 'max:500'],
             'profile_photo' => ['nullable', 'image', 'mimes:jpeg,jpg,png,webp', 'max:5120'],

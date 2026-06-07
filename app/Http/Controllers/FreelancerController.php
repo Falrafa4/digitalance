@@ -156,8 +156,11 @@ class FreelancerController extends Controller
             return redirect()->route('freelancer.profile')->with('error', 'Password salah');
         }
 
+        $student = $freelancer->skomda_student;
+
         $this->deleteProfilePhoto($freelancer->profile_photo);
         $freelancer->delete();
+        $student?->forceFill(['is_registered' => false])->save();
 
         return redirect()->route('home')->with('success', 'Akun freelancer berhasil dihapus');
     }
@@ -176,7 +179,8 @@ class FreelancerController extends Controller
         $data['password'] = Hash::make($data['password']);
         $data['profile_photo'] = $this->storeProfilePhoto($request) ?? self::DEFAULT_PROFILE_PHOTO;
 
-        Freelancer::create($data);
+        $freelancer = Freelancer::create($data);
+        $freelancer->skomda_student?->forceFill(['is_registered' => true])->save();
 
         if ($request->expectsJson()) {
             return response()->json(['message' => 'Akun freelancer berhasil dibuat'], 201);
@@ -248,8 +252,10 @@ class FreelancerController extends Controller
     public function destroy(Request $request, string $id)
     {
         $freelancer = Freelancer::findOrFail($id);
+        $student = $freelancer->skomda_student;
         $this->deleteProfilePhoto($freelancer->profile_photo);
         $freelancer->delete();
+        $student?->forceFill(['is_registered' => false])->save();
 
         if ($request->expectsJson()) {
             return response()->json(['message' => 'Akun freelancer berhasil dihapus'], 200);

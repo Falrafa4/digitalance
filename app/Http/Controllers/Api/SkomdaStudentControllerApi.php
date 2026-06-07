@@ -36,8 +36,13 @@ class SkomdaStudentControllerApi extends Controller
                     ->orWhere('class', 'like', "%{$q}%");
             }))
             ->when($major !== '', fn($query) => $query->where('major', $major))
-            ->when($available === true, fn($query) => $query->whereDoesntHave('freelancer'))
-            ->when($available === false, fn($query) => $query->whereHas('freelancer'))
+            ->when($available === true, fn($query) => $query
+                ->where('is_registered', false)
+                ->whereDoesntHave('freelancer'))
+            ->when($available === false, fn($query) => $query
+                ->where(fn($query) => $query
+                    ->where('is_registered', true)
+                    ->orWhereHas('freelancer')))
             ->latest()
             ->paginate(10, ['*'], 'page', $page)
             ->withQueryString();
@@ -116,6 +121,8 @@ class SkomdaStudentControllerApi extends Controller
      */
     public function freelancerIndex(SkomdaStudentIndexRequest $request): JsonResponse
     {
+        $request->merge(['available' => true]);
+
         return $this->index($request);
     }
 }

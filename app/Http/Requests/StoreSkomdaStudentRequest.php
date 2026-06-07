@@ -28,6 +28,7 @@ class StoreSkomdaStudentRequest extends FormRequest
             'class' => 'required|string|max:255',
             'major' => 'required|in:SIJA,TJAT',
             'phone' => 'nullable|string|max:20',
+            'is_registered' => 'sometimes|boolean',
         ];
     }
 }

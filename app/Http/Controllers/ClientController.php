@@ -29,6 +29,7 @@ class ClientController extends Controller
 
         $clientsQuery = Client::query()->select('id', 'name', 'email', 'phone', 'profile_photo', DB::raw('NULL as avatar'), DB::raw("'Client' as role"), DB::raw("'Active' as status"), 'created_at');
         $skomdaQuery = SkomdaStudent::query()
+            ->where('is_registered', false)
             ->whereDoesntHave('freelancer')
             ->select('id', 'name', 'email', 'phone', DB::raw('NULL as profile_photo'), DB::raw('NULL as avatar'), DB::raw("'Skomda Student' as role"), DB::raw("'Active' as status"), 'created_at');
         // Use the query builder so Freelancer::getNameAttribute() does not override the joined student name.
@@ -69,7 +70,11 @@ class ClientController extends Controller
         }
 
         // We still need skomdaData for the 'Add Freelancer' dropdown
-        $skomdaAll = SkomdaStudent::select('id', 'name', 'nis')->get();
+        $skomdaAll = SkomdaStudent::where('is_registered', false)
+            ->whereDoesntHave('freelancer')
+            ->select('id', 'name', 'nis')
+            ->orderBy('name')
+            ->get();
 
         return view('dashboard.admin.clients', [
             'users' => $users,

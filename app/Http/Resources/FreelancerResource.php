@@ -23,6 +23,7 @@ class FreelancerResource extends JsonResource
             'phone' => $this->skomda_student->phone,
             'class' => $this->skomda_student->class,
             'major' => $this->skomda_student->major,
+            'is_registered' => (bool) ($this->skomda_student?->is_registered ?? false),
             'bio' => $this->bio,
             'profile_photo' => $this->profile_photo,
             'status' => $this->status,

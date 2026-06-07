@@ -32,17 +32,5 @@ class ProductionSeeder extends Seeder
                 'password' => bcrypt('admin123'),
             ]
         );
-
-        // SKOMDA STUDENTS
-        // progress...
-        SkomdaStudent::firstOrCreate(
-            [
-                'nis' => '000000001',
-                'name' => 'Skomda Student 1',
-                'email' => 'student1@student.smktelkom-sda.sch.id',
-                'class' => 'XI SIJA 2',
-                'major' => 'SIJA',
-            ]
-        );
     }
 }

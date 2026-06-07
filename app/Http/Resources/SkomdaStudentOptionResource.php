@@ -18,6 +18,7 @@ class SkomdaStudentOptionResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'nis' => $this->nis,
+            'is_registered' => (bool) ($this->is_registered ?? false),
         ];
     }
 }

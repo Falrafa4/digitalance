@@ -33,6 +33,7 @@ class SkomdaStudentUpdateRequest extends FormRequest
             'class' => ['sometimes', 'required', 'string', 'max:255'],
             'major' => ['sometimes', 'required', 'in:SIJA,TJAT'],
             'avatar' => ['sometimes', 'nullable', 'string', 'max:255'],
+            'is_registered' => ['sometimes', 'boolean'],
         ];
     }
 }
