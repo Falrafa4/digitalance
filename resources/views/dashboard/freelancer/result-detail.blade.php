@@ -75,15 +75,15 @@
                 <div class="flex items-center justify-between p-4 bg-blue-50 border border-blue-100 rounded-[16px]">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center text-xl">
-                            <i class="ri-file-zip-line"></i>
+                            <i class="{{ $result->fileIcon() }}"></i>
                         </div>
                         <div>
-                            <p class="text-[13px] font-bold text-slate-900">File Terlampir</p>
-                            <p class="text-[11px] text-slate-500">Tersedia untuk diunduh</p>
+                            <p class="text-[13px] font-bold text-slate-900">{{ $result->fileLabel() }}</p>
+                            <p class="text-[11px] text-slate-500">{{ $result->isExternalLink() ? 'Link eksternal' : 'File tersimpan' }}</p>
                         </div>
                     </div>
-                    <a href="{{ asset('storage/' . $result->file_url) }}" target="_blank" class="px-4 py-2 bg-white text-blue-600 border border-blue-200 rounded-lg font-bold text-[12px] hover:bg-blue-600 hover:text-white transition-all shadow-sm">
-                        Unduh
+                    <a href="{{ $result->downloadUrl() }}" target="_blank" rel="noopener noreferrer" class="px-4 py-2 bg-white text-blue-600 border border-blue-200 rounded-lg font-bold text-[12px] hover:bg-blue-600 hover:text-white transition-all shadow-sm">
+                        {{ $result->fileActionLabel() }}
                     </a>
                 </div>
             @else

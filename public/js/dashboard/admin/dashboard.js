@@ -33,6 +33,20 @@
             .replace(/"/g, '&quot;');
     }
 
+    function isExternalResult(result) {
+        return result?.result_mode === 'link' || /^https?:\/\//i.test(String(result?.file_url || ''));
+    }
+
+    function resultDownloadUrl(result) {
+        if (!result?.file_url) return '#';
+
+        return isExternalResult(result) ? result.file_url : '/storage/' + result.file_url;
+    }
+
+    function resultActionLabel(result) {
+        return isExternalResult(result) ? 'Buka Link' : 'Unduh';
+    }
+
     async function handleApprove(id) {
         var container = document.getElementById('verification-container');
         var card = document.querySelector('.approval-card[data-id="' + id + '"]');
@@ -154,7 +168,7 @@
                 '<section><h3 class="text-[12px] font-black text-slate-900 uppercase tracking-widest mb-4 flex items-center gap-2"><i class="ri-file-list-3-line text-emerald-500"></i> Hasil Proyek</h3>' +
                 '<div class="space-y-3">' +
                 (results.length ? results.map(function (r) {
-                    return '<div class="p-4 bg-emerald-50/50 border border-emerald-100 rounded-2xl flex items-center justify-between"><div><p class="text-[12px] font-bold text-slate-800">' + escapeHtml(r.version || 'Versi') + '</p><p class="text-[10px] text-slate-500">' + new Date(r.created_at).toLocaleString('id-ID') + '</p></div><a href="/storage/' + r.file_url + '" target="_blank" class="px-3 py-1.5 bg-white text-[#0f766e] border border-[#0f766e] rounded-lg text-[10px] font-bold hover:bg-[#0f766e] hover:text-white transition-all">Unduh</a></div>';
+                    return '<div class="p-4 bg-emerald-50/50 border border-emerald-100 rounded-2xl flex items-center justify-between"><div><p class="text-[12px] font-bold text-slate-800">' + escapeHtml(r.version || 'Versi') + '</p><p class="text-[10px] text-slate-500">' + new Date(r.created_at).toLocaleString('id-ID') + '</p></div><a href="' + resultDownloadUrl(r) + '" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 bg-white text-[#0f766e] border border-[#0f766e] rounded-lg text-[10px] font-bold hover:bg-[#0f766e] hover:text-white transition-all">' + resultActionLabel(r) + '</a></div>';
                 }).join('') : '<p class="text-slate-400 text-xs italic">Belum ada hasil yang dikirim.</p>') +
                 '</div></section>' +
                 '</div></div>' +

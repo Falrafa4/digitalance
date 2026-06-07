@@ -61,9 +61,9 @@
                 <i class="ri-eye-line"></i> Lihat Detail
               </a>
               @if($result->file_url)
-                <a href="{{ asset('storage/' . $result->file_url) }}" target="_blank"
+                <a href="{{ $result->downloadUrl() }}" target="_blank" rel="noopener noreferrer"
                   class="flex-1 px-4 py-2.5 rounded-[12px] bg-[#0f766e] text-white font-bold text-[12.5px] hover:bg-[#0a5e58] transition-all text-center flex items-center justify-center gap-2">
-                  <i class="ri-download-line"></i> Unduh File
+                  <i class="{{ $result->fileIcon() }}"></i> {{ $result->fileActionLabel() }}
                 </a>
               @endif
               <a href="{{ route('client.orders.show', $result->order_id) }}" class="flex-1 px-4 py-2.5 rounded-[12px] bg-white border border-slate-200 text-slate-700 font-bold text-[12.5px]

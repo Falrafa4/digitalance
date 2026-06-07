@@ -334,9 +334,9 @@
                       <a href="{{ route('client.results.show', $result->id) }}" class="text-[#0f766e] text-[12px] font-bold hover:underline">Detail</a>
                     </div>
                     @if($result->file_url)
-                      <a href="{{ asset('storage/' . $result->file_url) }}" target="_blank"
+                      <a href="{{ $result->downloadUrl() }}" target="_blank" rel="noopener noreferrer"
                         class="mt-3 inline-flex items-center gap-2 text-[12px] font-semibold text-slate-600 hover:text-[#0f766e]">
-                        <i class="ri-external-link-line"></i> Preview file
+                        <i class="{{ $result->fileIcon() }}"></i> {{ $result->fileActionLabel() }}
                       </a>
                     @endif
                   </div>

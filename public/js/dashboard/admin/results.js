@@ -25,6 +25,20 @@
         return (item.status || item.order?.status || 'in_progress').toLowerCase();
     }
 
+    function isExternalResult(item) {
+        return item?.result_mode === 'link' || /^https?:\/\//i.test(String(item?.file_url || ''));
+    }
+
+    function resultDownloadUrl(item) {
+        if (!item?.file_url) return '#';
+
+        return isExternalResult(item) ? item.file_url : `/storage/${item.file_url}`;
+    }
+
+    function resultActionLabel(item) {
+        return isExternalResult(item) ? 'Buka Link' : 'Unduh File';
+    }
+
     // 3. FUNGSI RENDER STATS
     function renderStats() {
         let stats = { paid: 0, pending: 0, in_progress: 0, cancelled: 0 };
@@ -77,8 +91,8 @@
                     <td class="px-6 py-4 text-[13px] font-semibold text-[#0f766e]">#${orderId}</td>
                     <td class="px-6 py-4">
                         ${item.file_url ? 
-                            `<a href="/storage/${item.file_url}" target="_blank" class="inline-flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-600 rounded-md text-xs font-bold hover:bg-blue-100">
-                                <i class="ri-file-link-line"></i> Lihat
+                            `<a href="${resultDownloadUrl(item)}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-600 rounded-md text-xs font-bold hover:bg-blue-100">
+                                <i class="${isExternalResult(item) ? 'ri-external-link-line' : 'ri-file-link-line'}"></i> ${resultActionLabel(item)}
                             </a>` : '<span class="text-slate-300 text-xs">—</span>'
                         }
                     </td>
@@ -174,14 +188,14 @@
                     <div class="flex items-center justify-between p-4 bg-[#f0fdfa] border border-[#ccfbf1] rounded-xl">
                         <div class="flex items-center gap-3">
                             <div class="w-10 h-10 rounded-lg bg-white shadow-sm flex items-center justify-center text-[#0f766e]">
-                                <i class="ri-file-zip-line text-xl"></i>
+                                <i class="${isExternalResult(r) ? 'ri-external-link-line' : 'ri-file-zip-line'} text-xl"></i>
                             </div>
                             <div>
-                                <div class="text-[13px] font-bold text-slate-900">File Proyek</div>
+                                <div class="text-[13px] font-bold text-slate-900">${isExternalResult(r) ? 'Link Proyek' : 'File Proyek'}</div>
                                 <div class="text-[11px] text-slate-500">${date}</div>
                             </div>
                         </div>
-                        <a href="/storage/${r.file_url}" target="_blank" class="px-4 py-2 bg-[#0f766e] text-white rounded-lg text-[12px] font-bold hover:bg-[#0a5e58] transition-all">Unduh</a>
+                        <a href="${resultDownloadUrl(r)}" target="_blank" rel="noopener noreferrer" class="px-4 py-2 bg-[#0f766e] text-white rounded-lg text-[12px] font-bold hover:bg-[#0a5e58] transition-all">${resultActionLabel(r)}</a>
                     </div>
                 </div>
 
