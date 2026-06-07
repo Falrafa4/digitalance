@@ -202,7 +202,7 @@
             {{-- Modal Negosiasi (Client) --}}
             <div x-show="showNego"
               x-init="$watch('showNego', value => { if(value) { $nextTick(() => window.DigitalanceUtils.focusTrap($el)) } })"
-              x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
+              x-cloak class="fixed inset-0 z-[100] flex items-center justify-center p-4" role="dialog" aria-modal="true">
               <div @click="showNego = false" class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm"></div>
               <div class="relative w-full max-w-lg bg-white rounded-[24px] shadow-xl p-6 sm:p-8">
                 <button @click="showNego = false"
@@ -247,7 +247,7 @@
             {{-- Modal Tolak --}}
             <div x-show="showReject"
               x-init="$watch('showReject', value => { if(value) { $nextTick(() => window.DigitalanceUtils.focusTrap($el)) } })"
-              x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
+              x-cloak class="fixed inset-0 z-[100] flex items-center justify-center p-4" role="dialog" aria-modal="true">
               <div @click="showReject = false" class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm"></div>
               <div class="relative w-full max-w-md bg-white rounded-[20px] shadow-xl p-6">
                 <h3 class="font-display text-lg font-bold text-slate-900 mb-2 text-center">Tolak Pesanan?</h3>
@@ -409,7 +409,7 @@
 
             <div x-show="showRevision"
               x-init="$watch('showRevision', value => { if(value) { $nextTick(() => window.DigitalanceUtils.focusTrap($el)) } })"
-              x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
+              x-cloak class="fixed inset-0 z-[100] flex items-center justify-center p-4" role="dialog" aria-modal="true">
               <div @click="showRevision = false" class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm"></div>
               <div class="relative w-full max-w-lg bg-white rounded-[24px] shadow-xl p-6 sm:p-8">
                 <button @click="showRevision = false"
