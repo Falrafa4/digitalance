@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AuthControllerApi;
 use App\Http\Controllers\Api\AdministratorControllerApi;
 use App\Http\Controllers\Api\ClientControllerApi;
 use App\Http\Controllers\Api\FreelancerControllerApi;
+use App\Http\Controllers\Api\SkomdaStudentControllerApi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -31,6 +32,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/users', [ClientControllerApi::class, 'index']);
         Route::apiResource('/clients', ClientControllerApi::class)->only(['store', 'show', 'update', 'destroy']);
         Route::put('/clients/{id}/password', [ClientControllerApi::class, 'updateClientPassword']);
+        Route::apiResource('/skomda-students', SkomdaStudentControllerApi::class);
         
         Route::put('/freelancers/{id}/password', [ClientControllerApi::class, 'updateFreelancerPassword']);
         Route::get('/freelancers/{freelancer}/services', [FreelancerControllerApi::class, 'showServices'])->whereNumber('freelancer');
@@ -47,6 +49,7 @@ Route::prefix('v1')->group(function () {
 
     Route::middleware(['auth:sanctum', 'role:freelancer'])->group(function () {
         Route::get('/freelancers/clients', [ClientControllerApi::class, 'freelancerIndex']);
+        Route::get('/freelancers/skomda-students', [SkomdaStudentControllerApi::class, 'freelancerIndex']);
         
         Route::get('/freelancers/profile', [FreelancerControllerApi::class, 'profile']);
         Route::put('/freelancers/profile', [FreelancerControllerApi::class, 'updateProfile']);
