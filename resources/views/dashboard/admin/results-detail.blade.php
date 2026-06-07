@@ -16,7 +16,7 @@
                     <div class="flex items-center gap-5">
                         <div
                             class="w-16 h-16 rounded-[22px] bg-white border border-slate-200 shadow-sm flex items-center justify-center text-3xl text-[#0f766e]">
-                            <i class="ri-folder-check-line"></i>
+                            <i class="ri-file-list-2-line"></i>
                         </div>
                         <div>
                             <h1 class="font-display text-[1.8rem] font-black text-slate-900 leading-tight">Detail Hasil
@@ -54,8 +54,7 @@
                         <h3 class="text-[11px] font-bold text-slate-400 uppercase tracking-[2px] mb-4">Pesan & Catatan
                             Freelancer</h3>
                         <div class="bg-slate-50 border border-slate-100 rounded-2xl p-6">
-                            <p class="text-slate-700 text-[14px] leading-relaxed whitespace-pre-wrap italic">
-                                "{{ $result->version ?: ($result->note ?: 'Tidak ada pesan tertulis.') }}"</p>
+                            <p class="text-slate-700 text-[14px] leading-relaxed whitespace-pre-wrap italic">"{{ $result->version ?: ($result->note ?: 'Tidak ada pesan tertulis.') }}"</p>
                         </div>
                     </section>
 
