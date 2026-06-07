@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\OfferControllerApi;
 use App\Http\Controllers\Api\OrderControllerApi;
 use App\Http\Controllers\Api\PortofolioControllerApi;
 use App\Http\Controllers\Api\ProfileControllerApi;
+use App\Http\Controllers\Api\ResultControllerApi;
 use App\Http\Controllers\Api\ServiceCategoryControllerApi;
 use App\Http\Controllers\Api\ServiceControllerApi;
 use App\Http\Controllers\Api\SkomdaStudentControllerApi;
@@ -69,6 +70,8 @@ Route::prefix('v1')->group(function () {
         Route::apiResource('negotiations', NegotiationControllerApi::class);
         Route::post('negotiations/{negotiation}/accept', [NegotiationControllerApi::class, 'accept']);
         Route::post('negotiations/{negotiation}/reject', [NegotiationControllerApi::class, 'reject']);
+
+        Route::apiResource('results', ResultControllerApi::class);
     });
 
     Route::middleware(['auth:sanctum', 'role:administrator'])->group(function () {

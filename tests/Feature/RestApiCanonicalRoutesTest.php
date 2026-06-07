@@ -8,6 +8,7 @@ use App\Models\Freelancer;
 use App\Models\Negotiation;
 use App\Models\Offer;
 use App\Models\Order;
+use App\Models\Result;
 use App\Models\Service;
 use App\Models\ServiceCategory;
 use App\Models\SkomdaStudent;
@@ -232,6 +233,99 @@ class RestApiCanonicalRoutesTest extends TestCase
             ->assertForbidden();
     }
 
+    public function test_freelancer_can_create_result_link_on_canonical_route(): void
+    {
+        [, , $freelancer, $order] = $this->makeOrderFixture();
+
+        Sanctum::actingAs($freelancer);
+
+        $this->postJson('/api/v1/results', [
+            'order_id' => $order->id,
+            'result_mode' => 'link',
+            'result_link' => 'https://files.digitalance.test/result.zip',
+            'note' => 'Final delivery via API.',
+            'version' => 'v1.0',
+        ])
+            ->assertCreated()
+            ->assertJsonPath('data.order_id', $order->id)
+            ->assertJsonPath('data.result_mode', 'link')
+            ->assertJsonPath('data.version', 'v1.0');
+
+        $this->assertDatabaseHas('results', [
+            'order_id' => $order->id,
+            'file_url' => 'https://files.digitalance.test/result.zip',
+            'result_mode' => 'link',
+            'version' => 'v1.0',
+        ]);
+
+        $this->assertDatabaseHas('orders', [
+            'id' => $order->id,
+            'status' => 'In Progress',
+        ]);
+    }
+
+    public function test_client_can_view_result_owned_by_their_order(): void
+    {
+        [, $client, , $order] = $this->makeOrderFixture();
+        $result = $this->makeResult($order);
+
+        Sanctum::actingAs($client);
+
+        $this->getJson('/api/v1/results/'.$result->id)
+            ->assertOk()
+            ->assertJsonPath('data.id', $result->id)
+            ->assertJsonPath('data.order.client.id', $client->id);
+    }
+
+    public function test_freelancer_cannot_view_result_owned_by_another_freelancer(): void
+    {
+        [, , , $order] = $this->makeOrderFixture();
+        $result = $this->makeResult($order);
+        $otherFreelancer = $this->makeFreelancer('other-result-freelancer@example.com');
+
+        Sanctum::actingAs($otherFreelancer);
+
+        $this->getJson('/api/v1/results/'.$result->id)
+            ->assertForbidden();
+    }
+
+    public function test_admin_can_update_result_with_put_on_canonical_route(): void
+    {
+        [$admin, , , $order] = $this->makeOrderFixture();
+        $result = $this->makeResult($order);
+
+        Sanctum::actingAs($admin);
+
+        $this->putJson('/api/v1/results/'.$result->id, [
+            'note' => 'Catatan hasil diperbarui oleh admin.',
+            'version' => 'v1.1',
+        ])
+            ->assertOk()
+            ->assertJsonPath('data.note', 'Catatan hasil diperbarui oleh admin.')
+            ->assertJsonPath('data.version', 'v1.1');
+
+        $this->assertDatabaseHas('results', [
+            'id' => $result->id,
+            'note' => 'Catatan hasil diperbarui oleh admin.',
+            'version' => 'v1.1',
+        ]);
+    }
+
+    public function test_admin_can_delete_result_on_canonical_route(): void
+    {
+        [$admin, , , $order] = $this->makeOrderFixture();
+        $result = $this->makeResult($order);
+
+        Sanctum::actingAs($admin);
+
+        $this->deleteJson('/api/v1/results/'.$result->id)
+            ->assertOk();
+
+        $this->assertDatabaseMissing('results', [
+            'id' => $result->id,
+        ]);
+    }
+
     private function makeOrderFixture(): array
     {
         $admin = Administrator::create([
@@ -322,6 +416,17 @@ class RestApiCanonicalRoutesTest extends TestCase
             'reason' => 'Budget perlu disesuaikan.',
             'description' => 'Scope tetap sama.',
             'status' => 'Pending',
+        ]);
+    }
+
+    private function makeResult(Order $order): Result
+    {
+        return Result::create([
+            'order_id' => $order->id,
+            'file_url' => 'https://files.digitalance.test/result.zip',
+            'result_mode' => 'link',
+            'note' => 'Result untuk test API.',
+            'version' => 'v1.0',
         ]);
     }
 }
