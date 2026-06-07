@@ -5,12 +5,14 @@ namespace Tests\Feature;
 use App\Models\Administrator;
 use App\Models\Client;
 use App\Models\Freelancer;
+use App\Models\Negotiation;
 use App\Models\Offer;
 use App\Models\Order;
 use App\Models\Service;
 use App\Models\ServiceCategory;
 use App\Models\SkomdaStudent;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
@@ -169,6 +171,67 @@ class RestApiCanonicalRoutesTest extends TestCase
             ->assertForbidden();
     }
 
+    public function test_client_can_create_price_negotiation_on_canonical_route(): void
+    {
+        Event::fake();
+        [, $client, , $order] = $this->makeOrderFixture();
+
+        Sanctum::actingAs($client);
+
+        $this->postJson('/api/v1/negotiations', [
+            'order_id' => $order->id,
+            'reason' => 'Budget perlu disesuaikan.',
+            'new_price' => 1250000,
+            'description' => 'Scope tetap sama, hanya penyesuaian harga.',
+        ])
+            ->assertCreated()
+            ->assertJsonPath('data.sender', 'client')
+            ->assertJsonPath('data.status', 'Pending')
+            ->assertJsonPath('data.reason', 'Budget perlu disesuaikan.');
+
+        $this->assertDatabaseHas('negotiations', [
+            'order_id' => $order->id,
+            'sender' => 'client',
+            'proposed_price' => 1250000,
+            'status' => 'Pending',
+        ]);
+
+        $this->assertDatabaseHas('orders', [
+            'id' => $order->id,
+            'status' => 'Negotiated',
+            'agreed_price' => 1250000,
+        ]);
+    }
+
+    public function test_freelancer_can_accept_negotiation_on_canonical_route(): void
+    {
+        [, , $freelancer, $order] = $this->makeOrderFixture();
+        $negotiation = $this->makeNegotiation($order);
+
+        Sanctum::actingAs($freelancer);
+
+        $this->postJson('/api/v1/negotiations/'.$negotiation->id.'/accept')
+            ->assertOk()
+            ->assertJsonPath('data.status', 'Accepted');
+
+        $this->assertDatabaseHas('negotiations', [
+            'id' => $negotiation->id,
+            'status' => 'Accepted',
+        ]);
+    }
+
+    public function test_freelancer_cannot_view_negotiation_owned_by_another_freelancer(): void
+    {
+        [, , , $order] = $this->makeOrderFixture();
+        $negotiation = $this->makeNegotiation($order);
+        $otherFreelancer = $this->makeFreelancer('other-negotiation-freelancer@example.com');
+
+        Sanctum::actingAs($otherFreelancer);
+
+        $this->getJson('/api/v1/negotiations/'.$negotiation->id)
+            ->assertForbidden();
+    }
+
     private function makeOrderFixture(): array
     {
         $admin = Administrator::create([
@@ -246,6 +309,19 @@ class RestApiCanonicalRoutesTest extends TestCase
             'offered_price' => 1500000,
             'deadline' => now()->addDays(7)->toDateString(),
             'status' => 'Sent',
+        ]);
+    }
+
+    private function makeNegotiation(Order $order): Negotiation
+    {
+        return Negotiation::create([
+            'order_id' => $order->id,
+            'sender' => 'client',
+            'message' => 'Negosiasi harga: Budget perlu disesuaikan.',
+            'proposed_price' => 1250000,
+            'reason' => 'Budget perlu disesuaikan.',
+            'description' => 'Scope tetap sama.',
+            'status' => 'Pending',
         ]);
     }
 }
