@@ -49,12 +49,10 @@
     <div class="flex-1 overflow-y-auto" id="notif-list">
         @if ($dbNotifications->count() > 0)
             @foreach ($dbNotifications as $n)
-                <div class="notif-item px-5 py-4 border-b border-slate-50 transition-all duration-200 cursor-pointer
-                    {{ $n->is_read ? 'bg-white hover:bg-slate-50' : 'bg-teal-50/40 hover:bg-teal-50/70' }}"
-                    @if (!empty($n->link))
-                        onclick="window.location.href='{{ url($n->link) }}'"
-                    @endif
-                    data-id="{{ $n->id }}">
+<div class="notif-item px-5 py-4 border-b border-slate-50 transition-all duration-200 cursor-pointer
+                {{ $n->is_read ? 'bg-white hover:bg-slate-50' : 'bg-teal-50/40 hover:bg-teal-50/70' }}"
+                data-id="{{ $n->id }}"
+                data-link="{{ $n->link ?? '' }}">
 
             <div class="flex items-start gap-3">
                 <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0

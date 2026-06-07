@@ -16,28 +16,27 @@
     }
 
     $role = ($segment === 'admin') ? 'admin' : ($segment === 'client' ? 'client' : ($segment === 'freelancer' ? 'freelancer' : null));
-    // Gunakan variable dari layout ($notifUnreadCount sudah dihitung di layouts/dashboard.blade.php)
-    // Fallback jika header dipakai di luar layout
     if (!isset($notifUnreadCount)) {
         $notifUnreadCount = 0;
     }
 @endphp
 
 <header class="flex items-center justify-between gap-3 mb-6 lg:mb-9 pl-20 lg:pl-0">
-    <form action="{{ url($segment . '/search') }}" method="GET"
-    class="relative flex-1 flex items-center gap-2 min-w-0">
-        <div class="relative flex-1">
-            <i
-                class="ri-search-line absolute left-[15px] top-[11px] text-slate-400 text-[17px] pointer-events-none z-10"></i>
-            <input type="text" name="q" placeholder="Ingin mencari sesuatu? Ketik..." autocomplete="off"
-                value="{{ request('q') }}"
-                class="w-full py-[11px] pl-[42px] pr-4 bg-white border-[1.5px] border-slate-200 rounded-[13px] text-[13.5px] font-sans outline-none transition-all duration-200 text-slate-900 placeholder:text-slate-400 focus:border-[#0f766e] focus:shadow-[0_3px_14px_rgba(15,118,110,0.1)]" />
-        </div>
-        <button type="submit" aria-label="Cari"
-            class="w-[45px] h-[45px] bg-teal-600 text-white rounded-[13px] flex items-center justify-center hover:bg-teal-700 hover:shadow-teal-sm transition-all duration-200 shrink-0">
-            <i class="ri-search-line text-[18px]"></i>
-        </button>
-    </form>
+    <form action="{{ url($segment . '/search') }}" method="GET" class="relative flex-1 flex items-center gap-2 min-w-0">
+    <div class="relative flex-1">
+        <label for="search-input" class="sr-only">Cari konten di situs ini</label>
+        
+        <i class="ri-search-line absolute left-[15px] top-[11px] text-slate-400 text-[17px] pointer-events-none z-10"></i>
+        
+        <input type="text" id="search-input" name="q" placeholder="Ingin mencari sesuatu? Ketik..." autocomplete="search"
+            value="{{ request('q') }}"
+            class="w-full py-[11px] pl-[42px] pr-4 bg-white border-[1.5px] border-slate-200 rounded-[13px] text-[13.5px] font-sans outline-none transition-all duration-200 text-slate-900 placeholder:text-slate-400 focus:border-[#0f766e] focus:shadow-[0_3px_14px_rgba(15,118,110,0.1)]" />
+    </div>
+    <button type="submit" aria-label="Jalankan Pencarian"
+        class="w-[45px] h-[45px] bg-teal-600 text-white rounded-[13px] flex items-center justify-center hover:bg-teal-700 hover:shadow-teal-sm transition-all duration-200 shrink-0">
+        <i class="ri-search-line text-[18px]"></i>
+    </button>
+</form>
 
     <div class="flex items-center gap-3.5 shrink-0">        <div class="relative">
             <button id="notif-btn" aria-label="Notifikasi" onclick="openNotificationDrawer()"

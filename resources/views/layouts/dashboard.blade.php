@@ -12,6 +12,9 @@
     <link rel="stylesheet" href="{{ asset('css/dashboard/dashboard.css') }}">
     <x-dashboard-css />
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -60,8 +63,6 @@
     <script src="{{ asset('js/dashboard/shared/flash.js') }}"></script>
     <script src="{{ asset('js/dashboard/confirm-modal.js') }}"></script>
 
-    {{-- Alpine (used by various dashboard pages for interactive UI) --}}
-    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     {{-- Pusher + Echo bootstrap for realtime chat (uses env meta tags) --}}
     <meta name="pusher-key" content="{{ env('PUSHER_APP_KEY') }}">
     <meta name="pusher-cluster" content="{{ env('PUSHER_APP_CLUSTER') }}">
@@ -88,31 +89,28 @@
             <i class="ri-menu-line text-xl"></i>
         </button>
 
-        <!-- Mobile Overlay -->
         <div id="sidebarOverlay" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-30 lg:hidden">
         </div>
 
-        <!-- Sidebar (role-aware) -->
         <x-sidebar />
 
-        <!-- Main -->
         <main id="main-content"
             class="flex-1 px-4 md:px-6 lg:px-11 py-5 lg:py-7 overflow-y-auto min-w-0 focus:outline-none">
-     <!-- Header (role-aware) -->
-     <x-header :notif-unread-count="$notifUnreadCount" />
-     <x-flash />
+            <x-header :notif-unread-count="$notifUnreadCount" />
+            <x-flash />
 
-     @yield('content')
+            @yield('content')
         </main>
-    </div>
+            </div>
 
-    @yield('modals')
+            @include('components.notification-drawer')
 
-     <!-- Toast Container -->
-     <div id="toast-container" role="region" aria-label="Notifications" aria-live="polite"></div>
+            @yield('modals')
 
-     @yield('scripts')
-     @stack('scripts')
+    <div id="toast-container" role="region" aria-label="Notifications" aria-live="polite"></div>
+
+    @yield('scripts')
+    @stack('scripts')
 </body>
 
 </html>

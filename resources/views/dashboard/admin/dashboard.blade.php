@@ -197,15 +197,15 @@
                                         </p>
                                     </div>
                                 </div>
-                                <button onclick="window.openVerificationDetail({{ $v->id }})"
+                                <button data-action="detail"
                                     class="w-8 h-8 rounded-lg bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-[#0f766e] hover:text-white transition-all">
                                     <i class="ri-information-line text-lg"></i>
                                 </button>
                             </div>
                             <div class="flex gap-2 pt-3.5 border-t border-slate-50">
-                                <button type="button" onclick="window.processVerification({{ $v->id }}, 'approve', event)"
+                                <button type="button" data-action="approve"
                                     class="flex-1 py-2 bg-emerald-50 text-emerald-600 text-[11px] font-bold rounded-lg hover:bg-emerald-600 hover:text-white transition-all">Setujui</button>
-                                <button type="button" onclick="window.processVerification({{ $v->id }}, 'reject', event)"
+                                <button type="button" data-action="reject"
                                     class="flex-1 py-2 bg-red-50 text-red-600 text-[11px] font-bold rounded-lg hover:bg-red-600 hover:text-white transition-all">Tolak</button>
                             </div>
                         </div>
@@ -394,126 +394,6 @@
         document.addEventListener('DOMContentLoaded', () => {
             initChart('monthly');
         });
-
-        // ==========================================
-        // PERBAIKAN TASK 3: LOGIK MODAL VERIFIKASI TALENT
-        // ==========================================
-        window.openVerificationDetail = function (id) {
-            const v = window.__PENDING_VERIFICATIONS__.find(x => x.id == id);
-            if (!v) return;
-
-            const box = document.getElementById('modal-verify-box');
-            const overlay = document.getElementById('modal-verify-overlay');
-            if (!box || !overlay) return;
-
-            box.innerHTML = `
-                        <div class="relative">
-                            <div class="h-28 bg-gradient-to-r from-[#0f766e] to-[#10b981] flex items-center px-8 relative">
-                                <div class="flex-1">
-                                    <h2 class="text-white font-black text-xl tracking-tight">Freelancer Verification</h2>
-                                    <p class="text-white/70 text-[10px] font-bold uppercase tracking-[0.2em]">Freelancer ID: #FLR-${v.id}</p>
-                                </div>
-                                <button onclick="window.closeVerificationDetail()" class="w-10 h-10 bg-white/20 text-white rounded-full flex items-center justify-center hover:bg-white/30 transition">
-                                    <i class="ri-close-line text-xl"></i>
-                                </button>
-                            </div>
-
-                            <div class="px-8 pb-8 -mt-8 relative z-10">
-                                <div class="bg-white rounded-2xl p-6 shadow-xl border border-slate-50 mb-6">
-                                    <div class="flex items-center gap-4">
-                                        <img src="${v.skomda_student?.avatar ? `/storage/${v.skomda_student.avatar}` : `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(v.skomda_student?.name || 'User')}&background=0f766e&color=fff&size=48`}" class="w-12 h-12 rounded-xl shadow-sm border" />
-                                        <div>
-                                            <h3 class="text-[1.3rem] font-black text-slate-900 leading-tight">${v.skomda_student?.name || 'Tidak tersedia'}</h3>
-                                            <p class="text-xs font-semibold text-slate-400 uppercase mt-0.5">${v.skomda_student?.major || 'Siswa Skomda'}</p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100 mb-6">
-                                    <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Informasi Kontak</span>
-                                    <div class="space-y-1.5 text-sm text-slate-700 font-medium">
-                                        <p><span class="text-slate-400 font-normal">Email Akun:</span> ${v.skomda_student?.email || '-'}</p>
-                                        <p><span class="text-slate-400 font-normal">Status Verifikasi:</span> <span class="px-2 py-0.5 bg-amber-100 text-amber-800 rounded text-xs font-bold font-sans">${v.status}</span></p>
-                                    </div>
-                                </div>
-
-                                <div class="mb-6">
-                                    <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Pengenalan Diri (Bio)</span>
-                                    <div class="bg-slate-50/50 p-4 rounded-2xl border border-slate-100/50">
-                                        <p class="text-[13px] text-slate-600 leading-relaxed font-medium max-h-[120px] overflow-y-auto custom-scrollbar">${v.bio || 'Freelancer belum mengisi kolom bio deskripsi diri.'}</p>
-                                    </div>
-                                </div>
-
-                                <div class="flex gap-3">
-                                    <button type="button" onclick="window.processVerification(${v.id}, 'reject', event)" class="flex-1 py-4 bg-red-50 text-red-600 font-bold rounded-2xl text-[13px] hover:bg-red-600 hover:text-white transition-all">Tolak</button>
-                                    <button type="button" onclick="window.processVerification(${v.id}, 'approve', event)" class="flex-1 py-4 bg-[#0f766e] text-white font-bold rounded-2xl text-[13px] hover:bg-[#0a5e58] transition-all shadow-lg shadow-teal-sm">Setujui</button>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-
-            overlay.classList.remove('opacity-0', 'pointer-events-none');
-            box.classList.remove('scale-95');
-        };
-
-        window.closeVerificationDetail = function () {
-            const overlay = document.getElementById('modal-verify-overlay');
-            const box = document.getElementById('modal-verify-box');
-            if (overlay) overlay.classList.add('opacity-0', 'pointer-events-none');
-            if (box) box.classList.add('scale-95');
-        };
-
-        window.processVerification = async function (id, action, event) {
-            const container = document.getElementById('verification-container');
-            if (!container) return;
-
-            let url = '';
-            let bodyData = {};
-
-            if (action === 'approve') {
-                url = container.getAttribute('data-verify-url').replace('__ID__', id);
-            } else {
-                url = container.getAttribute('data-reject-url').replace('__ID__', id);
-                const reason = prompt('Masukkan alasan penolakan berkas freelancer:');
-                if (reason === null) return;
-                if (!reason.trim()) {
-                    window.showToast?.('Alasan penolakan wajib diisi.', 'warning');
-                    return;
-                }
-                bodyData.reason = reason.trim();
-            }
-
-            // Proteksi disable submit button & ubah ke loading state
-            const actionBtn = event.target;
-            const originalText = actionBtn.innerHTML;
-            actionBtn.disabled = true;
-            actionBtn.innerHTML = '<span class="animate-spin inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full mr-1 align-middle"></span> Processing...';
-
-            try {
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify(bodyData)
-                });
-
-                if (!response.ok) throw new Error('Gagal memperbarui status verifikasi');
-
-                window.showToast?.('Status verifikasi freelancer berhasil diperbarui!', 'success');
-                window.location.reload();
-            } catch (e) {
-                actionBtn.disabled = false;
-                actionBtn.innerHTML = originalText;
-                if (window.showToast) {
-                    window.showToast(e.message || 'Terjadi kesalahan sistem.', 'danger');
-                } else {
-                    alert(e.message);
-                }
-            }
-        };
     </script>
     <script src="{{ asset('js/dashboard/admin/dashboard.js') }}"></script>
 @endsection
