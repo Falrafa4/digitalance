@@ -9,6 +9,7 @@ use App\Models\Negotiation;
 use App\Models\Offer;
 use App\Models\Order;
 use App\Models\Result;
+use App\Models\Review;
 use App\Models\Service;
 use App\Models\ServiceCategory;
 use App\Models\SkomdaStudent;
@@ -326,6 +327,97 @@ class RestApiCanonicalRoutesTest extends TestCase
         ]);
     }
 
+    public function test_client_can_create_review_on_canonical_route(): void
+    {
+        [, $client, , $order] = $this->makeOrderFixture();
+        $order->update(['status' => 'Completed']);
+
+        Sanctum::actingAs($client);
+
+        $this->postJson('/api/v1/reviews', [
+            'order_id' => $order->id,
+            'rating' => 5,
+            'comment' => 'Hasil sangat rapi dan komunikatif.',
+        ])
+            ->assertCreated()
+            ->assertJsonPath('data.order_id', $order->id)
+            ->assertJsonPath('data.rating', 5);
+
+        $this->assertDatabaseHas('reviews', [
+            'order_id' => $order->id,
+            'rating' => 5,
+        ]);
+    }
+
+    public function test_client_can_view_review_owned_by_their_order(): void
+    {
+        [, $client, , $order] = $this->makeOrderFixture();
+        $review = $this->makeReview($order);
+
+        Sanctum::actingAs($client);
+
+        $this->getJson('/api/v1/reviews/'.$review->id)
+            ->assertOk()
+            ->assertJsonPath('data.id', $review->id)
+            ->assertJsonPath('data.order.client.id', $client->id);
+    }
+
+    public function test_other_client_cannot_view_review_owned_by_different_order(): void
+    {
+        [, , , $order] = $this->makeOrderFixture();
+        $review = $this->makeReview($order);
+
+        $otherClient = Client::create([
+            'name' => 'Other Client',
+            'email' => 'other-client-review@example.com',
+            'phone' => '081333333333',
+            'password' => Hash::make('password'),
+            'profile_photo' => 'profiles/placeholder.webp',
+        ]);
+
+        Sanctum::actingAs($otherClient);
+
+        $this->getJson('/api/v1/reviews/'.$review->id)
+            ->assertForbidden();
+    }
+
+    public function test_admin_can_update_review_with_put_on_canonical_route(): void
+    {
+        [$admin, , , $order] = $this->makeOrderFixture();
+        $review = $this->makeReview($order);
+
+        Sanctum::actingAs($admin);
+
+        $this->putJson('/api/v1/reviews/'.$review->id, [
+            'rating' => 4,
+            'comment' => 'Review diperbarui oleh admin.',
+        ])
+            ->assertOk()
+            ->assertJsonPath('data.rating', 4)
+            ->assertJsonPath('data.comment', 'Review diperbarui oleh admin.');
+
+        $this->assertDatabaseHas('reviews', [
+            'id' => $review->id,
+            'rating' => 4,
+            'comment' => 'Review diperbarui oleh admin.',
+        ]);
+    }
+
+    public function test_owner_client_can_delete_review_on_canonical_route(): void
+    {
+        [, $client, , $order] = $this->makeOrderFixture();
+        $review = $this->makeReview($order);
+
+        Sanctum::actingAs($client);
+
+        $this->deleteJson('/api/v1/reviews/'.$review->id)
+            ->assertOk();
+
+        $this->assertDatabaseMissing('reviews', [
+            'id' => $review->id,
+        ]);
+    }
+
     private function makeOrderFixture(): array
     {
         $admin = Administrator::create([
@@ -427,6 +519,15 @@ class RestApiCanonicalRoutesTest extends TestCase
             'result_mode' => 'link',
             'note' => 'Result untuk test API.',
             'version' => 'v1.0',
+        ]);
+    }
+
+    private function makeReview(Order $order): Review
+    {
+        return Review::create([
+            'order_id' => $order->id,
+            'rating' => 5,
+            'comment' => 'Review untuk test API.',
         ]);
     }
 }
