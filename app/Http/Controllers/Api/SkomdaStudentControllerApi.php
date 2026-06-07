@@ -10,6 +10,7 @@ use App\Http\Resources\SkomdaStudentResource;
 use App\Models\SkomdaStudent;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Gate;
 
 class SkomdaStudentControllerApi extends Controller
 {
@@ -20,6 +21,8 @@ class SkomdaStudentControllerApi extends Controller
      */
     public function index(SkomdaStudentIndexRequest $request): JsonResponse
     {
+        Gate::authorize('viewAny', SkomdaStudent::class);
+
         $validated = $request->validated();
         $q = trim((string) ($validated['q'] ?? ''));
         $major = trim((string) ($validated['major'] ?? ''));
@@ -66,6 +69,8 @@ class SkomdaStudentControllerApi extends Controller
      */
     public function store(SkomdaStudentStoreRequest $request): JsonResponse
     {
+        Gate::authorize('create', SkomdaStudent::class);
+
         $student = SkomdaStudent::create($request->validated());
 
         return $this->successResponse(
@@ -80,6 +85,8 @@ class SkomdaStudentControllerApi extends Controller
      */
     public function show(SkomdaStudent $skomdaStudent): JsonResponse
     {
+        Gate::authorize('view', $skomdaStudent);
+
         return $this->successResponse(
             new SkomdaStudentResource($skomdaStudent->load('freelancer')),
             'Data siswa Skomda berhasil diambil'
@@ -91,6 +98,8 @@ class SkomdaStudentControllerApi extends Controller
      */
     public function update(SkomdaStudentUpdateRequest $request, SkomdaStudent $skomdaStudent): JsonResponse
     {
+        Gate::authorize('update', $skomdaStudent);
+
         $skomdaStudent->update($request->validated());
 
         return $this->successResponse(
@@ -104,6 +113,8 @@ class SkomdaStudentControllerApi extends Controller
      */
     public function destroy(SkomdaStudent $skomdaStudent): JsonResponse
     {
+        Gate::authorize('delete', $skomdaStudent);
+
         if ($skomdaStudent->freelancer()->exists()) {
             return $this->errorResponse(
                 'Siswa tidak dapat dihapus karena masih terhubung dengan akun freelancer.',

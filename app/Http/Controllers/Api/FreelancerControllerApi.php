@@ -18,6 +18,7 @@ use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 
 class FreelancerControllerApi extends Controller
@@ -31,6 +32,12 @@ class FreelancerControllerApi extends Controller
      */
     public function index(FreelancerIndexRequest $request): JsonResponse
     {
+        Gate::authorize('viewAny', Freelancer::class);
+
+        if ($request->user()?->getRole() !== 'administrator') {
+            return $this->clientFindTalent($request);
+        }
+
         $validated = $request->validated();
         $q = trim((string) ($validated['q'] ?? ''));
         $status = trim((string) ($validated['status'] ?? ''));
@@ -67,6 +74,8 @@ class FreelancerControllerApi extends Controller
      */
     public function store(FreelancerStoreRequest $request): JsonResponse
     {
+        Gate::authorize('create', Freelancer::class);
+
         $validated = $request->validated();
         $validated['password'] = Hash::make($validated['password']);
         $validated['profile_photo'] = $this->storeProfilePhoto($request) ?? self::DEFAULT_PROFILE_PHOTO;
@@ -86,6 +95,8 @@ class FreelancerControllerApi extends Controller
      */
     public function show(Freelancer $freelancer): JsonResponse
     {
+        Gate::authorize('view', $freelancer);
+
         return $this->successResponse(
             new FreelancerResource($freelancer->load('skomda_student')),
             'Data freelancer berhasil diambil'
@@ -97,7 +108,16 @@ class FreelancerControllerApi extends Controller
      */
     public function showServices(Freelancer $freelancer): JsonResponse
     {
+        Gate::authorize('view', $freelancer);
+
         $freelancer->load(['skomda_student', 'services.category']);
+
+        if (request()->user()?->getRole() !== 'administrator') {
+            $freelancer->setRelation(
+                'services',
+                $freelancer->services->where('status', 'Approved')->values()
+            );
+        }
 
         return $this->successResponse([
             'freelancer' => new FreelancerResource($freelancer),
@@ -110,6 +130,8 @@ class FreelancerControllerApi extends Controller
      */
     public function update(FreelancerUpdateRequest $request, Freelancer $freelancer): JsonResponse
     {
+        Gate::authorize('update', $freelancer);
+
         $this->updateFreelancerFromValidatedData($freelancer, $request->validated(), $request);
 
         return $this->successResponse(
@@ -123,6 +145,8 @@ class FreelancerControllerApi extends Controller
      */
     public function destroy(Freelancer $freelancer): JsonResponse
     {
+        Gate::authorize('delete', $freelancer);
+
         $student = $freelancer->skomda_student;
 
         $this->deleteProfilePhoto($freelancer->profile_photo);
@@ -137,6 +161,8 @@ class FreelancerControllerApi extends Controller
      */
     public function verify(Freelancer $freelancer): JsonResponse
     {
+        Gate::authorize('moderate', $freelancer);
+
         $freelancer->update([
             'status' => 'Approved',
             'reject_reason' => null,
@@ -153,6 +179,8 @@ class FreelancerControllerApi extends Controller
      */
     public function suspend(Freelancer $freelancer): JsonResponse
     {
+        Gate::authorize('moderate', $freelancer);
+
         $freelancer->update([
             'status' => 'Suspended',
         ]);
@@ -168,6 +196,8 @@ class FreelancerControllerApi extends Controller
      */
     public function unsuspend(Freelancer $freelancer): JsonResponse
     {
+        Gate::authorize('moderate', $freelancer);
+
         $freelancer->update([
             'status' => 'Approved',
             'reject_reason' => null,
@@ -331,6 +361,8 @@ class FreelancerControllerApi extends Controller
      */
     public function clientTalentShow(Freelancer $freelancer): JsonResponse
     {
+        Gate::authorize('view', $freelancer);
+
         if ($freelancer->status !== 'Approved') {
             return $this->errorResponse('Freelancer tidak tersedia.', 404);
         }

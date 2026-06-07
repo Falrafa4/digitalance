@@ -14,6 +14,7 @@ use App\Support\ImageStorage;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 
 class PortofolioControllerApi extends Controller
@@ -25,6 +26,12 @@ class PortofolioControllerApi extends Controller
      */
     public function index(PortofolioIndexRequest $request): JsonResponse
     {
+        Gate::authorize('viewAny', Portofolio::class);
+
+        if ($request->user()?->getRole() === 'freelancer') {
+            return $this->freelancerIndex($request);
+        }
+
         $validated = $request->validated();
         $q = trim((string) ($validated['q'] ?? ''));
         $serviceId = $validated['service_id'] ?? null;
@@ -32,6 +39,10 @@ class PortofolioControllerApi extends Controller
 
         $portofolios = Portofolio::query()
             ->with(['service.category:id,name', 'service.freelancer.skomda_student:id,name,email'])
+            ->when($request->user()?->getRole() === 'client', fn($query) => $query
+                ->whereHas('service', fn($serviceQuery) => $serviceQuery
+                    ->where('status', 'Approved')
+                    ->whereHas('freelancer', fn($freelancerQuery) => $freelancerQuery->where('status', 'Approved'))))
             ->when($serviceId, fn($query) => $query->where('service_id', $serviceId))
             ->when($q !== '', fn($query) => $query->where(function ($query) use ($q) {
                 $query->where('title', 'like', "%{$q}%")
@@ -87,6 +98,8 @@ class PortofolioControllerApi extends Controller
      */
     public function store(PortofolioStoreRequest $request): JsonResponse
     {
+        Gate::authorize('create', Portofolio::class);
+
         $validated = $request->validated();
         $freelancer = $request->user();
 
@@ -119,9 +132,7 @@ class PortofolioControllerApi extends Controller
      */
     public function show(Request $request, Portofolio $portofolio): JsonResponse
     {
-        if (! $this->belongsToFreelancer($portofolio, $request->user())) {
-            return $this->errorResponse('Anda tidak memiliki akses ke portofolio ini', 403);
-        }
+        Gate::authorize('view', $portofolio);
 
         return $this->successResponse(
             new PortofolioResource($portofolio->load(['service.category', 'service.freelancer.skomda_student'])),
@@ -134,6 +145,8 @@ class PortofolioControllerApi extends Controller
      */
     public function adminShow(Portofolio $portofolio): JsonResponse
     {
+        Gate::authorize('view', $portofolio);
+
         return $this->successResponse(
             new PortofolioResource($portofolio->load(['service.category', 'service.freelancer.skomda_student'])),
             'Data portofolio berhasil diambil'
@@ -145,8 +158,10 @@ class PortofolioControllerApi extends Controller
      */
     public function update(PortofolioUpdateRequest $request, Portofolio $portofolio): JsonResponse
     {
-        if (! $this->belongsToFreelancer($portofolio, $request->user())) {
-            return $this->errorResponse('Anda tidak memiliki akses untuk mengedit portofolio ini', 403);
+        Gate::authorize('update', $portofolio);
+
+        if ($request->user()?->getRole() === 'administrator') {
+            return $this->adminUpdate($request, $portofolio);
         }
 
         $validated = $this->validatedUpdateData($request, $portofolio, $request->user());
@@ -163,9 +178,7 @@ class PortofolioControllerApi extends Controller
      */
     public function destroy(Request $request, Portofolio $portofolio): JsonResponse
     {
-        if (! $this->belongsToFreelancer($portofolio, $request->user())) {
-            return $this->errorResponse('Anda tidak memiliki akses untuk menghapus portofolio ini', 403);
-        }
+        Gate::authorize('delete', $portofolio);
 
         $this->deleteLocalMedia($portofolio->media_url);
         $portofolio->delete();
@@ -178,6 +191,8 @@ class PortofolioControllerApi extends Controller
      */
     public function adminUpdate(PortofolioUpdateRequest $request, Portofolio $portofolio): JsonResponse
     {
+        Gate::authorize('update', $portofolio);
+
         $validated = $request->validated();
 
         if ($request->hasFile('media_file')) {
@@ -201,6 +216,8 @@ class PortofolioControllerApi extends Controller
      */
     public function adminDestroy(Portofolio $portofolio): JsonResponse
     {
+        Gate::authorize('delete', $portofolio);
+
         $this->deleteLocalMedia($portofolio->media_url);
         $portofolio->delete();
 
@@ -228,6 +245,8 @@ class PortofolioControllerApi extends Controller
      */
     public function showFreelancerPortofolio(Portofolio $portofolio): JsonResponse
     {
+        Gate::authorize('view', $portofolio);
+
         return $this->successResponse(
             new PortofolioResource($portofolio->load(['service.category', 'service.freelancer.skomda_student'])),
             'Data portofolio berhasil diambil'

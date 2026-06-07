@@ -10,6 +10,7 @@ use App\Http\Resources\ServiceCategoryResource;
 use App\Models\ServiceCategory;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Gate;
 
 class ServiceCategoryControllerApi extends Controller
 {
@@ -20,6 +21,12 @@ class ServiceCategoryControllerApi extends Controller
      */
     public function index(ServiceCategoryIndexRequest $request): JsonResponse
     {
+        Gate::authorize('viewAny', ServiceCategory::class);
+
+        if ($request->user()?->getRole() !== 'administrator') {
+            return $this->activeCategoryOptions($request, 'Data kategori layanan berhasil diambil');
+        }
+
         $validated = $request->validated();
         $q = trim((string) ($validated['q'] ?? ''));
         $isActive = $request->has('is_active') && $request->filled('is_active')
@@ -56,6 +63,8 @@ class ServiceCategoryControllerApi extends Controller
      */
     public function store(ServiceCategoryStoreRequest $request): JsonResponse
     {
+        Gate::authorize('create', ServiceCategory::class);
+
         $category = ServiceCategory::create($this->normalizedData($request->validated()));
 
         return $this->successResponse(
@@ -70,6 +79,8 @@ class ServiceCategoryControllerApi extends Controller
      */
     public function show(ServiceCategory $serviceCategory): JsonResponse
     {
+        Gate::authorize('view', $serviceCategory);
+
         return $this->successResponse(
             new ServiceCategoryResource($serviceCategory->loadCount('services')),
             'Data kategori layanan berhasil diambil'
@@ -81,6 +92,8 @@ class ServiceCategoryControllerApi extends Controller
      */
     public function update(ServiceCategoryUpdateRequest $request, ServiceCategory $serviceCategory): JsonResponse
     {
+        Gate::authorize('update', $serviceCategory);
+
         $serviceCategory->update($this->normalizedData($request->validated()));
 
         return $this->successResponse(
@@ -94,6 +107,8 @@ class ServiceCategoryControllerApi extends Controller
      */
     public function destroy(ServiceCategory $serviceCategory): JsonResponse
     {
+        Gate::authorize('delete', $serviceCategory);
+
         if ($serviceCategory->services()->exists()) {
             return $this->errorResponse(
                 'Kategori layanan tidak dapat dihapus karena masih digunakan oleh layanan.',
