@@ -25,7 +25,7 @@ class RegisterClientRequest extends FormRequest
             'name' => 'required',
             'email' => 'required|unique:clients,email|email',
             'password' => 'required|min:8',
-            'phone' => 'required|unique:clients,phone',
+            'phone' => 'required|regex:/^08[1-9][0-9]{7,}$/',
         ];
     }
 }

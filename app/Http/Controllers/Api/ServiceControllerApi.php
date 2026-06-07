@@ -15,6 +15,7 @@ use App\Models\ServiceCategory;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class ServiceControllerApi extends Controller
 {
@@ -25,6 +26,16 @@ class ServiceControllerApi extends Controller
      */
     public function index(ServiceIndexRequest $request): JsonResponse
     {
+        Gate::authorize('viewAny', Service::class);
+
+        if ($request->user()?->getRole() === 'client') {
+            return $this->catalog($request);
+        }
+
+        if ($request->user()?->getRole() === 'freelancer') {
+            return $this->freelancerIndex($request);
+        }
+
         $validated = $request->validated();
         $q = trim((string) ($validated['q'] ?? ''));
         $status = trim((string) ($validated['status'] ?? ''));
@@ -136,6 +147,8 @@ class ServiceControllerApi extends Controller
      */
     public function store(ServiceStoreRequest $request): JsonResponse
     {
+        Gate::authorize('create', Service::class);
+
         if ($response = $this->ensureApprovedFreelancer($request)) {
             return $response;
         }
@@ -165,6 +178,8 @@ class ServiceControllerApi extends Controller
      */
     public function adminShow(Service $service): JsonResponse
     {
+        Gate::authorize('view', $service);
+
         return $this->successResponse(
             new ServiceResource($service->load(['category:id,name', 'freelancer.skomda_student:id,name,email'])),
             'Data layanan berhasil diambil'
@@ -176,8 +191,10 @@ class ServiceControllerApi extends Controller
      */
     public function show(Request $request, Service $service): JsonResponse
     {
-        if ((int) $service->freelancer_id !== (int) $request->user()->id) {
-            return $this->errorResponse('Anda tidak memiliki akses ke layanan ini', 403);
+        Gate::authorize('view', $service);
+
+        if ($request->user()?->getRole() === 'client') {
+            return $this->clientShow($service);
         }
 
         return $this->successResponse(
@@ -191,6 +208,8 @@ class ServiceControllerApi extends Controller
      */
     public function clientShow(Service $service): JsonResponse
     {
+        Gate::authorize('view', $service);
+
         if (
             $service->status !== 'Approved'
             || ! $service->freelancer_id
@@ -235,12 +254,10 @@ class ServiceControllerApi extends Controller
      */
     public function update(ServiceUpdateRequest $request, Service $service): JsonResponse
     {
-        if ($response = $this->ensureApprovedFreelancer($request)) {
-            return $response;
-        }
+        Gate::authorize('update', $service);
 
-        if ((int) $service->freelancer_id !== (int) $request->user()->id) {
-            return $this->errorResponse('Anda tidak memiliki akses ke layanan ini', 403);
+        if ($request->user()?->getRole() === 'freelancer' && $response = $this->ensureApprovedFreelancer($request)) {
+            return $response;
         }
 
         $service->update(array_merge($request->validated(), [
@@ -259,12 +276,10 @@ class ServiceControllerApi extends Controller
      */
     public function destroy(Request $request, Service $service): JsonResponse
     {
-        if ($response = $this->ensureApprovedFreelancer($request)) {
-            return $response;
-        }
+        Gate::authorize('delete', $service);
 
-        if ((int) $service->freelancer_id !== (int) $request->user()->id) {
-            return $this->errorResponse('Anda tidak memiliki akses ke layanan ini', 403);
+        if ($request->user()?->getRole() === 'freelancer' && $response = $this->ensureApprovedFreelancer($request)) {
+            return $response;
         }
 
         $service->delete();
@@ -277,12 +292,10 @@ class ServiceControllerApi extends Controller
      */
     public function submit(Request $request, Service $service): JsonResponse
     {
+        Gate::authorize('submit', $service);
+
         if ($response = $this->ensureApprovedFreelancer($request)) {
             return $response;
-        }
-
-        if ((int) $service->freelancer_id !== (int) $request->user()->id) {
-            return $this->errorResponse('Anda tidak memiliki akses ke layanan ini', 403);
         }
 
         if ($service->status !== 'Draft') {
@@ -302,6 +315,8 @@ class ServiceControllerApi extends Controller
      */
     public function updateStatus(ServiceStatusUpdateRequest $request, Service $service): JsonResponse
     {
+        Gate::authorize('updateStatus', $service);
+
         $validated = $request->validated();
         $requestedStatus = $validated['status'];
         $finalStatus = $requestedStatus;

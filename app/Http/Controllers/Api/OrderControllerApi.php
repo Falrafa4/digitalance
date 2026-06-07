@@ -3,8 +3,6 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Api\AdminOrderStoreRequest;
-use App\Http\Requests\Api\ClientOrderStoreRequest;
 use App\Http\Requests\Api\OrderAgreedPriceRequest;
 use App\Http\Requests\Api\OrderAttachmentStoreRequest;
 use App\Http\Requests\Api\OrderIndexRequest;
@@ -21,6 +19,7 @@ use App\Models\Service;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class OrderControllerApi extends Controller
 {
@@ -31,6 +30,16 @@ class OrderControllerApi extends Controller
      */
     public function index(OrderIndexRequest $request): JsonResponse
     {
+        Gate::authorize('viewAny', Order::class);
+
+        if ($request->user()?->getRole() === 'client') {
+            return $this->clientIndex($request);
+        }
+
+        if ($request->user()?->getRole() === 'freelancer') {
+            return $this->freelancerIndex($request);
+        }
+
         $validated = $request->validated();
         $status = $validated['status'] ?? null;
         $search = trim((string) ($validated['q'] ?? ''));
@@ -72,9 +81,23 @@ class OrderControllerApi extends Controller
     /**
      * Store a new order for administrator.
      */
-    public function store(AdminOrderStoreRequest $request): JsonResponse
+    public function store(Request $request): JsonResponse
     {
-        $validated = $request->validated();
+        Gate::authorize('create', Order::class);
+
+        if ($request->user()?->getRole() === 'client') {
+            return $this->clientStore($request);
+        }
+
+        $validated = $request->validate([
+            'client_id' => ['required', 'integer', 'exists:clients,id'],
+            'service_id' => ['required', 'integer', 'exists:services,id'],
+            'brief' => ['required', 'string'],
+            'status' => ['nullable', 'in:Pending,Negotiated,Paid,In Progress,Revision,Completed,Cancelled'],
+            'agreed_price' => ['nullable', 'numeric', 'min:0'],
+            'deadline' => ['nullable', 'date'],
+        ]);
+
         $service = Service::findOrFail($validated['service_id']);
 
         $order = Order::create([
@@ -99,6 +122,8 @@ class OrderControllerApi extends Controller
      */
     public function show(Order $order): JsonResponse
     {
+        Gate::authorize('view', $order);
+
         return $this->successResponse(
             new OrderResource($order->load($this->detailRelations())),
             'Detail pesanan berhasil diambil'
@@ -110,6 +135,8 @@ class OrderControllerApi extends Controller
      */
     public function updateStatus(OrderStatusUpdateRequest $request, Order $order): JsonResponse
     {
+        Gate::authorize('update', $order);
+
         $order->update($request->validated());
 
         return $this->successResponse(
@@ -123,6 +150,8 @@ class OrderControllerApi extends Controller
      */
     public function destroy(Order $order): JsonResponse
     {
+        Gate::authorize('delete', $order);
+
         $order->delete();
 
         return $this->successResponse(null, 'Pesanan berhasil dihapus');
@@ -162,9 +191,18 @@ class OrderControllerApi extends Controller
     /**
      * Store a new order for authenticated client.
      */
-    public function clientStore(ClientOrderStoreRequest $request): JsonResponse
+    public function clientStore(Request $request): JsonResponse
     {
-        $validated = $request->validated();
+        Gate::authorize('create', Order::class);
+
+        $validated = $request->validate([
+            'service_id' => ['required', 'integer', 'exists:services,id'],
+            'brief' => ['required', 'string'],
+            'attachments' => ['nullable', 'array', 'max:10'],
+            'attachments.*' => ['file', 'max:51200'],
+            'deadline' => ['nullable', 'date'],
+        ]);
+
         $service = Service::with('freelancer')->findOrFail($validated['service_id']);
 
         if ($response = $this->ensureOrderableService($service)) {
@@ -202,9 +240,7 @@ class OrderControllerApi extends Controller
      */
     public function uploadAttachment(OrderAttachmentStoreRequest $request, Order $order): JsonResponse
     {
-        if (! $this->belongsToClient($order, $request->user()->id)) {
-            return $this->errorResponse('Anda tidak memiliki akses ke pesanan ini', 403);
-        }
+        Gate::authorize('clientAction', $order);
 
         $this->storeUploadedAttachments($order, $request->file('file') ?? [], 'client');
 
@@ -217,11 +253,74 @@ class OrderControllerApi extends Controller
     /**
      * Get checkout summary for authenticated client.
      */
+    public function accept(Request $request, Order $order): JsonResponse
+    {
+        if ($request->user()?->getRole() === 'client') {
+            return $this->clientAccept($request, $order);
+        }
+
+        if ($request->user()?->getRole() === 'freelancer') {
+            Gate::authorize('freelancerAction', $order);
+
+            if ($response = $this->ensureApprovedFreelancer($request)) {
+                return $response;
+            }
+
+            $validated = $request->validate([
+                'agreed_price' => ['required', 'numeric', 'min:0'],
+                'note' => ['nullable', 'string'],
+            ]);
+
+            $order->update([
+                'agreed_price' => $validated['agreed_price'],
+                'status' => 'Negotiated',
+            ]);
+
+            if ($request->filled('note')) {
+                $order->negotiations()->create([
+                    'sender' => 'freelancer',
+                    'message' => $validated['note'],
+                    'proposed_price' => $validated['agreed_price'],
+                    'status' => 'Pending',
+                ]);
+            }
+
+            $this->notifyClient(
+                $order->client_id,
+                'Tawaran Harga dari Freelancer',
+                'Freelancer mengajukan kesepakatan harga baru sebesar Rp ' . number_format((float) $validated['agreed_price'], 0, ',', '.') . '. Silakan lakukan checkout pembayaran.',
+                'warning',
+                url('/client/orders/' . $order->id)
+            );
+
+            return $this->successResponse(
+                new OrderResource($order->fresh($this->detailRelations())),
+                'Pesanan diterima dengan penawaran baru'
+            );
+        }
+
+        return $this->errorResponse('Tidak memiliki izin untuk melakukan aksi ini.', 403);
+    }
+
+    public function reject(OrderRejectRequest $request, Order $order): JsonResponse
+    {
+        if ($request->user()?->getRole() === 'client') {
+            return $this->clientReject($request, $order);
+        }
+
+        if ($request->user()?->getRole() === 'freelancer') {
+            return $this->freelancerReject($request, $order);
+        }
+
+        return $this->errorResponse('Tidak memiliki izin untuk melakukan aksi ini.', 403);
+    }
+
+    /**
+     * Get checkout summary for authenticated client.
+     */
     public function clientAccept(Request $request, Order $order): JsonResponse
     {
-        if (! $this->belongsToClient($order, $request->user()->id)) {
-            return $this->errorResponse('Anda tidak memiliki akses ke pesanan ini', 403);
-        }
+        Gate::authorize('clientAction', $order);
 
         if ($response = $this->ensureCheckoutableOrder($order)) {
             return $response;
@@ -238,9 +337,7 @@ class OrderControllerApi extends Controller
      */
     public function checkout(Request $request, Order $order): JsonResponse
     {
-        if (! $this->belongsToClient($order, $request->user()->id)) {
-            return $this->errorResponse('Anda tidak memiliki akses ke pesanan ini', 403);
-        }
+        Gate::authorize('clientAction', $order);
 
         if ($response = $this->ensureCheckoutableOrder($order)) {
             return $response;
@@ -264,9 +361,7 @@ class OrderControllerApi extends Controller
      */
     public function processPayment(OrderPaymentRequest $request, Order $order): JsonResponse
     {
-        if (! $this->belongsToClient($order, $request->user()->id)) {
-            return $this->errorResponse('Anda tidak memiliki akses ke pesanan ini', 403);
-        }
+        Gate::authorize('clientAction', $order);
 
         if ($response = $this->ensureCheckoutableOrder($order)) {
             return $response;
@@ -310,9 +405,7 @@ class OrderControllerApi extends Controller
      */
     public function clientReject(OrderRejectRequest $request, Order $order): JsonResponse
     {
-        if (! $this->belongsToClient($order, $request->user()->id)) {
-            return $this->errorResponse('Anda tidak memiliki akses ke pesanan ini', 403);
-        }
+        Gate::authorize('clientAction', $order);
 
         $order->update(['status' => 'Cancelled']);
         $order->negotiations()->create([
@@ -331,9 +424,7 @@ class OrderControllerApi extends Controller
      */
     public function clientNegotiate(OrderNegotiationRequest $request, Order $order): JsonResponse
     {
-        if (! $this->belongsToClient($order, $request->user()->id)) {
-            return $this->errorResponse('Anda tidak memiliki akses ke pesanan ini', 403);
-        }
+        Gate::authorize('clientAction', $order);
 
         $validated = $request->validated();
 
@@ -369,9 +460,7 @@ class OrderControllerApi extends Controller
      */
     public function clientRequestRevision(OrderRevisionRequest $request, Order $order): JsonResponse
     {
-        if (! $this->belongsToClient($order, $request->user()->id)) {
-            return $this->errorResponse('Anda tidak memiliki akses ke pesanan ini', 403);
-        }
+        Gate::authorize('clientAction', $order);
 
         if (! in_array($order->status, ['In Progress', 'Completed'], true)) {
             return $this->errorResponse('Revision hanya bisa diminta pada pekerjaan yang sedang berlangsung atau sudah selesai.', 422);
@@ -408,9 +497,7 @@ class OrderControllerApi extends Controller
      */
     public function clientComplete(Request $request, Order $order): JsonResponse
     {
-        if (! $this->belongsToClient($order, $request->user()->id)) {
-            return $this->errorResponse('Anda tidak memiliki akses ke pesanan ini', 403);
-        }
+        Gate::authorize('clientAction', $order);
 
         if (! $order->service_id || ! $order->service?->freelancer_id) {
             return $this->errorResponse('Aksi ini hanya berlaku untuk order client dan freelancer.', 422);
@@ -464,9 +551,7 @@ class OrderControllerApi extends Controller
      */
     public function freelancerShow(Request $request, Order $order): JsonResponse
     {
-        if (! $this->belongsToFreelancer($order, $request->user()->id)) {
-            return $this->errorResponse('Anda tidak memiliki akses ke pesanan ini', 403);
-        }
+        Gate::authorize('view', $order);
 
         return $this->successResponse(
             new OrderResource($order->load($this->detailRelations())),
@@ -479,12 +564,10 @@ class OrderControllerApi extends Controller
      */
     public function updateStatusFreelancer(OrderStatusUpdateRequest $request, Order $order): JsonResponse
     {
+        Gate::authorize('freelancerAction', $order);
+
         if ($response = $this->ensureApprovedFreelancer($request)) {
             return $response;
-        }
-
-        if (! $this->belongsToFreelancer($order, $request->user()->id)) {
-            return $this->errorResponse('Anda tidak memiliki akses ke pesanan ini', 403);
         }
 
         $order->update($request->validated());
@@ -500,12 +583,10 @@ class OrderControllerApi extends Controller
      */
     public function updateAgreedPrice(OrderAgreedPriceRequest $request, Order $order): JsonResponse
     {
+        Gate::authorize('freelancerAction', $order);
+
         if ($response = $this->ensureApprovedFreelancer($request)) {
             return $response;
-        }
-
-        if (! $this->belongsToFreelancer($order, $request->user()->id)) {
-            return $this->errorResponse('Anda tidak memiliki akses ke pesanan ini', 403);
         }
 
         $validated = $request->validated();
@@ -551,12 +632,10 @@ class OrderControllerApi extends Controller
      */
     public function freelancerReject(OrderRejectRequest $request, Order $order): JsonResponse
     {
+        Gate::authorize('freelancerAction', $order);
+
         if ($response = $this->ensureApprovedFreelancer($request)) {
             return $response;
-        }
-
-        if (! $this->belongsToFreelancer($order, $request->user()->id)) {
-            return $this->errorResponse('Anda tidak memiliki akses ke pesanan ini', 403);
         }
 
         $reason = $request->validated('reason');
@@ -585,9 +664,7 @@ class OrderControllerApi extends Controller
      */
     public function freelancerApproveRevision(Request $request, Order $order): JsonResponse
     {
-        if (! $this->belongsToFreelancer($order, $request->user()->id)) {
-            return $this->errorResponse('Anda tidak memiliki akses ke pesanan ini', 403);
-        }
+        Gate::authorize('freelancerAction', $order);
 
         if ($order->status !== 'Revision') {
             return $this->errorResponse('Order bukan dalam status revisi.', 422);
@@ -619,9 +696,7 @@ class OrderControllerApi extends Controller
      */
     public function freelancerRejectRevision(OrderRejectRequest $request, Order $order): JsonResponse
     {
-        if (! $this->belongsToFreelancer($order, $request->user()->id)) {
-            return $this->errorResponse('Anda tidak memiliki akses ke pesanan ini', 403);
-        }
+        Gate::authorize('freelancerAction', $order);
 
         if ($order->status !== 'Revision') {
             return $this->errorResponse('Order bukan dalam status revisi.', 422);

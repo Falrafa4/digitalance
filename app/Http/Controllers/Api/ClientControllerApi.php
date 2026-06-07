@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
@@ -39,6 +40,8 @@ class ClientControllerApi extends Controller
      */
     public function index(ClientIndexRequest $request): JsonResponse
     {
+        Gate::authorize('viewAny', Client::class);
+
         $validated = $request->validated();
         $q = trim((string) ($validated['q'] ?? ''));
         $role = $this->normalizeAdminUserRole($validated['role'] ?? 'all');
@@ -113,6 +116,8 @@ class ClientControllerApi extends Controller
      */
     public function store(UserStoreRequest $request): JsonResponse
     {
+        Gate::authorize('create', Client::class);
+
         $validated = $request->validated();
 
         if ($profilePhoto = $this->storeProfilePhoto($request)) {
@@ -130,6 +135,8 @@ class ClientControllerApi extends Controller
      */
     public function show(Client $client): JsonResponse
     {
+        Gate::authorize('view', $client);
+
         return $this->successResponse(new ClientResource($client), 'Data klien berhasil diambil');
     }
 
@@ -138,6 +145,8 @@ class ClientControllerApi extends Controller
      */
     public function update(UserUpdateRequest $request, Client $client): JsonResponse
     {
+        Gate::authorize('update', $client);
+
         $client->update($request->validated());
 
         return $this->successResponse(new ClientResource($client->fresh()), 'Akun klien berhasil diperbarui');
@@ -148,6 +157,8 @@ class ClientControllerApi extends Controller
      */
     public function destroy(Client $client): JsonResponse
     {
+        Gate::authorize('delete', $client);
+
         $this->deleteProfilePhoto($client->profile_photo);
         $client->delete();
 
@@ -177,46 +188,6 @@ class ClientControllerApi extends Controller
     }
 
     // ==========================================
-    // CLIENT ONLY (MANAGE OWN ACCOUNT)
-    // ==========================================
-
-    /**
-     * Update the client's profile.
-     */
-    public function updateProfile(UpdateClientProfileRequest $request): JsonResponse
-    {
-        $client = $request->user();
-        $validated = $request->validated();
-
-        if ($profilePhoto = $this->storeProfilePhoto($request)) {
-            $this->deleteProfilePhoto($client->profile_photo);
-            $validated['profile_photo'] = $profilePhoto;
-        }
-
-        $client->update($validated);
-
-        return $this->successResponse(new ClientResource($client->fresh()), 'Profil berhasil diperbarui');
-    }
-
-    /**
-     * Update the client's password.
-     */
-    public function updatePassword(UpdateClientPasswordRequest $request): JsonResponse
-    {
-        $client = $request->user();
-
-        if (! Hash::check($request->current_password, $client->password)) {
-            return $this->errorResponse('Password saat ini salah', 422, [
-                'current_password' => ['Password saat ini salah'],
-            ]);
-        }
-
-        $this->updateHashedPassword($client, $request->password);
-
-        return $this->successResponse(null, 'Password berhasil diperbarui');
-    }
-
-    // ==========================================
     // FREELANCER ONLY
     // ==========================================
 
@@ -225,6 +196,8 @@ class ClientControllerApi extends Controller
      */
     public function freelancerIndex(): JsonResponse
     {
+        Gate::authorize('viewAny', Client::class);
+
         $clients = Client::query()
             ->latest()
             ->get()
