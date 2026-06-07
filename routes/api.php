@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AdministratorControllerApi;
 use App\Http\Controllers\Api\AuthControllerApi;
 use App\Http\Controllers\Api\ClientControllerApi;
 use App\Http\Controllers\Api\FreelancerControllerApi;
+use App\Http\Controllers\Api\OfferControllerApi;
 use App\Http\Controllers\Api\OrderControllerApi;
 use App\Http\Controllers\Api\PortofolioControllerApi;
 use App\Http\Controllers\Api\ProfileControllerApi;
@@ -80,6 +81,14 @@ Route::prefix('v1')->group(function () {
         Route::get('/orders/{order}', [OrderControllerApi::class, 'show'])->whereNumber('order');
         Route::patch('/orders/{order}', [OrderControllerApi::class, 'updateStatus'])->whereNumber('order');
         Route::delete('/orders/{order}', [OrderControllerApi::class, 'destroy'])->whereNumber('order');
+
+        Route::get('/offers', [OfferControllerApi::class, 'index']);
+        Route::post('/offers', [OfferControllerApi::class, 'store']);
+        Route::post('/offers/{offer}/accept', [OfferControllerApi::class, 'accept'])->whereNumber('offer');
+        Route::post('/offers/{offer}/reject', [OfferControllerApi::class, 'reject'])->whereNumber('offer');
+        Route::get('/offers/{offer}', [OfferControllerApi::class, 'show'])->whereNumber('offer');
+        Route::patch('/offers/{offer}', [OfferControllerApi::class, 'update'])->whereNumber('offer');
+        Route::delete('/offers/{offer}', [OfferControllerApi::class, 'destroy'])->whereNumber('offer');
     });
 
     Route::middleware(['auth:sanctum', 'role:administrator'])->group(function () {
@@ -87,11 +96,11 @@ Route::prefix('v1')->group(function () {
 
         Route::apiResource('/clients', ClientControllerApi::class)->only(['store', 'show', 'update', 'destroy']);
         Route::patch('/clients/{id}/password', [ClientControllerApi::class, 'updateClientPassword'])->whereNumber('id');
-        Route::put('/freelancers/{id}/password', [ClientControllerApi::class, 'updateFreelancerPassword'])->whereNumber('id');
+        Route::patch('/freelancers/{id}/password', [ClientControllerApi::class, 'updateFreelancerPassword'])->whereNumber('id');
 
         Route::apiResource('/skomda-students', SkomdaStudentControllerApi::class);
 
-        Route::put('/administrators/{administrator}/password', [AdministratorControllerApi::class, 'updateAdminPassword'])->whereNumber('administrator');
+        Route::patch('/administrators/{administrator}/password', [AdministratorControllerApi::class, 'updateAdminPassword'])->whereNumber('administrator');
         Route::apiResource('/administrators', AdministratorControllerApi::class);
     });
 });

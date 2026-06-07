@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Administrator;
 use App\Models\Client;
 use App\Models\Freelancer;
+use App\Models\Offer;
 use App\Models\Order;
 use App\Models\Service;
 use App\Models\ServiceCategory;
@@ -62,7 +63,7 @@ class RestApiCanonicalRoutesTest extends TestCase
 
         Sanctum::actingAs($client);
 
-        $this->patchJson('/api/v1/services/' . $service->id, [
+        $this->patchJson('/api/v1/services/'.$service->id, [
             'title' => 'Tidak boleh',
             'description' => 'Client tidak boleh update service.',
             'price_min' => 100000,
@@ -78,7 +79,7 @@ class RestApiCanonicalRoutesTest extends TestCase
 
         Sanctum::actingAs($otherFreelancer);
 
-        $this->getJson('/api/v1/orders/' . $order->id)
+        $this->getJson('/api/v1/orders/'.$order->id)
             ->assertForbidden();
     }
 
@@ -104,6 +105,68 @@ class RestApiCanonicalRoutesTest extends TestCase
         $this->assertDatabaseHas('service_categories', [
             'name' => 'Kategori API',
         ]);
+    }
+
+    public function test_freelancer_can_create_and_update_offer_on_canonical_route(): void
+    {
+        [, , $freelancer, $order] = $this->makeOrderFixture();
+
+        Sanctum::actingAs($freelancer);
+
+        $response = $this->postJson('/api/v1/offers', [
+            'order_id' => $order->id,
+            'title' => 'Penawaran API',
+            'description' => 'Penawaran dibuat dari REST API canonical.',
+            'offered_price' => 1750000,
+            'deadline' => now()->addDays(7)->toDateString(),
+        ])
+            ->assertCreated()
+            ->assertJsonPath('data.title', 'Penawaran API')
+            ->assertJsonPath('data.status', 'Sent');
+
+        $offerId = $response->json('data.id');
+
+        $this->patchJson('/api/v1/offers/'.$offerId, [
+            'title' => 'Penawaran API Revisi',
+            'offered_price' => 1650000,
+        ])
+            ->assertOk()
+            ->assertJsonPath('data.title', 'Penawaran API Revisi');
+
+        $this->assertDatabaseHas('offers', [
+            'id' => $offerId,
+            'title' => 'Penawaran API Revisi',
+            'status' => 'Sent',
+        ]);
+    }
+
+    public function test_client_can_accept_sent_offer_on_canonical_route(): void
+    {
+        [, $client, , $order] = $this->makeOrderFixture();
+        $offer = $this->makeOffer($order);
+
+        Sanctum::actingAs($client);
+
+        $this->postJson('/api/v1/offers/'.$offer->id.'/accept')
+            ->assertOk()
+            ->assertJsonPath('data.status', 'Accepted');
+
+        $this->assertDatabaseHas('offers', [
+            'id' => $offer->id,
+            'status' => 'Accepted',
+        ]);
+    }
+
+    public function test_freelancer_cannot_view_offer_owned_by_another_freelancer(): void
+    {
+        [, , , $order] = $this->makeOrderFixture();
+        $offer = $this->makeOffer($order);
+        $otherFreelancer = $this->makeFreelancer('other-offer-freelancer@example.com');
+
+        Sanctum::actingAs($otherFreelancer);
+
+        $this->getJson('/api/v1/offers/'.$offer->id)
+            ->assertForbidden();
     }
 
     private function makeOrderFixture(): array
@@ -171,6 +234,18 @@ class RestApiCanonicalRoutesTest extends TestCase
             'profile_photo' => 'profiles/placeholder.webp',
             'password' => Hash::make('password'),
             'status' => 'Approved',
+        ]);
+    }
+
+    private function makeOffer(Order $order): Offer
+    {
+        return Offer::create([
+            'order_id' => $order->id,
+            'title' => 'Penawaran Test API',
+            'description' => 'Penawaran untuk test API.',
+            'offered_price' => 1500000,
+            'deadline' => now()->addDays(7)->toDateString(),
+            'status' => 'Sent',
         ]);
     }
 }
