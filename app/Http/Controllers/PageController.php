@@ -55,7 +55,8 @@ class PageController
     public function login()
     {
         $categories = ServiceCategory::pluck('name')->toArray();
-        $students = SkomdaStudent::whereDoesntHave('freelancer')
+        $students = SkomdaStudent::where('is_registered', false)
+            ->whereDoesntHave('freelancer')
             ->select('id', 'nis', 'name', 'email')
             ->orderBy('name')
             ->get();

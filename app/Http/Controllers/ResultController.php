@@ -60,24 +60,29 @@ class ResultController extends Controller
         $note = $validated['note'] ?? '';
 
         if (!$version) {
-            Storage::disk('public')->delete($filePath);
+            if ($resultMode === 'file' && $filePath) {
+                Storage::disk('public')->delete($filePath);
+            }
 
             return back()->withErrors(['version' => 'Versi hasil wajib diisi.'])->withInput();
         }
 
         try {
-            DB::transaction(function () use ($order, $filePath, $note, $version) {
+            DB::transaction(function () use ($order, $filePath, $note, $resultMode, $version) {
                 $order->update(['status' => 'In Progress']);
 
                 Result::create([
                     'order_id' => $order->id,
                     'file_url' => $filePath,
+                    'result_mode' => $resultMode,
                     'note' => $note,
                     'version' => $version,
                 ]);
             });
         } catch (\Throwable $e) {
-            Storage::disk('public')->delete($filePath);
+            if ($resultMode === 'file' && $filePath) {
+                Storage::disk('public')->delete($filePath);
+            }
             throw $e;
         }
 

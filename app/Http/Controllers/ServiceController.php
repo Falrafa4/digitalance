@@ -23,7 +23,10 @@ class ServiceController extends Controller
             ->where('is_active', true)
             ->withCount([
                 'services as approved_services_count' => function ($query) {
-                    $query->where('status', 'Approved');
+                    $query->where('status', 'Approved')
+                        ->whereHas('freelancer', function ($freelancerQuery) {
+                            $freelancerQuery->where('status', 'Approved');
+                        });
                 },
             ])
             ->orderBy('name')
@@ -36,7 +39,9 @@ class ServiceController extends Controller
             ])
             ->where('status', 'Approved')
             ->whereNotNull('freelancer_id')
-            ->whereHas('freelancer');
+            ->whereHas('freelancer', function ($query) {
+                $query->where('status', 'Approved');
+            });
 
         if ($categoryId) {
             $servicesQuery->where('category_id', $categoryId);
@@ -67,7 +72,9 @@ class ServiceController extends Controller
             ])
             ->where('status', 'Approved')
             ->whereNotNull('freelancer_id')
-            ->whereHas('freelancer')
+            ->whereHas('freelancer', function ($query) {
+                $query->where('status', 'Approved');
+            })
             ->latest()
             ->take(3)
             ->get();
@@ -129,7 +136,10 @@ class ServiceController extends Controller
             ->where('is_active', true)
             ->withCount([
                 'services as approved_services_count' => function ($query) {
-                    $query->where('status', 'Approved');
+                    $query->where('status', 'Approved')
+                        ->whereHas('freelancer', function ($freelancerQuery) {
+                            $freelancerQuery->where('status', 'Approved');
+                        });
                 },
             ])
             ->orderBy('name')
@@ -141,7 +151,9 @@ class ServiceController extends Controller
         ])
             ->where('status', 'Approved')
             ->whereNotNull('freelancer_id')
-            ->whereHas('freelancer');
+            ->whereHas('freelancer', function ($query) {
+                $query->where('status', 'Approved');
+            });
 
         if ($categoryId) {
             $servicesQuery->where('category_id', $categoryId);
@@ -181,7 +193,9 @@ class ServiceController extends Controller
             ])
             ->where('status', 'Approved')
             ->whereNotNull('freelancer_id')
-            ->whereHas('freelancer')
+            ->whereHas('freelancer', function ($query) {
+                $query->where('status', 'Approved');
+            })
             ->latest()
             ->take(3)
             ->get();
@@ -204,8 +218,8 @@ class ServiceController extends Controller
             return redirect()->route('client.services.index')->with('warning', 'Layanan tidak tersedia.');
         }
 
-        if (!$service->freelancer_id || !$service->freelancer) {
-            return redirect()->route('client.services.index')->with('warning', 'Layanan ini tidak memiliki freelancer yang tertaut.');
+        if (!$service->freelancer_id || !$service->freelancer || $service->freelancer->status !== 'Approved') {
+            return redirect()->route('client.services.index')->with('warning', 'Layanan tidak tersedia.');
         }
 
         $service->load([
@@ -225,7 +239,9 @@ class ServiceController extends Controller
             ->where('id', '!=', $service->id)
             ->where('status', 'Approved')
             ->whereNotNull('freelancer_id')
-            ->whereHas('freelancer')
+            ->whereHas('freelancer', function ($query) {
+                $query->where('status', 'Approved');
+            })
             ->latest()
             ->take(6)
             ->get();

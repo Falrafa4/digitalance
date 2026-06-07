@@ -46,6 +46,7 @@ class SkomdaStudentFreelancerFlowTest extends TestCase
             'password' => Hash::make('password'),
             'status' => 'Approved',
         ]);
+        $freelancerStudent->forceFill(['is_registered' => true])->save();
 
         $response = $this->actingAs($administrator, 'administrator')->get(route('admin.clients.index', ['role' => 'Skomda Student']));
 
@@ -102,6 +103,7 @@ class SkomdaStudentFreelancerFlowTest extends TestCase
             'password' => Hash::make('password'),
             'status' => 'Approved',
         ]);
+        $freelancerStudent->forceFill(['is_registered' => true])->save();
 
         $response = $this->actingAs($freelancer, 'freelancer')->post(route('freelancer.delete'), [
             'password' => 'password',
@@ -116,6 +118,7 @@ class SkomdaStudentFreelancerFlowTest extends TestCase
         $this->assertDatabaseHas('skomda_students', [
             'id' => $freelancerStudent->id,
             'name' => 'Calon Freelancer',
+            'is_registered' => false,
         ]);
     }
 }

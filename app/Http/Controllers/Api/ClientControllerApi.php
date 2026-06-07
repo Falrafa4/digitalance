@@ -3,33 +3,57 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\ClientIndexRequest;
+use App\Http\Requests\Api\UpdateUserPasswordRequest;
 use App\Http\Requests\Api\UserStoreRequest;
 use App\Http\Requests\Api\UserUpdateRequest;
 use App\Http\Requests\UpdateClientPasswordRequest;
 use App\Http\Requests\UpdateClientProfileRequest;
+use App\Http\Resources\ClientResource;
+use App\Http\Resources\UserManagementResource;
 use App\Models\Client;
 use App\Models\Freelancer;
 use App\Models\SkomdaStudent;
+use App\Support\ImageStorage;
+use App\Traits\ApiResponse;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Storage;
 
 class ClientControllerApi extends Controller
 {
+    use ApiResponse;
+
+    private const DEFAULT_PROFILE_PHOTO = 'profiles/placeholder.webp';
+
+    // ==========================================
+    // ADMIN-ONLY (MANAGE ANY CLIENT)
+    // ==========================================
+
     /**
      * Get All Data for User Management (Admin Dashboard)
      */
-    public function index(Request $request)
+    public function index(ClientIndexRequest $request): JsonResponse
     {
-        $q = trim($request->query('q', ''));
-        $role = $request->query('role', 'all');
+        $validated = $request->validated();
+        $q = trim((string) ($validated['q'] ?? ''));
+        $role = $this->normalizeAdminUserRole($validated['role'] ?? 'all');
+        $perPage = (int) ($validated['per_page'] ?? 12);
 
-        $clientsQuery = Client::query()->select('id', 'name', 'email', 'phone', DB::raw("'Client' as role"), DB::raw("'Active' as status"), 'created_at');
-        $skomdaQuery = SkomdaStudent::query()->select('id', 'name', 'email', 'phone', DB::raw("'Skomda Student' as role"), DB::raw("'Active' as status"), 'created_at');
+        $clientsQuery = Client::query()->select('id', 'name', 'email', 'phone', 'profile_photo', DB::raw('NULL as avatar'), DB::raw("'Client' as role"), DB::raw("'Active' as status"), 'created_at');
+        $skomdaQuery = SkomdaStudent::query()
+            ->where('is_registered', false)
+            ->whereDoesntHave('freelancer')
+            ->select('id', 'name', 'email', 'phone', DB::raw('NULL as profile_photo'), 'avatar', DB::raw("'Skomda Student' as role"), DB::raw("'Active' as status"), 'created_at');
+
         // Use the query builder so Freelancer::getNameAttribute() does not override the joined student name.
         $freelancersQuery = DB::table('freelancers')
             ->join('skomda_students', 'freelancers.student_id', '=', 'skomda_students.id')
-            ->select('freelancers.id', 'skomda_students.name', 'skomda_students.email', 'skomda_students.phone', DB::raw("'Freelancer' as role"), 'freelancers.status', 'freelancers.created_at');
+            ->select('freelancers.id', 'skomda_students.name', 'skomda_students.email', 'skomda_students.phone', 'freelancers.profile_photo', 'skomda_students.avatar', DB::raw("'Freelancer' as role"), 'freelancers.status', 'freelancers.created_at');
 
         if ($q !== '') {
             $clientsQuery->where(fn($query) => $query
@@ -48,217 +72,148 @@ class ClientControllerApi extends Controller
         }
 
         if ($role === 'Client') {
-            $users = $clientsQuery->latest()->paginate(12)->withQueryString();
+            $users = $clientsQuery->latest()->paginate($perPage)->withQueryString();
         } elseif ($role === 'Freelancer') {
-            $users = $freelancersQuery->orderByDesc('freelancers.created_at')->paginate(12)->withQueryString();
+            $users = $freelancersQuery->orderByDesc('freelancers.created_at')->paginate($perPage)->withQueryString();
         } elseif ($role === 'Skomda Student') {
-            $users = $skomdaQuery->latest()->paginate(12)->withQueryString();
+            $users = $skomdaQuery->latest()->paginate($perPage)->withQueryString();
         } else {
             // Combined using Union
             $combined = $clientsQuery->union($skomdaQuery)->union($freelancersQuery);
             $users = DB::table(DB::raw("({$combined->toSql()}) as combined"))
                 ->mergeBindings($combined->getQuery())
                 ->orderBy('created_at', 'desc')
-                ->paginate(12)
+                ->paginate($perPage)
                 ->withQueryString();
         }
 
-        // We still need skomdaData for the 'Add Freelancer' dropdown
-        $skomdaAll = SkomdaStudent::select('id', 'name', 'nis')->get();
+        $users->through(fn($user) => (new UserManagementResource($user))->toArray($request));
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Data users berhasil diambil',
-            'data' => [
+        // $skomdaAll = SkomdaStudent::query()
+        //     ->whereDoesntHave('freelancer')
+        //     ->select('id', 'name', 'nis')
+        //     ->orderBy('name')
+        //     ->get()
+        //     ->map(fn($student) => (new SkomdaStudentOptionResource($student))->toArray($request))
+        //     ->values();
+
+        return $this->successResponse([
+            'filters' => [
                 'q' => $q,
                 'role' => $role,
-                'users' => $users,
-                'skomdaAll' => $skomdaAll,
+                'per_page' => $perPage,
             ],
-        ]);
+            'users' => $users,
+            // 'skomda_students' => $skomdaAll,
+        ], 'Data users berhasil diambil');
     }
 
     /**
      * Store Client Data
      */
-    public function store(UserStoreRequest $request)
+    public function store(UserStoreRequest $request): JsonResponse
     {
         $validated = $request->validated();
+
+        if ($profilePhoto = $this->storeProfilePhoto($request)) {
+            $validated['profile_photo'] = $profilePhoto;
+        }
+
         $validated['password'] = Hash::make($validated['password']);
         $client = Client::create($validated);
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Klien berhasil ditambahkan',
-            'data' => $client,
-        ], 201);
+        return $this->successResponse(new ClientResource($client->fresh()), 'Klien berhasil ditambahkan', 201);
     }
 
     /**
      * Get Single Client Data
      */
-    public function show(string $id)
+    public function show(Client $client): JsonResponse
     {
-        $client = Client::findOrFail($id);
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Data klien berhasil diambil',
-            'data' => $client,
-        ]);
+        return $this->successResponse(new ClientResource($client), 'Data klien berhasil diambil');
     }
 
     /**
      * Update Client Data
      */
-    public function update(UserUpdateRequest $request, Client $client)
+    public function update(UserUpdateRequest $request, Client $client): JsonResponse
     {
         $client->update($request->validated());
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Akun klien berhasil diperbarui',
-            'data' => $client,
-        ]);
+        return $this->successResponse(new ClientResource($client->fresh()), 'Akun klien berhasil diperbarui');
     }
 
     /**
      * Delete Client Data
      */
-    public function destroy(Client $client)
+    public function destroy(Client $client): JsonResponse
     {
+        $this->deleteProfilePhoto($client->profile_photo);
         $client->delete();
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Akun klien berhasil dihapus',
-        ]);
+        return $this->successResponse(null, 'Akun klien berhasil dihapus');
     }
 
-    // CLIENT SELF-SERVICE (PROFILE & PASSWORD)
-    /**
-     * Display the client's profile.
-     */
-    public function profile()
-    {
-        $user = auth('client')->user();
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Data profil berhasil diambil',
-            'data' => [
-                'user' => $user,
-                'role' => 'Client',
-            ],
-        ]);
-    }
-
-    /**
-     * Update the client's profile.
-     */
-    public function updateProfile(UpdateClientProfileRequest $request)
-    {
-        /** @var Client $client */
-        $client = auth('client')->user();
-        $client->update($request->validated());
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Profil berhasil diperbarui',
-            'data' => $client,
-        ]);
-    }
-
-    /**
-     * Update the client's password.
-     */
-    public function updatePassword(UpdateClientPasswordRequest $request)
-    {
-        /** @var Client $client */
-        $client = auth('client')->user();
-
-        if (! Hash::check($request->current_password, $client->password)) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Password saat ini salah',
-            ], 422);
-        }
-
-        $client->update([
-            'password' => Hash::make($request->password),
-        ]);
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Password berhasil diperbarui',
-            'data' => $client,
-        ]);
-    }
-
-    // ==========================================
-    // ADMIN-ONLY (MANAGE ANY CLIENT)
-    // ==========================================
     /**
      * Update a client's password.
      */
-    public function updateClientPassword(Request $request, $id)
+    public function updateClientPassword(UpdateUserPasswordRequest $request, string $id): JsonResponse
     {
-        $request->validate([
-            'password' => 'required|string|min:8|confirmed',
-        ]);
-
         $client = Client::findOrFail($id);
-        $client->update([
-            'password' => Hash::make($request->password),
-        ]);
+        $this->updateHashedPassword($client, $request->password);
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Password ' . $client->name . ' berhasil diperbarui',
-            'data' => $client,
-        ]);
+        return $this->successResponse(null, 'Password ' . $client->name . ' berhasil diperbarui');
     }
 
     /**
      * Update a freelancer's password.
      */
-    public function updateFreelancerPassword(Request $request, $id)
+    public function updateFreelancerPassword(UpdateUserPasswordRequest $request, string $id): JsonResponse
     {
-        $request->validate([
-            'password' => 'required|string|min:8|confirmed',
-        ]);
-
         $freelancer = Freelancer::findOrFail($id);
-        $freelancer->update([
-            'password' => Hash::make($request->password),
-        ]);
+        $this->updateHashedPassword($freelancer, $request->password);
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Password ' . ($freelancer->skomda_student->name ?? 'Freelancer') . ' berhasil diperbarui',
-            'data' => $freelancer,
-        ]);
+        return $this->successResponse(null, 'Password ' . ($freelancer->skomda_student->name ?? 'Freelancer') . ' berhasil diperbarui');
+    }
+
+    // ==========================================
+    // CLIENT ONLY (MANAGE OWN ACCOUNT)
+    // ==========================================
+
+    /**
+     * Update the client's profile.
+     */
+    public function updateProfile(UpdateClientProfileRequest $request): JsonResponse
+    {
+        $client = $request->user();
+        $validated = $request->validated();
+
+        if ($profilePhoto = $this->storeProfilePhoto($request)) {
+            $this->deleteProfilePhoto($client->profile_photo);
+            $validated['profile_photo'] = $profilePhoto;
+        }
+
+        $client->update($validated);
+
+        return $this->successResponse(new ClientResource($client->fresh()), 'Profil berhasil diperbarui');
     }
 
     /**
-     * Update a Skomda student's password.
+     * Update the client's password.
      */
-    public function updateSkomdaPassword(Request $request, $id)
+    public function updatePassword(UpdateClientPasswordRequest $request): JsonResponse
     {
-        $request->validate([
-            'password' => 'required|string|min:8|confirmed',
-        ]);
+        $client = $request->user();
 
-        $skomdaStudent = \App\Models\SkomdaStudent::findOrFail($id);
-        $skomdaStudent->update([
-            'password' => Hash::make($request->password),
-        ]);
+        if (! Hash::check($request->current_password, $client->password)) {
+            return $this->errorResponse('Password saat ini salah', 422, [
+                'current_password' => ['Password saat ini salah'],
+            ]);
+        }
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Password ' . $skomdaStudent->name . ' berhasil diperbarui',
-            'data' => $skomdaStudent,
-        ]);
+        $this->updateHashedPassword($client, $request->password);
+
+        return $this->successResponse(null, 'Password berhasil diperbarui');
     }
 
     // ==========================================
@@ -268,14 +223,60 @@ class ClientControllerApi extends Controller
     /**
      * Get all clients (for freelancers to view potential clients).
      */
-    public function freelancerIndex()
+    public function freelancerIndex(): JsonResponse
     {
-        $clients = Client::all();
+        $clients = Client::query()
+            ->latest()
+            ->get()
+            ->map(fn($client) => (new ClientResource($client))->toArray(request()))
+            ->values();
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Data klien berhasil diambil',
-            'data' => $clients,
-        ]);
+        return $this->successResponse($clients, 'Data klien berhasil diambil');
+    }
+
+    // ==========================================
+    // HELPER METHODS
+    // ==========================================
+
+    private function normalizeAdminUserRole(?string $role): string
+    {
+        $normalized = trim((string) $role);
+
+        return match ($normalized) {
+            'Client', 'Freelancer', 'Skomda Student', 'all' => $normalized,
+            'Siswa Skomda', 'Skomda Students', 'Skomda', 'skomda student' => 'Skomda Student',
+            default => 'all',
+        };
+    }
+
+    private function updateHashedPassword(Model $model, string $password): bool
+    {
+        if (! Schema::hasColumn($model->getTable(), 'password')) {
+            return false;
+        }
+
+        $model->forceFill([
+            'password' => Hash::make($password),
+        ])->save();
+
+        return true;
+    }
+
+    private function storeProfilePhoto(Request $request): ?string
+    {
+        if (! $request->hasFile('profile_photo')) {
+            return null;
+        }
+
+        return ImageStorage::storeAsWebp($request->file('profile_photo'), 'profiles');
+    }
+
+    private function deleteProfilePhoto(?string $path): void
+    {
+        if (! $path || $path === self::DEFAULT_PROFILE_PHOTO) {
+            return;
+        }
+
+        Storage::disk('public')->delete($path);
     }
 }

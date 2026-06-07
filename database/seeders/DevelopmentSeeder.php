@@ -13,6 +13,7 @@ use App\Models\Result;
 use App\Models\Review;
 use App\Models\Service;
 use App\Models\ServiceCategory;
+use App\Models\SkomdaStudent;
 use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -59,6 +60,9 @@ class DevelopmentSeeder extends Seeder
 
         // 3 - FREELANCER (DEPEND ON USER & STUDENT)
         $freelancers = Freelancer::factory(10)->create();
+
+        SkomdaStudent::whereIn('id', $freelancers->pluck('student_id')->filter()->unique())
+            ->update(['is_registered' => true]);
 
         // 4 - MASTER KATEGORI LAYANAN
         $categories = [

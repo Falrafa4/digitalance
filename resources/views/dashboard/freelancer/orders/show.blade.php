@@ -421,9 +421,9 @@
                                             <p class="font-bold text-slate-900">{{ $result->version ?? 'Versi' }}</p>
                                             <p class="text-[12px] text-slate-500 mt-1">{{ optional($result->created_at)->timezone(config('app.timezone'))->format('d M Y, H:i') }} WIB</p>
                                         </div>
-                                        <a href="{{ asset('storage/' . $result->file_url) }}" target="_blank"
+                                        <a href="{{ $result->downloadUrl() }}" target="_blank" rel="noopener noreferrer"
                                             class="inline-flex items-center gap-2 px-4 py-2 rounded-[12px] bg-white border border-slate-200 text-slate-700 font-bold text-[12px] hover:border-[#0f766e] hover:text-[#0f766e] transition-all">
-                                            <i class="ri-external-link-line"></i> Preview File
+                                            <i class="{{ $result->fileIcon() }}"></i> {{ $result->fileActionLabel() }}
                                         </a>
                                     </div>
                                 @endforeach

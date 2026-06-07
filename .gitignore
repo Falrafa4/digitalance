@@ -23,3 +23,7 @@ Homestead.json
 Homestead.yaml
 Thumbs.db
 database/seeders/data/*.xlsx
+.playwright/
+.playwright-mcp/
+.codex/
+.agents/

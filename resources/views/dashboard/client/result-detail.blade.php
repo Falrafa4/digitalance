@@ -51,8 +51,8 @@
         <div class="bg-white border border-slate-200 rounded-[18px] p-6">
           <h2 class="font-display font-extrabold text-slate-900 text-[1.25rem] mb-4">File Hasil</h2>
           @php
-            $resultIsLink = is_string($result->file_url) && preg_match('/^https?:\/\//i', $result->file_url);
-            $resultFileUrl = $resultIsLink ? $result->file_url : asset('storage/' . $result->file_url);
+            $resultIsLink = $result->isExternalLink();
+            $resultFileUrl = $result->downloadUrl();
             $resultMime = (!$resultIsLink && $result->file_url && file_exists(storage_path('app/public/' . $result->file_url))) ? mime_content_type(storage_path('app/public/' . $result->file_url)) : null;
           @endphp
           <div class="rounded-xl border border-blue-100 bg-blue-50 overflow-hidden">
@@ -60,7 +60,8 @@
               <div class="p-5">
                 <p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2">Link Hasil</p>
                 <a href="{{ $resultFileUrl }}" target="_blank"
-                  class="text-[#0f766e] font-bold hover:underline break-all">{{ $resultFileUrl }}</a>
+                  rel="noopener noreferrer"
+                  class="text-[#0f766e] font-bold hover:underline break-all">{{ $result->fileLabel() }}</a>
               </div>
             @elseif(in_array($resultMime, ['image/jpeg', 'image/png', 'image/gif', 'image/webp']))
               <a href="{{ $resultFileUrl }}" target="_blank" class="block">
@@ -73,16 +74,17 @@
               <div class="flex items-center justify-between p-4">
                 <div class="flex items-center gap-3">
                   <div class="w-10 h-10 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center text-xl">
-                    <i class="ri-file-zip-line"></i>
+                    <i class="{{ $result->fileIcon() }}"></i>
                   </div>
                   <div>
-                    <p class="text-[13px] font-bold text-slate-900">File Terlampir</p>
+                    <p class="text-[13px] font-bold text-slate-900">{{ $result->fileLabel() }}</p>
                     <p class="text-[11px] text-slate-500">Tersedia untuk diunduh</p>
                   </div>
                 </div>
                 <a href="{{ $resultFileUrl }}" target="_blank"
+                  rel="noopener noreferrer"
                   class="px-4 py-2 bg-white text-blue-600 border border-blue-200 rounded-lg font-bold text-[12px] hover:bg-blue-600 hover:text-white transition-all shadow-sm">
-                  Unduh
+                  {{ $result->fileActionLabel() }}
                 </a>
               </div>
             @endif

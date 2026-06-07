@@ -47,4 +47,14 @@ jobs:
             chmod -R ug+rw storage bootstrap/cache
 
             echo "== Restart services =="
+            if sudo systemctl list-unit-files | grep -q '^digitalance-reverb\.service'; then
+              echo "Restarting digitalance-reverb service"
+              sudo systemctl restart digitalance-reverb
+            elif sudo systemctl list-unit-files | grep -q '^reverb\.service'; then
+              echo "Restarting reverb service"
+              sudo systemctl restart reverb
+            else
+              echo "No Reverb systemd service found. Skipping Reverb restart."
+            fi
+
             sudo systemctl reload nginx

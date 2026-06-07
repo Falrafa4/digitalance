@@ -202,7 +202,7 @@
             {{-- Modal Negosiasi (Client) --}}
             <div x-show="showNego"
               x-init="$watch('showNego', value => { if(value) { $nextTick(() => window.DigitalanceUtils.focusTrap($el)) } })"
-              x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
+              x-cloak class="fixed inset-0 z-[100] flex items-center justify-center p-4" role="dialog" aria-modal="true">
               <div @click="showNego = false" class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm"></div>
               <div class="relative w-full max-w-lg bg-white rounded-[24px] shadow-xl p-6 sm:p-8">
                 <button @click="showNego = false"
@@ -247,7 +247,7 @@
             {{-- Modal Tolak --}}
             <div x-show="showReject"
               x-init="$watch('showReject', value => { if(value) { $nextTick(() => window.DigitalanceUtils.focusTrap($el)) } })"
-              x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
+              x-cloak class="fixed inset-0 z-[100] flex items-center justify-center p-4" role="dialog" aria-modal="true">
               <div @click="showReject = false" class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm"></div>
               <div class="relative w-full max-w-md bg-white rounded-[20px] shadow-xl p-6">
                 <h3 class="font-display text-lg font-bold text-slate-900 mb-2 text-center">Tolak Pesanan?</h3>
@@ -334,9 +334,9 @@
                       <a href="{{ route('client.results.show', $result->id) }}" class="text-[#0f766e] text-[12px] font-bold hover:underline">Detail</a>
                     </div>
                     @if($result->file_url)
-                      <a href="{{ asset('storage/' . $result->file_url) }}" target="_blank"
+                      <a href="{{ $result->downloadUrl() }}" target="_blank" rel="noopener noreferrer"
                         class="mt-3 inline-flex items-center gap-2 text-[12px] font-semibold text-slate-600 hover:text-[#0f766e]">
-                        <i class="ri-external-link-line"></i> Preview file
+                        <i class="{{ $result->fileIcon() }}"></i> {{ $result->fileActionLabel() }}
                       </a>
                     @endif
                   </div>
@@ -409,7 +409,7 @@
 
             <div x-show="showRevision"
               x-init="$watch('showRevision', value => { if(value) { $nextTick(() => window.DigitalanceUtils.focusTrap($el)) } })"
-              x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
+              x-cloak class="fixed inset-0 z-[100] flex items-center justify-center p-4" role="dialog" aria-modal="true">
               <div @click="showRevision = false" class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm"></div>
               <div class="relative w-full max-w-lg bg-white rounded-[24px] shadow-xl p-6 sm:p-8">
                 <button @click="showRevision = false"
@@ -476,16 +476,20 @@
               <p class="text-slate-600 mt-2 italic">"{{ $order->review->comment ?? '-' }}"</p>
             </div>
           @elseif($order->status === 'Completed')
-            <form method="POST" action="{{ route('client.reviews.store') }}" class="mt-4 space-y-4">
+            <form method="POST" action="{{ route('client.reviews.store') }}" class="mt-4 space-y-4"
+              x-data="{ rating: {{ (int) old('rating', 5) }} }">
               @csrf
               <input type="hidden" name="order_id" value="{{ $order->id }}" />
               <div class="flex flex-col gap-2">
                 <label class="text-[11px] font-bold text-slate-500 uppercase tracking-[.1em]">Rating</label>
                 <div class="flex flex-wrap gap-2">
                   @for($i = 5; $i >= 1; $i--)
-                    <label class="cursor-pointer">
-                      <input type="radio" name="rating" value="{{ $i }}" class="peer sr-only" {{ $i === 5 ? 'checked' : '' }}>
-                      <span class="inline-flex items-center gap-1 px-4 py-2 rounded-[12px] border border-slate-200 bg-white text-slate-500 font-bold text-[13px] peer-checked:bg-amber-50 peer-checked:text-amber-700 peer-checked:border-amber-200 transition-all">
+                    <label class="relative cursor-pointer">
+                      <input type="radio" name="rating" value="{{ $i }}" x-model.number="rating"
+                        class="absolute opacity-0 pointer-events-none" {{ $i === 5 ? 'checked' : '' }}>
+                      <span
+                        class="inline-flex items-center gap-1 px-4 py-2 rounded-[12px] border font-bold text-[13px] transition-all"
+                        :class="rating === {{ $i }} ? 'bg-amber-50 text-amber-700 border-amber-200 shadow-sm' : 'bg-white text-slate-500 border-slate-200 hover:border-amber-200 hover:text-amber-600'">
                         {{ str_repeat('★', $i) }}
                       </span>
                     </label>

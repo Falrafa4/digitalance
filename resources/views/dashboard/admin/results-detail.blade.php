@@ -16,7 +16,7 @@
                     <div class="flex items-center gap-5">
                         <div
                             class="w-16 h-16 rounded-[22px] bg-white border border-slate-200 shadow-sm flex items-center justify-center text-3xl text-[#0f766e]">
-                            <i class="ri-folder-check-line"></i>
+                            <i class="ri-file-list-2-line"></i>
                         </div>
                         <div>
                             <h1 class="font-display text-[1.8rem] font-black text-slate-900 leading-tight">Detail Hasil
@@ -54,34 +54,45 @@
                         <h3 class="text-[11px] font-bold text-slate-400 uppercase tracking-[2px] mb-4">Pesan & Catatan
                             Freelancer</h3>
                         <div class="bg-slate-50 border border-slate-100 rounded-2xl p-6">
-                            <p class="text-slate-700 text-[14px] leading-relaxed whitespace-pre-wrap italic">
-                                "{{ $result->version ?: ($result->note ?: 'Tidak ada pesan tertulis.') }}"</p>
+                            <p class="text-slate-700 text-[14px] leading-relaxed whitespace-pre-wrap">{{ $result->note ?: 'Tidak ada catatan tertulis.' }}</p>
+                            <p class="text-slate-400 text-[11px] font-bold uppercase tracking-widest mt-4">
+                                Versi: {{ $result->version ?: '-' }}
+                            </p>
                         </div>
                     </section>
 
                     <section>
                         <h3 class="text-[11px] font-bold text-slate-400 uppercase tracking-[2px] mb-4">File Pekerjaan</h3>
+                        @if($result->file_url)
                         <div
                             class="flex items-center justify-between p-5 bg-white border-2 border-slate-100 rounded-3xl hover:border-[#0f766e]/30 transition-all group">
                             <div class="flex items-center gap-4">
                                 <div
                                     class="w-12 h-12 rounded-2xl bg-[#f0fdfa] text-[#0f766e] flex items-center justify-center text-2xl">
-                                    <i class="ri-file-zip-line"></i>
+                                    <i class="{{ $result->fileIcon() }}"></i>
                                 </div>
                                 <div>
                                     <p
                                         class="text-[14px] font-black text-slate-900 group-hover:text-[#0f766e] transition-colors">
-                                        Hasil_Pekerjaan_Final.zip</p>
+                                        {{ $result->fileLabel() }}</p>
+                                    <p class="text-[11px] text-slate-500 font-bold uppercase">
+                                        {{ $result->isExternalLink() ? 'Link eksternal' : 'File tersimpan' }}
+                                    </p>
                                     <p class="text-[11px] text-slate-400 font-bold uppercase">Diunggah pada
                                         {{ $result->created_at->format('d M Y, H:i') }}
                                     </p>
                                 </div>
                             </div>
-                            <a href="{{ asset('storage/' . $result->file_url) }}" target="_blank"
+                            <a href="{{ $result->downloadUrl() }}" target="_blank" rel="noopener noreferrer"
                                 class="px-5 py-2.5 bg-slate-900 text-white rounded-xl font-bold text-[12px] hover:bg-[#0f766e] transition-all shadow-lg">
-                                Unduh File
+                                {{ $result->fileActionLabel() }}
                             </a>
                         </div>
+                        @else
+                            <div class="p-5 bg-slate-50 border border-slate-100 rounded-3xl text-center text-slate-500 text-[13px]">
+                                Tidak ada file atau link hasil.
+                            </div>
+                        @endif
                     </section>
                 </div>
 

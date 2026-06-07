@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class RegisterFreelancerRequest extends FormRequest
 {
@@ -22,7 +23,11 @@ class RegisterFreelancerRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'student_id' => 'required|exists:skomda_students,id|unique:freelancers,student_id',
+            'student_id' => [
+                'required',
+                Rule::exists('skomda_students', 'id')->where('is_registered', false),
+                'unique:freelancers,student_id',
+            ],
             'password' => 'required|string',
         ];
     }
@@ -31,7 +36,7 @@ class RegisterFreelancerRequest extends FormRequest
     {
         return [
             'student_id.required' => 'Student ID wajib dipilih.',
-            'student_id.exists' => 'Student ID tidak ditemukan. Pilih dari dropdown siswa.',
+            'student_id.exists' => 'Student ID tidak ditemukan atau sudah terdaftar sebagai freelancer.',
             'student_id.unique' => 'Akun freelancer untuk siswa ini sudah terdaftar. Silakan login.',
         ];
     }

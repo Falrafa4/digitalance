@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Api;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UserUpdateRequest extends FormRequest
 {
@@ -21,10 +22,13 @@ class UserUpdateRequest extends FormRequest
      */
     public function rules(): array
     {
+        $client = $this->route('client') ?? $this->route('id');
+        $clientId = is_object($client) ? $client->id : $client;
+
         return [
-            'name' => 'required|string',
-            'email' => 'required|email|unique:clients,email,'.$this->route('id'),
-            'phone' => 'required|string',
+            'name' => ['required', 'string'],
+            'email' => ['required', 'email', Rule::unique('clients', 'email')->ignore($clientId)],
+            'phone' => ['required', 'string'],
         ];
     }
 }

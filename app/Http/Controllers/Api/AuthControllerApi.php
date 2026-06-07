@@ -6,29 +6,47 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterClientRequest;
 use App\Http\Requests\RegisterFreelancerRequest;
+use App\Http\Resources\AdministratorResource;
+use App\Http\Resources\ClientResource;
+use App\Http\Resources\FreelancerResource;
+use App\Models\Administrator;
 use App\Models\Client;
+use App\Models\Freelancer;
 use App\Models\SkomdaStudent;
+use App\Traits\ApiResponse;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class AuthControllerApi extends Controller
 {
+    use ApiResponse;
+
     /**
      * Get the authenticated user's profile.
      */
     public function me(Request $request)
     {
         $user = $request->user();
+        $role = null;
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Data profil berhasil diambil',
-            'data' => [
-                'user' => $user,
-                'role' => $user->getRoleNames()->first() ?? 'Unknown',
-            ],
-        ], 200);
+        if ($user instanceof Administrator) {
+            $user = new AdministratorResource($user);
+            $role = 'administrator';
+        } elseif ($user instanceof Client) {
+            $user = new ClientResource($user);
+            $role = 'client';
+        } elseif ($user instanceof Freelancer) {
+            $user = new FreelancerResource($user);
+            $role = 'freelancer';
+        }
+
+        return $this->successResponse([
+            'user' => $user,
+            'role' => $role,
+        ], 'Profil berhasil diambil');
     }
 
     /**
@@ -41,10 +59,7 @@ class AuthControllerApi extends Controller
 
         Client::create($validated);
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Akun client berhasil dibuat',
-        ], 201);
+        return $this->successResponse(null, 'Registrasi client berhasil. Silakan login.', 201);
     }
 
     /**
@@ -56,29 +71,32 @@ class AuthControllerApi extends Controller
         $student = SkomdaStudent::where('id', $validated['student_id'])->first();
 
         if (! $student) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Siswa dengan ID Student tersebut tidak ditemukan',
-            ], 404);
+            return $this->errorResponse('Siswa dengan ID Student tersebut tidak ditemukan', 404);
         }
 
-        if ($student->freelancer) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Akun freelancer untuk ID Student ini sudah terdaftar. Silakan login.',
-            ], 400);
+        if ($student->is_registered || Freelancer::where('student_id', $validated['student_id'])->exists()) {
+            return $this->errorResponse('Akun freelancer untuk ID Student ini sudah terdaftar. Silakan login.', 400);
         }
 
-        $student->freelancer()->create([
-            'student_id' => $validated['student_id'],
-            'password' => Hash::make($validated['password']),
-            'status' => 'Pending',
-        ]);
+        try {
+            $student->freelancer()->create([
+                'student_id' => $validated['student_id'],
+                'password' => Hash::make($validated['password']),
+                'status' => 'Pending',
+            ]);
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Registrasi freelancer berhasil. Silakan login.',
-        ], 201);
+            try {
+                $student->is_registered = true;
+                $student->save();
+            } catch (\Exception $e) {
+                // Log the error but don't fail the registration if this part fails
+                Log::error('Failed to update SkomdaStudent after freelancer registration: ' . $e->getMessage());
+            }
+        } catch (\Exception $e) {
+            return $this->errorResponse('Terjadi kesalahan saat mendaftarkan freelancer. Silakan coba lagi.', 500);
+        }
+
+        return $this->successResponse(null, 'Registrasi freelancer berhasil. Silakan login.', 201);
     }
 
     /**
@@ -87,27 +105,89 @@ class AuthControllerApi extends Controller
     public function login(LoginRequest $request)
     {
         $credentials = $request->validated();
+        $email = $credentials['email'];
+        $password = $credentials['password'];
+        $role = $credentials['role'] ?? null;
 
-        if (! Auth::attempt($credentials)) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Login gagal, pastikan email dan password benar',
-            ], 401);
+        if ($role) {
+            return match ($role) {
+                'administrator' => $this->loginAdministrator($email, $password),
+                'client' => $this->loginClient($email, $password),
+                'freelancer' => $this->loginFreelancer($email, $password),
+            } ?? $this->errorResponse('Email atau password salah. Silakan coba lagi.', 401);
         }
 
-        $user = Auth::user();
-        $token = $user->createToken('auth_token')->plainTextToken;
+        foreach (['administrator', 'client', 'freelancer'] as $attemptRole) {
+            $response = match ($attemptRole) {
+                'administrator' => $this->loginAdministrator($email, $password),
+                'client' => $this->loginClient($email, $password),
+                'freelancer' => $this->loginFreelancer($email, $password),
+            };
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Login berhasil',
-            'data' => [
-                'user' => $user,
-                'role' => $user->getRoleNames()->first() ?? 'Unknown',
-                'access_token' => $token,
-                'token_type' => 'Bearer',
-            ],
-        ], 200);
+            if ($response) {
+                return $response;
+            }
+        }
+
+        return $this->errorResponse('Email atau password salah. Silakan coba lagi.', 401);
+    }
+
+    private function loginAdministrator(string $email, string $password): ?JsonResponse
+    {
+        $admin = Administrator::where('email', $email)->first();
+
+        if (! $admin || ! Hash::check($password, $admin->password)) {
+            return null;
+        }
+
+        $token = $admin->createToken('api-token')->plainTextToken;
+
+        return $this->successResponse([
+            'user' => new AdministratorResource($admin),
+            'role' => 'administrator',
+            'token' => $token,
+        ], 'Login sebagai administrator berhasil');
+    }
+
+    private function loginClient(string $email, string $password): ?JsonResponse
+    {
+        $client = Client::where('email', $email)->first();
+
+        if (! $client || ! Hash::check($password, $client->password)) {
+            return null;
+        }
+
+        $token = $client->createToken('api-token')->plainTextToken;
+
+        return $this->successResponse([
+            'user' => $client,
+            'role' => 'client',
+            'token' => $token,
+        ], 'Login sebagai client berhasil');
+    }
+
+    private function loginFreelancer(string $email, string $password): ?JsonResponse
+    {
+        $freelancer = Freelancer::whereHas('skomda_student', function ($query) use ($email) {
+            $query->where('email', $email);
+        })->first();
+
+        if (! $freelancer || ! Hash::check($password, $freelancer->password)) {
+            return null;
+        }
+
+        if ($freelancer->status !== 'Approved') {
+            return $this->errorResponse('Akun freelancer Anda sedang dalam status ' . $freelancer->status . '. Silakan tunggu konfirmasi dari administrator.', 403);
+        }
+
+        $token = $freelancer->createToken('api-token')->plainTextToken;
+        $freelancer->load('skomda_student');
+
+        return $this->successResponse([
+            'user' => new FreelancerResource($freelancer),
+            'role' => 'freelancer',
+            'token' => $token,
+        ], 'Login sebagai freelancer berhasil');
     }
 
     /**
@@ -117,9 +197,6 @@ class AuthControllerApi extends Controller
     {
         $request->user()->currentAccessToken()->delete();
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Logout berhasil',
-        ], 200);
+        return $this->successResponse(null, 'Logout berhasil');
     }
 }

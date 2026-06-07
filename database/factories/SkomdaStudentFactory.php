@@ -28,6 +28,7 @@ class SkomdaStudentFactory extends Factory
             'email' => fake()->unique()->userName().'@student.smktelkom-sda.sch.id',
             'class' => $class,
             'major' => $major,
+            'is_registered' => false,
         ];
     }
 }

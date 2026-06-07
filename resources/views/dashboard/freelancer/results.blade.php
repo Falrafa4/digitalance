@@ -38,8 +38,8 @@
 
                     <div class="flex items-center gap-3 pt-4 border-t border-slate-100 mt-auto">
                         @if($res->file_url)
-                            <a href="{{ asset('storage/' . $res->file_url) }}" target="_blank" class="flex-1 py-2.5 rounded-xl border border-blue-200 bg-blue-50 text-blue-700 font-bold text-[12.5px] text-center hover:bg-blue-100 transition-colors">
-                                <i class="ri-download-cloud-2-line mr-1"></i> Unduh File
+                            <a href="{{ $res->downloadUrl() }}" target="_blank" rel="noopener noreferrer" class="flex-1 py-2.5 rounded-xl border border-blue-200 bg-blue-50 text-blue-700 font-bold text-[12.5px] text-center hover:bg-blue-100 transition-colors">
+                                <i class="{{ $res->fileIcon() }} mr-1"></i> {{ $res->fileActionLabel() }}
                             </a>
                         @else
                             <div class="flex-1 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-400 font-bold text-[12.5px] text-center cursor-not-allowed">
