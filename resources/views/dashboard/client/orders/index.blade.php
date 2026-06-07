@@ -42,6 +42,7 @@
                       @else
                         {{ $o->service?->title ?? '-' }}
                       @endif
+                    </p>
                   </div>
                   <p class="text-slate-400 text-[12px] font-bold mt-2">
                     @if($o->agreed_price)
@@ -90,7 +91,6 @@
                     <x-ui.status-badge :status="$o->status ?? '-'" class="ml-2" />
                   </div>
                 </div>
-              </div>
 
               <div class="flex gap-2 mt-4">
                 <a href="{{ route('client.orders.show', $o->id) }}"
