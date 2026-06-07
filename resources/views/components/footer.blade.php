@@ -1,20 +1,12 @@
 <footer class="bg-slate-100 border-t border-slate-200">
     <div class="max-w-7xl mx-auto px-6 py-12">
         <div class="flex flex-col md:flex-row md:justify-between md:items-start gap-10">
-            <!-- KIRI: Logo, deskripsi, sosmed -->
             <div class="flex flex-col gap-4 md:max-w-sm">
                 <div class="flex items-center gap-2 font-display text-2xl font-black text-slate-900 select-none">
-                    <svg width="36" height="36" viewBox="0 0 32 32" fill="none">
-                        <rect width="32" height="32" rx="8" fill="url(#lg2)" />
-                        <path d="M16 8L24 12V20L16 24L8 20V12L16 8Z" fill="white" />
-                        <defs>
-                            <linearGradient id="lg2" x1="0" y1="0" x2="32" y2="32">
-                                <stop offset="0%" stop-color="#0F766E" />
-                                <stop offset="100%" stop-color="#10B981" />
-                            </linearGradient>
-                        </defs>
-                    </svg>
-                    Digitalance
+    <a href="{{ route('home') }}" class="flex items-center gap-3">
+        <img src="{{ asset('image.png') }}"
+             alt="Digitalance"
+             class="h-14 w-auto">
                 </div>
                 <p class="text-slate-500 italic font-medium leading-relaxed">
                     Platform freelance eksklusif untuk siswa/i SKOMDA. Menghubungkan talenta dengan peluang.

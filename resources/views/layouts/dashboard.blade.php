@@ -63,8 +63,6 @@
     <script src="{{ asset('js/dashboard/shared/flash.js') }}"></script>
     <script src="{{ asset('js/dashboard/confirm-modal.js') }}"></script>
 
-    {{-- Alpine (used by various dashboard pages for interactive UI) --}}
-    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     {{-- Reverb + Echo bootstrap for realtime chat --}}
     <meta name="reverb-key" content="{{ config('broadcasting.connections.reverb.key') }}">
     <meta name="reverb-host" content="{{ config('broadcasting.connections.reverb.options.host') }}">

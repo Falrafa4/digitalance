@@ -1,19 +1,10 @@
 <nav class="navbar sticky top-0 z-50 bg-white/90 backdrop-blur-xl border-b border-teal-700/10 py-4" id="navbar">
-    <div class="max-w-7xl mx-auto px-6 flex justify-between items-center">
-        <a href="{{ route('home') }}"
-            class="flex items-center gap-2.5 font-display text-2xl font-bold text-primary no-underline">
-            <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-                <rect width="32" height="32" rx="8" fill="url(#lg1)" />
-                <path d="M16 8L24 12V20L16 24L8 20V12L16 8Z" fill="white" />
-                <defs>
-                    <linearGradient id="lg1" x1="0" y1="0" x2="32" y2="32">
-                        <stop offset="0%" stop-color="#0F766E" />
-                        <stop offset="100%" stop-color="#10B981" />
-                    </linearGradient>
-                </defs>
-            </svg>
-            Digitalance
-        </a>
+   <div class="max-w-7xl mx-auto px-6 h-16 flex justify-between items-center">
+    <a href="{{ route('home') }}" class="flex items-center gap-3">
+        <img src="{{ asset('image.png') }}"
+             alt="Digitalance"
+             class="h-14 w-auto">
+    </a>
 
         <div class="hidden md:flex items-center gap-12">
             <ul class="flex list-none gap-8 m-0 p-0">

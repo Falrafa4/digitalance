@@ -312,9 +312,7 @@
         window.__PENDING_VERIFICATIONS__ = @json($pendingVerifications ?? []);
     </script>
     <script>
-        // ==========================================
-        // PERBAIKAN TASK 2: LOGIK CHART REVENUE DARI DB
-        // ==========================================
+
         let performanceChart = null;
 
         function initChart(viewType) {

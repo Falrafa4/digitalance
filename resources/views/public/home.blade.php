@@ -99,7 +99,7 @@
 
     <!-- STATS (Layout Grid 2-2) -->
     <section class="bg-white py-12 border-t border-b border-slate-200">
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 grid grid-cols-2 gap-6 sm:gap-10 stagger">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 grid grid-cols-2 md:grid-cols-4 gap-12 stagger">
             <div class="reveal flex flex-col items-center text-center gap-3 group cursor-default">
                 <div
                     class="w-12 h-12 sm:w-14 sm:h-14 bg-slate-100 rounded-2xl flex items-center justify-center text-primary transition-all group-hover:bg-primary group-hover:text-white group-hover:scale-110">
