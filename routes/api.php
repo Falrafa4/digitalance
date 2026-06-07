@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AuthControllerApi;
 use App\Http\Controllers\Api\AdministratorControllerApi;
 use App\Http\Controllers\Api\ClientControllerApi;
 use App\Http\Controllers\Api\FreelancerControllerApi;
+use App\Http\Controllers\Api\ServiceCategoryControllerApi;
 use App\Http\Controllers\Api\ServiceControllerApi;
 use App\Http\Controllers\Api\SkomdaStudentControllerApi;
 use Illuminate\Http\Request;
@@ -37,6 +38,11 @@ Route::prefix('v1')->group(function () {
         Route::get('/services', [ServiceControllerApi::class, 'index']);
         Route::get('/services/{service}', [ServiceControllerApi::class, 'adminShow'])->whereNumber('service');
         Route::post('/services/{service}/status', [ServiceControllerApi::class, 'updateStatus'])->whereNumber('service');
+        Route::get('/service-categories', [ServiceCategoryControllerApi::class, 'index']);
+        Route::post('/service-categories', [ServiceCategoryControllerApi::class, 'store']);
+        Route::get('/service-categories/{serviceCategory}', [ServiceCategoryControllerApi::class, 'show'])->whereNumber('serviceCategory');
+        Route::put('/service-categories/{serviceCategory}', [ServiceCategoryControllerApi::class, 'update'])->whereNumber('serviceCategory');
+        Route::delete('/service-categories/{serviceCategory}', [ServiceCategoryControllerApi::class, 'destroy'])->whereNumber('serviceCategory');
         
         Route::put('/freelancers/{id}/password', [ClientControllerApi::class, 'updateFreelancerPassword']);
         Route::get('/freelancers/{freelancer}/services', [FreelancerControllerApi::class, 'showServices'])->whereNumber('freelancer');
@@ -66,6 +72,7 @@ Route::prefix('v1')->group(function () {
         Route::put('/freelancers/services/{service}', [ServiceControllerApi::class, 'update'])->whereNumber('service');
         Route::delete('/freelancers/services/{service}', [ServiceControllerApi::class, 'destroy'])->whereNumber('service');
         Route::post('/freelancers/services/{service}/submit', [ServiceControllerApi::class, 'submit'])->whereNumber('service');
+        Route::get('/freelancers/service-categories', [ServiceCategoryControllerApi::class, 'freelancerIndex']);
     });
 
     Route::middleware(['auth:sanctum', 'role:client'])->group(function () {
@@ -74,6 +81,7 @@ Route::prefix('v1')->group(function () {
         Route::put('/clients/password', [ClientControllerApi::class, 'updatePassword']);
         Route::get('/service-catalog', [ServiceControllerApi::class, 'catalog']);
         Route::get('/service-catalog/{service}', [ServiceControllerApi::class, 'clientShow'])->whereNumber('service');
+        Route::get('/client/service-categories', [ServiceCategoryControllerApi::class, 'clientIndex']);
         Route::get('/talents', [FreelancerControllerApi::class, 'clientFindTalent']);
         Route::get('/talents/{freelancer}', [FreelancerControllerApi::class, 'clientTalentShow'])->whereNumber('freelancer');
     });
