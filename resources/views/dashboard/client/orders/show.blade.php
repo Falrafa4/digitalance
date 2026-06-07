@@ -476,16 +476,20 @@
               <p class="text-slate-600 mt-2 italic">"{{ $order->review->comment ?? '-' }}"</p>
             </div>
           @elseif($order->status === 'Completed')
-            <form method="POST" action="{{ route('client.reviews.store') }}" class="mt-4 space-y-4">
+            <form method="POST" action="{{ route('client.reviews.store') }}" class="mt-4 space-y-4"
+              x-data="{ rating: {{ (int) old('rating', 5) }} }">
               @csrf
               <input type="hidden" name="order_id" value="{{ $order->id }}" />
               <div class="flex flex-col gap-2">
                 <label class="text-[11px] font-bold text-slate-500 uppercase tracking-[.1em]">Rating</label>
                 <div class="flex flex-wrap gap-2">
                   @for($i = 5; $i >= 1; $i--)
-                    <label class="cursor-pointer">
-                      <input type="radio" name="rating" value="{{ $i }}" class="peer sr-only" {{ $i === 5 ? 'checked' : '' }}>
-                      <span class="inline-flex items-center gap-1 px-4 py-2 rounded-[12px] border border-slate-200 bg-white text-slate-500 font-bold text-[13px] peer-checked:bg-amber-50 peer-checked:text-amber-700 peer-checked:border-amber-200 transition-all">
+                    <label class="relative cursor-pointer">
+                      <input type="radio" name="rating" value="{{ $i }}" x-model.number="rating"
+                        class="absolute opacity-0 pointer-events-none" {{ $i === 5 ? 'checked' : '' }}>
+                      <span
+                        class="inline-flex items-center gap-1 px-4 py-2 rounded-[12px] border font-bold text-[13px] transition-all"
+                        :class="rating === {{ $i }} ? 'bg-amber-50 text-amber-700 border-amber-200 shadow-sm' : 'bg-white text-slate-500 border-slate-200 hover:border-amber-200 hover:text-amber-600'">
                         {{ str_repeat('★', $i) }}
                       </span>
                     </label>
