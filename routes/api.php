@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AuthControllerApi;
 use App\Http\Controllers\Api\AdministratorControllerApi;
 use App\Http\Controllers\Api\ClientControllerApi;
 use App\Http\Controllers\Api\FreelancerControllerApi;
+use App\Http\Controllers\Api\ServiceControllerApi;
 use App\Http\Controllers\Api\SkomdaStudentControllerApi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -33,6 +34,9 @@ Route::prefix('v1')->group(function () {
         Route::apiResource('/clients', ClientControllerApi::class)->only(['store', 'show', 'update', 'destroy']);
         Route::put('/clients/{id}/password', [ClientControllerApi::class, 'updateClientPassword']);
         Route::apiResource('/skomda-students', SkomdaStudentControllerApi::class);
+        Route::get('/services', [ServiceControllerApi::class, 'index']);
+        Route::get('/services/{service}', [ServiceControllerApi::class, 'adminShow'])->whereNumber('service');
+        Route::post('/services/{service}/status', [ServiceControllerApi::class, 'updateStatus'])->whereNumber('service');
         
         Route::put('/freelancers/{id}/password', [ClientControllerApi::class, 'updateFreelancerPassword']);
         Route::get('/freelancers/{freelancer}/services', [FreelancerControllerApi::class, 'showServices'])->whereNumber('freelancer');
@@ -56,12 +60,20 @@ Route::prefix('v1')->group(function () {
         Route::put('/freelancers/password', [FreelancerControllerApi::class, 'updatePassword']);
         Route::delete('/freelancers/account', [FreelancerControllerApi::class, 'deleteAccount']);
         Route::post('/freelancers/verification', [FreelancerControllerApi::class, 'applyForVerification']);
+        Route::get('/freelancers/services', [ServiceControllerApi::class, 'freelancerIndex']);
+        Route::post('/freelancers/services', [ServiceControllerApi::class, 'store']);
+        Route::get('/freelancers/services/{service}', [ServiceControllerApi::class, 'show'])->whereNumber('service');
+        Route::put('/freelancers/services/{service}', [ServiceControllerApi::class, 'update'])->whereNumber('service');
+        Route::delete('/freelancers/services/{service}', [ServiceControllerApi::class, 'destroy'])->whereNumber('service');
+        Route::post('/freelancers/services/{service}/submit', [ServiceControllerApi::class, 'submit'])->whereNumber('service');
     });
 
     Route::middleware(['auth:sanctum', 'role:client'])->group(function () {
         Route::get('/clients/profile', [ClientControllerApi::class, 'profile']);
         Route::put('/clients/profile', [ClientControllerApi::class, 'updateProfile']);
         Route::put('/clients/password', [ClientControllerApi::class, 'updatePassword']);
+        Route::get('/service-catalog', [ServiceControllerApi::class, 'catalog']);
+        Route::get('/service-catalog/{service}', [ServiceControllerApi::class, 'clientShow'])->whereNumber('service');
         Route::get('/talents', [FreelancerControllerApi::class, 'clientFindTalent']);
         Route::get('/talents/{freelancer}', [FreelancerControllerApi::class, 'clientTalentShow'])->whereNumber('freelancer');
     });
