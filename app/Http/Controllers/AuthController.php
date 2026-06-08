@@ -112,12 +112,14 @@ class AuthController extends Controller
             return back()
                 ->withErrors(['email' => 'Password yang kamu masukkan salah. Silakan coba lagi.'])
                 ->withInput()
+                ->with('login_error', 'Password yang kamu masukkan salah. Silakan coba lagi.')
                 ->with('error', 'Password salah');
         }
 
         return back()
             ->withErrors(['email' => 'Email tidak ditemukan. Silakan daftar terlebih dahulu.'])
             ->withInput()
+            ->with('login_error', 'Email tidak ditemukan. Silakan daftar terlebih dahulu.')
             ->with('error', 'Akun tidak terdaftar');
     }
 
