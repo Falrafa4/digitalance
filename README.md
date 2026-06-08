@@ -45,12 +45,14 @@ Digitalance dibuat untuk:
 - Sistem review (one-to-one per order)
 - Kategori layanan
 - Fitur lowongan kerja (`loker`) dan lamaran freelancer
+- AI recommendation untuk membantu client menemukan freelancer yang relevan
+- Career mapping freelancer dengan analisis spesialisasi dan pengajuan verifikasi jalur karir
 - Dashboard berbeda untuk setiap role
 - Attachment upload pada order
 - Upload gambar profil dan portofolio dengan konversi WebP
 - Avatar user di dashboard dan halaman publik
 - Navbar publik dengan efek floating saat scroll
-- Dokumentasi API sederhana
+- REST API `/api/v1` dengan dokumentasi OpenAPI dari Scramble
 - Status visual pesan pada inbox chat (`Perlu Respons` / `Sudah Dibaca`)
 
 ---
@@ -64,6 +66,10 @@ Digitalance dibuat untuk:
 5. Freelancer mengunggah hasil pekerjaan (`Result`)
 6. Transaksi diselesaikan
 7. Client memberikan review
+
+Flow lain yang juga aktif:
+- `Loker -> Application -> Approval -> Order`
+- `Freelancer onboarding -> Career Mapping -> Verification`
 
 ---
 
@@ -133,7 +139,7 @@ Digitalance menggunakan pendekatan:
 - Laravel monolith architecture
 - Controller-first pattern
 - Server-rendered web application sebagai surface utama
-- API tersedia dalam scope terbatas
+- Web-first application dengan REST API `/api/v1` sebagai surface pendamping
 
 ---
 
@@ -203,13 +209,13 @@ DB_PASSWORD=
 
 ### 7. Jalankan Migrasi dan Seeder
 
-Seeder data siswa membaca file Excel lokal dari:
+Seeder membaca data siswa dari file:
 
 ```text
 database/seeders/data/siswa.xlsx
 ```
 
-Pastikan file tersebut tersedia sebelum menjalankan seeder. File `.xlsx` pada folder tersebut tidak disimpan di repository.
+File tersebut saat ini tersedia di repository. Pada environment non-production, `DatabaseSeeder` akan menjalankan `DevelopmentSeeder`; pada environment production akan menjalankan `ProductionSeeder`.
 
 ```bash
 php artisan migrate --seed
@@ -283,8 +289,9 @@ http://localhost:8000
   - `administrator`
   - `client`
   - `freelancer`
-- `Laravel Sanctum` tersedia sebagai dependency namun belum menjadi authentication utama untuk web app.
-- API project masih bersifat terbatas dan web-first.
+- Web app utama tetap memakai session multi-guard.
+- `Laravel Sanctum` dipakai untuk autentikasi API `/api/v1`.
+- Surface utama project tetap web-first, tetapi REST API sudah tersedia untuk resource penting seperti auth, services, freelancers, orders, offers, negotiations, results, reviews, transactions, dan loker.
 
 ---
 
@@ -304,14 +311,15 @@ Akun berikut dapat digunakan:
 | --- | --- | --- |
 | Administrator | `admin1@email.com` | `admin123` |
 | Administrator | `admin2@email.com` | `admin123` |
+| Client | `client1@email.com` | `client123` |
 
 ### Akun Tambahan Seeder
-- Client dibuat menggunakan email acak dengan password default:
+- Pada environment local/development, factory client tambahan memakai password default:
   ```text
   password
   ```
 
-- Freelancer menggunakan:
+- Freelancer seeded/factory menggunakan email milik relasi:
   ```text
   skomda_student.email
   ```
@@ -321,7 +329,9 @@ Akun berikut dapat digunakan:
   password
   ```
 
-Jika tidak mengetahui email seeded account, pengguna dapat melakukan registrasi manual melalui halaman publik.
+Pada environment production, `ProductionSeeder` juga membuat data demo yang lebih terkurasi untuk service, loker, order story, dan AI pool freelancer.
+
+Jika tidak mengetahui email seeded account, pengguna tetap dapat melakukan registrasi manual melalui halaman publik.
 
 ---
 
@@ -334,11 +344,17 @@ Jika tidak mengetahui email seeded account, pengguna dapat melakukan registrasi 
 - `/admin`
 - `/client`
 - `/freelancer`
+- `/client/ai-recommendations`
+- `/freelancer/career-mapping`
 
 ## API & Dokumentasi
 - `/docs/api`
 - `/docs/api.json`
 - `/api/test`
+- `/api/v1/auth/*`
+- `/api/v1/services`
+- `/api/v1/orders`
+- `/api/v1/lokers`
 
 ---
 
@@ -362,11 +378,11 @@ docs/               # Dokumentasi internal
 
 # ⚠️ Keterbatasan Saat Ini
 
-- Surface API masih terbatas
-- Layout masih hybrid: Tailwind CDN + CSS statis + Vite scaffold
+- UI masih hybrid: Blade server-rendered sebagai surface utama, dengan Tailwind CDN, asset statis `public/*`, dan Vite bundle `resources/*` berjalan berdampingan
+- Web auth dan API auth memakai mekanisme berbeda: session multi-guard untuk web, Sanctum untuk API
 - Realtime negotiation/chat membutuhkan proses `Laravel Reverb` aktif saat development lokal
 - Payment gateway belum diimplementasikan
-- Test coverage masih minimal dan membutuhkan perluasan feature testing
+- Test coverage sudah mulai berkembang, tetapi masih perlu diperluas untuk flow bisnis utama yang lebih kompleks
 
 ---
 
@@ -395,10 +411,13 @@ composer test
 ```
 
 Coverage yang sudah ada mencakup:
-- smoke test halaman publik dan layout frontend,
-- flow Skomda Student menjadi Freelancer,
-- notification drawer/composer,
-- helper konversi gambar ke WebP.
+- smoke test halaman publik dan layout frontend
+- login request validation
+- flow Skomda Student menjadi Freelancer
+- notification drawer/composer
+- canonical REST API routes
+- loker management, apply validation, dan checkout flow terkait
+- helper konversi gambar ke WebP
 
 ---
 

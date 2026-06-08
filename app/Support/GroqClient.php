@@ -17,7 +17,7 @@ class GroqClient
     public static function generate(string $systemPrompt, string $userPrompt): ?string
     {
         $apiKey = config('services.groq.key');
-        $model = config('services.groq.model', 'llama-3.3-70b-versatile');
+        $model = config('services.groq.model', 'llama-3.1-8b-instant');
 
         if (empty($apiKey)) {
             Log::warning('Groq API Key is not set. Falling back to local offline engine.');
