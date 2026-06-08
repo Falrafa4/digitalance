@@ -1,37 +1,31 @@
 @extends('layouts.dashboard')
 @section('title', 'Profil Freelancer | Digitalance')
 
-@section('content')
-    <div class="content-scroll flex-1 px-4 sm:px-8 py-7 overflow-y-auto">
-
-        {{-- Page Header --}}
-        <div class="mb-8 animate-fadeUp">
-            <h1 class="font-display text-[2.1rem] font-extrabold text-slate-900">Profil Freelancer</h1>
-            <p class="text-slate-500 text-[0.95rem] mt-1">Kelola informasi akun dan keamanan.</p>
-        </div>
-
-        @php
-            $profile = $freelancer ?? $user;
-            $student = $profile->skomda_student;
-            $displayName = $student?->name ?? $profile->name ?? 'Freelancer';
-            $displayEmail = $student?->email ?? $profile->email ?? '-';
-            $displayPhone = $student?->phone ?? '-';
-            $displayMajor = $student?->major ?? 'Siswa SKOMDA';
-            $displayClass = $student?->class ?? '-';
-            $displayNis = $student?->nis ?? '-';
-            $avatarFallbackUrl = 'https://api.dicebear.com/7.x/avataaars/svg?seed=' . urlencode('freelancer-' . $displayNis . '-' . random_int(1000, 999999));
-            $avatarUrl = $profile->profile_photo ? asset('storage/' . $profile->profile_photo) : $avatarFallbackUrl;
-            $serviceItems = $services ?? collect();
-            $portfolioItems = $portofolios ?? collect();
-            $skillItems = $skillTags ?? collect();
-            $approvedServiceItems = $approvedServices ?? $serviceItems->where('status', 'Approved');
-            $profileStats = $stats ?? [
-                'services' => $serviceItems->count(),
-                'approvedServices' => $approvedServiceItems->count(),
-                'portofolios' => $portfolioItems->count(),
-                'skills' => $skillItems->count(),
-            ];
-        @endphp
+        @section('content')
+    
+        <div class="content-scroll flex-1 px-4 sm:px-8 py-7 overflow-y-auto">
+    
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    
+                {{-- Sidebar Profile --}}
+                <div class="lg:col-span-1">
+                    <div
+                        class="bg-white rounded-[18px] border border-slate-200 p-6 flex flex-col items-center text-center animate-fadeUp">
+                        <div class="relative mb-4">
+                            <x-avatar :user="$user" role="freelancer" :size="128" class="w-24 h-24 rounded-[18px] object-cover border-4 border-white shadow-teal-md" />
+                        </div>
+                        <h3 class="font-display font-extrabold text-[1.15rem] text-slate-900">{{ $user->name }}</h3>
+                        <p class="text-[13px] text-slate-400 mt-0.5">{{ $user->email }}</p>
+                        <span
+                            class="inline-flex items-center gap-1.5 mt-2 px-3 py-1 bg-orange-50 text-orange-600 text-[11px] font-bold rounded-full">
+                            <i class="ri-vip-crown-line"></i> Freelancer
+                        </span>
+                        @if($user->skomda_student)
+                            <p class="text-xs text-slate-500 mt-3 font-semibold">Terkoneksi dengan akun Skomda Student (NIS:
+                                {{ $user->skomda_student->nis }})</p>
+                        @endif
+                    </div>
+                </div>
 
         <div class="mb-6 animate-fadeUp-1">
             <div class="relative overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-sm">
@@ -291,8 +285,9 @@
                     </div>
                          <div class="px-7 py-6">
 
-                        <form action="{{ route('freelancer.profile.update') }}" method="POST" enctype="multipart/form-data">
-                            @csrf
+                         <form action="{{ route('freelancer.profile.update') }}" method="POST" enctype="multipart/form-data">
+                             @csrf
+                             @method('PUT')
                             <div class="flex flex-col gap-1.5 mb-4">
                                 <label class="text-[11px] font-bold text-slate-500 uppercase tracking-[.1em]">Foto
                                     Profil</label>
@@ -359,8 +354,9 @@
                             </div>
                         @endif
 
-                        <form action="{{ route('freelancer.password.update') }}" method="POST">
-                            @csrf
+                         <form action="{{ route('freelancer.password.update') }}" method="POST">
+                             @csrf
+                             @method('PUT')
                             <div class="flex flex-col gap-1.5 mb-4">
                                 <label class="text-[11px] font-bold text-slate-500 uppercase tracking-[.1em]">Password Saat
                                     Ini</label>

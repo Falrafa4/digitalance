@@ -46,9 +46,9 @@
                             </div>
                         @endif
 
-                        <form action="{{ route('client.profile.update') }}" method="POST" enctype="multipart/form-data">
-                            @csrf
-                            @method('PUT')
+                          <form action="{{ route('client.profile.update') }}" method="POST" enctype="multipart/form-data">
+                              @csrf
+                              @method('PUT')
                             <div class="flex flex-col gap-1.5 mb-4">
                                 <label class="text-[11px] font-bold text-slate-500 uppercase tracking-[.1em]">Foto
                                     Profil</label>
@@ -116,9 +116,9 @@
                             </div>
                         @endif
 
-                        <form action="{{ route('client.password.update') }}" method="POST">
-                            @csrf
-                            @method('PUT')
+                          <form action="{{ route('client.password.update') }}" method="POST">
+                              @csrf
+                              @method('PUT')
                             <div class="flex flex-col gap-1.5 mb-4">
                                 <label class="text-[11px] font-bold text-slate-500 uppercase tracking-[.1em]">Password Saat
                                     Ini</label>

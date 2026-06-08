@@ -4,7 +4,18 @@
 ])
 
 @php
-    // Map types to classes and icons
+    /**
+     * Komponen flash message (toast) untuk session flash.
+     *
+     * Peran komponen ini TERPISAH dari notifikasi DB:
+     *   - flash.blade.php    = pesan sekali-pakai dari session Laravel (sukses/gagal CRUD)
+     *   - notification-drawer = persistent notification per-user dari tabel `notifications`
+     *
+     * Keduanya tidak menggantikan satu sama lain. Controller existing yang
+     * memakai `redirect()->back()->with('success', ...)` tetap bekerja.
+     *
+     * JS animasi tetap di-handle oleh `public/js/dashboard/shared/flash.js`.
+     */
     $typeClasses = [
         'success' => [
             'bg' => 'bg-emerald-50',
@@ -68,7 +79,7 @@
         ],
     ];
 
-    // If no props given, show session flashes
+    // Sumber flash: jika tidak ada props, baca dari session Laravel.
     if (is_null($type) && is_null($message)) {
         $flashes = [];
 
@@ -82,12 +93,11 @@
         if ($unifiedError) {
             $flashes[] = ['type' => 'error', 'message' => $unifiedError];
         }
-        if ($errors->any()) {
-            // For validation, we want to show all errors
+        if (isset($errors) && $errors->any()) {
+            // Validasi form: tampilkan semua error.
             $flashes[] = ['type' => 'validation', 'message' => $errors->all()];
         }
     } else {
-        // Show single flash from props
         $flashes = [['type' => $type, 'message' => $message]];
     }
 @endphp
