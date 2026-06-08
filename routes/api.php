@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AdministratorControllerApi;
 use App\Http\Controllers\Api\AuthControllerApi;
 use App\Http\Controllers\Api\ClientControllerApi;
 use App\Http\Controllers\Api\FreelancerControllerApi;
+use App\Http\Controllers\Api\LokerControllerApi;
 use App\Http\Controllers\Api\NegotiationControllerApi;
 use App\Http\Controllers\Api\OfferControllerApi;
 use App\Http\Controllers\Api\OrderControllerApi;
@@ -76,6 +77,12 @@ Route::prefix('v1')->group(function () {
         Route::apiResource('results', ResultControllerApi::class);
         Route::apiResource('reviews', ReviewControllerApi::class);
         Route::apiResource('transactions', TransactionControllerApi::class);
+        Route::apiResource('lokers', LokerControllerApi::class);
+        Route::post('lokers/{loker}/applications', [LokerControllerApi::class, 'apply']);
+        Route::get('loker-applications', [LokerControllerApi::class, 'applicationIndex']);
+        Route::get('loker-applications/{application}', [LokerControllerApi::class, 'showApplication']);
+        Route::post('loker-applications/{application}/approve', [LokerControllerApi::class, 'approveApplication']);
+        Route::post('loker-applications/{application}/reject', [LokerControllerApi::class, 'rejectApplication']);
     });
 
     Route::middleware(['auth:sanctum', 'role:administrator'])->group(function () {

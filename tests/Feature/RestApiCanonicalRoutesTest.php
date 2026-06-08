@@ -5,6 +5,8 @@ namespace Tests\Feature;
 use App\Models\Administrator;
 use App\Models\Client;
 use App\Models\Freelancer;
+use App\Models\Loker;
+use App\Models\LokerApplication;
 use App\Models\Negotiation;
 use App\Models\Offer;
 use App\Models\Order;
@@ -509,6 +511,107 @@ class RestApiCanonicalRoutesTest extends TestCase
         ]);
     }
 
+    public function test_client_can_create_loker_on_canonical_route(): void
+    {
+        [, $client, , , $service] = $this->makeOrderFixture();
+
+        Sanctum::actingAs($client);
+
+        $this->postJson('/api/v1/lokers', [
+            'title' => 'Butuh UI Designer Landing Page',
+            'description' => 'Mencari freelancer untuk desain landing page campaign sekolah selama dua minggu.',
+            'category_id' => $service->category_id,
+            'budget_min' => 500000,
+            'budget_max' => 1000000,
+            'deadline' => now()->addDays(7)->toDateString(),
+        ])
+            ->assertCreated()
+            ->assertJsonPath('data.title', 'Butuh UI Designer Landing Page')
+            ->assertJsonPath('data.status', 'Open')
+            ->assertJsonPath('data.client.id', $client->id);
+
+        $this->assertDatabaseHas('lokkers', [
+            'client_id' => $client->id,
+            'title' => 'Butuh UI Designer Landing Page',
+            'status' => 'Open',
+        ]);
+    }
+
+    public function test_freelancer_can_apply_to_open_loker_on_canonical_route(): void
+    {
+        [, $client, $freelancer, , $service] = $this->makeOrderFixture();
+        $loker = $this->makeLoker($client, $service->category_id);
+
+        Sanctum::actingAs($freelancer);
+
+        $this->postJson('/api/v1/lokers/'.$loker->id.'/applications', [
+            'proposal' => 'Saya siap membantu mengerjakan loker ini dengan alur revisi yang terstruktur dan komunikasi rutin.',
+            'proposed_price' => 850000,
+        ])
+            ->assertCreated()
+            ->assertJsonPath('data.loker_id', $loker->id)
+            ->assertJsonPath('data.freelancer_id', $freelancer->id)
+            ->assertJsonPath('data.status', 'Pending');
+
+        $this->assertDatabaseHas('loker_applications', [
+            'loker_id' => $loker->id,
+            'freelancer_id' => $freelancer->id,
+            'status' => 'Pending',
+        ]);
+    }
+
+    public function test_client_can_approve_loker_application_and_create_order(): void
+    {
+        [, $client, $freelancer, , $service] = $this->makeOrderFixture();
+        $loker = $this->makeLoker($client, $service->category_id);
+        $application = $this->makeLokerApplication($loker, $freelancer);
+
+        Sanctum::actingAs($client);
+
+        $this->postJson('/api/v1/loker-applications/'.$application->id.'/approve')
+            ->assertOk()
+            ->assertJsonPath('data.application.status', 'Approved')
+            ->assertJsonPath('data.order.freelancer_id', $freelancer->id)
+            ->assertJsonPath('data.order.loker_application_id', $application->id);
+
+        $this->assertDatabaseHas('loker_applications', [
+            'id' => $application->id,
+            'status' => 'Approved',
+        ]);
+
+        $this->assertDatabaseHas('lokkers', [
+            'id' => $loker->id,
+            'status' => 'Closed',
+        ]);
+
+        $this->assertDatabaseHas('orders', [
+            'client_id' => $client->id,
+            'freelancer_id' => $freelancer->id,
+            'loker_application_id' => $application->id,
+            'status' => 'Pending',
+        ]);
+    }
+
+    public function test_other_client_cannot_approve_loker_application_owned_by_different_client(): void
+    {
+        [, $client, $freelancer, , $service] = $this->makeOrderFixture();
+        $loker = $this->makeLoker($client, $service->category_id);
+        $application = $this->makeLokerApplication($loker, $freelancer);
+
+        $otherClient = Client::create([
+            'name' => 'Other Loker Client',
+            'email' => 'other-loker-client@example.com',
+            'phone' => '081444444444',
+            'password' => Hash::make('password'),
+            'profile_photo' => 'profiles/placeholder.webp',
+        ]);
+
+        Sanctum::actingAs($otherClient);
+
+        $this->postJson('/api/v1/loker-applications/'.$application->id.'/approve')
+            ->assertForbidden();
+    }
+
     private function makeOrderFixture(): array
     {
         $admin = Administrator::create([
@@ -629,6 +732,31 @@ class RestApiCanonicalRoutesTest extends TestCase
             'amount' => 1500000,
             'type' => 'Full',
             'status' => 'Paid',
+        ]);
+    }
+
+    private function makeLoker(Client $client, ?int $categoryId = null): Loker
+    {
+        return Loker::create([
+            'client_id' => $client->id,
+            'category_id' => $categoryId,
+            'title' => 'Butuh Desainer Poster Event',
+            'description' => 'Membutuhkan freelancer untuk mendesain poster event sekolah dengan revisi maksimal dua kali.',
+            'budget_min' => 400000,
+            'budget_max' => 900000,
+            'deadline' => now()->addDays(5)->toDateString(),
+            'status' => 'Open',
+        ]);
+    }
+
+    private function makeLokerApplication(Loker $loker, Freelancer $freelancer): LokerApplication
+    {
+        return LokerApplication::create([
+            'loker_id' => $loker->id,
+            'freelancer_id' => $freelancer->id,
+            'proposal' => 'Saya siap mengerjakan kebutuhan desain ini dengan timeline yang jelas dan revisi terkontrol.',
+            'proposed_price' => 750000,
+            'status' => 'Pending',
         ]);
     }
 }
