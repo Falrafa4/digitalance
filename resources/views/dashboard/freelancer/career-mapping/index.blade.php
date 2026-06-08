@@ -17,7 +17,7 @@
                     <i class="ri-verified-badge-line text-xl"></i>
                 </div>
                 <div>
-                    <h4 class="text-emerald-950 font-extrabold text-[14.5px]">Akun Terverifikasi & Jalur Karir Terkunci</h4>
+                    <h4 class="text-emerald-950 font-extrabold text-[14.5px]">Jalur Karier Disetujui</h4>
                     <p class="text-emerald-700/80 text-[13px] font-medium mt-0.5">Spesialisasi Anda saat ini adalah: <strong class="text-emerald-950">{{ $freelancer->career_track }}</strong>.</p>
                 </div>
             </div>
@@ -27,7 +27,7 @@
                     <i class="ri-time-line text-xl"></i>
                 </div>
                 <div>
-                    <h4 class="text-amber-950 font-extrabold text-[14.5px]">Menunggu Verifikasi Admin</h4>
+                    <h4 class="text-amber-950 font-extrabold text-[14.5px]">Menunggu Review Admin</h4>
                     <p class="text-amber-700/80 text-[13px] font-medium mt-0.5">Pengajuan spesialisasi jalur karir (<strong class="text-amber-950">{{ $freelancer->career_track }}</strong>) sedang ditinjau oleh administrator.</p>
                 </div>
             </div>
@@ -37,28 +37,22 @@
                     <i class="ri-error-warning-line text-xl"></i>
                 </div>
                 <div class="flex-1">
-                    <h4 class="text-red-950 font-extrabold text-[14.5px]">Verifikasi Ditolak / Dibatalkan</h4>
+                    <h4 class="text-red-950 font-extrabold text-[14.5px]">Pengajuan Jalur Karier Ditolak</h4>
                     <p class="text-red-700/80 text-[13px] font-medium mt-0.5">Alasan: <span class="italic font-bold">{{ $freelancer->reject_reason ?? 'Tidak ada alasan spesifik.' }}</span></p>
                     <p class="text-red-700/80 text-[12px] font-medium mt-1">Silakan isi form di bawah untuk mengajukan ulang pemetaan karir Anda.</p>
                 </div>
             </div>
         @else
-    <div class="mb-8 p-4 sm:p-5 rounded-[22px] bg-teal-50/60 border border-teal-100 flex flex-col sm:flex-row items-center justify-between gap-4 animate-fadeUp shadow-sm">
-        <div class="flex items-center gap-4 w-full sm:w-auto">
-            <div class="w-12 h-12 shrink-0 rounded-2xl bg-[#0f766e] text-white flex items-center justify-center shadow-lg shadow-teal-100">
-                <i class="ri-information-line text-xl"></i>
+            <div class="!p-4 rounded-[22px] bg-teal-50 border border-teal-100 flex items-center gap-4 shadow-sm">
+                <div class="w-11 h-11 rounded-xl bg-[#0f766e] text-white flex items-center justify-center flex-shrink-0">
+                    <i class="ri-information-line text-xl"></i>
+                </div>
+                <div>
+                    <h4 class="text-teal-950 font-extrabold text-[14.5px]">Langkah Wajib: Ajukan Jalur Karier</h4>
+                    <p class="text-teal-700/80 text-[13px] font-medium mt-0.5">Agar dapat menerima order dan tampil di pencarian klien, Anda perlu memilih jalur karier dan mengajukannya untuk direview oleh admin.</p>
+                </div>
             </div>
-            <div>
-                <h4 class="text-slate-800 font-extrabold text-[15px] leading-snug">Langkah Wajib: Ajukan Verifikasi Akun</h4>
-                <p class="text-slate-600/80 text-[13px] font-medium mt-1">Agar dapat menerima order dan tampil di pencarian klien, Anda wajib menyetujui pemetaan karir dan mengajukan verifikasi ke admin.</p>
-            </div>
-        </div>
-        <a href="#" 
-            class="w-full sm:w-auto px-6 py-3.5 bg-[#0f766e] text-white rounded-xl font-bold text-[13px] hover:bg-[#0a5e58] transition-all shadow-md shadow-teal-100 text-center shrink-0">
-            Ajukan Verifikasi <i class="ri-arrow-right-line ml-1.5"></i>
-        </a>
-    </div>
-@endif
+        @endif
     </div>
 
     @if(!$careerMap)
@@ -131,11 +125,15 @@
                         <div class="flex-1 text-center sm:text-left">
                             <span class="text-xs font-black uppercase tracking-wider text-slate-400">Jalur Karir yang Disarankan</span>
                             <h2 class="text-2xl font-black text-slate-900 mt-0.5">{{ $careerMap['career_track'] }}</h2>
-                            <div class="mt-2 flex flex-wrap items-center justify-center sm:justify-start gap-2.5">
+                            {{-- <div class="mt-2 flex flex-wrap items-center justify-center sm:justify-start gap-2.5">
                                 <span class="px-3 py-1 bg-slate-100 text-slate-700 text-[11.5px] font-bold rounded-full uppercase tracking-wider">
                                     LEVEL: {{ $careerMap['current_level'] }}
                                 </span>
-                            </div>
+                                <span class="text-slate-300 text-sm hidden sm:inline">•</span>
+                                <span class="text-slate-500 font-semibold text-[12.5px]">
+                                    {{ $careerMap['xp'] }} XP Terkumpul
+                                </span>
+                            </div> --}}
                         </div>
                     </div>
 
@@ -242,9 +240,9 @@
                         <i class="ri-shield-user-line text-3xl"></i>
                     </div>
                     <div>
-                        <h3 class="text-xl font-black text-slate-900">Ajukan Aktivasi & Verifikasi Akun</h3>
+                        <h3 class="text-xl font-black text-slate-900">Ajukan Jalur Karier</h3>
                         <p class="text-slate-500 text-sm mt-1.5 leading-relaxed">
-                            Dengan mengajukan jalur karir <strong class="text-slate-900">"{{ $careerMap['career_track'] }}"</strong> ini, profil dan portfolio Anda akan dikirim ke admin untuk direview dan diverifikasi sebagai freelancer resmi Digitalance.
+                            Dengan mengajukan jalur karir <strong class="text-slate-900">"{{ $careerMap['career_track'] }}"</strong> ini, profil dan portofolio Anda akan direview oleh tim Digitalance untuk menentukan kelayakan dan kecocokan Anda pada jalur karier tersebut.
                         </p>
                     </div>
 
@@ -262,7 +260,7 @@
 
                         <button type="submit" id="submit-verification-btn" disabled 
                                 class="w-full max-w-sm py-3 rounded-xl bg-slate-400 text-white font-extrabold text-[13.5px] cursor-not-allowed transition-all shadow-md">
-                            Kirim Pengajuan Verifikasi ke Admin
+                            Kirim Pengajuan ke Admin
                         </button>
                     </form>
 

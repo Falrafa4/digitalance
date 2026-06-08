@@ -30,7 +30,7 @@ Route::get('/test', function () {
     ]);
 });
 
-Route::prefix('v1')->group(function () {
+Route::prefix('v1')->name('api.')->group(function () {
     Route::prefix('auth')->group(function () {
         Route::post('/register/client', [AuthControllerApi::class, 'registerClient']);
         Route::post('/register/freelancer', [AuthControllerApi::class, 'registerFreelancer']);
