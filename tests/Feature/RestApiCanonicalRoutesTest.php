@@ -17,8 +17,10 @@ use App\Models\ServiceCategory;
 use App\Models\SkomdaStudent;
 use App\Models\Transaction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
@@ -56,12 +58,12 @@ class RestApiCanonicalRoutesTest extends TestCase
         Sanctum::actingAs($client);
         $this->getJson('/api/v1/orders')
             ->assertOk()
-            ->assertJsonPath('data.0.id', $order->id);
+            ->assertJsonPath('data.orders.data.0.id', $order->id);
 
         Sanctum::actingAs($freelancer);
         $this->getJson('/api/v1/orders')
             ->assertOk()
-            ->assertJsonPath('data.0.id', $order->id);
+            ->assertJsonPath('data.orders.data.0.id', $order->id);
     }
 
     public function test_client_cannot_update_freelancer_service(): void
@@ -88,6 +90,194 @@ class RestApiCanonicalRoutesTest extends TestCase
 
         $this->getJson('/api/v1/orders/'.$order->id)
             ->assertForbidden();
+    }
+
+    public function test_client_can_create_order_on_canonical_route(): void
+    {
+        [, $client, , , $service] = $this->makeOrderFixture();
+
+        Sanctum::actingAs($client);
+
+        $this->postJson('/api/v1/orders', [
+            'service_id' => $service->id,
+            'brief' => 'Brief API order dari client.',
+            'deadline' => now()->addDays(5)->toDateString(),
+        ])
+            ->assertCreated()
+            ->assertJsonPath('data.client_id', $client->id)
+            ->assertJsonPath('data.service_id', $service->id)
+            ->assertJsonPath('data.status', 'Pending');
+
+        $this->assertDatabaseHas('orders', [
+            'client_id' => $client->id,
+            'service_id' => $service->id,
+            'status' => 'Pending',
+        ]);
+    }
+
+    public function test_admin_can_update_order_on_canonical_route(): void
+    {
+        [$admin, , , $order] = $this->makeOrderFixture();
+
+        Sanctum::actingAs($admin);
+
+        $this->patchJson('/api/v1/orders/'.$order->id, [
+            'status' => 'In Progress',
+            'agreed_price' => 1750000,
+        ])
+            ->assertOk()
+            ->assertJsonPath('data.status', 'In Progress')
+            ->assertJsonPath('data.agreed_price', 1750000);
+
+        $this->assertDatabaseHas('orders', [
+            'id' => $order->id,
+            'status' => 'In Progress',
+            'agreed_price' => 1750000,
+        ]);
+    }
+
+    public function test_freelancer_can_accept_order_with_price_offer(): void
+    {
+        [, , $freelancer, $order] = $this->makeOrderFixture();
+
+        Sanctum::actingAs($freelancer);
+
+        $this->postJson('/api/v1/orders/'.$order->id.'/accept', [
+            'agreed_price' => 1350000,
+            'note' => 'Saya siap mengerjakan project ini dengan harga tersebut.',
+        ])
+            ->assertOk()
+            ->assertJsonPath('data.order.status', 'Negotiated')
+            ->assertJsonPath('data.order.agreed_price', 1350000)
+            ->assertJsonPath('data.negotiation.sender', 'freelancer');
+
+        $this->assertDatabaseHas('orders', [
+            'id' => $order->id,
+            'status' => 'Negotiated',
+            'agreed_price' => 1350000,
+        ]);
+    }
+
+    public function test_freelancer_can_update_order_price_during_negotiation(): void
+    {
+        [, , $freelancer, $order] = $this->makeOrderFixture();
+        $order->update([
+            'status' => 'Negotiated',
+            'agreed_price' => 1200000,
+        ]);
+
+        Sanctum::actingAs($freelancer);
+
+        $this->patchJson('/api/v1/orders/'.$order->id.'/price', [
+            'agreed_price' => 1450000,
+            'note' => 'Harga direvisi menyesuaikan scope tambahan.',
+        ])
+            ->assertOk()
+            ->assertJsonPath('data.order.agreed_price', 1450000)
+            ->assertJsonPath('data.negotiation.sender', 'freelancer');
+
+        $this->assertDatabaseHas('orders', [
+            'id' => $order->id,
+            'agreed_price' => 1450000,
+            'status' => 'Negotiated',
+        ]);
+    }
+
+    public function test_client_can_get_checkout_summary_and_process_payment(): void
+    {
+        [, $client, , $order] = $this->makeOrderFixture();
+        $order->update([
+            'status' => 'Negotiated',
+            'agreed_price' => 2000000,
+        ]);
+
+        Sanctum::actingAs($client);
+
+        $this->getJson('/api/v1/orders/'.$order->id.'/checkout')
+            ->assertOk()
+            ->assertJsonPath('data.order.id', $order->id)
+            ->assertJsonPath('data.summary.agreed_price', 2000000)
+            ->assertJsonPath('data.summary.platform_fee', 200000);
+
+        $this->postJson('/api/v1/orders/'.$order->id.'/checkout', [
+            'payment_method' => 'qris',
+        ])
+            ->assertOk()
+            ->assertJsonPath('data.order.status', 'Paid')
+            ->assertJsonPath('data.transaction.type', 'Full')
+            ->assertJsonPath('data.transaction.status', 'Paid');
+
+        $this->assertDatabaseHas('transactions', [
+            'order_id' => $order->id,
+            'type' => 'Full',
+            'status' => 'Paid',
+            'amount' => 2200000,
+        ]);
+    }
+
+    public function test_client_can_request_revision_and_freelancer_can_approve_it(): void
+    {
+        [, $client, $freelancer, $order] = $this->makeOrderFixture();
+        $order->update(['status' => 'In Progress']);
+
+        Sanctum::actingAs($client);
+
+        $this->postJson('/api/v1/orders/'.$order->id.'/revision-requests', [
+            'reason' => 'Perlu revisi pada bagian hero section.',
+            'description' => 'Tolong ubah copy dan layout CTA utama.',
+        ])
+            ->assertCreated()
+            ->assertJsonPath('data.order.status', 'Revision')
+            ->assertJsonPath('data.revision_request.sender', 'client');
+
+        Sanctum::actingAs($freelancer);
+
+        $this->postJson('/api/v1/orders/'.$order->id.'/revision-requests/approve')
+            ->assertOk()
+            ->assertJsonPath('data.order.status', 'In Progress')
+            ->assertJsonPath('data.revision_request.status', 'Approved');
+    }
+
+    public function test_client_can_reject_order_and_create_rejection_note(): void
+    {
+        [, $client, , $order] = $this->makeOrderFixture();
+
+        Sanctum::actingAs($client);
+
+        $this->postJson('/api/v1/orders/'.$order->id.'/reject', [
+            'reason' => 'Project dibatalkan oleh client.',
+        ])
+            ->assertOk()
+            ->assertJsonPath('data.order.status', 'Cancelled')
+            ->assertJsonPath('data.negotiation.sender', 'client');
+
+        $this->assertDatabaseHas('orders', [
+            'id' => $order->id,
+            'status' => 'Cancelled',
+        ]);
+    }
+
+    public function test_client_can_upload_order_attachment(): void
+    {
+        Storage::fake('public');
+        [, $client, , $order] = $this->makeOrderFixture();
+
+        Sanctum::actingAs($client);
+
+        $this->postJson('/api/v1/orders/'.$order->id.'/attachments', [
+            'file' => [
+                UploadedFile::fake()->create('brief.pdf', 120, 'application/pdf'),
+            ],
+        ])
+            ->assertOk()
+            ->assertJsonPath('data.attachments.0.order_id', $order->id)
+            ->assertJsonPath('data.attachments.0.uploaded_by', 'client');
+
+        $this->assertDatabaseHas('order_attachments', [
+            'order_id' => $order->id,
+            'uploaded_by' => 'client',
+            'file_name' => 'brief.pdf',
+        ]);
     }
 
     public function test_admin_can_manage_service_category_on_canonical_route(): void
