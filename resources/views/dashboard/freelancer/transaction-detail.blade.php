@@ -18,15 +18,7 @@
                     <p class="text-slate-500 text-[13px]">Order #{{ $transaction->order_id }} -
                         {{ $transaction->order->service->title ?? '-' }}</p>
                 </div>
-                @php
-                    $status = $transaction->status ?? 'Pending';
-                    $statusClass = match ($status) {
-                        'Paid', 'Success' => 'bg-emerald-50 text-emerald-700',
-                        'Failed', 'Cancelled' => 'bg-red-50 text-red-700',
-                        default => 'bg-amber-50 text-amber-700',
-                    };
-                @endphp
-                <span class="px-3 py-1 rounded-lg font-bold text-[12px] {{ $statusClass }}">{{ $status }}</span>
+                <x-ui.status-badge :status="$transaction->status ?? 'Pending'" class="px-3 py-1 rounded-lg font-bold text-[12px]" />
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">

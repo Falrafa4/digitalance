@@ -57,12 +57,12 @@
             @foreach($services as $s)
                 <div class="service-card bg-white border border-slate-200 rounded-xl p-6 flex flex-col"
                     onclick="window.openServiceDetail({{ $s->id }})">
-                    <div class="flex justify-between items-start mb-5">
-                        <div
-                            class="w-12 h-12 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400 text-xl border border-slate-100">
-                            <i class="ri-tools-line"></i>
-                        </div>
-                        <x-ui.status-badge :status="$s->status" />
+                <div class="flex justify-between items-start mb-5">
+                    <div
+                        class="w-12 h-12 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400 text-xl border border-slate-100">
+                        <i class="ri-tools-line"></i>
+                    </div>
+                    <x-ui.status-badge :status="$s->status ?? 'Draft'" />
                     </div>
 
                     <h3 class="font-display font-black text-slate-900 text-lg mb-2 leading-tight truncate">{{ $s->title }}

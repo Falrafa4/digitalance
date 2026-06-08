@@ -21,3 +21,22 @@ Broadcast::channel('negotiation.{orderId}', function ($user, $orderId) {
 
     return false;
 }, ['guards' => ['client', 'freelancer']]);
+
+Broadcast::channel('notifications.{role}.{userId}', function ($user, $role, $userId) {
+    // Administrator guard
+    if (auth('administrator')->check()) {
+        $authUser = auth('administrator')->user();
+        return $role === 'admin' && (int) $authUser->id === (int) $userId;
+    }
+    // Client guard
+    if (auth('client')->check()) {
+        $authUser = auth('client')->user();
+        return $role === 'client' && (int) $authUser->id === (int) $userId;
+    }
+    // Freelancer guard
+    if (auth('freelancer')->check()) {
+        $authUser = auth('freelancer')->user();
+        return $role === 'freelancer' && (int) $authUser->id === (int) $userId;
+    }
+    return false;
+}, ['guards' => ['administrator', 'client', 'freelancer']]);

@@ -10,18 +10,17 @@
  *  - Tandai semua dibaca
  *  - Bersihkan semua (soft archive / hard delete)
  *  - Aksi massal (bulk) dengan checkbox
- *  - Filter tab (semua, belum dibaca, disimpan, arsip)
- *  - Search (debounced)
- *  - Polling otomatis setiap 15 detik untuk sinkronisasi
+ *  - Filter tab (semua, belum dibaca, disimpan, arsip) - stay in drawer
+ *  - Search (stay in drawer)
+ *  - Polling otomatis setiap 30 detik untuk sinkronisasi
  *  - Update badge unread di header
  *
- * Kompatibel dengan data attribute lama (.notif-item, .notif-keep-btn) sehingga
- * halaman yang masih render notifikasi dari controller lama tetap bekerja.
+ * Semua operasi filter dan search dilakukan dalam drawer tanpa navigasi ke halaman history.
  */
 (function () {
     'use strict';
 
-    var POLL_INTERVAL = 15000;
+    var POLL_INTERVAL = 30000;
     var SEARCH_DEBOUNCE = 350;
     var seenIds = new Set();
     var bulkMode = false;
@@ -137,12 +136,31 @@
         }
     }
 
+    function updateTabCounts(data) {
+        if (data.unread_count !== undefined) {
+            var el = document.getElementById('notif-tab-unread-count');
+            if (el) el.textContent = data.unread_count;
+        }
+        if (data.kept_count !== undefined) {
+            var el = document.querySelector('#notif-tabs .notif-tab[data-filter="kept"] .notif-tab-count');
+            if (el) el.textContent = data.kept_count;
+        }
+        if (data.archived_count !== undefined) {
+            var el = document.querySelector('#notif-tabs .notif-tab[data-filter="archived"] .notif-tab-count');
+            if (el) el.textContent = data.archived_count;
+        }
+        if (data.all_count !== undefined) {
+            var el = document.querySelector('#notif-tabs .notif-tab[data-filter="all"] .notif-tab-count');
+            if (el) el.textContent = data.all_count;
+        }
+    }
+
     // =========================================================================
     // Build node (untuk item baru dari polling)
     // =========================================================================
     function buildNotificationNode(n) {
         var wrapper = document.createElement('div');
-        var rowClass = n.is_read ? 'bg-white hover:bg-slate-50' : 'bg-teal-50/40 hover:bg-teal-50/70';
+        var rowClass = n.is_read ? 'bg-white hover:bg-slate-50' : 'bg-teal-50 hover:bg-teal-100';
         wrapper.className = 'notif-item group px-5 py-4 border-b border-slate-50 transition-all duration-200 ' + rowClass;
         wrapper.dataset.id = n.id;
         wrapper.dataset.link = n.link || '';
@@ -156,11 +174,64 @@
         var iconColor = colorForType(n.type);
         var link = n.link || '#';
 
+        // Create checkbox wrapper
+        var checkboxWrapper = document.createElement('label');
+        checkboxWrapper.className = 'notif-checkbox-wrap hidden flex-shrink-0 mt-2 cursor-pointer';
+        var checkboxInput = document.createElement('input');
+        checkboxInput.type = 'checkbox';
+        checkboxInput.className = 'notif-checkbox w-4 h-4 rounded border-slate-300 text-teal-600 focus:ring-teal-500';
+        checkboxWrapper.appendChild(checkboxInput);
+
+        // Create icon container
+        var iconContainer = document.createElement('div');
+        iconContainer.className = 'w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ' + iconColor;
+        var iconElement = document.createElement('i');
+        iconElement.className = icon + ' text-lg';
+        iconContainer.appendChild(iconElement);
+
+        // Create body container
+        var bodyContainer = document.createElement('div');
+        bodyContainer.className = 'flex-1 min-w-0';
+
+        // Create header
+        var headerDiv = document.createElement('div');
+        headerDiv.className = 'flex items-start justify-between gap-2';
+
+        var titleP = document.createElement('p');
+        titleP.className = 'font-bold text-[13px] text-slate-900 leading-tight';
+        titleP.textContent = n.title || '';
+
+        var actionDiv = document.createElement('div');
+        actionDiv.className = 'flex items-center gap-1 flex-shrink-0';
+
         var keepBtn = n.is_kept
             ? '<button data-notif-id="' + n.id + '" class="notif-keep-btn w-6 h-6 rounded-md flex items-center justify-center text-amber-500 hover:bg-amber-50 transition-all" title="Lepas dari simpanan" aria-label="Lepas dari simpanan"><i class="ri-bookmark-fill text-sm"></i></button>'
             : '<button data-notif-id="' + n.id + '" class="notif-keep-btn w-6 h-6 rounded-md flex items-center justify-center text-slate-300 hover:bg-slate-50 hover:text-amber-500 transition-all" title="Simpan notifikasi" aria-label="Simpan notifikasi"><i class="ri-bookmark-line text-sm"></i></button>';
 
         var unreadDot = n.is_read ? '' : '<span class="notif-unread-dot w-2 h-2 rounded-full bg-teal-500 flex-shrink-0 mt-1.5" title="Belum dibaca"></span>';
+
+        actionDiv.innerHTML = keepBtn + unreadDot;
+
+        headerDiv.appendChild(titleP);
+        headerDiv.appendChild(actionDiv);
+
+        var messageP = document.createElement('p');
+        messageP.className = 'text-[12px] text-slate-500 mt-1 leading-relaxed line-clamp-2';
+        messageP.textContent = n.message || '';
+
+        bodyContainer.appendChild(headerDiv);
+        bodyContainer.appendChild(messageP);
+
+        // Create meta + actions container
+        var metaActionsDiv = document.createElement('div');
+        metaActionsDiv.className = 'flex items-center justify-between gap-2 mt-2';
+
+        var timeSpan = document.createElement('span');
+        timeSpan.className = 'text-[10px] text-slate-400 font-semibold notif-time';
+        timeSpan.textContent = n.created_human || '';
+
+        var actionsDiv = document.createElement('div');
+        actionsDiv.className = 'notif-actions flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity';
 
         var readBtn = n.is_read
             ? '<button type="button" data-notif-action="unread" data-notif-id="' + n.id + '" class="w-6 h-6 rounded-md flex items-center justify-center text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition-all" title="Tandai belum dibaca" aria-label="Tandai belum dibaca"><i class="ri-mail-unread-line text-[14px]"></i></button>'
@@ -170,70 +241,62 @@
             ? '<button type="button" data-notif-action="unarchive" data-notif-id="' + n.id + '" class="w-6 h-6 rounded-md flex items-center justify-center text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 transition-all" title="Kembalikan dari arsip" aria-label="Kembalikan dari arsip"><i class="ri-inbox-unarchive-line text-[14px]"></i></button>'
             : '<button type="button" data-notif-action="archive" data-notif-id="' + n.id + '" class="w-6 h-6 rounded-md flex items-center justify-center text-slate-400 hover:bg-amber-50 hover:text-amber-600 transition-all" title="Arsipkan" aria-label="Arsipkan"><i class="ri-archive-line text-[14px]"></i></button>';
 
-        wrapper.innerHTML =
-            '<div class="flex items-start gap-3">' +
-                '<label class="notif-checkbox-wrap hidden flex-shrink-0 mt-2 cursor-pointer">' +
-                    '<input type="checkbox" class="notif-checkbox w-4 h-4 rounded border-slate-300 text-teal-600 focus:ring-teal-500" />' +
-                '</label>' +
-                '<div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ' + iconColor + '">' +
-                    '<i class="' + icon + ' text-lg"></i>' +
-                '</div>' +
-                '<div class="flex-1 min-w-0">' +
-                    '<div class="flex items-start justify-between gap-2">' +
-                        '<p class="font-bold text-[13px] text-slate-900 leading-tight">' + escapeHtml(n.title || '') + '</p>' +
-                        '<div class="flex items-center gap-1 flex-shrink-0">' +
-                            keepBtn + unreadDot +
-                        '</div>' +
-                    '</div>' +
-                    '<p class="text-[12px] text-slate-500 mt-1 leading-relaxed line-clamp-2">' + escapeHtml(n.message || '') + '</p>' +
-                    '<div class="flex items-center justify-between gap-2 mt-2">' +
-                        '<span class="text-[10px] text-slate-400 font-semibold notif-time">' + escapeHtml(n.created_human || '') + '</span>' +
-                        '<div class="notif-actions flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">' +
-                            readBtn + archiveBtn +
-                            '<button type="button" data-notif-action="delete" data-notif-id="' + n.id + '" class="w-6 h-6 rounded-md flex items-center justify-center text-slate-400 hover:bg-red-50 hover:text-red-600 transition-all" title="Hapus" aria-label="Hapus"><i class="ri-delete-bin-line text-[14px]"></i></button>' +
-                        '</div>' +
-                    '</div>' +
-                '</div>' +
-            '</div>';
+        var deleteBtn = '<button type="button" data-notif-action="delete" data-notif-id="' + n.id + '" class="w-6 h-6 rounded-md flex items-center justify-center text-slate-400 hover:bg-red-50 hover:text-red-600 transition-all" title="Hapus" aria-label="Hapus"><i class="ri-delete-bin-line text-[14px]"></i></button>';
+
+        actionsDiv.innerHTML = readBtn + archiveBtn + deleteBtn;
+
+        metaActionsDiv.appendChild(timeSpan);
+        metaActionsDiv.appendChild(actionsDiv);
+
+        bodyContainer.appendChild(metaActionsDiv);
+
+        // Assemble everything
+        wrapper.appendChild(checkboxWrapper);
+        wrapper.appendChild(iconContainer);
+        wrapper.appendChild(bodyContainer);
 
         return wrapper;
     }
 
-    // =========================================================================
-    // Polling sinkronisasi
+// =========================================================================
+    // Polling sinkronisasi - realtime untuk semua filter
     // =========================================================================
     function syncNotifications() {
         var list = document.getElementById('notif-list');
-        if (!list) return;
-        var filter = list.dataset.filter || 'all';
+        var overlay = document.getElementById('notif-overlay');
+        var isDrawerOpen = overlay && !overlay.classList.contains('hidden');
 
-        // Untuk tab arsip/kept/unread, server tidak mengembalikan via /poll
-        // (poll hanya mengembalikan semua aktif), tapi kita tetap update badge.
-        if (filter !== 'all') return;
-
+        // Always fetch latest unread count for the badge
         fetchJson('/notifications/poll?limit=15', { method: 'GET' })
             .then(function (data) {
                 if (!data) return;
                 updateBadge(data.unread_count || 0);
                 updateHeaderStatus(data.unread_count || 0);
 
-                (data.notifications || []).forEach(function (n) {
-                    if (!seenIds.has(String(n.id))) {
-                        var node = buildNotificationNode(n);
-                        var existing = list.querySelector('.notif-item[data-id="' + n.id + '"]');
-                        if (existing) return; // sudah ada, skip
-                        if (list.firstChild) {
-                            list.insertBefore(node, list.firstChild);
-                        } else {
-                            list.appendChild(node);
-                        }
-                        seenIds.add(String(n.id));
-                    }
-                });
+                // If drawer is open, refresh the current filter view for freshness
+                if (isDrawerOpen && list) {
+                    var filter = list.dataset.filter || 'all';
+                    var q = list.dataset.q || '';
+                    var category = list.dataset.category || '';
+                    fetchFilteredNotifications(filter, q, category);
+                }
             })
             .catch(function () { /* silent */ });
     }
+    
+    // =========================================================================
+    // Refresh notification list based on current filter/search/category
+    // =========================================================================
+    function refreshNotificationList() {
+        var list = document.getElementById('notif-list');
+        if (!list) return;
 
+        var filter = list.dataset.filter || 'all';
+        var q = list.dataset.q || '';
+        var category = list.dataset.category || '';
+        fetchFilteredNotifications(filter, q, category);
+    }
+    
     // =========================================================================
     // Drawer open/close
     // =========================================================================
@@ -247,8 +310,8 @@
         });
         document.body.style.overflow = 'hidden';
 
-        // Segarkan badge saat dibuka
-        syncNotifications();
+        // Segarkan notifikasi saat dibuka berdasarkan filter yang aktif
+        refreshNotificationList();
     }
 
     function closeNotificationDrawer() {
@@ -556,16 +619,118 @@
     }
 
     // =========================================================================
-    // Tab filter (All / Unread / Kept / Archived) -> navigasi ke history page
+    // Tab filter (All / Unread / Kept / Archived) - stay in drawer
     // =========================================================================
+    // Tab active color map: each filter has its own active color
+    var TAB_ACTIVE_CLASSES = {
+        'all':      'bg-slate-900 text-white shadow-sm',
+        'unread':   'bg-teal-600 text-white shadow-sm',
+        'kept':     'bg-amber-500 text-white shadow-sm',
+        'archived': 'bg-slate-700 text-white shadow-sm'
+    };
+    var TAB_INACTIVE_CLASSES = 'bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-800';
+
+    function applyTabStyling(filter) {
+        var tabs = document.querySelectorAll('#notif-tabs .notif-tab');
+        tabs.forEach(function (tab) {
+            var isActive = tab.dataset.filter === filter;
+            // Remove all possible active classes first
+            Object.values(TAB_ACTIVE_CLASSES).forEach(function (cls) {
+                cls.split(' ').forEach(function (c) { tab.classList.remove(c); });
+            });
+            TAB_INACTIVE_CLASSES.split(' ').forEach(function (c) { tab.classList.remove(c); });
+
+            if (isActive) {
+                (TAB_ACTIVE_CLASSES[filter] || TAB_ACTIVE_CLASSES['all']).split(' ').forEach(function (c) {
+                    tab.classList.add(c);
+                });
+            } else {
+                TAB_INACTIVE_CLASSES.split(' ').forEach(function (c) { tab.classList.add(c); });
+            }
+        });
+    }
+
+    function renderNotificationList(data, list) {
+        if (!data || !data.data) return;
+
+        if (data.unread_count !== undefined) {
+            updateBadge(data.unread_count);
+            updateHeaderStatus(data.unread_count);
+        }
+
+        // Update all tab counts (all, unread, kept, archived)
+        updateTabCounts(data);
+
+        list.innerHTML = '';
+        var items = data.data || [];
+        if (items.length === 0) {
+            // Show empty state based on current filter
+            var filter = list.dataset.filter || 'all';
+            var q = list.dataset.q || '';
+            var emptyMsg = '';
+            if (filter === 'unread') {
+                emptyMsg = 'Semua notifikasi sudah ditandai dibaca.';
+            } else if (filter === 'kept') {
+                emptyMsg = 'Belum ada notifikasi yang disimpan.';
+            } else if (filter === 'archived') {
+                emptyMsg = 'Belum ada notifikasi di arsip.';
+            } else if (q) {
+                emptyMsg = 'Tidak ada hasil untuk "' + escapeHtml(q) + '".';
+            } else {
+                emptyMsg = 'Update terbaru akan muncul di sini.';
+            }
+            list.innerHTML =
+                '<div class="flex flex-col items-center justify-center py-20 text-center px-8">' +
+                    '<div class="w-20 h-20 rounded-full bg-slate-50 flex items-center justify-center mb-5">' +
+                        '<i class="ri-notification-off-line text-4xl text-slate-300"></i>' +
+                    '</div>' +
+                    '<h4 class="font-display font-bold text-slate-700 text-[1rem] mb-1">Tidak Ada Notifikasi</h4>' +
+                    '<p class="text-slate-400 text-[13px]">' + emptyMsg + '</p>' +
+                '</div>';
+            return;
+        }
+
+        items.forEach(function (n) {
+            if (!seenIds.has(String(n.id))) {
+                var node = buildNotificationNode(n);
+                list.appendChild(node);
+                seenIds.add(String(n.id));
+            }
+        });
+    }
+
+    function fetchFilteredNotifications(filter, q, category) {
+        var list = document.getElementById('notif-list');
+        if (!list) return;
+
+        list.innerHTML = '<div class="px-5 py-4 text-center text-slate-400"><i class="ri-loader-4-line animate-spin mr-1"></i> Memuat...</div>';
+        seenIds.clear();
+
+        var url = '/notifications/list?filter=' + encodeURIComponent(filter) +
+                  (q ? '&q=' + encodeURIComponent(q) : '') +
+                  (category ? '&category=' + encodeURIComponent(category) : '');
+
+        fetchJson(url, { method: 'GET' })
+            .then(function (data) { renderNotificationList(data, list); })
+            .catch(function () {
+                list.innerHTML = '<div class="px-5 py-4 text-center text-slate-400">Gagal memuat notifikasi.</div>';
+            });
+    }
+
     function switchNotificationFilter(filter) {
         var list = document.getElementById('notif-list');
-        var q = list ? (list.dataset.q || '') : '';
-        // Untuk drawer, navigasi ke halaman history agar user melihat semua
-        // item di tab yang dipilih, lengkap dengan paginasi.
-        var url = '/notifications?filter=' + encodeURIComponent(filter);
-        if (q) url += '&q=' + encodeURIComponent(q);
-        window.location.href = url;
+        if (!list) return;
+
+        // Update active tab styling with correct per-tab colors
+        applyTabStyling(filter);
+
+        // Update filter dataset
+        list.dataset.filter = filter;
+
+        // Fetch filtered notifications
+        var q = list.dataset.q || '';
+        var category = list.dataset.category || '';
+        fetchFilteredNotifications(filter, q, category);
     }
 
     function submitNotificationSearch(e) {
@@ -574,10 +739,16 @@
         if (!input) return false;
         var q = input.value;
         var list = document.getElementById('notif-list');
-        var filter = list ? (list.dataset.filter || 'all') : 'all';
-        var url = '/notifications?filter=' + encodeURIComponent(filter);
-        if (q) url += '&q=' + encodeURIComponent(q);
-        window.location.href = url;
+        if (!list) return false;
+
+        // Update search dataset
+        list.dataset.q = q;
+
+        // Fetch filtered notifications using helper
+        var filter = list.dataset.filter || 'all';
+        var category = list.dataset.category || '';
+        fetchFilteredNotifications(filter, q, category);
+
         return false;
     }
 
@@ -656,6 +827,60 @@
         setInterval(syncNotifications, POLL_INTERVAL);
         // Kick off awal
         syncNotifications();
+
+        // Real-time listener via Echo/Reverb
+        setupEchoListener();
+    }
+
+    // =========================================================================
+    // Real-time Echo/Reverb listener
+    // =========================================================================
+    function setupEchoListener() {
+        // Wait for Echo to be available (loaded with defer)
+        function tryListen() {
+            if (typeof window.Echo === 'undefined' || typeof window.Echo.private !== 'function') {
+                setTimeout(tryListen, 1000);
+                return;
+            }
+
+            // Determine current user role and ID from the page
+            var metaRole = document.querySelector('meta[name="notif-role"]');
+            var metaUserId = document.querySelector('meta[name="notif-user-id"]');
+            if (!metaRole || !metaUserId) return;
+
+            var role = metaRole.content;
+            var userId = metaUserId.content;
+            var channelName = 'notifications.' + role + '.' + userId;
+
+            window.Echo.private(channelName)
+                .listen('.notification.created', function (e) {
+                    var n = e.notification;
+                    if (!n) return;
+
+                    // Update badge
+                    refreshUnreadCount();
+
+                    // If drawer is open, add the new notification to the list
+                    var list = document.getElementById('notif-list');
+                    var overlay = document.getElementById('notif-overlay');
+                    if (list && overlay && !overlay.classList.contains('hidden')) {
+                        if (!seenIds.has(String(n.id))) {
+                            var node = buildNotificationNode(n);
+                            if (list.firstChild) {
+                                list.insertBefore(node, list.firstChild);
+                            } else {
+                                list.appendChild(node);
+                            }
+                            seenIds.add(String(n.id));
+                        }
+                    }
+
+                    // Show toast notification
+                    showToast(n.title + ': ' + n.message, n.type || 'info');
+                });
+        }
+
+        tryListen();
     }
 
     // Expose ke window agar onclick="" di Blade bisa memanggil

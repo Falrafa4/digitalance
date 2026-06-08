@@ -27,3 +27,4 @@ database/seeders/data/*.xlsx
 .playwright-mcp/
 .codex/
 .agents/
+AUDIT_REPORT.md

@@ -26,17 +26,7 @@
                     <p class="text-slate-500 text-[13px]">Order #{{ $offer->order_id }} -
                         {{ $offer->order->service->title ?? '-' }}</p>
                 </div>
-                @php
-                    $statusColors = [
-                        'Sent' => 'bg-amber-100 text-amber-700',
-                        'Accepted' => 'bg-emerald-100 text-emerald-700',
-                        'Rejected' => 'bg-red-100 text-red-700',
-                    ];
-                    $color = $statusColors[$offer->status] ?? 'bg-slate-100 text-slate-600';
-                @endphp
-                <span class="px-4 py-1.5 rounded-xl text-[12.5px] font-bold {{ $color }}">
-                    {{ $offer->status }}
-                </span>
+                <x-ui.status-badge :status="$offer->status ?? '-'" class="px-4 py-1.5 rounded-xl text-[12.5px]" />
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">

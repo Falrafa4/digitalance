@@ -23,12 +23,6 @@
         @foreach($results as $result)
           @php
             $status = $result->order->status ?? '-';
-            $statusClass = match ($status) {
-              'In Progress' => 'bg-blue-100 text-blue-700',
-              'Revision' => 'bg-amber-100 text-amber-700',
-              'Completed' => 'bg-emerald-100 text-emerald-700',
-              default => 'bg-slate-100 text-slate-600'
-            };
           @endphp
           <div class="bg-white border border-slate-200 rounded-[18px] p-5 hover:shadow-md transition-all">
             <div class="flex items-start justify-between gap-4 mb-4">
@@ -45,7 +39,7 @@
                 </p>
               </div>
               <div class="flex items-center gap-2 flex-shrink-0">
-                <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase {{ $statusClass }}">{{ $status }}</span>
+                <x-ui.status-badge :status="$status" class="px-2.5 py-1 rounded-lg text-[10px] uppercase" />
               </div>
             </div>
 

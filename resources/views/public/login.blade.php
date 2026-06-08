@@ -67,17 +67,9 @@
                         <p class="mt-1 text-xs text-slate-500">Masuk ke dashboard Digitalance Anda</p>
                     </div>
 
-                    <!-- Alert khusus Validasi error Login Laravel -->
+                    {{-- Alert error login sudah ditangani otomatis oleh x-flash di layouts/app --}}
                     @if ($errors->has('email') && session('login_error'))
-                        <div class="bg-red-50 border-l-4 border-red-500 p-3 rounded-xl">
-                            <div class="flex items-start">
-                                <!-- Warning SVG Icon -->
-                                <svg width="16" height="16" class="w-4 h-4 text-red-500 mr-2 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                                </svg>
-                                <p class="text-xs text-red-700 font-semibold">{{ $errors->first('email') }}</p>
-                            </div>
-                        </div>
+                        <x-ui.alert type="error" class="text-xs">{{ $errors->first('email') }}</x-ui.alert>
                     @endif
 
                     <form action="{{ route('login-process') }}" method="POST" class="space-y-4" id="loginForm">
@@ -132,23 +124,16 @@
                         <p class="mt-1 text-xs text-slate-500">Pilih jenis akun Digitalance Anda</p>
                     </div>
 
-                    <!-- Alert khusus Validasi error Registrasi Laravel -->
+                    {{-- Alert error registrasi sudah ditangani otomatis oleh x-flash di layouts/app --}}
                     @if ($errors->any() && !session('login_error'))
-                        <div class="bg-red-50 border-l-4 border-red-500 p-3 rounded-xl">
-                            <div class="flex items-start">
-                                <svg width="16" height="16" class="w-4 h-4 text-red-500 mr-2 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                                </svg>
-                                <div>
-                                    <p class="text-xs text-red-700 font-bold mb-1">Pendaftaran gagal:</p>
-                                    <ul class="list-disc list-inside text-[11px] text-red-600 space-y-0.5 p-0 m-0">
-                                        @foreach ($errors->all() as $error)
-                                            <li>{{ $error }}</li>
-                                        @endforeach
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
+                        <x-ui.alert type="error" class="text-xs">
+                            <p class="font-bold mb-1">Pendaftaran gagal:</p>
+                            <ul class="list-disc list-inside text-[11px] space-y-0.5 pl-4">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </x-ui.alert>
                     @endif
 
                     <!-- Tab Pilihan Peran (Client / Freelancer) -->

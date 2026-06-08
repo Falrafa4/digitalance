@@ -101,9 +101,9 @@
                         <h3 class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-4 text-center">
                             Informasi Pesanan</h3>
                         <div class="space-y-4">
-                            <div class="flex justify-between items-center text-[13px]">
-                                <span class="text-slate-500 font-medium">Status Pesanan</span>
-                                <x-ui.status-badge :status="$result->order->status" />
+                    <div class="flex justify-between items-center text-[13px]">
+                        <span class="text-slate-500 font-medium">Status Pesanan</span>
+                        <x-ui.status-badge :status="$result->order->status ?? '-'" />
                             </div>
                             <div class="flex justify-between items-center text-[13px]">
                                 <span class="text-slate-500 font-medium">Harga</span>

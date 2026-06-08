@@ -202,7 +202,6 @@
                 aria-current="{{ request()->routeIs('client.messages.*') ? 'page' : '' }}">
                 <i class="ri-message-3-line text-[17px]" aria-hidden="true"></i> Pesan
             </a>
-
             <a href="{{ route('client.offers.index') }}" class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
                                        {{ request()->routeIs('client.offers.*') ? $active : $inactive }}"
                 aria-current="{{ request()->routeIs('client.offers.*') ? 'page' : '' }}">
@@ -258,6 +257,13 @@
                 <i class="ri-price-tag-3-line text-[17px]" aria-hidden="true"></i> Penawaran
             </a>
 
+            <a href="{{ route('freelancer.career-mapping') }}"
+                class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
+                                            {{ request()->routeIs('freelancer.career-mapping*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}"
+                aria-current="{{ request()->routeIs('freelancer.career-mapping*') ? 'page' : '' }}">
+                <i class="ri-compass-3-line text-[17px]" aria-hidden="true"></i> Pemetaan Karir
+            </a>
+
             <a href="{{ route('freelancer.reviews.index') }}"
                 class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
                                             {{ request()->routeIs('freelancer.reviews.*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}"
@@ -291,13 +297,6 @@
                                             {{ request()->routeIs('freelancer.loker.*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}"
                 aria-current="{{ request()->routeIs('freelancer.loker.*') ? 'page' : '' }}">
                 <i class="ri-briefcase-2-line text-[17px]" aria-hidden="true"></i> Lowongan Kerja
-            </a>
-
-            <a href="{{ route('freelancer.career-mapping') }}"
-                class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
-                                            {{ request()->routeIs('freelancer.career-mapping*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}"
-                aria-current="{{ request()->routeIs('freelancer.career-mapping*') ? 'page' : '' }}">
-                <i class="ri-compass-3-line text-[17px]" aria-hidden="true"></i> Pemetaan Karir (AI)
             </a>
         @endif
 

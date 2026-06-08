@@ -43,16 +43,22 @@
                 </div>
             </div>
         @else
-            <div class="p-4.5 rounded-[22px] bg-teal-50 border border-teal-100 flex items-center gap-4 shadow-sm">
-                <div class="w-11 h-11 rounded-xl bg-[#0f766e] text-white flex items-center justify-center flex-shrink-0">
-                    <i class="ri-information-line text-xl"></i>
-                </div>
-                <div>
-                    <h4 class="text-teal-950 font-extrabold text-[14.5px]">Langkah Wajib: Ajukan Verifikasi Akun</h4>
-                    <p class="text-teal-700/80 text-[13px] font-medium mt-0.5">Agar dapat menerima order dan tampil di pencarian klien, Anda wajib menyetujui pemetaan karir dan mengajukan verifikasi ke admin.</p>
-                </div>
+    <div class="mb-8 p-4 sm:p-5 rounded-[22px] bg-teal-50/60 border border-teal-100 flex flex-col sm:flex-row items-center justify-between gap-4 animate-fadeUp shadow-sm">
+        <div class="flex items-center gap-4 w-full sm:w-auto">
+            <div class="w-12 h-12 shrink-0 rounded-2xl bg-[#0f766e] text-white flex items-center justify-center shadow-lg shadow-teal-100">
+                <i class="ri-information-line text-xl"></i>
             </div>
-        @endif
+            <div>
+                <h4 class="text-slate-800 font-extrabold text-[15px] leading-snug">Langkah Wajib: Ajukan Verifikasi Akun</h4>
+                <p class="text-slate-600/80 text-[13px] font-medium mt-1">Agar dapat menerima order dan tampil di pencarian klien, Anda wajib menyetujui pemetaan karir dan mengajukan verifikasi ke admin.</p>
+            </div>
+        </div>
+        <a href="#" 
+            class="w-full sm:w-auto px-6 py-3.5 bg-[#0f766e] text-white rounded-xl font-bold text-[13px] hover:bg-[#0a5e58] transition-all shadow-md shadow-teal-100 text-center shrink-0">
+            Ajukan Verifikasi <i class="ri-arrow-right-line ml-1.5"></i>
+        </a>
+    </div>
+@endif
     </div>
 
     @if(!$careerMap)
@@ -128,10 +134,6 @@
                             <div class="mt-2 flex flex-wrap items-center justify-center sm:justify-start gap-2.5">
                                 <span class="px-3 py-1 bg-slate-100 text-slate-700 text-[11.5px] font-bold rounded-full uppercase tracking-wider">
                                     LEVEL: {{ $careerMap['current_level'] }}
-                                </span>
-                                <span class="text-slate-300 text-sm hidden sm:inline">•</span>
-                                <span class="text-slate-500 font-semibold text-[12.5px]">
-                                    {{ $careerMap['xp'] }} XP Terkumpul
                                 </span>
                             </div>
                         </div>

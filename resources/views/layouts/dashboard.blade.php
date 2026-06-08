@@ -68,6 +68,17 @@
     <meta name="reverb-host" content="{{ config('broadcasting.connections.reverb.options.host') }}">
     <meta name="reverb-port" content="{{ config('broadcasting.connections.reverb.options.port') }}">
     <meta name="reverb-scheme" content="{{ config('broadcasting.connections.reverb.options.scheme') }}">
+    @php
+        $notifUser = auth('administrator')->user() ?? auth('client')->user() ?? auth('freelancer')->user();
+        $notifRole = null;
+        if (auth('administrator')->check()) $notifRole = 'admin';
+        elseif (auth('client')->check()) $notifRole = 'client';
+        elseif (auth('freelancer')->check()) $notifRole = 'freelancer';
+    @endphp
+    @if ($notifRole && $notifUser)
+        <meta name="notif-role" content="{{ $notifRole }}">
+        <meta name="notif-user-id" content="{{ $notifUser->id }}">
+    @endif
     <script src="https://js.pusher.com/8.5.0/pusher.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/laravel-echo@1.11.0/dist/echo.iife.js" defer></script>
     <script src="{{ asset('js/dashboard/echo-bootstrap.js') }}" defer></script>

@@ -17,18 +17,18 @@
         <div class="grid grid-cols-1 xl:grid-cols-2 gap-5" data-pager-list>
           @foreach($orders as $o)
             <div data-pager-item class="bg-white border border-slate-200 rounded-[18px] p-5 hover:shadow-lg transition-all">
-              <div class="flex items-start justify-between gap-4">
-                <div class="min-w-0">
-                  <p class="font-extrabold text-slate-900">Order #{{ $o->id }}</p>
-                  <p class="text-slate-500 text-[13px] mt-1 truncate">
-                    {{ $o->service->title ?? '-' }}
-                  </p>
-                  <p class="text-slate-400 text-[12px] font-bold mt-2">
-                    Agreed: Rp{{ number_format((float) ($o->agreed_price ?? 0), 0, ',', '.') }}
-                  </p>
+                <div class="flex items-start justify-between gap-4">
+                  <div class="min-w-0">
+                    <p class="font-extrabold text-slate-900">Order #{{ $o->id }}</p>
+                    <p class="text-slate-500 text-[13px] mt-1 truncate">
+                      {{ optional($o->service)->title ?? '-' }}
+                    </p>
+                    <p class="text-slate-400 text-[12px] font-bold mt-2">
+                      Agreed: Rp{{ number_format((float) ($o->agreed_price ?? 0), 0, ',', '.') }}
+                    </p>
+                  </div>
+                  <x-ui.status-badge :status="$o->status ?? '-'" />
                 </div>
-                <x-ui.status-badge :status="$o->status ?? '-'" />
-              </div>
 
               <div class="flex gap-2 mt-4">
                 <a href="{{ route('client.orders.show', $o->id) }}"

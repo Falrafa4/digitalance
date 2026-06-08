@@ -46,70 +46,18 @@ class NotificationController extends Controller
      */
     public function index(Request $request)
     {
-        [$role, $user] = $this->context();
-        if (!$role || !$user) {
+        [$role] = $this->context();
+        
+        if (!$role) {
             abort(403);
         }
-
-        $filter = (string) $request->query('filter', 'all'); // all|unread|kept|archived
-        $category = $request->query('category');
-        $q = $request->query('q');
-
-        $query = Notification::query()
-            ->forUser($role, $user->id)
-            ->ofCategory($category)
-            ->search($q);
-
-        switch ($filter) {
-            case 'unread':
-                $query->active()->unread();
-                break;
-            case 'kept':
-                $query->active()->kept();
-                break;
-            case 'archived':
-                $query->archived();
-                break;
-            default:
-                $query->active();
-        }
-
-        $dbNotifications = $query->latest()->paginate(15)->withQueryString();
-        $unreadCount = Notification::query()
-            ->forUser($role, $user->id)
-            ->active()
-            ->unread()
-            ->count();
-        $keptCount = Notification::query()
-            ->forUser($role, $user->id)
-            ->active()
-            ->kept()
-            ->count();
-        $archivedCount = Notification::query()
-            ->forUser($role, $user->id)
-            ->archived()
-            ->count();
-        $allCount = Notification::query()
-            ->forUser($role, $user->id)
-            ->active()
-            ->count();
-
-        // Beberapa view layout sudah memakai $notifUnreadCount / $notifNotifications.
-        $notifNotifications = $dbNotifications;
-        $notifUnreadCount = $unreadCount;
-
-        return view('dashboard.shared.notifications', compact(
-            'dbNotifications',
-            'unreadCount',
-            'keptCount',
-            'archivedCount',
-            'allCount',
-            'filter',
-            'category',
-            'q',
-            'notifNotifications',
-            'notifUnreadCount',
-        ));
+        
+        return match ($role) {
+            'administrator' => redirect()->route('admin.dashboard'),
+            'client' => redirect()->route('client.dashboard'),
+            'freelancer' => redirect()->route('freelancer.dashboard'),
+            default => redirect()->route('login'),
+        };
     }
 
     /**
@@ -179,15 +127,18 @@ class NotificationController extends Controller
         }
 
         $notifications = $query->latest()->take($limit)->get();
-        $unreadCount = Notification::query()
-            ->forUser($role, $user->id)
-            ->active()
-            ->unread()
-            ->count();
+        $baseQuery = Notification::query()->forUser($role, $user->id);
+        $unreadCount = (clone $baseQuery)->active()->unread()->count();
+        $keptCount = (clone $baseQuery)->active()->kept()->count();
+        $archivedCount = (clone $baseQuery)->archived()->count();
+        $allCount = (clone $baseQuery)->active()->count();
 
         return response()->json([
             'data' => $notifications->map(fn (Notification $n) => $n->toApiPayload())->values(),
             'unread_count' => $unreadCount,
+            'kept_count' => $keptCount,
+            'archived_count' => $archivedCount,
+            'all_count' => $allCount,
         ]);
     }
 

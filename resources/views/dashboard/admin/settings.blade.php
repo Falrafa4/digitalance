@@ -16,21 +16,7 @@
         </div>
     </section>
 
-    {{-- PERBAIKAN TASK 4: Menambahkan sistem alert penangkap flash message untuk konfirmasi status penataan --}}
-    @if(session('success'))
-        <div
-            class="mb-6 p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-2xl flex items-center gap-3 text-sm font-medium animate-fadeUp">
-            <i class="ri-checkbox-circle-fill text-lg text-emerald-600"></i>
-            <span>{{ session('success') }}</span>
-        </div>
-    @endif
-    @if(session('error'))
-        <div
-            class="mb-6 p-4 bg-red-50 border border-red-200 text-red-800 rounded-2xl flex items-center gap-3 text-sm font-medium animate-fadeUp">
-            <i class="ri-error-warning-fill text-lg text-red-600"></i>
-            <span>{{ session('error') }}</span>
-        </div>
-    @endif
+    {{-- Flash message sudah ditangani otomatis oleh x-flash di layouts/dashboard --}}
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {{-- Quick Links --}}

@@ -99,12 +99,7 @@
                     <p class="text-[12px] text-slate-400 mt-0.5">Perbarui bio dan nomor telepon.</p>
                 </div>
                 <div class="px-7 py-6">
-                    @if(session('success'))
-                        <div class="flex items-center gap-3 mb-5 px-4 py-3 bg-emerald-50 border border-emerald-200 rounded-2xl text-emerald-800 text-[13px] font-semibold">
-                            <i class="ri-check-double-line text-emerald-500 text-[17px]"></i>
-                            {{ session('success') }}
-                        </div>
-                    @endif
+                    {{-- Flash message 'success' sudah ditangani otomatis oleh x-flash di layouts/dashboard --}}
 
                     <form action="{{ route('freelancer.profile.update') }}" method="POST" enctype="multipart/form-data">
                         @csrf
@@ -155,17 +150,9 @@
                     <p class="text-[12px] text-slate-400 mt-0.5">Pastikan akun kamu menggunakan password yang kuat.</p>
                 </div>
                 <div class="px-7 py-6">
+                    {{-- Flash message 'error' sudah ditangani otomatis oleh x-flash di layouts/dashboard --}}
                     @if(session('password_success'))
-                        <div class="flex items-center gap-3 mb-5 px-4 py-3 bg-emerald-50 border border-emerald-200 rounded-2xl text-emerald-800 text-[13px] font-semibold">
-                            <i class="ri-check-double-line text-emerald-500 text-[17px]"></i>
-                            {{ session('password_success') }}
-                        </div>
-                    @endif
-                    @if(session('error'))
-                        <div class="flex items-center gap-3 mb-5 px-4 py-3 bg-red-50 border border-red-200 rounded-2xl text-red-800 text-[13px] font-semibold">
-                            <i class="ri-error-warning-line text-red-500 text-[17px]"></i>
-                            {{ session('error') }}
-                        </div>
+                        <x-ui.alert type="success" class="mb-5">{{ session('password_success') }}</x-ui.alert>
                     @endif
 
                     <form action="{{ route('freelancer.password.update') }}" method="POST">

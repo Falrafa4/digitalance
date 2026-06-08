@@ -11,6 +11,16 @@ class Notification extends Model
 {
     use HasFactory;
 
+    protected static function boot(): void
+    {
+        parent::boot();
+
+        static::created(function (Notification $notification) {
+            // Broadcast real-time notification via Reverb (covers all create() calls)
+            event(new \App\Events\NotificationCreated($notification));
+        });
+    }
+
     protected $fillable = [
         'title',
         'message',

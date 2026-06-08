@@ -12,16 +12,7 @@
         <h1 class="font-display text-[1.65rem] font-extrabold text-slate-900">Detail Hasil</h1>
         <p class="text-slate-500 mt-1">Order #{{ $result->order_id }}</p>
       </div>
-      @php
-        $status = $result->order->status ?? '-';
-        $statusClass = match ($status) {
-          'In Progress' => 'bg-blue-100 text-blue-700',
-          'Revision' => 'bg-amber-100 text-amber-700',
-          'Completed' => 'bg-emerald-100 text-emerald-700',
-          default => 'bg-slate-100 text-slate-600'
-        };
-      @endphp
-      <span class="px-3 py-1.5 rounded-lg text-[12px] font-bold uppercase {{ $statusClass }}">{{ $status }}</span>
+      <x-ui.status-badge :status="$result->order->status ?? '-'" class="px-3 py-1.5 rounded-lg text-[12px] uppercase" />
     </div>
 
     <div class="max-w-2xl space-y-6">

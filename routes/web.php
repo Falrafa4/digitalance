@@ -38,10 +38,6 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 // dipusatkan ke NotificationController. Route name lama (mark-all-read, keep,
 // poll) tetap dipertahankan untuk kompatibilitas dengan JS existing.
 Route::middleware('auth:administrator,client,freelancer')->group(function () {
-    // Halaman riwayat notifikasi lengkap (search, filter, paginasi).
-    Route::get('/notifications', [NotificationController::class, 'index'])
-        ->name('notifications.index');
-
     // Endpoint JSON untuk drawer.
     Route::get('/notifications/poll', [NotificationController::class, 'poll'])
         ->name('notifications.poll');

@@ -85,31 +85,31 @@
         <div class="mt-4 flex items-center gap-1 overflow-x-auto pb-1 -mx-1 px-1" id="notif-tabs">
             <button type="button" data-filter="all"
                 onclick="switchNotificationFilter('all')"
-                class="notif-tab flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-bold whitespace-nowrap transition-all {{ $filter === 'all' ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200' }}">
+                class="notif-tab flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-bold whitespace-nowrap transition-all {{ $filter === 'all' ? 'bg-slate-900 text-white shadow-sm' : 'bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-800' }}">
                 <i class="ri-inbox-line text-[14px]"></i>
                 <span>Semua</span>
-                <span class="text-[10px] opacity-80">{{ $allCount }}</span>
+                <span class="text-[10px] opacity-80 notif-tab-count">{{ $allCount }}</span>
             </button>
             <button type="button" data-filter="unread"
                 onclick="switchNotificationFilter('unread')"
-                class="notif-tab flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-bold whitespace-nowrap transition-all {{ $filter === 'unread' ? 'bg-teal-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200' }}">
+                class="notif-tab flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-bold whitespace-nowrap transition-all {{ $filter === 'unread' ? 'bg-teal-600 text-white shadow-sm' : 'bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-800' }}">
                 <i class="ri-mail-unread-line text-[14px]"></i>
                 <span>Belum Dibaca</span>
-                <span class="text-[10px] opacity-80" id="notif-tab-unread-count">{{ $unreadCount }}</span>
+                <span class="text-[10px] opacity-80 notif-tab-count" id="notif-tab-unread-count">{{ $unreadCount }}</span>
             </button>
             <button type="button" data-filter="kept"
                 onclick="switchNotificationFilter('kept')"
-                class="notif-tab flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-bold whitespace-nowrap transition-all {{ $filter === 'kept' ? 'bg-amber-500 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200' }}">
+                class="notif-tab flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-bold whitespace-nowrap transition-all {{ $filter === 'kept' ? 'bg-amber-500 text-white shadow-sm' : 'bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-800' }}">
                 <i class="ri-bookmark-line text-[14px]"></i>
                 <span>Disimpan</span>
-                <span class="text-[10px] opacity-80">{{ $keptCount }}</span>
+                <span class="text-[10px] opacity-80 notif-tab-count">{{ $keptCount }}</span>
             </button>
             <button type="button" data-filter="archived"
                 onclick="switchNotificationFilter('archived')"
-                class="notif-tab flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-bold whitespace-nowrap transition-all {{ $filter === 'archived' ? 'bg-slate-700 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200' }}">
+                class="notif-tab flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-bold whitespace-nowrap transition-all {{ $filter === 'archived' ? 'bg-slate-700 text-white shadow-sm' : 'bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-800' }}">
                 <i class="ri-archive-line text-[14px]"></i>
                 <span>Arsip</span>
-                <span class="text-[10px] opacity-80">{{ $archivedCount }}</span>
+                <span class="text-[10px] opacity-80 notif-tab-count">{{ $archivedCount }}</span>
             </button>
         </div>
 
@@ -145,7 +145,7 @@
                     $iconColor = $n->icon_color ?? 'bg-blue-100 text-blue-600';
                     $rowClass = $n->is_read
                         ? 'bg-white hover:bg-slate-50'
-                        : 'bg-teal-50/40 hover:bg-teal-50/70';
+                        : 'bg-teal-50 hover:bg-teal-100';
                     $href = $n->link ?: '#';
                 @endphp
                 <div class="notif-item group px-5 py-4 border-b border-slate-50 transition-all duration-200 {{ $rowClass }}"
@@ -261,7 +261,7 @@
                         <i class="ri-loader-4-line animate-spin"></i> Memuat...
                     </div>
                 </div>
-                <            @endif
+            @endif
         @else
             <div class="flex flex-col items-center justify-center py-20 text-center px-8">
                 <div class="w-20 h-20 rounded-full bg-slate-50 flex items-center justify-center mb-5">
@@ -286,11 +286,7 @@
     </div>
 
     {{-- Footer --}}
-    <div class="px-6 py-3 border-t border-slate-100 flex-shrink-0 flex items-center justify-between gap-2">
-        <a href="{{ url('/notifications') }}"
-            class="text-[11px] font-bold text-slate-600 hover:text-[#0f766e] uppercase tracking-widest transition-colors">
-            <i class="ri-history-line mr-0.5"></i> Lihat Semua Riwayat
-        </a>
+    <div class="px-6 py-3 border-t border-slate-100 flex-shrink-0 flex items-center justify-end gap-2">
         <button type="button" id="notif-clear-all-btn"
             class="text-[11px] font-bold text-slate-400 hover:text-red-600 uppercase tracking-widest transition-colors"
             onclick="clearAllNotifications()"

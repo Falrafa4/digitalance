@@ -16,12 +16,7 @@
                 <p class="text-slate-500 text-[13px]">Order #{{ $result->order_id }} - {{ $result->order->service->title ?? '-' }}</p>
             </div>
             <div class="flex gap-2 items-center flex-wrap">
-                <span class="px-3 py-1 rounded-lg text-[11px] font-bold uppercase 
-                    @if($result->order->status == 'Completed') bg-emerald-100 text-emerald-700
-                    @elseif($result->order->status == 'Revision') bg-amber-100 text-amber-700
-                    @else bg-blue-100 text-blue-700 @endif">
-                    Status: {{ $result->order->status }}
-                </span>
+                <x-ui.status-badge :status="$result->order->status ?? '-'" class="px-3 py-1 rounded-lg text-[11px] uppercase" />
             </div>
         </div>
 
