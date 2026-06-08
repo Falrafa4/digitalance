@@ -215,9 +215,8 @@
 
 @php
     $freelancer = Auth::guard('freelancer')->user();
-    // Show onboarding when user is newly created (within 72 hours) and not yet approved
-    // Include 'Pending' status so freshly-registered freelancers see the modal.
-    $isNewFreelancer = $freelancer && in_array($freelancer->status, [null, '', 'New', 'Draft', 'Pending']) && now()->diffInHours($freelancer->created_at) < 72;
+    $isNewFreelancer = false;
+    $studentName = optional($freelancer->skomda_student)->name ?? 'Freelancer';
 @endphp
 @section('scripts')
     <script>
@@ -233,93 +232,72 @@
                 window.__FREELANCER_DASHBOARD__ = {};
             }
 
-            window.__SHOW_ONBOARDING__ = {!! json_encode($isNewFreelancer) !!};
             window.__FREELANCER_STATUS__ = {!! json_encode($freelancer->status ?? null) !!};
-            window.__FREELANCER_ONBOARDING__ = {
-                applyUrl: {!! json_encode(route('freelancer.onboarding.apply')) !!}
-            };
+            window.__SHOW_WELCOME__ = @json($showWelcomePopup ?? false);
         })();
+
+        document.addEventListener('DOMContentLoaded', function () {
+            if (!window.__SHOW_WELCOME__) return;
+            if (localStorage.getItem('fl_welcome_dismissed')) return;
+
+            setTimeout(function () {
+                var overlay = document.getElementById('welcome-overlay');
+                var box = document.getElementById('welcome-box');
+                if (overlay && box) {
+                    overlay.classList.remove('opacity-0', 'pointer-events-none');
+                    overlay.classList.add('opacity-100', 'pointer-events-auto');
+                    box.classList.remove('scale-95');
+                    box.classList.add('scale-100');
+                    document.body.style.overflow = 'hidden';
+                }
+            }, 400);
+        });
+
+        function dismissWelcome() {
+            localStorage.setItem('fl_welcome_dismissed', '1');
+            var overlay = document.getElementById('welcome-overlay');
+            var box = document.getElementById('welcome-box');
+            if (overlay) {
+                overlay.classList.remove('opacity-100', 'pointer-events-auto');
+                overlay.classList.add('opacity-0', 'pointer-events-none');
+            }
+            if (box) {
+                box.classList.remove('scale-100');
+                box.classList.add('scale-95');
+            }
+            document.body.style.overflow = '';
+        }
     </script>
     <script src="{{ asset('js/dashboard/freelancer/dashboard.js') }}"></script>
 @endsection
 
 @section('modals')
-    {{-- Onboarding Modal for New Freelancers --}}
-    <div id="onboarding-overlay"
-        class="fixed inset-0 z-[9999] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 {{ !$isNewFreelancer ? 'hidden' : '' }}">
-        <div class="bg-white rounded-[28px] w-full max-w-lg shadow-2xl overflow-hidden">
-            <div class="relative h-20 bg-gradient-to-r from-[#0f766e] to-[#10b981] flex items-center px-8">
-                <div class="flex-1">
-                    <h2 class="text-white font-black text-xl">Selamat Datang,
-                        {{ $freelancer->skomda_student->name ?? 'Freelancer' }}! 🎉
-                    </h2>
-                    <p class="text-white/80 text-[11px] font-bold uppercase tracking-wider">Panduan Memulai Freelancer</p>
+    @if($showWelcomePopup ?? false)
+    <div id="welcome-overlay" class="fixed inset-0 z-[200] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300" onclick="dismissWelcome()">
+        <div id="welcome-box" class="bg-white rounded-[24px] w-full max-w-[460px] shadow-2xl overflow-hidden transform scale-95 transition-all duration-300" onclick="event.stopPropagation()">
+            <div class="px-8 pt-8 pb-6 text-center">
+                <div class="w-[72px] h-[72px] mx-auto mb-5 rounded-full bg-teal-50 flex items-center justify-center text-[#0f766e] shadow-inner">
+                    <i class="ri-compass-3-line text-3xl"></i>
                 </div>
+                <span class="inline-block px-3 py-1 bg-teal-50 border border-teal-100 text-[#0f766e] text-[11px] font-black uppercase tracking-wider rounded-full mb-3">
+                    🚀 AI Digitalance
+                </span>
+                <h3 class="text-[1.3rem] font-black text-slate-900 mb-1">Selamat Datang, {{ $studentName }}!</h3>
+                <p class="text-lg font-bold text-slate-700 mb-4">Jelajahi Peta Karir Impianmu ✨</p>
+                <p class="text-[13.5px] text-slate-500 leading-relaxed max-w-sm mx-auto">
+                    Tim AI Digitalance telah menyiapkan rekomendasi jalur spesialisasi khusus berdasarkan profil, jurusan, dan portofolio kamu. Yuk, lihat peta karir pribadimu dan ajukan verifikasi akun!
+                </p>
             </div>
-            <div class="p-8 max-h-[60vh] overflow-y-auto">
-                <div class="space-y-6">
-                    <div class="flex gap-4">
-                        <div
-                            class="w-10 h-10 rounded-xl bg-teal-50 text-[#0f766e] flex items-center justify-center flex-shrink-0 font-black text-sm">
-                            1</div>
-                        <div>
-                            <h3 class="font-bold text-slate-900 text-sm mb-1">Buat Layanan</h3>
-                            <p class="text-slate-500 text-xs leading-relaxed">Buat jasa yang kamu tawarkan. Isi deskripsi,
-                                harga, dan kategori dengan jelas. Admin akan mereview sebelum ditampilkan ke publik.</p>
-                        </div>
-                    </div>
-                    <div class="flex gap-4">
-                        <div
-                            class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0 font-black text-sm">
-                            2</div>
-                        <div>
-                            <h3 class="font-bold text-slate-900 text-sm mb-1">Respon Order dengan Cepat</h3>
-                            <p class="text-slate-500 text-xs leading-relaxed">Saat ada order masuk, segera ACC atau tolak.
-                                Jika ACC, kirim penawaran harga. Respon cepat meningkatkan reputasimu.</p>
-                        </div>
-                    </div>
-                    <div class="flex gap-4">
-                        <div
-                            class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center flex-shrink-0 font-black text-sm">
-                            3</div>
-                        <div>
-                            <h3 class="font-bold text-slate-900 text-sm mb-1">Kerjakan & Kirim Hasil</h3>
-                            <p class="text-slate-500 text-xs leading-relaxed">Setelah order Paid, kerjakan dan upload hasil
-                                kerja via tombol "Kirim Hasil". Klien akan meninjau sebelum order selesai.</p>
-                        </div>
-                    </div>
-                    <div class="flex gap-4">
-                        <div
-                            class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center flex-shrink-0 font-black text-sm">
-                            4</div>
-                        <div>
-                            <h3 class="font-bold text-slate-900 text-sm mb-1">Penting: Aturan Wajib</h3>
-                            <p class="text-slate-500 text-xs leading-relaxed">Jangan menelantarkan order. Selalu komunikasi
-                                via chat jika ada kendala. Pelanggaran bisa berakibat suspend akun.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="mt-8 p-4 bg-amber-50 rounded-xl border border-amber-100">
-                    <p class="text-[11px] text-amber-800 font-bold leading-relaxed">
-                        <i class="ri-information-line mr-1"></i>
-                        Dengan menutup panduan ini, kamu menyetujui seluruh aturan dan ketentuan platform Digitalance.
-                    </p>
-                </div>
-            </div>
-            <div class="p-6 bg-slate-50 border-t border-slate-100 flex gap-3">
-                <a href="{{ route('freelancer.services.create') }}"
-                    class="flex-1 py-3 bg-white border border-slate-200 text-slate-600 font-bold rounded-xl text-sm hover:bg-slate-100 transition-all text-center">
-                    Buat Layanan Pertama
+            <div class="flex gap-3 px-8 pb-8">
+                <button onclick="dismissWelcome()" class="flex-1 py-3.5 rounded-xl bg-slate-100 text-slate-600 font-bold text-[13px] hover:bg-slate-200 transition-all">
+                    Nanti Saja
+                </button>
+                <a href="{{ route('freelancer.career-mapping') }}" class="flex-1 py-3.5 rounded-xl bg-[#0f766e] text-white font-bold text-[13px] hover:bg-[#0a5e58] shadow-lg shadow-teal-200 transition-all text-center flex items-center justify-center gap-2">
+                    Jelajahi Pemetaan Karir AI
+                    <i class="ri-arrow-right-line"></i>
                 </a>
-                <button id="onboarding-apply-btn" type="button"
-                    class="flex-1 py-3 bg-amber-500 text-white font-bold rounded-xl text-sm hover:bg-amber-600 transition-all shadow-md">
-                    Ajukan ke Admin
-                </button>
-                <button onclick="closeOnboarding()"
-                    class="flex-1 py-3 bg-[#0f766e] text-white font-bold rounded-xl text-sm hover:bg-[#0a5e58] transition-all shadow-lg shadow-teal-sm">
-                    Saya Mengerti, Mulai!
-                </button>
             </div>
         </div>
     </div>
+    @endif
 @endsection

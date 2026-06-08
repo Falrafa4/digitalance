@@ -18,6 +18,8 @@ use App\Http\Controllers\ServiceCategoryController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\SkomdaStudentController;
 use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\ClientAiRecommendationController;
+use App\Http\Controllers\FreelancerCareerMappingController;
 use Illuminate\Support\Facades\Route;
 
 // ── PUBLIC ──────────────────────────────────────────────
@@ -217,6 +219,9 @@ Route::middleware('auth:client')->prefix('client')->name('client.')->group(funct
     Route::delete('/loker/{loker}', [LokerController::class, 'clientDestroy'])->name('loker.destroy');
     Route::post('/loker/applications/{application}/approve', [LokerController::class, 'approveApplication'])->name('loker.applications.approve');
     Route::post('/loker/applications/{application}/reject', [LokerController::class, 'rejectApplication'])->name('loker.applications.reject');
+
+    // AI Recommendations
+    Route::get('/ai-recommendations', [ClientAiRecommendationController::class, 'index'])->name('ai-recommendations');
 });
 
 // ── FREELANCER ───────────────────────────────────────────
@@ -285,4 +290,9 @@ Route::middleware('auth:freelancer')->prefix('freelancer')->name('freelancer.')-
     Route::post('/loker/{loker}/apply', [LokerController::class, 'freelancerApply'])->name('loker.apply');
     Route::get('/loker/my/applications', [LokerController::class, 'freelancerMyApplications'])->name('loker.my-applications');
     Route::post('/onboarding/apply', [FreelancerController::class, 'applyForVerification'])->name('onboarding.apply');
+
+    // Career Mapping
+    Route::get('/career-mapping', [FreelancerCareerMappingController::class, 'index'])->name('career-mapping');
+    Route::post('/career-mapping/analyze', [FreelancerCareerMappingController::class, 'analyze'])->name('career-mapping.analyze');
+    Route::post('/career-mapping/submit', [FreelancerCareerMappingController::class, 'submitCareerApproval'])->name('career-mapping.submit');
 });

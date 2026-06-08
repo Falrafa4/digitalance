@@ -168,6 +168,8 @@ class DashboardController extends Controller
             'totalSpent' => $totalSpent,
         ];
 
+        $showWelcomePopup = $user->created_at && $user->created_at->isToday() && $allOrders->isEmpty();
+
         return view('dashboard.client.dashboard', compact(
             'user',
             'projects',
@@ -175,7 +177,8 @@ class DashboardController extends Controller
             'statsData',
             'activeProjects',
             'totalSpent',
-            'completedProjects'
+            'completedProjects',
+            'showWelcomePopup'
         ));
     }
 
@@ -259,24 +262,32 @@ class DashboardController extends Controller
             'ordersWithStatusChange' => $ordersWithStatusChange,
         ];
 
-        return view('dashboard.freelancer.dashboard', compact('dashboardData'));
+        $showWelcomePopup = $freelancer->career_track_status === 'None' && $freelancer->status !== 'Approved';
+
+        return view('dashboard.freelancer.dashboard', compact('dashboardData', 'showWelcomePopup'));
     }
 
     public function verifyFreelancer($id)
     {
         $freelancer = Freelancer::with('skomda_student')->findOrFail($id);
-        $freelancer->update(['status' => 'Approved', 'reject_reason' => null]);
+        
+        $updateData = ['status' => 'Approved', 'reject_reason' => null];
+        if ($freelancer->career_track_status === 'Pending') {
+            $updateData['career_track_status'] = 'Approved';
+            $updateData['career_track_notes'] = null;
+        }
+        $freelancer->update($updateData);
 
         $exists = \App\Models\Notification::where('role', 'freelancer')
             ->where('user_id', $freelancer->id)
-            ->where('title', 'Akun Diverifikasi')
+            ->where('title', 'Akun & Jalur Karir Diverifikasi')
             ->where('is_read', false)
             ->exists();
 
         if (!$exists) {
             \App\Models\Notification::create([
-                'title' => 'Akun Diverifikasi',
-                'message' => 'Selamat, akun freelancer kamu telah disetujui oleh admin!',
+                'title' => 'Akun & Jalur Karir Diverifikasi',
+                'message' => 'Selamat, akun freelancer dan pengajuan jalur karir kamu (' . ($freelancer->career_track ?? 'Spesialis') . ') telah disetujui oleh admin!',
                 'type' => 'success',
                 'role' => 'freelancer',
                 'user_id' => $freelancer->id,
@@ -293,10 +304,15 @@ class DashboardController extends Controller
 
         $reason = $request->input('reason', 'Tidak ada alasan spesifik');
 
-        $freelancer->update([
+        $updateData = [
             'status' => 'Rejected',
             'reject_reason' => $reason,
-        ]);
+        ];
+        if ($freelancer->career_track_status === 'Pending') {
+            $updateData['career_track_status'] = 'Rejected';
+            $updateData['career_track_notes'] = $reason;
+        }
+        $freelancer->update($updateData);
 
         $exists = \App\Models\Notification::where('role', 'freelancer')
             ->where('user_id', $freelancer->id)
@@ -307,7 +323,7 @@ class DashboardController extends Controller
         if (!$exists) {
             \App\Models\Notification::create([
                 'title' => 'Verifikasi Ditolak',
-                'message' => 'Maaf, pengajuan akun freelancer kamu belum dapat kami setujui. Alasan: ' . $reason,
+                'message' => 'Maaf, pengajuan akun freelancer & jalur karir kamu belum dapat kami setujui. Alasan: ' . $reason,
                 'type' => 'danger',
                 'role' => 'freelancer',
                 'user_id' => $freelancer->id,
