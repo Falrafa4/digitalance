@@ -276,7 +276,7 @@
                 <h3 class="text-[1.3rem] font-black text-slate-900 mb-1">Selamat Datang, {{ $user->name }}!</h3>
                 <p class="text-lg font-bold text-slate-700 mb-4">Temukan Talent Terbaik dengan AI 🚀</p>
                 <p class="text-[13.5px] text-slate-500 leading-relaxed max-w-sm mx-auto">
-                    Gunakan kecerdasan buatan Groq AI untuk mencocokkan freelancer dengan kebutuhan proyekmu. Cukup pilih lowongan atau jelaskan kebutuhanmu, AI akan merekomendasikan talent yang tepat!
+                    Gunakan Digitalance AI untuk mencocokkan freelancer dengan kebutuhan proyekmu. Cukup pilih lowongan atau jelaskan kebutuhanmu, AI akan merekomendasikan talent yang tepat!
                 </p>
             </div>
             <div class="flex gap-3 px-8 pb-8">

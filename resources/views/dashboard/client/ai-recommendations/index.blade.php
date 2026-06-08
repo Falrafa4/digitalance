@@ -6,7 +6,7 @@
     {{-- Header --}}
     <section class="mb-8">
         <h1 class="font-display text-[1.85rem] font-extrabold text-slate-900">Rekomendasi Freelancer AI</h1>
-        <p class="text-slate-500 mt-1">Gunakan kecerdasan buatan Groq AI untuk mencari dan mencocokkan siswa freelancer terbaik untuk proyek Anda.</p>
+        <p class="text-slate-500 mt-1">Gunakan Digitalance AI untuk mencari dan mencocokkan siswa freelancer terbaik untuk proyek Anda.</p>
     </section>
 
     {{-- Filter Forms --}}
