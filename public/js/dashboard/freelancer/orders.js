@@ -34,7 +34,13 @@
     const price = o?.agreed_price ?? o?.amount ?? o?.price ?? null;
     const created = o?.created_at ?? o?.date ?? o?.created ?? null;
 
-    const serviceTitle = o?.service?.title ?? o?.service?.name ?? o?.service_title ?? o?.service_name ?? 'Layanan';
+    const serviceTitle = o?.service?.title
+      ?? o?.service?.name
+      ?? o?.loker_application?.loker?.title
+      ?? o?.lokerApplication?.loker?.title
+      ?? o?.service_title
+      ?? o?.service_name
+      ?? 'Pesanan Kustom';
     const clientName = o?.client?.name ?? o?.client_name ?? o?.buyer?.name ?? 'Klien';
 
     return { id, status, brief, price, created, serviceTitle, clientName, _raw: o };
@@ -158,4 +164,3 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();
 })();
-

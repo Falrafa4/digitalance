@@ -122,6 +122,12 @@ Route::middleware('auth:administrator')->prefix('admin')->name('admin.')->group(
     Route::get('/services', [ServiceController::class, 'index'])->name('services.index');
     Route::post('/services/{id}/status', [ServiceController::class, 'updateStatus'])->name('services.updateStatus');
 
+    Route::get('/loker', [LokerController::class, 'adminIndex'])->name('loker.index');
+    Route::patch('/loker/{loker}', [LokerController::class, 'adminUpdate'])->name('loker.update');
+    Route::delete('/loker/{loker}', [LokerController::class, 'adminDestroy'])->name('loker.destroy');
+    Route::post('/loker/applications/{application}/approve', [LokerController::class, 'adminApproveApplication'])->name('loker.applications.approve');
+    Route::post('/loker/applications/{application}/reject', [LokerController::class, 'adminRejectApplication'])->name('loker.applications.reject');
+
     Route::get('/service-categories', [ServiceCategoryController::class, 'index'])->name('service-categories.index');
     Route::post('/service-categories', [ServiceCategoryController::class, 'store'])->name('service-categories.store');
     Route::get('/service-categories/{service_category}', [ServiceCategoryController::class, 'show'])->name('service-categories.show');

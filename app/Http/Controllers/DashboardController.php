@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Carbon\Carbon;
 use App\Models\Client;
 use App\Models\Freelancer;
+use App\Models\Loker;
 use App\Models\Offer;
 use App\Models\Order;
 use App\Models\Service;
@@ -348,7 +349,7 @@ class DashboardController extends Controller
         abort(403);
     }
 
-    public function search(\Illuminate\Http\Request $request)
+    public function search(Request $request)
     {
         $q = $request->query('q');
 
@@ -364,6 +365,7 @@ class DashboardController extends Controller
                 ['name' => 'Freelancers', 'url' => route('admin.freelancers.index'), 'desc' => 'Daftar talent dan verifikasi data'],
                 ['name' => 'Orders Management', 'url' => route('admin.orders.index'), 'desc' => 'Kelola pesanan dan status proyek'],
                 ['name' => 'Services Catalog', 'url' => route('admin.services.index'), 'desc' => 'Manajemen layanan dan kategori'],
+                ['name' => 'Loker Management', 'url' => route('admin.loker.index'), 'desc' => 'Pantau lowongan kerja dan lamaran freelancer'],
                 ['name' => 'Offers', 'url' => route('admin.offers.index'), 'desc' => 'Penawaran masuk dan request custom'],
                 ['name' => 'Transactions', 'url' => route('admin.transactions.index'), 'desc' => 'Riwayat pembayaran dan keuangan'],
                 ['name' => 'Reviews', 'url' => route('admin.reviews.index'), 'desc' => 'Ulasan klien terhadap freelancer'],
@@ -428,6 +430,22 @@ class DashboardController extends Controller
                 ->get()->map(function ($item) {
                     $item->search_type = 'Order';
                     $item->search_url = route('admin.orders.index');
+
+                    return $item;
+                });
+
+            // Search Lokers
+            $lokers = Loker::where('title', 'like', $fuzzy)
+                ->orWhere('description', 'like', $fuzzy)
+                ->orWhereHas('client', function ($query) use ($fuzzy) {
+                    $query->where('name', 'like', $fuzzy);
+                })
+                ->orWhereHas('category', function ($query) use ($fuzzy) {
+                    $query->where('name', 'like', $fuzzy);
+                })
+                ->get()->map(function ($item) {
+                    $item->search_type = 'Loker';
+                    $item->search_url = route('admin.loker.index') . '?q=' . urlencode($item->title);
 
                     return $item;
                 });
@@ -524,6 +542,7 @@ class DashboardController extends Controller
                 ->concat($services)
                 ->concat($categories)
                 ->concat($orders)
+                ->concat($lokers)
                 ->concat($transactions)
                 ->concat($portofolios)
                 ->concat($offers)
@@ -535,7 +554,7 @@ class DashboardController extends Controller
         return view('dashboard.admin.search', compact('results', 'q'));
     }
 
-    public function clientSearch(\Illuminate\Http\Request $request)
+    public function clientSearch(Request $request)
     {
         $q = $request->query('q');
         $user = auth()->guard('client')->user();
@@ -619,7 +638,7 @@ class DashboardController extends Controller
         return response()->json($freelancer);
     }
 
-    public function freelancerSearch(\Illuminate\Http\Request $request)
+    public function freelancerSearch(Request $request)
     {
         $q = $request->query('q');
         $user = auth()->guard('freelancer')->user();
@@ -670,7 +689,7 @@ class DashboardController extends Controller
     /**
      * PERBAIKAN TASK 6: Aksi eksekusi Admin untuk menyelesaikan dispute secara tuntas
      */
-    public function resolveDispute(\Illuminate\Http\Request $request, $id)
+    public function resolveDispute(Request $request, $id)
     {
         $order = Order::findOrFail($id);
 
