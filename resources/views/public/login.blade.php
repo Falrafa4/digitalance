@@ -15,7 +15,7 @@
     <x-flash />
 
     <main class="min-h-screen bg-[#f8fafc] flex items-start justify-center p-0 md:p-6 lg:p-8">
-        <div class="w-full max-w-[840px] md:h-[590px] bg-white md:rounded-[32px] shadow-[0_24px_70px_rgba(15,118,110,0.07)] border border-slate-100 flex flex-col md:flex-row relative" id="authContainer">
+        <div class="w-full max-w-[840px] md:min-h-[600px] bg-white md:rounded-[32px] shadow-[0_24px_70px_rgba(15,118,110,0.07)] border border-slate-100 flex flex-col md:flex-row relative" id="authContainer">
             
             <!-- 1. PANEL OVERLAY (PREMIUM DARK GRADIENT - TANPA LOGO & ICON PETIR) -->
             <div class="auth-overlay bg-slate-950 text-white" id="authOverlay">
