@@ -560,6 +560,27 @@ class RestApiCanonicalRoutesTest extends TestCase
         ]);
     }
 
+    public function test_freelancer_cannot_apply_to_loker_above_budget_max_on_canonical_route(): void
+    {
+        [, $client, $freelancer, , $service] = $this->makeOrderFixture();
+        $loker = $this->makeLoker($client, $service->category_id);
+
+        Sanctum::actingAs($freelancer);
+
+        $this->postJson('/api/v1/lokers/'.$loker->id.'/applications', [
+            'proposal' => 'Saya siap membantu mengerjakan loker ini dengan alur revisi yang terstruktur dan komunikasi rutin.',
+            'proposed_price' => 950000,
+        ])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['proposed_price']);
+
+        $this->assertDatabaseMissing('loker_applications', [
+            'loker_id' => $loker->id,
+            'freelancer_id' => $freelancer->id,
+            'proposed_price' => 950000,
+        ]);
+    }
+
     public function test_client_can_approve_loker_application_and_create_order(): void
     {
         [, $client, $freelancer, , $service] = $this->makeOrderFixture();

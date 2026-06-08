@@ -211,9 +211,16 @@ class LokerController extends Controller
             return back()->with('warning', 'Kamu sudah melamar lowongan ini.');
         }
 
+        $proposedPriceRules = ['nullable', 'numeric', 'min:1000'];
+        if ($loker->budget_max !== null) {
+            $proposedPriceRules[] = 'max:' . (float) $loker->budget_max;
+        }
+
         $validated = $request->validate([
             'proposal' => 'required|string|min:20',
-            'proposed_price' => 'nullable|numeric|min:1000',
+            'proposed_price' => $proposedPriceRules,
+        ], [
+            'proposed_price.max' => 'Harga tawaran tidak boleh melebihi budget maksimum client.',
         ]);
 
         LokerApplication::create([
