@@ -436,7 +436,7 @@
                 if (window.showToast) {
                     window.showToast(e.message || 'Terjadi kesalahan.', 'danger');
                 } else {
-                    alert(e.message);
+                    window.__FLASH?.create('danger', e.message || 'Terjadi kesalahan.');
                 }
             }
         };
