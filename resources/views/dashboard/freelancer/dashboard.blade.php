@@ -277,7 +277,7 @@
                     <i class="ri-compass-3-line text-3xl"></i>
                 </div>
                 <span class="inline-block px-3 py-1 bg-teal-50 border border-teal-100 text-[#0f766e] text-[11px] font-black uppercase tracking-wider rounded-full mb-3">
-                    🚀 AI Digitalance
+                    🚀 Digitalance AI
                 </span>
                 <h3 class="text-[1.3rem] font-black text-slate-900 mb-1">Selamat Datang, {{ $studentName }}!</h3>
                 <p class="text-lg font-bold text-slate-700 mb-4">Jelajahi Peta Karir Impianmu ✨</p>

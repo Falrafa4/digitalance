@@ -138,13 +138,14 @@
                             <div class="flex-1 lg:border-x lg:border-slate-100 lg:px-6">
                                 <div class="flex items-center gap-6">
                                     {{-- Circular Score --}}
-                                    <div class="relative w-18 h-18 flex-shrink-0 flex items-center justify-center">
-                                        <svg class="absolute inset-0 w-full h-full transform -rotate-90">
+                                    <div class="relative w-[72px] h-[72px] aspect-square flex-shrink-0 flex items-center justify-center">
+                                        <svg viewBox="0 0 72 72" aria-hidden="true"
+                                            class="absolute inset-0 w-full h-full transform -rotate-90 overflow-visible">
                                             <circle cx="36" cy="36" r="30" stroke="#f1f5f9" stroke-width="6" fill="transparent" />
-                                            <circle cx="36" cy="36" r="30" stroke="{{ $scoreStroke }}" stroke-width="6" fill="transparent"
+                                            <circle cx="36" cy="36" r="30" stroke="{{ $scoreStroke }}" stroke-width="6" fill="transparent" stroke-linecap="round"
                                                     stroke-dasharray="188.4" stroke-dashoffset="{{ 188.4 - (188.4 * $score) / 100 }}" />
                                         </svg>
-                                        <div class="text-center">
+                                        <div class="text-center leading-none">
                                             <span class="text-lg font-black text-slate-800">{{ $score }}%</span>
                                             <p class="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Match</p>
                                         </div>
@@ -188,7 +189,7 @@
                                 {{-- AI Analysis --}}
                                 <div class="mt-4 p-3.5 bg-slate-50 border border-slate-100 rounded-xl">
                                     <p class="text-[12.5px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5 mb-1.5">
-                                        <i class="ri-ai-generate text-[#0f766e]"></i> Analisis AI Groq
+                                        <i class="ri-ai-generate text-[#0f766e]"></i> Analisis AI
                                     </p>
                                     <p class="text-[13px] text-slate-600 leading-relaxed font-medium">{{ $analysis }}</p>
                                 </div>

@@ -11,9 +11,6 @@
     <!-- Grain overlay -->
     <div class="grain-overlay"></div>
     
-    <!-- Flash messages -->
-    <x-flash />
-
     <main class="min-h-screen bg-[#f8fafc] flex items-start justify-center p-0 md:p-6 lg:p-8">
         <div class="w-full max-w-[840px] md:min-h-[600px] bg-white md:rounded-[32px] shadow-[0_24px_70px_rgba(15,118,110,0.07)] border border-slate-100 flex flex-col md:flex-row relative" id="authContainer">
             
