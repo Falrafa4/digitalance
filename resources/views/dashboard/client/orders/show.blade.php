@@ -140,7 +140,7 @@
 
         {{-- ACTION: Pending (from loker approval) --}}
         @if($order->status === 'Pending' && $order->lokerApplication && $order->agreed_price)
-          <div x-data="{ isSubmitting: false }" class="bg-white border border-slate-200 rounded-[18px] p-6">
+          <div x-data="{ showReject: false, showAccept: false, isSubmitting: false, isSubmittingReject: false }" class="bg-white border border-slate-200 rounded-[18px] p-6">
             <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
               <div>
                 <h3 class="font-display font-extrabold text-slate-900 text-[1.1rem]">Harga Fluancer</h3>
@@ -151,20 +151,69 @@
                 </p>
               </div>
               <div class="flex flex-col sm:flex-row gap-3">
-                <form action="{{ route('client.orders.reject', $order->id) }}" method="POST">
+                <button type="button" @click="showReject = true"
+                  class="px-5 py-3 rounded-[12px] bg-white border border-red-200 text-red-600 font-bold text-[13px] hover:bg-red-50 transition-all">
+                  <i class="ri-close-line mr-1"></i> Tolak
+                </button>
+                <button type="button" @click="showAccept = true"
+                  class="px-5 py-3 rounded-[12px] bg-[#0f766e] text-white font-bold text-[13px] hover:bg-[#0a5e58] transition-all disabled:opacity-50">
+                  <i class="ri-check-line mr-1"></i> Terima & Bayar
+                </button>
+                <form x-cloak x-show="false" action="{{ route('client.orders.accept', $order->id) }}" method="POST" @submit="isSubmitting = true">
                   @csrf
-                  <button type="submit"
-                    class="px-5 py-3 rounded-[12px] bg-white border border-red-200 text-red-600 font-bold text-[13px] hover:bg-red-50 transition-all">
-                    <i class="ri-close-line mr-1"></i> Tolak
-                  </button>
                 </form>
-                <form action="{{ route('client.orders.accept', $order->id) }}" method="POST" @submit="isSubmitting = true">
+              </div>
+            </div>
+
+            <div x-show="showAccept"
+              x-init="$watch('showAccept', value => { if(value) { $nextTick(() => window.DigitalanceUtils.focusTrap($el)) } })"
+              x-cloak class="fixed inset-0 z-[100] flex items-center justify-center p-4" role="dialog" aria-modal="true">
+              <div @click="showAccept = false" class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm"></div>
+              <div class="relative w-full max-w-md bg-white rounded-[20px] shadow-xl p-6">
+                <div class="w-14 h-14 mx-auto mb-4 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                  <i class="ri-wallet-3-line text-2xl"></i>
+                </div>
+                <h3 class="font-display text-lg font-bold text-slate-900 mb-2 text-center">Terima Harga & Lanjut Bayar?</h3>
+                <p class="text-sm text-slate-500 text-center leading-relaxed">
+                  Setelah kamu menerima penawaran ini, langkah berikutnya adalah melanjutkan ke proses pembayaran untuk memulai project.
+                </p>
+                <form action="{{ route('client.orders.accept', $order->id) }}" method="POST" class="space-y-4 mt-5"
+                  @submit="isSubmitting = true">
                   @csrf
-                  <button type="submit" :disabled="isSubmitting"
-                    onclick="return confirm('Terima dan lanjut ke pembayaran?')"
-                    class="px-5 py-3 rounded-[12px] bg-[#0f766e] text-white font-bold text-[13px] hover:bg-[#0a5e58] transition-all disabled:opacity-50">
-                    <i class="ri-check-line mr-1"></i> Terima & Bayar
-                  </button>
+                  <div class="flex gap-3">
+                    <button type="button" @click="showAccept = false"
+                      class="flex-1 py-2.5 rounded-[12px] bg-slate-100 text-slate-600 font-bold text-sm">Batal</button>
+                    <button type="submit" :disabled="isSubmitting"
+                      class="flex-1 py-2.5 rounded-[12px] bg-[#0f766e] text-white font-bold text-sm hover:bg-[#0a5e58] disabled:opacity-50">
+                      <span x-show="!isSubmitting">Ya, Lanjutkan</span>
+                      <span x-show="isSubmitting"><i class="ri-loader-4-line animate-spin"></i></span>
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <div x-show="showReject"
+              x-init="$watch('showReject', value => { if(value) { $nextTick(() => window.DigitalanceUtils.focusTrap($el)) } })"
+              x-cloak class="fixed inset-0 z-[100] flex items-center justify-center p-4" role="dialog" aria-modal="true">
+              <div @click="showReject = false" class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm"></div>
+              <div class="relative w-full max-w-md bg-white rounded-[20px] shadow-xl p-6">
+                <h3 class="font-display text-lg font-bold text-slate-900 mb-2 text-center">Tolak Pesanan?</h3>
+                <form action="{{ route('client.orders.reject', $order->id) }}" method="POST" class="space-y-4"
+                  @submit="isSubmittingReject = true">
+                  @csrf
+                  <textarea name="reason" rows="3" required
+                    class="w-full px-4 py-3 rounded-[12px] border border-slate-200 text-sm"
+                    placeholder="Alasan menolak..."></textarea>
+                  <div class="flex gap-3">
+                    <button type="button" @click="showReject = false"
+                      class="flex-1 py-2.5 rounded-[12px] bg-slate-100 text-slate-600 font-bold text-sm">Batal</button>
+                    <button type="submit" :disabled="isSubmittingReject"
+                      class="flex-1 py-2.5 rounded-[12px] bg-red-600 text-white font-bold text-sm hover:bg-red-700 disabled:opacity-50">
+                      <span x-show="!isSubmittingReject">Ya, Tolak</span>
+                      <span x-show="isSubmittingReject"><i class="ri-loader-4-line animate-spin"></i></span>
+                    </button>
+                  </div>
                 </form>
               </div>
             </div>
