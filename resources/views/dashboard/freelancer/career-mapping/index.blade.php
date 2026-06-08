@@ -43,7 +43,7 @@
                 </div>
             </div>
         @else
-            <div class="p-4.5 rounded-[22px] bg-teal-50 border border-teal-100 flex items-center gap-4 shadow-sm">
+            <div class="!p-4 rounded-[22px] bg-teal-50 border border-teal-100 flex items-center gap-4 shadow-sm">
                 <div class="w-11 h-11 rounded-xl bg-[#0f766e] text-white flex items-center justify-center flex-shrink-0">
                     <i class="ri-information-line text-xl"></i>
                 </div>
@@ -125,7 +125,7 @@
                         <div class="flex-1 text-center sm:text-left">
                             <span class="text-xs font-black uppercase tracking-wider text-slate-400">Jalur Karir yang Disarankan</span>
                             <h2 class="text-2xl font-black text-slate-900 mt-0.5">{{ $careerMap['career_track'] }}</h2>
-                            <div class="mt-2 flex flex-wrap items-center justify-center sm:justify-start gap-2.5">
+                            {{-- <div class="mt-2 flex flex-wrap items-center justify-center sm:justify-start gap-2.5">
                                 <span class="px-3 py-1 bg-slate-100 text-slate-700 text-[11.5px] font-bold rounded-full uppercase tracking-wider">
                                     LEVEL: {{ $careerMap['current_level'] }}
                                 </span>
@@ -133,7 +133,7 @@
                                 <span class="text-slate-500 font-semibold text-[12.5px]">
                                     {{ $careerMap['xp'] }} XP Terkumpul
                                 </span>
-                            </div>
+                            </div> --}}
                         </div>
                     </div>
 
