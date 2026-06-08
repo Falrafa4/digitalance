@@ -112,6 +112,13 @@
                 <i class="ri-tools-line text-[17px]" aria-hidden="true"></i> Layanan
             </a>
 
+            <a href="{{ route('admin.loker.index') }}"
+                class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
+                                            {{ request()->routeIs('admin.loker.*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}"
+                aria-current="{{ request()->routeIs('admin.loker.*') ? 'page' : '' }}">
+                <i class="ri-briefcase-2-line text-[17px]" aria-hidden="true"></i> Lowongan
+            </a>
+
             <a href="{{ route('admin.transactions.index') }}"
                 class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
                                             {{ request()->routeIs('admin.transactions.*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}"
@@ -164,6 +171,12 @@
                                  {{ request()->routeIs('client.talents.*') ? $active : $inactive }}"
                 aria-current="{{ request()->routeIs('client.talents.*') ? 'page' : '' }}">
                 <i class="ri-user-search-line text-[17px]" aria-hidden="true"></i> Cari Talenta
+            </a>
+
+            <a href="{{ route('client.ai-recommendations') }}" class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
+                                 {{ request()->routeIs('client.ai-recommendations*') ? $active : $inactive }}"
+                aria-current="{{ request()->routeIs('client.ai-recommendations*') ? 'page' : '' }}">
+                <i class="ri-magic-line text-[17px]" aria-hidden="true"></i> Rekomendasi AI
             </a>
 
             <a href="{{ route($projectsRoute) }}" class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
@@ -278,6 +291,13 @@
                                             {{ request()->routeIs('freelancer.loker.*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}"
                 aria-current="{{ request()->routeIs('freelancer.loker.*') ? 'page' : '' }}">
                 <i class="ri-briefcase-2-line text-[17px]" aria-hidden="true"></i> Lowongan Kerja
+            </a>
+
+            <a href="{{ route('freelancer.career-mapping') }}"
+                class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
+                                            {{ request()->routeIs('freelancer.career-mapping*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}"
+                aria-current="{{ request()->routeIs('freelancer.career-mapping*') ? 'page' : '' }}">
+                <i class="ri-compass-3-line text-[17px]" aria-hidden="true"></i> Pemetaan Karir (AI)
             </a>
         @endif
 

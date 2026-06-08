@@ -18,6 +18,8 @@ use App\Http\Controllers\ServiceCategoryController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\SkomdaStudentController;
 use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\ClientAiRecommendationController;
+use App\Http\Controllers\FreelancerCareerMappingController;
 use Illuminate\Support\Facades\Route;
 
 // ── PUBLIC ──────────────────────────────────────────────
@@ -120,6 +122,12 @@ Route::middleware('auth:administrator')->prefix('admin')->name('admin.')->group(
     Route::get('/services', [ServiceController::class, 'index'])->name('services.index');
     Route::post('/services/{id}/status', [ServiceController::class, 'updateStatus'])->name('services.updateStatus');
 
+    Route::get('/loker', [LokerController::class, 'adminIndex'])->name('loker.index');
+    Route::patch('/loker/{loker}', [LokerController::class, 'adminUpdate'])->name('loker.update');
+    Route::delete('/loker/{loker}', [LokerController::class, 'adminDestroy'])->name('loker.destroy');
+    Route::post('/loker/applications/{application}/approve', [LokerController::class, 'adminApproveApplication'])->name('loker.applications.approve');
+    Route::post('/loker/applications/{application}/reject', [LokerController::class, 'adminRejectApplication'])->name('loker.applications.reject');
+
     Route::get('/service-categories', [ServiceCategoryController::class, 'index'])->name('service-categories.index');
     Route::post('/service-categories', [ServiceCategoryController::class, 'store'])->name('service-categories.store');
     Route::get('/service-categories/{service_category}', [ServiceCategoryController::class, 'show'])->name('service-categories.show');
@@ -217,6 +225,9 @@ Route::middleware('auth:client')->prefix('client')->name('client.')->group(funct
     Route::delete('/loker/{loker}', [LokerController::class, 'clientDestroy'])->name('loker.destroy');
     Route::post('/loker/applications/{application}/approve', [LokerController::class, 'approveApplication'])->name('loker.applications.approve');
     Route::post('/loker/applications/{application}/reject', [LokerController::class, 'rejectApplication'])->name('loker.applications.reject');
+
+    // AI Recommendations
+    Route::get('/ai-recommendations', [ClientAiRecommendationController::class, 'index'])->name('ai-recommendations');
 });
 
 // ── FREELANCER ───────────────────────────────────────────
@@ -285,4 +296,9 @@ Route::middleware('auth:freelancer')->prefix('freelancer')->name('freelancer.')-
     Route::post('/loker/{loker}/apply', [LokerController::class, 'freelancerApply'])->name('loker.apply');
     Route::get('/loker/my/applications', [LokerController::class, 'freelancerMyApplications'])->name('loker.my-applications');
     Route::post('/onboarding/apply', [FreelancerController::class, 'applyForVerification'])->name('onboarding.apply');
+
+    // Career Mapping
+    Route::get('/career-mapping', [FreelancerCareerMappingController::class, 'index'])->name('career-mapping');
+    Route::post('/career-mapping/analyze', [FreelancerCareerMappingController::class, 'analyze'])->name('career-mapping.analyze');
+    Route::post('/career-mapping/submit', [FreelancerCareerMappingController::class, 'submitCareerApproval'])->name('career-mapping.submit');
 });

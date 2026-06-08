@@ -12,6 +12,96 @@ use Illuminate\Http\Request;
 class LokerController extends Controller
 {
     // ========================
+    // ADMIN: Monitoring & Moderation
+    // ========================
+
+    public function adminIndex(Request $request)
+    {
+        $query = Loker::with(['client', 'category', 'applications.freelancer.skomda_student']);
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->query('status'));
+        }
+
+        if ($request->filled('category')) {
+            $query->where('category_id', $request->query('category'));
+        }
+
+        if ($request->filled('q')) {
+            $q = $request->query('q');
+            $query->where(function ($sub) use ($q) {
+                $sub->where('title', 'like', "%{$q}%")
+                    ->orWhere('description', 'like', "%{$q}%")
+                    ->orWhereHas('category', fn ($categoryQuery) => $categoryQuery->where('name', 'like', "%{$q}%"))
+                    ->orWhereHas('client', fn ($clientQuery) => $clientQuery->where('name', 'like', "%{$q}%"));
+            });
+        }
+
+        $lokkers = $query->latest()->paginate(6)->withQueryString();
+        $categories = ServiceCategory::orderBy('name')->get();
+        $stats = [
+            'total' => Loker::count(),
+            'open' => Loker::where('status', 'Open')->count(),
+            'closed' => Loker::where('status', 'Closed')->count(),
+            'pending_applications' => LokerApplication::where('status', 'Pending')->count(),
+        ];
+
+        return view('dashboard.admin.lokers', compact('lokkers', 'categories', 'stats'));
+    }
+
+    public function adminUpdate(Request $request, Loker $loker)
+    {
+        $validated = $request->validate([
+            'status' => 'required|in:Open,Closed',
+        ]);
+
+        $loker->update([
+            'status' => $validated['status'],
+        ]);
+
+        $label = $validated['status'] === 'Closed' ? 'ditutup' : 'dibuka kembali';
+
+        return redirect()->route('admin.loker.index')->with('success', "Lowongan berhasil {$label}.");
+    }
+
+    public function adminDestroy(Loker $loker)
+    {
+        $loker->delete();
+
+        return redirect()->route('admin.loker.index')->with('success', 'Lowongan berhasil dihapus.');
+    }
+
+    public function adminApproveApplication(LokerApplication $application)
+    {
+        $application->loadMissing('loker', 'freelancer.skomda_student');
+
+        if ($application->status !== 'Pending') {
+            return redirect()->route('admin.loker.index')->with('warning', 'Lamaran ini sudah diproses.');
+        }
+
+        if (Order::where('loker_application_id', $application->id)->exists()) {
+            return redirect()->route('admin.loker.index')->with('warning', 'Order untuk lamaran ini sudah dibuat.');
+        }
+
+        $this->approveApplicationRecord($application, (int) $application->loker->client_id);
+
+        return redirect()->route('admin.loker.index')->with('success', 'Lamaran disetujui! Order telah dibuat untuk freelancer.');
+    }
+
+    public function adminRejectApplication(LokerApplication $application)
+    {
+        $application->loadMissing('loker', 'freelancer.skomda_student');
+
+        if ($application->status !== 'Pending') {
+            return redirect()->route('admin.loker.index')->with('warning', 'Lamaran ini sudah diproses.');
+        }
+
+        $this->rejectApplicationRecord($application);
+
+        return redirect()->route('admin.loker.index')->with('success', 'Lamaran freelancer ditolak.');
+    }
+
+    // ========================
     // CLIENT: Job Posting
     // ========================
 
@@ -99,29 +189,18 @@ class LokerController extends Controller
     public function approveApplication(LokerApplication $application)
     {
         $client = auth('client')->user();
+        $application->loadMissing('loker', 'freelancer.skomda_student');
         abort_unless($application->loker->client_id === $client->id, 403);
 
-        $application->update(['status' => 'Approved']);
-        $application->loker->update(['status' => 'Closed']);
+        if ($application->status !== 'Pending') {
+            return back()->with('warning', 'Lamaran ini sudah diproses.');
+        }
 
-        Order::create([
-            'service_id' => null,
-            'client_id' => $client->id,
-            'freelancer_id' => $application->freelancer_id,
-            'loker_application_id' => $application->id,
-            'brief' => $application->loker->title . ' - ' . $application->loker->description,
-            'status' => 'Pending',
-            'agreed_price' => $application->proposed_price,
-        ]);
+        if (Order::where('loker_application_id', $application->id)->exists()) {
+            return back()->with('warning', 'Order untuk lamaran ini sudah dibuat.');
+        }
 
-        Notification::create([
-            'title' => 'Lamaran Disetujui',
-            'message' => 'Client telah menyetujui lamaranmu untuk: ' . $application->loker->title . '. Order sudah dibuat, tunggu konfirmasi pembayaran.',
-            'type' => 'success',
-            'role' => 'freelancer',
-            'user_id' => $application->freelancer_id,
-            'link' => '/freelancer/orders',
-        ]);
+        $this->approveApplicationRecord($application, (int) $client->id);
 
         return back()->with('success', 'Lamaran disetujui! Order telah dibuat untuk freelancer.');
     }
@@ -129,18 +208,14 @@ class LokerController extends Controller
     public function rejectApplication(LokerApplication $application)
     {
         $client = auth('client')->user();
+        $application->loadMissing('loker', 'freelancer.skomda_student');
         abort_unless($application->loker->client_id === $client->id, 403);
 
-        $application->update(['status' => 'Rejected']);
+        if ($application->status !== 'Pending') {
+            return back()->with('warning', 'Lamaran ini sudah diproses.');
+        }
 
-        Notification::create([
-            'title' => 'Lamaran Ditolak',
-            'message' => 'Maaf, lamaranmu untuk: ' . $application->loker->title . ' tidak disetujui.',
-            'type' => 'warning',
-            'role' => 'freelancer',
-            'user_id' => $application->freelancer_id,
-            'link' => '/freelancer/loker/my/applications',
-        ]);
+        $this->rejectApplicationRecord($application);
 
         return back()->with('success', 'Lamaran freelancer ditolak.');
     }
@@ -211,9 +286,16 @@ class LokerController extends Controller
             return back()->with('warning', 'Kamu sudah melamar lowongan ini.');
         }
 
+        $proposedPriceRules = ['nullable', 'numeric', 'min:1000'];
+        if ($loker->budget_max !== null) {
+            $proposedPriceRules[] = 'max:' . (float) $loker->budget_max;
+        }
+
         $validated = $request->validate([
             'proposal' => 'required|string|min:20',
-            'proposed_price' => 'nullable|numeric|min:1000',
+            'proposed_price' => $proposedPriceRules,
+        ], [
+            'proposed_price.max' => 'Harga tawaran tidak boleh melebihi budget maksimum client.',
         ]);
 
         LokerApplication::create([
@@ -246,5 +328,44 @@ class LokerController extends Controller
             ->get();
 
         return view('dashboard.freelancer.loker.applications', compact('applications'));
+    }
+
+    private function approveApplicationRecord(LokerApplication $application, int $clientId): void
+    {
+        $application->update(['status' => 'Approved']);
+        $application->loker->update(['status' => 'Closed']);
+
+        Order::create([
+            'service_id' => null,
+            'client_id' => $clientId,
+            'freelancer_id' => $application->freelancer_id,
+            'loker_application_id' => $application->id,
+            'brief' => $application->loker->title . ' - ' . $application->loker->description,
+            'status' => 'Pending',
+            'agreed_price' => $application->proposed_price,
+        ]);
+
+        Notification::create([
+            'title' => 'Lamaran Disetujui',
+            'message' => 'Client telah menyetujui lamaranmu untuk: ' . $application->loker->title . '. Order sudah dibuat, tunggu konfirmasi pembayaran.',
+            'type' => 'success',
+            'role' => 'freelancer',
+            'user_id' => $application->freelancer_id,
+            'link' => '/freelancer/orders',
+        ]);
+    }
+
+    private function rejectApplicationRecord(LokerApplication $application): void
+    {
+        $application->update(['status' => 'Rejected']);
+
+        Notification::create([
+            'title' => 'Lamaran Ditolak',
+            'message' => 'Maaf, lamaranmu untuk: ' . $application->loker->title . ' tidak disetujui.',
+            'type' => 'warning',
+            'role' => 'freelancer',
+            'user_id' => $application->freelancer_id,
+            'link' => '/freelancer/loker/my/applications',
+        ]);
     }
 }

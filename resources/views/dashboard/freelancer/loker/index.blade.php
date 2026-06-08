@@ -179,6 +179,11 @@
                             <input type="text" name="proposed_price" data-rupiah-input inputmode="numeric"
                                 placeholder="Opsional — kosongkan jika perlu diskusi"
                                 class="py-[10px] px-[13px] bg-slate-50 border-[1.5px] border-slate-200 rounded-[11px] text-[13.5px] outline-none transition-all focus:border-[#0f766e] focus:bg-white" />
+                            @if($loker->budget_max)
+                                <p class="text-[11px] text-slate-400">
+                                    Maks {{ 'Rp' . number_format((float) $loker->budget_max, 0, ',', '.') }}
+                                </p>
+                            @endif
                         </div>
                         <div class="flex justify-end gap-3">
                             <button type="button" onclick="closeApplyModal({{ $loker->id }})"

@@ -245,9 +245,18 @@ class OrderController extends Controller
     {
         $freelancer = $request->user('freelancer');
 
-        $orders = Order::with(['service.freelancer.skomda_student', 'client', 'offers'])
-            ->whereHas('service', function ($query) use ($freelancer) {
-                $query->where('freelancer_id', $freelancer->id);
+        $orders = Order::with([
+            'service.freelancer.skomda_student',
+            'client',
+            'offers',
+            'lokerApplication.loker',
+            'lokerApplication.freelancer.skomda_student',
+        ])
+            ->where(function ($query) use ($freelancer) {
+                $query->where('freelancer_id', $freelancer->id)
+                    ->orWhereHas('service', function ($serviceQuery) use ($freelancer) {
+                        $serviceQuery->where('freelancer_id', $freelancer->id);
+                    });
             })
             ->latest()
             ->get();
@@ -459,7 +468,7 @@ class OrderController extends Controller
         $client = auth('client')->user();
         abort_unless($order->client_id === $client->id, 403);
 
-        if (!$order->service_id || !$order->service?->freelancer_id) {
+        if (!$this->orderHasPayableCounterparty($order)) {
             return redirect()->back()->with('error', 'Transaksi hanya tersedia untuk order client dan freelancer.');
         }
 
@@ -479,7 +488,7 @@ class OrderController extends Controller
         $client = auth('client')->user();
         abort_unless($order->client_id === $client->id, 403);
 
-        if (!$order->service_id || !$order->service?->freelancer_id) {
+        if (!$this->orderHasPayableCounterparty($order)) {
             return redirect()->route('client.orders.show', $order->id)->with('error', 'Transaksi hanya tersedia untuk order client dan freelancer.');
         }
 
@@ -487,7 +496,13 @@ class OrderController extends Controller
             return redirect()->route('client.orders.show', $order->id)->with('error', 'Pembayaran tidak dapat diproses.');
         }
 
-        $order->load(['service.freelancer.skomda_student', 'service.service_category', 'freelancer.skomda_student']);
+        $order->load([
+            'service.freelancer.skomda_student',
+            'service.service_category',
+            'freelancer.skomda_student',
+            'lokerApplication.freelancer.skomda_student',
+            'lokerApplication.loker',
+        ]);
 
         return view('dashboard.client.orders.checkout', compact('order'));
     }
@@ -498,7 +513,7 @@ class OrderController extends Controller
         abort_unless($order->client_id === $client->id, 403);
         $expectsJson = $request->expectsJson();
 
-        if (!$order->service_id || !$order->service?->freelancer_id) {
+        if (!$this->orderHasPayableCounterparty($order)) {
             if ($expectsJson) {
                 return response()->json(['message' => 'Transaksi hanya tersedia untuk order client dan freelancer.'], 422);
             }
@@ -542,6 +557,10 @@ class OrderController extends Controller
             'va_mandiri' => 'Mandiri Virtual Account',
             'va_bri' => 'BRI Virtual Account',
         ];
+        $freelancerId = $order->freelancer_id ?? $order->service?->freelancer_id;
+        $projectTitle = $order->service?->title
+            ?? $order->lokerApplication?->loker?->title
+            ?? ('Order #' . $order->id);
 
         // 1. Sistem mencatat transaksi ke database
         $order->transactions()->create([
@@ -555,10 +574,10 @@ class OrderController extends Controller
         // 2. Kirim Notifikasi real-time agar dibaca sistem polling header freelancer
         \App\Models\Notification::create([
             'title' => 'Pembayaran Pesanan Diterima',
-            'message' => "Klien telah melunasi pembayaran untuk pesanan '{$order->service->title}'. Status berubah menjadi 'Paid'. Silakan mulai pengerjaan project.",
+            'message' => "Klien telah melunasi pembayaran untuk pesanan '{$projectTitle}'. Status berubah menjadi 'Paid'. Silakan mulai pengerjaan project.",
             'type' => 'success',
             'role' => 'freelancer',
-            'user_id' => $order->freelancer_id,
+            'user_id' => $freelancerId,
             'link' => route('freelancer.orders.show', $order->id),
         ]);
         // ────────────────────────────────────────
@@ -768,5 +787,10 @@ class OrderController extends Controller
         ]);
 
         return redirect()->back()->with('error', 'Revisi ditolak.');
+    }
+
+    private function orderHasPayableCounterparty(Order $order): bool
+    {
+        return (bool) ($order->freelancer_id || $order->service?->freelancer_id);
     }
 }

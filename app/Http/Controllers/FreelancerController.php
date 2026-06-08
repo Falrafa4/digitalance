@@ -65,15 +65,44 @@ class FreelancerController extends Controller
 
         $profileData = $this->buildProfileData($freelancer);
 
+        // Mengambil data student sebagai shortcut jika data relasi tersedia
+        $student = $freelancer->skomda_student;
+
+        // Membentuk seluruh variabel display dengan fallback aman agar tidak crash
+        $displayName  = $student->name ?? $freelancer->name ?? 'Freelancer';
+        $displayMajor = $student->major ?? 'Jurusan Tidak Diketahui';
+        $displayClass = $student->class ?? 'Kelas Tidak Diketahui';
+        $displayNis   = $student->nis ?? 'NIS Tidak Diketahui';
+        $displayPhone = $student->phone ?? '-';
+        $displayEmail = $student->email ?? $freelancer->email ?? '-';
+
         return view('dashboard.freelancer.profile', [
-            'user' => $profileData['freelancer'],
-            'freelancer' => $profileData['freelancer'],
-            'services' => $profileData['services'],
+            // Variabel dasar otentikasi & profile builder
+            'user'             => $profileData['freelancer'],
+            'freelancer'       => $profileData['freelancer'],
+            'profile'          => $profileData['freelancer'], // Mengatasi error $profile
+            
+            // Variabel koleksi data item
+            'services'         => $profileData['services'],
+            'serviceItems'     => $profileData['services'],   // Menyediakan $serviceItems untuk loop blade
             'approvedServices' => $profileData['approvedServices'],
-            'portofolios' => $profileData['portofolios'],
-            'skillTags' => $profileData['skillTags'],
-            'stats' => $profileData['stats'],
-            'role' => 'Freelancer',
+            'portofolios'      => $profileData['portofolios'],
+            'portfolioItems'   => $profileData['portofolios'], // Menyediakan $portfolioItems untuk loop blade
+            'skillTags'        => $profileData['skillTags'],
+            'skillItems'       => $profileData['skillTags'],   // Menyediakan $skillItems untuk loop blade
+            
+            // Variabel statistik profil
+            'stats'            => $profileData['stats'],
+            'profileStats'     => $profileData['stats'],       // Mengatasi error $profileStats
+            'role'             => 'Freelancer',
+            
+            // Variabel display yang dibutuhkan oleh struktur komponen atas blade
+            'displayName'      => $displayName,
+            'displayMajor'     => $displayMajor,
+            'displayClass'     => $displayClass,
+            'displayNis'       => $displayNis,
+            'displayPhone'     => $displayPhone,
+            'displayEmail'     => $displayEmail,
         ]);
     }
 

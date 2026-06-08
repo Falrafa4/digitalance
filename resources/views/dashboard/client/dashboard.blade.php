@@ -225,6 +225,70 @@
             projects: @json($projectsData),
             stats: @json($statsData),
         };
+        window.__SHOW_WELCOME__ = @json($showWelcomePopup ?? false);
+
+        document.addEventListener('DOMContentLoaded', function () {
+            if (!window.__SHOW_WELCOME__) return;
+            if (localStorage.getItem('cl_welcome_dismissed')) return;
+
+            setTimeout(function () {
+                var overlay = document.getElementById('welcome-overlay');
+                var box = document.getElementById('welcome-box');
+                if (overlay && box) {
+                    overlay.classList.remove('opacity-0', 'pointer-events-none');
+                    overlay.classList.add('opacity-100', 'pointer-events-auto');
+                    box.classList.remove('scale-95');
+                    box.classList.add('scale-100');
+                    document.body.style.overflow = 'hidden';
+                }
+            }, 400);
+        });
+
+        function dismissWelcome() {
+            localStorage.setItem('cl_welcome_dismissed', '1');
+            var overlay = document.getElementById('welcome-overlay');
+            var box = document.getElementById('welcome-box');
+            if (overlay) {
+                overlay.classList.remove('opacity-100', 'pointer-events-auto');
+                overlay.classList.add('opacity-0', 'pointer-events-none');
+            }
+            if (box) {
+                box.classList.remove('scale-100');
+                box.classList.add('scale-95');
+            }
+            document.body.style.overflow = '';
+        }
     </script>
     <script src="{{ asset('js/dashboard/client/dashboard.js') }}" defer></script>
+@endsection
+
+@section('modals')
+    @if($showWelcomePopup ?? false)
+    <div id="welcome-overlay" class="fixed inset-0 z-[200] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300" onclick="dismissWelcome()">
+        <div id="welcome-box" class="bg-white rounded-[24px] w-full max-w-[460px] shadow-2xl overflow-hidden transform scale-95 transition-all duration-300" onclick="event.stopPropagation()">
+            <div class="px-8 pt-8 pb-6 text-center">
+                <div class="w-[72px] h-[72px] mx-auto mb-5 rounded-full bg-teal-50 flex items-center justify-center text-[#0f766e] shadow-inner">
+                    <i class="ri-magic-line text-3xl"></i>
+                </div>
+                <span class="inline-block px-3 py-1 bg-teal-50 border border-teal-100 text-[#0f766e] text-[11px] font-black uppercase tracking-wider rounded-full mb-3">
+                    ✨ AI Digitalance
+                </span>
+                <h3 class="text-[1.3rem] font-black text-slate-900 mb-1">Selamat Datang, {{ $user->name }}!</h3>
+                <p class="text-lg font-bold text-slate-700 mb-4">Temukan Talent Terbaik dengan AI 🚀</p>
+                <p class="text-[13.5px] text-slate-500 leading-relaxed max-w-sm mx-auto">
+                    Gunakan Digitalance AI untuk mencocokkan freelancer dengan kebutuhan proyekmu. Cukup pilih lowongan atau jelaskan kebutuhanmu, AI akan merekomendasikan talent yang tepat!
+                </p>
+            </div>
+            <div class="flex gap-3 px-8 pb-8">
+                <button onclick="dismissWelcome()" class="flex-1 py-3.5 rounded-xl bg-slate-100 text-slate-600 font-bold text-[13px] hover:bg-slate-200 transition-all">
+                    Nanti Saja
+                </button>
+                <a href="{{ route('client.ai-recommendations') }}" class="flex-1 py-3.5 rounded-xl bg-[#0f766e] text-white font-bold text-[13px] hover:bg-[#0a5e58] shadow-lg shadow-teal-200 transition-all text-center flex items-center justify-center gap-2">
+                    Coba Rekomendasi AI
+                    <i class="ri-arrow-right-line"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    @endif
 @endsection
