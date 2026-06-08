@@ -298,6 +298,40 @@
         </div>
     </div>
 
+    <div class="modal-overlay fixed inset-0 z-[110] bg-slate-900/40 backdrop-blur-sm flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300"
+        id="modal-reject-verify-overlay">
+        <div class="modal-box bg-white rounded-[28px] w-full max-w-[480px] shadow-2xl overflow-hidden transform scale-95 transition-all duration-300">
+            <div class="px-7 py-6 bg-gradient-to-r from-rose-500 to-red-600 text-white">
+                <p class="text-[10px] font-black uppercase tracking-[0.22em] opacity-80 mb-2">Verifikasi Freelancer</p>
+                <h3 class="font-display text-[1.2rem] font-extrabold leading-tight">Tolak Pengajuan Freelancer</h3>
+                <p class="text-white/80 text-[12px] mt-1.5">Sertakan alasan yang jelas agar freelancer tahu apa yang perlu diperbaiki.</p>
+            </div>
+
+            <form id="reject-verification-form" class="p-7">
+                <label for="reject-verification-reason" class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">
+                    Alasan Penolakan
+                </label>
+                <textarea id="reject-verification-reason" rows="5" maxlength="500" required
+                    placeholder="Tuliskan alasan penolakan berkas freelancer..."
+                    class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-[13px] text-slate-700 font-medium leading-relaxed outline-none transition focus:border-rose-300 focus:ring-2 focus:ring-rose-100"></textarea>
+                <p class="text-[11px] text-slate-400 mt-2">
+                    Alasan wajib diisi dan akan dikirim ke freelancer.
+                </p>
+
+                <div class="flex gap-3 mt-6">
+                    <button type="button" id="reject-verification-cancel"
+                        class="flex-1 py-3 rounded-xl bg-slate-100 text-slate-600 font-bold text-[13px] hover:bg-slate-200 transition-all">
+                        Batal
+                    </button>
+                    <button type="submit" id="reject-verification-submit"
+                        class="flex-1 py-3 rounded-xl bg-rose-600 text-white font-bold text-[13px] hover:bg-rose-700 transition-all shadow-lg shadow-rose-100">
+                        Kirim Penolakan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     {{-- Admin content area placeholder --}}
     <section id="admin-content" class="mt-10 animate-fadeUp-delay-2"></section>
 @endsection

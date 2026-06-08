@@ -111,22 +111,6 @@
                             </div>
                         </div>
 
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1.5">Konfirmasi Kata Sandi</label>
-                            <div class="relative">
-                                <input type="password" name="password_confirmation" id="loginPasswordConfirmation" required
-                                    class="w-full pl-4 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-950 focus:border-transparent text-xs transition-all placeholder:text-slate-400"
-                                    placeholder="Ulangi kata sandi">
-                                <button type="button" id="toggleLoginPasswordConfirmation" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none flex items-center justify-center">
-                                    <!-- Default: Mata Terbuka -->
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-
                         <button type="submit"
                             class="w-full py-3 px-5 rounded-xl text-white font-bold bg-gradient-to-r from-slate-900 to-zinc-800 hover:shadow-lg hover:shadow-slate-900/10 active:scale-[0.98] transition-all text-xs">
                             Masuk Sekarang
@@ -444,7 +428,6 @@
 
         // Jalankan toggle untuk form login dan register
         setupPasswordToggle('toggleLoginPassword', 'loginPassword');
-        setupPasswordToggle('toggleLoginPasswordConfirmation', 'loginPasswordConfirmation');
         setupPasswordToggle('toggleRegisterPassword', 'registerPassword');
         setupPasswordToggle('toggleRegisterPasswordConfirmation', 'registerPasswordConfirmation');
     });

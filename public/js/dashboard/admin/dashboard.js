@@ -7,6 +7,77 @@
 (function () {
     var csrfToken = document.querySelector('meta[name="csrf-token"]');
     csrfToken = csrfToken ? csrfToken.content : (document.querySelector('input[name="_token"]') ? document.querySelector('input[name="_token"]').value : '');
+    var rejectModalState = {
+        id: null,
+        url: '',
+        actionBtn: null,
+        onSuccess: null,
+        onError: null,
+        submitting: false
+    };
+
+    function getRejectModalElements() {
+        return {
+            overlay: document.getElementById('modal-reject-verify-overlay'),
+            form: document.getElementById('reject-verification-form'),
+            textarea: document.getElementById('reject-verification-reason'),
+            submitBtn: document.getElementById('reject-verification-submit'),
+            cancelBtn: document.getElementById('reject-verification-cancel')
+        };
+    }
+
+    function setButtonLoading(btn, isLoading, loadingText) {
+        if (!btn) return;
+
+        if (isLoading) {
+            btn.dataset.originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = loadingText || '<span class="animate-spin inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full mr-1 align-middle"></span> Memproses...';
+            return;
+        }
+
+        btn.disabled = false;
+        if (btn.dataset.originalText) {
+            btn.innerHTML = btn.dataset.originalText;
+            delete btn.dataset.originalText;
+        }
+    }
+
+    function openDashboardModal(id) {
+        if (typeof window.openModal === 'function') {
+            window.openModal(id);
+            return;
+        }
+
+        if (window.DigitalanceUtils && typeof window.DigitalanceUtils.openModal === 'function') {
+            window.DigitalanceUtils.openModal(id);
+            return;
+        }
+
+        var overlay = document.getElementById(id);
+        if (!overlay) return;
+        overlay.classList.remove('opacity-0', 'pointer-events-none');
+        var box = overlay.querySelector('.modal-box, aside, [role="dialog"], div > div');
+        if (box) box.classList.remove('scale-95');
+    }
+
+    function closeDashboardModal(id) {
+        if (typeof window.closeModal === 'function') {
+            window.closeModal(id);
+            return;
+        }
+
+        if (window.DigitalanceUtils && typeof window.DigitalanceUtils.closeModal === 'function') {
+            window.DigitalanceUtils.closeModal(id);
+            return;
+        }
+
+        var overlay = document.getElementById(id);
+        if (!overlay) return;
+        overlay.classList.add('opacity-0', 'pointer-events-none');
+        var box = overlay.querySelector('.modal-box, aside, [role="dialog"], div > div');
+        if (box) box.classList.add('scale-95');
+    }
 
     function setCardLoading(card, isLoading) {
         if (!card) return;
@@ -17,6 +88,22 @@
         var res = await fetch(url, {
             method: 'POST',
             headers: { 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' }
+        });
+        var data = null;
+        try { data = await res.json(); } catch (e) { }
+        if (!res.ok) throw new Error(data?.message || 'Request gagal. Coba lagi.');
+        return data;
+    }
+
+    async function postJson(url, body) {
+        var res = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': csrfToken,
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body || {})
         });
         var data = null;
         try { data = await res.json(); } catch (e) { }
@@ -47,6 +134,102 @@
         return isExternalResult(result) ? 'Buka Link' : 'Unduh';
     }
 
+    function resetRejectModal() {
+        var elements = getRejectModalElements();
+        rejectModalState = {
+            id: null,
+            url: '',
+            actionBtn: null,
+            onSuccess: null,
+            onError: null,
+            submitting: false
+        };
+
+        if (elements.form) elements.form.reset();
+        if (elements.submitBtn) setButtonLoading(elements.submitBtn, false);
+    }
+
+    function closeRejectModal(forceClose) {
+        if (rejectModalState.submitting && !forceClose) return;
+        closeDashboardModal('modal-reject-verify-overlay');
+        resetRejectModal();
+    }
+
+    function openRejectModal(config) {
+        var elements = getRejectModalElements();
+        if (!elements.overlay || !elements.textarea || !config?.url) return;
+
+        rejectModalState = {
+            id: config.id,
+            url: config.url,
+            actionBtn: config.actionBtn || null,
+            onSuccess: typeof config.onSuccess === 'function' ? config.onSuccess : null,
+            onError: typeof config.onError === 'function' ? config.onError : null,
+            submitting: false
+        };
+
+        if (elements.form) elements.form.reset();
+        if (elements.submitBtn) setButtonLoading(elements.submitBtn, false);
+        openDashboardModal('modal-reject-verify-overlay');
+
+        setTimeout(function () {
+            elements.textarea.focus();
+        }, 120);
+    }
+
+    async function submitRejectModal() {
+        var elements = getRejectModalElements();
+        var reason = elements.textarea ? elements.textarea.value.trim() : '';
+
+        if (!rejectModalState.url) return;
+        if (!reason) {
+            window.showToast('Alasan penolakan wajib diisi.', 'warning');
+            if (elements.textarea) elements.textarea.focus();
+            return;
+        }
+
+        rejectModalState.submitting = true;
+        setButtonLoading(elements.submitBtn, true, '<span class="animate-spin inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full mr-1 align-middle"></span> Mengirim...');
+
+        try {
+            await postJson(rejectModalState.url, { reason: reason });
+            if (rejectModalState.onSuccess) {
+                rejectModalState.onSuccess(reason);
+            }
+            closeRejectModal(true);
+        } catch (error) {
+            window.showToast(error?.message || 'Gagal menolak verifikasi.', 'danger');
+            rejectModalState.submitting = false;
+            setButtonLoading(elements.submitBtn, false);
+            if (rejectModalState.onError) {
+                rejectModalState.onError(error);
+            }
+            if (elements.textarea) elements.textarea.focus();
+        }
+    }
+
+    function initRejectModal() {
+        var elements = getRejectModalElements();
+        if (!elements.overlay || !elements.form || !elements.cancelBtn) return;
+
+        elements.cancelBtn.addEventListener('click', closeRejectModal);
+        elements.overlay.addEventListener('click', function (e) {
+            if (e.target === elements.overlay) {
+                closeRejectModal();
+            }
+        });
+        elements.form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            submitRejectModal();
+        });
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && rejectModalState.url) {
+                closeRejectModal();
+            }
+        });
+    }
+
     async function handleApprove(id) {
         var container = document.getElementById('verification-container');
         var card = document.querySelector('.approval-card[data-id="' + id + '"]');
@@ -70,35 +253,18 @@
         }
     }
 
-    async function handleReject(id) {
+    function handleReject(id, actionBtn) {
         var container = document.getElementById('verification-container');
         var card = document.querySelector('.approval-card[data-id="' + id + '"]');
         var url = (container?.dataset.rejectUrl || '').replace('__ID__', id);
         if (!url) return;
 
-        var reason = prompt('Masukkan alasan penolakan:');
-        if (reason === null) return;
-        reason = reason.trim();
-        if (!reason) {
-            window.showToast('Alasan penolakan wajib diisi.', 'warning');
-            return;
-        }
-
-        setCardLoading(card, true);
-        try {
-            var res = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': csrfToken,
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ reason: reason })
-            });
-            var data = null;
-            try { data = await res.json(); } catch (e) { }
-            if (!res.ok) throw new Error(data?.message || 'Request gagal. Coba lagi.');
-
+        openRejectModal({
+            id: id,
+            url: url,
+            actionBtn: actionBtn || null,
+            onSuccess: function () {
+                setCardLoading(card, true);
             card.classList.add('card-rejected');
             window.showToast('Verifikasi ditolak.', 'danger');
             setTimeout(function () {
@@ -106,13 +272,16 @@
                 card.style.transform = 'translateX(-30px)';
                 setTimeout(function () { card.remove(); }, 400);
             }, 800);
-        } catch (error) {
-            window.showToast(error?.message || 'Gagal menolak verifikasi.', 'danger');
-            setCardLoading(card, false);
-        }
+            },
+            onError: function () {
+                setCardLoading(card, false);
+            }
+        });
     }
 
     function initAdminDashboard() {
+        initRejectModal();
+
         var verificationContainer = document.getElementById('verification-container');
         if (verificationContainer) {
             verificationContainer.addEventListener('click', function (e) {
@@ -123,7 +292,7 @@
                 if (!id) return;
                 var action = btn.getAttribute('data-action');
                 if (action === 'approve') handleApprove(id);
-                if (action === 'reject') handleReject(id);
+                if (action === 'reject') handleReject(id, btn);
                 if (action === 'detail') window.openVerificationDetail(id);
             });
         }
@@ -134,7 +303,7 @@
         var box = document.getElementById('modal-dispute-box');
         if (!overlay || !box) return;
 
-        window.openModal('modal-dispute-overlay');
+        openDashboardModal('modal-dispute-overlay');
 
         try {
             var response = await fetch('/admin/orders/' + id + '/dispute');
@@ -149,7 +318,7 @@
 
             box.innerHTML = '<div class="modal-header relative h-24 bg-gradient-to-r from-amber-500 to-orange-600 flex items-center px-8">' +
                 '<div class="flex-1"><h2 class="text-white font-extrabold text-xl tracking-tight">Mediasi Dispute</h2><p class="text-white/80 text-[11px] font-bold uppercase tracking-wider">Order ID: #ORD-' + order.id + '</p></div>' +
-                '<button onclick="window.closeModal(\'modal-dispute-overlay\')" class="w-10 h-10 bg-white/20 text-white rounded-full flex items-center justify-center hover:bg-white/30 transition"><i class="ri-close-line text-xl"></i></button>' +
+                '<button onclick="window.closeDashboardModal(\'modal-dispute-overlay\')" class="w-10 h-10 bg-white/20 text-white rounded-full flex items-center justify-center hover:bg-white/30 transition"><i class="ri-close-line text-xl"></i></button>' +
                 '</div>' +
                 '<div class="p-8 max-h-[70vh] overflow-y-auto">' +
                 '<div class="grid grid-cols-2 gap-6 mb-8">' +
@@ -174,12 +343,12 @@
                 '</div></section>' +
                 '</div></div>' +
                 '<div class="p-6 bg-slate-50 border-t border-slate-100 flex gap-3">' +
-                '<button onclick="window.closeModal(\'modal-dispute-overlay\')" class="flex-1 py-3 bg-white border border-slate-200 text-slate-600 font-bold rounded-xl text-sm hover:bg-slate-100 transition-all">Tutup Detail</button>' +
+                '<button onclick="window.closeDashboardModal(\'modal-dispute-overlay\')" class="flex-1 py-3 bg-white border border-slate-200 text-slate-600 font-bold rounded-xl text-sm hover:bg-slate-100 transition-all">Tutup Detail</button>' +
                 '<a href="/admin/orders" class="flex-1 py-3 bg-[#0f766e] text-white text-center font-bold rounded-xl text-sm hover:bg-[#0a5e58] transition-all shadow-lg shadow-teal-sm">Kelola di Halaman Pesanan</a>' +
                 '</div>';
 
         } catch (error) {
-            box.innerHTML = '<div class="p-12 text-center"><div class="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4"><i class="ri-error-warning-line text-3xl"></i></div><h3 class="text-lg font-bold text-slate-900 mb-2">Gagal Memuat Data</h3><p class="text-slate-500 text-sm mb-6">' + error.message + '</p><button onclick="window.closeModal(\'modal-dispute-overlay\')" class="px-8 py-2.5 bg-slate-900 text-white font-bold rounded-xl text-sm">Tutup</button></div>';
+            box.innerHTML = '<div class="p-12 text-center"><div class="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4"><i class="ri-error-warning-line text-3xl"></i></div><h3 class="text-lg font-bold text-slate-900 mb-2">Gagal Memuat Data</h3><p class="text-slate-500 text-sm mb-6">' + error.message + '</p><button onclick="window.closeDashboardModal(\'modal-dispute-overlay\')" class="px-8 py-2.5 bg-slate-900 text-white font-bold rounded-xl text-sm">Tutup</button></div>';
         }
     };
 
@@ -397,15 +566,14 @@
             '</div>' +
             '</div>';
 
-        overlay.classList.remove('opacity-0', 'pointer-events-none');
-        box.classList.remove('scale-95');
+        openDashboardModal('modal-verify-overlay');
     };
 
     window.closeVerificationDetail = function () {
         var overlay = document.getElementById('modal-verify-overlay');
         var box = document.getElementById('modal-verify-box');
-        if (overlay) overlay.classList.add('opacity-0', 'pointer-events-none');
-        if (box) box.classList.add('scale-95');
+        if (!overlay || !box) return;
+        closeDashboardModal('modal-verify-overlay');
     };
 
     window.processVerification = async function (id, action, event) {
@@ -413,40 +581,33 @@
         if (!container) return;
 
         var url = '';
-        var bodyData = {};
 
         if (action === 'approve') {
             url = container.getAttribute('data-verify-url').replace('__ID__', id);
         } else {
             url = container.getAttribute('data-reject-url').replace('__ID__', id);
-            var reason = prompt('Masukkan alasan penolakan berkas freelancer:');
-            if (reason === null) return;
-            reason = reason.trim();
-            if (!reason) {
-                window.showToast?.('Alasan penolakan wajib diisi.', 'warning');
-                return;
-            }
-            bodyData.reason = reason;
+            openRejectModal({
+                id: id,
+                url: url,
+                actionBtn: event?.currentTarget || event?.target || null,
+                onSuccess: function () {
+                    window.closeVerificationDetail();
+                    window.showToast?.('Status verifikasi freelancer berhasil diperbarui!', 'success');
+                    setTimeout(function () {
+                        window.location.reload();
+                    }, 300);
+                }
+            });
+            return;
         }
 
-        var actionBtn = event.target;
+        var actionBtn = event?.currentTarget || event?.target;
         var originalText = actionBtn.innerHTML;
         actionBtn.disabled = true;
         actionBtn.innerHTML = '<span class="animate-spin inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full mr-1 align-middle"></span> Processing...';
 
         try {
-            var response = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify(bodyData)
-            });
-
-            if (!response.ok) throw new Error('Gagal memperbarui status verifikasi');
-
+            await postJson(url, {});
             window.showToast?.('Status verifikasi freelancer berhasil diperbarui!', 'success');
             window.location.reload();
         } catch (e) {
@@ -462,4 +623,6 @@
 
     window.handleApprove = handleApprove;
     window.handleReject = handleReject;
+    window.openDashboardModal = openDashboardModal;
+    window.closeDashboardModal = closeDashboardModal;
 })();
