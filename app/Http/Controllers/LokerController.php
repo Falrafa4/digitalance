@@ -37,7 +37,7 @@ class LokerController extends Controller
             });
         }
 
-        $lokkers = $query->latest()->paginate(12)->withQueryString();
+        $lokkers = $query->latest()->paginate(6)->withQueryString();
         $categories = ServiceCategory::orderBy('name')->get();
         $stats = [
             'total' => Loker::count(),

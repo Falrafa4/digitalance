@@ -242,7 +242,7 @@
         </div>
 
         <div class="mt-12 flex justify-center pagination-container">
-            {{ $lokkers->links() }}
+            {{ $lokkers->onEachSide(1)->links('dashboard.admin.partials.loker-pagination') }}
         </div>
     @else
         <x-ui.empty-state icon="ri-briefcase-2-line" title="Tidak Ada Lowongan"
