@@ -1,5 +1,5 @@
 @extends('layouts.dashboard')
-@section('title', 'Penawaran & Negosiasi | Digitalance')
+@section('title', 'Negosiasi | Digitalance')
 
 @section('styles')
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
@@ -7,146 +7,63 @@
 @endsection
 
 @section('content')
-    <div class="mb-8">
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-                <div class="flex items-center gap-2 mb-2">
-                    <i class="ri-price-tag-3-line text-2xl text-teal-600"></i>
-                    <h1 class="text-2xl font-bold text-slate-800">Tawaran & Negosiasi</h1>
-                </div>
-                <p class="text-slate-600">Pantau tawaran jasa masuk dan log pesan negosiasi antar pengguna secara real-time.
-                </p>
-            </div>
-            <div class="relative w-full md:w-64">
-                <i class="ri-search-line absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                <input type="text" id="global-search-input" onkeyup="handleSearch()" placeholder="Cari ID atau Nama..."
-                    class="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent">
-            </div>
+    <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8 animate-fadeUp">
+        <div>
+            <h1 class="font-display text-[2.1rem] font-extrabold text-slate-900">Negosiasi</h1>
+            <p class="text-slate-500 text-[0.95rem] mt-1">Pantau percakapan negosiasi antara klien dan freelancer.</p>
+        </div>
+        <div class="relative">
+            <i class="ri-search-line absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-[15px]"></i>
+            <input type="text" id="nego-search" placeholder="Cari pesan, ID order..."
+                class="pl-10 pr-4 py-[9px] w-[260px] border-[1.5px] border-slate-200 rounded-[11px] text-[13px] font-semibold text-slate-700 bg-white outline-none focus:border-[#0f766e] transition-all" />
         </div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8" id="stats-row">
-    </div>
-
-    <div class="flex border-b border-gray-200 mb-6 bg-white rounded-t-lg overflow-hidden">
-        <button
-            class="section-tab active w-full md:w-auto px-6 py-3 text-sm font-semibold text-gray-500 border-b-2 border-transparent transition-all"
-            data-target="offers-section">
-            <i class="ri-price-tag-3-line mr-2"></i>Data Tawaran
-        </button>
-        <button
-            class="section-tab w-full md:w-auto px-6 py-3 text-sm font-semibold text-gray-500 border-b-2 border-transparent transition-all"
-            data-target="nego-section">
-            <i class="ri-discuss-line mr-2"></i>Pesan Negosiasi
-        </button>
-    </div>
-
-    <div id="offers-section" class="tab-content active space-y-4">
-        <div class="flex flex-wrap gap-2" id="offers-filters">
-            <button
-                class="filter-tab active px-4 py-1.5 text-xs font-medium rounded-full bg-teal-600 text-white transition-all"
-                data-filter="all">Semua</button>
-            <button
-                class="filter-tab px-4 py-1.5 text-xs font-medium rounded-full bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
-                data-filter="sent">Terkirim</button>
-            <button
-                class="filter-tab px-4 py-1.5 text-xs font-medium rounded-full bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
-                data-filter="accepted">Diterima</button>
-            <button
-                class="filter-tab px-4 py-1.5 text-xs font-medium rounded-full bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
-                data-filter="rejected">Ditolak</button>
+    <div class="bg-white rounded-[24px] border border-slate-200 overflow-hidden animate-fadeUp-2">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse" id="nego-table">
+                <thead>
+                    <tr class="bg-slate-50/50 border-b border-slate-100">
+                        <th class="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">Nego ID</th>
+                        <th class="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">Order Ref</th>
+                        <th class="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">Pengirim</th>
+                        <th class="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">Isi Pesan</th>
+                        <th class="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest">Waktu</th>
+                    </tr>
+                </thead>
+                <tbody id="nego-tbody" class="divide-y divide-slate-50">
+                </tbody>
+            </table>
         </div>
 
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse" id="offers-table">
-                    <thead>
-                        <tr class="bg-gray-50 border-b border-gray-100">
-                            <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase">ID Tawaran</th>
-                            <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase">Klien & Freelancer</th>
-                            <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase">Detail Layanan</th>
-                            <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase">Harga</th>
-                            <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase">Status</th>
-                            <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase text-center">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody id="offers-tbody" class="divide-y divide-gray-50">
-                    </tbody>
-                </table>
+        <div id="nego-pagination"
+            class="flex items-center justify-between px-6 py-4 bg-slate-50 border-t border-slate-100">
+            <div class="text-sm text-slate-600">
+                Menampilkan <span id="nego-showing-start">0</span> sampai <span id="nego-showing-end">0</span> dari
+                <span id="nego-total">0</span> hasil
             </div>
-
-            <div id="offers-pagination"
-                class="flex items-center justify-between px-6 py-4 bg-gray-50 border-t border-gray-100">
-                <div class="text-sm text-gray-600">
-                    Menampilkan <span id="offers-showing-start">0</span> sampai <span id="offers-showing-end">0</span> dari
-                    <span id="offers-total">0</span> hasil
-                </div>
-                <div class="flex gap-2">
-                    <button id="offers-prev-btn"
-                        class="px-3 py-1 text-sm bg-white border border-gray-200 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">Sebelumnya</button>
-                    <button id="offers-next-btn"
-                        class="px-3 py-1 text-sm bg-white border border-gray-200 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">Selanjutnya</button>
-                </div>
-            </div>
-
-            <div id="offers-empty" class="py-20 text-center hidden">
-                <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i class="ri-price-tag-3-line text-3xl text-gray-300"></i>
-                </div>
-                <h3 class="text-gray-700 font-bold text-lg">Tidak ada tawaran</h3>
-                <p class="text-gray-400">Data tawaran akan muncul setelah ada aktivitas transaksi.</p>
+            <div class="flex gap-2">
+                <button id="nego-prev-btn"
+                    class="px-3 py-1 text-sm bg-white border border-slate-200 rounded hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed">Sebelumnya</button>
+                <button id="nego-next-btn"
+                    class="px-3 py-1 text-sm bg-white border border-slate-200 rounded hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed">Selanjutnya</button>
             </div>
         </div>
-    </div>
 
-    <div id="nego-section" class="tab-content space-y-4">
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse" id="nego-table">
-                    <thead>
-                        <tr class="bg-gray-50 border-b border-gray-100">
-                            <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase">Nego ID</th>
-                            <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase">Order Ref</th>
-                            <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase">Pengirim</th>
-                            <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase">Isi Pesan</th>
-                            <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase">Waktu</th>
-                            <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase text-center">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody id="nego-tbody" class="divide-y divide-gray-50">
-                    </tbody>
-                </table>
+        <div id="nego-empty" class="py-20 text-center hidden">
+            <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="ri-discuss-line text-3xl text-slate-300"></i>
             </div>
-
-            <div id="nego-pagination"
-                class="flex items-center justify-between px-6 py-4 bg-gray-50 border-t border-gray-100">
-                <div class="text-sm text-gray-600">
-                    Menampilkan <span id="nego-showing-start">0</span> sampai <span id="nego-showing-end">0</span> dari
-                    <span id="nego-total">0</span> hasil
-                </div>
-                <div class="flex gap-2">
-                    <button id="nego-prev-btn"
-                        class="px-3 py-1 text-sm bg-white border border-gray-200 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">Sebelumnya</button>
-                    <button id="nego-next-btn"
-                        class="px-3 py-1 text-sm bg-white border border-gray-200 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">Selanjutnya</button>
-                </div>
-            </div>
-
-            <div id="nego-empty" class="py-20 text-center hidden">
-                <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i class="ri-discuss-line text-3xl text-gray-300"></i>
-                </div>
-                <h3 class="text-gray-700 font-bold text-lg">Belum ada negosiasi</h3>
-                <p class="text-gray-400">Log percakapan negosiasi belum terekam.</p>
-            </div>
+            <h3 class="text-slate-700 font-bold text-lg">Belum ada negosiasi</h3>
+            <p class="text-slate-400">Log percakapan negosiasi belum terekam.</p>
         </div>
     </div>
 @endsection
 
 @section('modals')
-    <div id="modal-offers-overlay"
-        class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[99] hidden flex items-center justify-center transition-all duration-300">
-        <div id="modal-offers-box"
+    <div id="modal-nego-overlay"
+        class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[99] hidden flex items-center justify-center transition-all duration-300">
+        <div id="modal-nego-box"
             class="bg-white rounded-2xl shadow-2xl max-w-lg w-full mx-4 overflow-hidden transform transition-all">
         </div>
     </div>
@@ -154,33 +71,8 @@
 
 @section('scripts')
     <script>
-        // PERBAIKAN TASK 4: Data dilempar langsung sebagai array JSON murni (mendukung pencarian real-time & multi-tab JS)
-        var offersData = @json($offers);
         var negotiationsData = @json($negotiations);
-
-        window.__OFFERS_PAGE__ = {
-            offers: offersData,
-            negotiations: negotiationsData
-        };
-
-        // Tab Switching Logic (Klik Tap-Tap)
-        document.querySelectorAll('.section-tab').forEach(tab => {
-            tab.addEventListener('click', function () {
-                document.querySelectorAll('.section-tab').forEach(t => {
-                    t.classList.remove('active', 'text-teal-600', 'border-teal-600');
-                    t.classList.add('text-gray-500', 'border-transparent');
-                });
-
-                this.classList.add('active', 'text-teal-600', 'border-teal-600');
-                this.classList.remove('text-gray-500', 'border-transparent');
-
-                const target = this.getAttribute('data-target');
-                document.querySelectorAll('.tab-content').forEach(content => {
-                    content.classList.remove('active');
-                });
-                document.getElementById(target).classList.add('active');
-            });
-        });
+        window.__OFFERS_PAGE__ = { negotiations: negotiationsData };
     </script>
     <script src="{{ asset('js/dashboard/admin/offers.js') }}"></script>
 @endsection

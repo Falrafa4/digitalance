@@ -227,11 +227,6 @@ function renderNego() {
                 </td>
                 <td class="px-6 py-4 text-sm text-gray-600 truncate max-w-[200px]">${n.message || ''}</td>
                 <td class="px-6 py-4 text-sm text-gray-500">${n.created_at ? new Date(n.created_at).toLocaleString('id-ID') : ''}</td>
-                <td class="px-6 py-4 text-center">
-                    <button onclick="openNegoModal('${negoId}')" class="p-2 text-teal-600 hover:bg-teal-50 rounded-lg transition group" aria-label="Lihat Negosiasi">
-                        <i class="ri-eye-line text-lg group-hover:scale-110"></i>
-                    </button>
-                </td>
             </tr>
         `);
     });

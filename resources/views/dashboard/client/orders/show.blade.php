@@ -556,17 +556,6 @@
             </a>
           </div>
         </div>
-
-        <div class="bg-white border border-slate-200 rounded-[18px] p-6">
-          <h3 class="font-display font-extrabold text-slate-900 text-[1rem]">Bantuan</h3>
-          <p class="text-slate-500 text-[12.5px] mt-2 leading-relaxed">
-            Punya kendala dengan pesanan? Silakan hubungi admin via chat bantuan atau buka tiket bantuan.
-          </p>
-          <button
-            class="w-full mt-4 py-2.5 rounded-[12px] bg-slate-50 text-slate-600 font-bold text-[12px] hover:bg-slate-100 transition-all">
-            Buka Tiket
-          </button>
-        </div>
       </aside>
     </div>
   </section>

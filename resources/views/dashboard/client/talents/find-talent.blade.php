@@ -15,16 +15,22 @@
       </a>
     </div>
 
-    @if(empty($freelancers) || count($freelancers) === 0)
+    @php
+      $freelancersWithServices = collect($freelancers)->filter(function ($f) {
+          return $f->services_count > 0;
+      });
+    @endphp
+
+    @if($freelancersWithServices->isEmpty())
       <x-ui.empty-state icon="ri-user-search-line" title="Belum ada freelancer"
-        description="Data freelancer belum tersedia." />
+        description="Data freelancer dengan layanan belum tersedia." />
     @else
       <div data-client-pager data-page-size="9" class="space-y-4">
         <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5" data-pager-list>
-          @foreach($freelancers as $f)
+          @foreach($freelancersWithServices as $f)
             {{-- PERBAIKAN TASK 5: Menambahkan efek hover-highlight border teal dan shadow transisi smooth --}}
             <div data-pager-item
-              class="bg-white border border-slate-200 rounded-[22px] p-6 hover:shadow-xl hover:border-[#0f766e] hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
+               class="bg-white border border-slate-200 rounded-[22px] p-6 hover:shadow-xl hover:border-[#0f766e] hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
               <div class="flex items-start gap-4">
                 <div class="shrink-0">
                   @php
@@ -52,7 +58,7 @@
                 </span>
 
                 <a href="{{ route('client.talents.show', $f->id) }}"
-                  class="px-4 py-2 rounded-xl bg-slate-900 text-white font-bold text-[12.5px] hover:bg-black transition-all shadow-md">
+                   class="px-4 py-2 rounded-xl bg-slate-900 text-white font-bold text-[12.5px] hover:bg-black transition-all shadow-md">
                   Profil Talent
                 </a>
               </div>

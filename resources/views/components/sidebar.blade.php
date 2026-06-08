@@ -130,7 +130,7 @@
                 class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
                                             {{ request()->routeIs('admin.offers.*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}"
                 aria-current="{{ request()->routeIs('admin.offers.*') ? 'page' : '' }}">
-                <i class="ri-price-tag-3-line text-[17px]" aria-hidden="true"></i> Penawaran
+                <i class="ri-price-tag-3-line text-[17px]" aria-hidden="true"></i> Negosiasi
             </a>
 
             <a href="{{ route('admin.results.index') }}"

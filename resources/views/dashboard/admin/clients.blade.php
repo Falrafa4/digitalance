@@ -95,7 +95,7 @@
                             <td class="px-6 py-4">
                                 <div class="flex items-center justify-center gap-2">
                                     <button onclick="window.openUserDetail('{{ $user->role }}', {{ $user->id }})"
-                                        class="w-9 h-9 rounded-xl bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-indigo-500 hover:text-white transition-all"
+                                        class="w-9 h-9 rounded-xl bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-[#0f766e] hover:text-white transition-all"
                                         title="View Detail">
                                         <i class="ri-eye-line"></i>
                                     </button>
@@ -140,8 +140,8 @@
     <!-- Edit User Modal (Dynamic based on role) -->
     <div class="fixed inset-0 z-[100] bg-slate-900/40 backdrop-blur-sm flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300"
         id="modal-user-overlay">
-        <div class="bg-white rounded-[32px] w-full max-w-[620px] shadow-2xl overflow-hidden transform scale-95 transition-all duration-300"
-            id="modal-user-box">
+        <div class="bg-white rounded-\[28px\] w-full max-w-\[680px\] shadow-2xl overflow-hidden transform scale-95 transition-all duration-300"
+        id="modal-user-box">
             <!-- Content filled by JS -->
         </div>
     </div>
@@ -476,7 +476,7 @@
             box.innerHTML = `
                     <div class="relative">
                         <!-- Gradient Header -->
-                        <div class="h-28 bg-gradient-to-r ${gradientClass} flex items-center px-8 relative">
+                        <div class="h-24 bg-gradient-to-r ${gradientClass} flex items-center px-7 relative">
                             <div class="flex-1">
                                 <h2 class="text-white font-black text-xl tracking-tight">${role === 'Client' ? 'Profil Klien' : (role === 'Freelancer' ? 'Profil Freelancer' : 'Profil Siswa SKOMDA')}</h2>
                                 <p class="text-white/70 text-[10px] font-bold uppercase tracking-[0.2em]">ID Pengguna: #UID-${u.id}</p>
@@ -487,9 +487,9 @@
                         </div>
 
                         <!-- Profile Info -->
-                        <div class="px-8 pb-8 -mt-8 relative z-10">
-                            <div class="flex items-end gap-5 mb-8">
-                                <div class="w-24 h-24 rounded-[28px] bg-white p-1.5 shadow-xl">
+                        <div class="px-7 pb-7 -mt-8 relative z-10 max-h-[75vh] overflow-y-auto">
+                            <div class="flex items-end gap-4 mb-6">
+                                <div class="w-20 h-20 rounded-[22px] bg-white p-1 shadow-lg">
                                     ${u.profile_photo || u.avatar ? `
                                         <img
                                             src="{{ asset('storage') }}/${u.profile_photo || u.avatar}"
@@ -510,29 +510,29 @@
                                 </div>
                                 </div>
                                 <div class="pb-2">
-                                    <h3 class="text-[1.5rem] font-black text-slate-900 leading-tight">${u.name}</h3>
+                                    <h3 class="text-[1.2rem] font-black text-slate-900 leading-tight">${u.name}</h3>
                                     <div class="flex items-center gap-2 text-slate-400 font-bold text-[11px] uppercase tracking-widest mt-1">
                                         <i class="ri-calendar-line text-[#0f766e]"></i> Joined ${joinedDate}
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="grid grid-cols-2 gap-4 mb-8">
-                                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 group hover:border-[#0f766e]/30 transition-all">
+                            <div class="grid grid-cols-2 gap-4 mb-6">
+                                <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-100 hover:border-[#0f766e]/30 transition-all">
                                     <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Alamat Email</span>
                                     <span class="text-[13px] font-bold text-slate-700 block truncate">${u.email}</span>
                                 </div>
-                                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 group hover:border-[#0f766e]/30 transition-all">
+                                <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-100 hover:border-[#0f766e]/30 transition-all">
                                     <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Nomor Telepon</span>
                                     <span class="text-[13px] font-bold text-slate-700 block truncate">${u.phone || 'Tidak tersedia'}</span>
                                 </div>
 
                                 ${role === 'Skomda Student' ? `
-                                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 group hover:border-[#0f766e]/30 transition-all">
+                                    <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-100 hover:border-[#0f766e]/30 transition-all">
                                         <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">NIS / ID Siswa</span>
                                         <span class="text-[13px] font-bold text-slate-700 block truncate">${u.nis || '-'}</span>
                                     </div>
-                                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 group hover:border-[#0f766e]/30 transition-all">
+                                    <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-100 hover:border-[#0f766e]/30 transition-all">
                                         <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Kelas & Jurusan</span>
                                         <span class="text-[13px] font-bold text-slate-700 block truncate">${u.class || ''} ${u.major || ''}</span>
                                     </div>
@@ -540,13 +540,13 @@
                             </div>
 
                             ${role === 'Freelancer' && u.bio ? `
-                                <div class="bg-slate-50 p-5 rounded-2xl border border-slate-100 mb-8">
+                                <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 mb-6">
                                     <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2.5">Bio Freelancer</span>
                                     <p class="text-[13px] text-slate-600 leading-relaxed font-medium">${u.bio}</p>
                                 </div>
                             ` : ''}
 
-                            <div class="flex gap-3">
+                            <div class="flex gap-2 pt-2">
                                 <button onclick="window.openPasswordModal('${role}', ${u.id})" class="flex-1 py-3.5 bg-amber-50 text-amber-600 font-bold rounded-xl text-[12px] hover:bg-amber-500 hover:text-white transition-all flex items-center justify-center gap-2">
                                     <i class="ri-lock-password-line"></i> Ubah Kata Sandi
                                 </button>

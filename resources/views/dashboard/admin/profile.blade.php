@@ -148,8 +148,8 @@
                 </div>
 
                 {{-- Danger Zone --}}
-                <div class="bg-white rounded-[18px] border border-red-100 animate-fadeUp-3">
-                    <div class="px-7 py-5 border-b border-red-100">
+                <div class="bg-white rounded-[18px] border border-red-200 animate-fadeUp-3">
+                    <div class="px-7 py-5 border-b border-red-200">
                         <h2 class="font-display font-bold text-[1.05rem] text-red-600">Zona Berbahaya</h2>
                         <p class="text-[12px] text-slate-400 mt-0.5">Aksi berbahaya yang tidak bisa dibatalkan.</p>
                     </div>

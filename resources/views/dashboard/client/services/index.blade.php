@@ -43,16 +43,6 @@
                   Order
                 </a>
               </div>
-
-              <div class="flex items-center justify-between mt-4 pt-4 border-t border-slate-100">
-                <button type="button" data-share-url="{{ route('client.services.show', $s->id) }}"
-                  onclick="navigator.clipboard.writeText(this.dataset.shareUrl); window.showToast('Link copied!', 'success')"
-                  class="text-slate-500 hover:text-slate-900 text-[12.5px] font-bold transition-all">
-                  <i class="ri-share-line mr-1"></i> Share
-                </button>
-
-                <span class="text-slate-400 text-[12px] font-bold">#{{ $s->id }}</span>
-              </div>
             </div>
           @endforeach
         </div>

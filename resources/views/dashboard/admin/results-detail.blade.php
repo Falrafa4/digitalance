@@ -10,8 +10,8 @@
             </a>
         </div>
 
-        <div class="bg-white border border-slate-200 rounded-[32px] overflow-hidden shadow-sm">
-            <div class="p-8 border-b border-slate-100 bg-slate-50/50">
+        <div class="bg-white border border-slate-200 rounded-\[28px\] overflow-hidden shadow-sm max-w-\[680px\] mx-auto">
+            <div class="p-9 border-b border-slate-100 bg-slate-50/50">
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
                     <div class="flex items-center gap-5">
                         <div
@@ -28,8 +28,8 @@
                     <div class="flex items-center gap-3 bg-white p-2 rounded-2xl border border-slate-200">
                         <div class="flex -space-x-2">
                             @php
-                                $clientAvatarUrl = $result->order->client->profile_photo 
-                                    ? asset('storage/' . $result->order->client->profile_photo) 
+                                $clientAvatarUrl = $result->order->client->profile_photo
+                                    ? asset('storage/' . $result->order->client->profile_photo)
                                     : 'https://api.dicebear.com/7.x/initials/svg?seed=' . urlencode($result->order->client->name ?? $result->order->client->email ?? 'User') . '&background=6366f1&color=fff&size=32';
                                 $freelancerAvatarUrl = $result->order->service->freelancer->profile_photo
                                     ? asset('storage/' . $result->order->service->freelancer->profile_photo)
@@ -48,7 +48,7 @@
                 </div>
             </div>
 
-            <div class="p-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="p-9 grid grid-cols-1 lg:grid-cols-3 gap-7">
                 <div class="lg:col-span-2 space-y-8">
                     <section>
                         <h3 class="text-[11px] font-bold text-slate-400 uppercase tracking-[2px] mb-4">Pesan & Catatan
@@ -103,12 +103,7 @@
                         <div class="space-y-4">
                             <div class="flex justify-between items-center text-[13px]">
                                 <span class="text-slate-500 font-medium">Status Pesanan</span>
-                                <span class="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase
-                                        @if($result->order->status == 'Completed') bg-emerald-100 text-emerald-700
-                                        @elseif($result->order->status == 'Revision') bg-amber-100 text-amber-700
-                                        @else bg-blue-100 text-blue-700 @endif">
-                                    {{ $result->order->status }}
-                                </span>
+                                <x-ui.status-badge :status="$result->order->status" />
                             </div>
                             <div class="flex justify-between items-center text-[13px]">
                                 <span class="text-slate-500 font-medium">Harga</span>

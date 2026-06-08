@@ -2,7 +2,7 @@
 @section('title', 'Manajemen Transaksi | Digitalance')
 @section('styles')
     <style>
-        /* Pastikan CSS ini ada jika belum di global css */
+        /* Status pill mengikuti pola warna alert di flash.blade.php */
         .status-pill {
             display: inline-flex;
             align-items: center;
@@ -12,26 +12,31 @@
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.05em;
+            border: 1px solid transparent;
         }
 
         .status-paid {
-            background-color: #dcfce7;
-            color: #166534;
+            background-color: #ecfdf5;
+            color: #065f46;
+            border-color: #a7f3d0;
         }
 
         .status-pending {
-            background-color: #fef3c7;
+            background-color: #fffbeb;
             color: #92400e;
+            border-color: #fde68a;
         }
 
         .status-failed {
-            background-color: #fee2e2;
+            background-color: #fef2f2;
             color: #991b1b;
+            border-color: #fecaca;
         }
 
         .status-refund {
-            background-color: #f1f5f9;
+            background-color: #f8fafc;
             color: #475569;
+            border-color: #e2e8f0;
         }
 
         .type-pill {
@@ -40,8 +45,9 @@
             border-radius: 6px;
             font-size: 10px;
             font-weight: 600;
-            background: #e2e8f0;
+            background: #f1f5f9;
             color: #475569;
+            border: 1px solid #e2e8f0;
         }
 
         .action-btn {

@@ -288,7 +288,7 @@
                     message: 'Layanan ini ditolak dan dikembalikan ke freelancer.',
                     icon: 'ri-close-circle-line',
                 })}
-                                    <div class="mt-4 rounded-xl border border-rose-100 bg-white/80 px-4 py-3 mb-6">
+                                    <div class="mt-4 rounded-xl border border-rose-200 bg-white/80 px-4 py-3 mb-6">
                                         <p class="text-[10px] font-black text-rose-500 uppercase tracking-wider mb-2">Alasan Penolakan</p>
                                         <p class="text-[13px] text-slate-700 font-medium leading-relaxed">${escapeHtml(s.reject_reason || 'Tidak ada alasan.')}</p>
                                     </div>

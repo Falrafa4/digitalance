@@ -228,7 +228,7 @@
                 <div class="space-y-4">
                     @if (($openDisputes ?? 0) > 0)
                         <div
-                            class="bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-100 p-5 rounded-2xl shadow-sm animate-pulse-slow">
+                            class="bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200 p-5 rounded-2xl shadow-sm animate-pulse-slow">
                             <div class="flex items-center gap-3 mb-3">
                                 <div
                                     class="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center text-amber-600">

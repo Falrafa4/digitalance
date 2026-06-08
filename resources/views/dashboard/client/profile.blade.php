@@ -84,12 +84,27 @@
                                 </div>
                             </div>
 
-                            <div class="flex justify-end">
-                                <button type="submit"
-                                    class="inline-flex items-center gap-2 px-[22px] py-[11px] bg-[#0f766e] text-white font-display font-bold text-[13px] rounded-[12px] shadow-teal-md hover:bg-[#0a5e58] hover:shadow-teal-lg transition-all duration-200 hover:-translate-y-0.5 cursor-pointer border-none">
-                                    <i class="ri-save-line"></i> Simpan Perubahan
-                                </button>
-                            </div>
+                             <!-- Bio -->
+                             <div class="mb-6">
+                                 <label class="block text-sm font-semibold text-slate-700 mb-2">
+                                     Bio
+                                 </label>
+                                 <textarea name="bio" rows="3"
+                                     class="w-full px-4 py-3 border border-slate-200 rounded-lg font-sans text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0f766e] focus:border-transparent resize-none {{ $errors->has('bio') ? 'border-red-300 bg-red-50' : '' }}">{{ old('bio', $user->bio) }}</textarea>
+                                 @if ($errors->has('bio'))
+                                     <p class="mt-2 text-sm text-red-600">
+                                         <i class="ri-error-warning-line mr-1"></i>
+                                         {{ $errors->first('bio') }}
+                                     </p>
+                                 @endif
+                             </div>
+
+                             <div class="flex justify-end">
+                                 <button type="submit"
+                                     class="inline-flex items-center gap-2 px-[22px] py-[11px] bg-[#0f766e] text-white font-display font-bold text-[13px] rounded-[12px] shadow-teal-md hover:bg-[#0a5e58] hover:shadow-teal-lg transition-all duration-200 hover:-translate-y-0.5 cursor-pointer border-none">
+                                     <i class="ri-save-line"></i> Simpan Perubahan
+                                 </button>
+                             </div>
                         </form>
                     </div>
                 </div>

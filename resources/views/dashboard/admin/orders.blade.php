@@ -33,21 +33,21 @@
     <div class="flex items-center justify-between gap-4 mb-8 flex-wrap animate-fadeUp-2">
         <div class="flex gap-2 flex-wrap">
             <a href="{{ route('admin.orders.index') }}"
-                class="px-[18px] py-2 rounded-full border-[1.5px] font-bold text-[12.5px] transition-all {{ !request('status') ? 'border-[#0f766e] bg-[#0f766e] text-white shadow-teal-sm' : 'border-slate-200 bg-white text-slate-500' }}">
+                class="px-[18px] py-2 rounded-full border-[1.5px] font-bold text-[12.5px] transition-all {{ !request('status') ? 'border-[#0f766e] bg-[#0f766e] text-white shadow-teal-sm' : 'border-slate-200 bg-white text-slate-500 hover:border-[#0f766e]' }}">
                 Semua
             </a>
             @foreach(['Pending', 'Paid', 'In Progress', 'Completed', 'Cancelled'] as $status)
                 <a href="{{ route('admin.orders.index', ['status' => $status]) }}"
-                    class="px-[18px] py-2 rounded-full border-[1.5px] font-bold text-[12.5px] transition-all {{ request('status') == $status ? 'border-[#0f766e] bg-[#0f766e] text-white shadow-teal-sm' : 'border-slate-200 bg-white text-slate-500' }}">
+                    class="px-[18px] py-2 rounded-full border-[1.5px] font-bold text-[12.5px] transition-all {{ request('status') == $status ? 'border-[#0f766e] bg-[#0f766e] text-white shadow-teal-sm' : 'border-slate-200 bg-white text-slate-500 hover:border-[#0f766e]' }}">
                     {{ $status }}
                 </a>
             @endforeach
             <a href="{{ route('admin.orders.index', array_filter(['payout' => 'paid', 'status' => request('status')])) }}"
-                class="px-[18px] py-2 rounded-full border-[1.5px] font-bold text-[12.5px] transition-all {{ request('payout') === 'paid' ? 'border-emerald-600 bg-emerald-600 text-white shadow-teal-sm' : 'border-slate-200 bg-white text-slate-500' }}">
+                class="px-[18px] py-2 rounded-full border-[1.5px] font-bold text-[12.5px] transition-all {{ request('payout') === 'paid' ? 'border-emerald-600 bg-emerald-600 text-white shadow-teal-sm' : 'border-slate-200 bg-white text-slate-500 hover:border-[#0f766e]' }}">
                 Sudah Ditransfer
             </a>
             <a href="{{ route('admin.orders.index', array_filter(['payout' => 'pending', 'status' => request('status')])) }}"
-                class="px-[18px] py-2 rounded-full border-[1.5px] font-bold text-[12.5px] transition-all {{ request('payout') === 'pending' ? 'border-amber-500 bg-amber-500 text-white shadow-teal-sm' : 'border-slate-200 bg-white text-slate-500' }}">
+                class="px-[18px] py-2 rounded-full border-[1.5px] font-bold text-[12.5px] transition-all {{ request('payout') === 'pending' ? 'border-amber-500 bg-amber-500 text-white shadow-teal-sm' : 'border-slate-200 bg-white text-slate-500 hover:border-[#0f766e]' }}">
                 Belum Ditransfer
             </a>
         </div>

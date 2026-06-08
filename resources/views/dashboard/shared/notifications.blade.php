@@ -20,10 +20,20 @@
                     Semua notifikasi yang pernah kamu terima. Gunakan filter atau pencarian untuk menemukan pesan tertentu.
                 </p>
             </div>
-            <a href="{{ url('/') }}"
-                class="px-3 py-2 rounded-lg border border-slate-200 bg-white text-[12px] font-bold text-slate-600 hover:bg-slate-50 transition-all">
-                <i class="ri-arrow-left-line mr-1"></i> Kembali
-            </a>
+            <a href="
+    @if(auth()->user() instanceof \App\Models\Administrator)
+        {{ route('admin.dashboard') }}
+    @elseif(auth()->user() instanceof \App\Models\Client)
+        {{ route('client.dashboard') }}
+    @elseif(auth()->user() instanceof \App\Models\Freelancer)
+        {{ route('freelancer.dashboard') }}
+    @else
+        {{ route('login') }}
+    @endif
+"
+class="px-3 py-2 rounded-lg border border-slate-200 bg-white text-[12px] font-bold text-slate-600 hover:bg-slate-50 transition-all">
+    <i class="ri-arrow-left-line mr-1"></i> Kembali
+</a>
         </div>
 
         {{-- Stat ringkas --}}
