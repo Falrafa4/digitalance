@@ -112,6 +112,13 @@
                 <i class="ri-tools-line text-[17px]" aria-hidden="true"></i> Layanan
             </a>
 
+            <a href="{{ route('admin.loker.index') }}"
+                class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
+                                            {{ request()->routeIs('admin.loker.*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}"
+                aria-current="{{ request()->routeIs('admin.loker.*') ? 'page' : '' }}">
+                <i class="ri-briefcase-2-line text-[17px]" aria-hidden="true"></i> Lowongan
+            </a>
+
             <a href="{{ route('admin.transactions.index') }}"
                 class="flex items-center gap-[11px] px-[14px] py-[11px] rounded-[11px] font-semibold text-[13.5px] transition-all duration-200
                                             {{ request()->routeIs('admin.transactions.*') ? 'bg-[#0f766e] text-white shadow-teal-md' : 'text-slate-500 hover:bg-slate-100 hover:text-[#0f766e]' }}"
