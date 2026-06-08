@@ -245,9 +245,18 @@ class OrderController extends Controller
     {
         $freelancer = $request->user('freelancer');
 
-        $orders = Order::with(['service.freelancer.skomda_student', 'client', 'offers'])
-            ->whereHas('service', function ($query) use ($freelancer) {
-                $query->where('freelancer_id', $freelancer->id);
+        $orders = Order::with([
+            'service.freelancer.skomda_student',
+            'client',
+            'offers',
+            'lokerApplication.loker',
+            'lokerApplication.freelancer.skomda_student',
+        ])
+            ->where(function ($query) use ($freelancer) {
+                $query->where('freelancer_id', $freelancer->id)
+                    ->orWhereHas('service', function ($serviceQuery) use ($freelancer) {
+                        $serviceQuery->where('freelancer_id', $freelancer->id);
+                    });
             })
             ->latest()
             ->get();
