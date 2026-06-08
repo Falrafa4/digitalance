@@ -23,25 +23,22 @@
         @endphp
 
         @if($pendingOrder)
-            <div
-                class="mb-8 p-4.5 rounded-[22px] bg-indigo-50 border border-indigo-100 flex flex-col sm:flex-row items-center justify-between gap-4 animate-fadeUp shadow-sm">
-                <div class="flex items-center gap-4">
-                    <div
-                        class="w-12 h-12 rounded-2xl bg-indigo-600 text-white flex items-center justify-center shadow-lg shadow-indigo-200">
-                        <i class="ri-notification-3-line text-xl"></i>
-                    </div>
-                    <div>
-                        <h4 class="text-indigo-950 font-extrabold text-[15px]">Ada pesanan baru menunggu respons kamu!</h4>
-                        <p class="text-indigo-700/70 text-[13px] font-medium mt-0.5">Segera respon untuk menjaga performa dan
-                            kepercayaan klien.</p>
-                    </div>
-                </div>
-                <a href="{{ route('freelancer.orders.show', $pendingOrder['id']) }}"
-                    class="w-full sm:w-auto px-6 py-3 bg-indigo-600 text-white rounded-xl font-bold text-[13px] hover:bg-indigo-700 transition-all shadow-md shadow-indigo-100 text-center">
-                    Detail Order <i class="ri-arrow-right-line ml-1.5"></i>
-                </a>
+    <div class="mb-8 p-4 sm:p-5 rounded-[22px] bg-teal-50/60 border border-teal-100 flex flex-col sm:flex-row items-center justify-between gap-4 animate-fadeUp shadow-sm">
+        <div class="flex items-center gap-4 w-full sm:w-auto">
+            <div class="w-12 h-12 shrink-0 rounded-2xl bg-teal-600 text-white flex items-center justify-center shadow-lg shadow-teal-100">
+                <i class="ri-notification-3-line text-xl"></i>
             </div>
-        @endif
+            <div>
+                <h4 class="text-slate-800 font-extrabold text-[15px] leading-snug">Ada pesanan baru menunggu respons kamu!</h4>
+                <p class="text-slate-600/80 text-[13px] font-medium mt-1">Segera respon untuk menjaga performa dan kepercayaan klien.</p>
+            </div>
+        </div>
+        <a href="{{ route('freelancer.orders.show', $pendingOrder['id']) }}"
+            class="w-full sm:w-auto px-6 py-3.5 bg-[#0f766e] text-white rounded-xl font-bold text-[13px] hover:bg-[#0a5e58] transition-all shadow-md shadow-teal-100 text-center shrink-0">
+            Detail Order <i class="ri-arrow-right-line ml-1.5"></i>
+        </a>
+    </div>
+@endif
 
         {{-- STAT CARDS --}}
         <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 mb-10 animate-fadeUp-delay-1"

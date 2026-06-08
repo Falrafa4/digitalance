@@ -41,7 +41,7 @@
                 </form>
                 <form action="{{ route('freelancer.negotiations.accept', $negotiation->id) }}" method="POST" class="flex-1">
                     @csrf
-                    <button type="submit" onclick="return confirm('Terima negosiasi ini?')" class="w-full py-3.5 rounded-[14px] bg-emerald-500 text-white font-bold text-[14px] hover:bg-emerald-600 transition-all flex items-center justify-center gap-2">
+                    <button type="submit" onclick="return confirm('Terima negosiasi ini?')" class="w-full py-3.5 rounded-[14px] bg-[#0f766e] text-white font-bold text-[14px] hover:bg-[#0a5e58] transition-all flex items-center justify-center gap-2">
                         <i class="ri-check-circle-line"></i>
                         Terima
                     </button>

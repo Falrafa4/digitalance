@@ -160,7 +160,7 @@
                             class="ri-folder-image-line text-[50px] text-slate-100/50 -rotate-12 translate-x-4 -translate-y-4"></i>
                     </div>
                     <div
-                        class="w-11 h-11 rounded-xl bg-indigo-50 text-indigo-500 flex items-center justify-center text-[22px] shrink-0 group-hover:scale-110 transition-transform">
+                        class="w-11 h-11 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center text-[22px] shrink-0 group-hover:scale-110 transition-transform">
                         <i class="ri-folder-image-line"></i>
                     </div>
                     <div>

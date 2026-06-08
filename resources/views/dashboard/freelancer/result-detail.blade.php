@@ -31,13 +31,13 @@
         @endphp
 
         @if($isLatestResult && in_array($result->order->status, ['In Progress', 'Revision']))
-        <div class="mb-6 p-4 rounded-xl bg-blue-50 border border-blue-100 flex items-start gap-3">
-            <div class="w-8 h-8 rounded-lg bg-blue-500 text-white flex items-center justify-center flex-shrink-0 text-sm">
+        <div class="mb-6 p-4 rounded-xl bg-teal-50 border border-teal-100 flex items-start gap-3">
+            <div class="w-8 h-8 rounded-lg bg-[#0f766e] text-white flex items-center justify-center flex-shrink-0 text-sm">
                 <i class="ri-information-line"></i>
             </div>
             <div>
-                <p class="font-bold text-blue-800 text-sm">Menunggu Respon Klien</p>
-                <p class="text-blue-700 text-xs mt-0.5">Hasil ini masih menunggu klien untuk menerima atau meminta revisi.</p>
+                <p class="font-bold text-teal-800 text-sm">Menunggu Respon Klien</p>
+                <p class="text-teal-700 text-xs mt-0.5">Hasil ini masih menunggu klien untuk menerima atau meminta revisi.</p>
             </div>
         </div>
         @elseif($result->order->status == 'Completed')
@@ -72,9 +72,9 @@
         <div class="mb-8">
             <h3 class="font-bold text-slate-900 mb-3 text-[15px]">File / Attachment</h3>
             @if($result->file_url)
-                <div class="flex items-center justify-between p-4 bg-blue-50 border border-blue-100 rounded-[16px]">
+                <div class="flex items-center justify-between p-4 bg-teal-50 border border-teal-100 rounded-[16px]">
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center text-xl">
+                        <div class="w-10 h-10 rounded-lg bg-teal-100 text-[#0f766e] flex items-center justify-center text-xl">
                             <i class="{{ $result->fileIcon() }}"></i>
                         </div>
                         <div>
@@ -82,7 +82,7 @@
                             <p class="text-[11px] text-slate-500">{{ $result->isExternalLink() ? 'Link eksternal' : 'File tersimpan' }}</p>
                         </div>
                     </div>
-                    <a href="{{ $result->downloadUrl() }}" target="_blank" rel="noopener noreferrer" class="px-4 py-2 bg-white text-blue-600 border border-blue-200 rounded-lg font-bold text-[12px] hover:bg-blue-600 hover:text-white transition-all shadow-sm">
+                    <a href="{{ $result->downloadUrl() }}" target="_blank" rel="noopener noreferrer" class="px-4 py-2 bg-white text-[#0f766e] border border-teal-200 rounded-lg font-bold text-[12px] hover:bg-[#0f766e] hover:text-white transition-all shadow-sm">
                         {{ $result->fileActionLabel() }}
                     </a>
                 </div>

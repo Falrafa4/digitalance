@@ -38,7 +38,7 @@
 
                     <div class="flex items-center gap-3 pt-4 border-t border-slate-100 mt-auto">
                         @if($res->file_url)
-                            <a href="{{ $res->downloadUrl() }}" target="_blank" rel="noopener noreferrer" class="flex-1 py-2.5 rounded-xl border border-blue-200 bg-blue-50 text-blue-700 font-bold text-[12.5px] text-center hover:bg-blue-100 transition-colors">
+                            <a href="{{ $res->downloadUrl() }}" target="_blank" rel="noopener noreferrer" class="flex-1 py-2.5 rounded-xl border border-teal-200 bg-teal-50 text-[#0f766e] font-bold text-[12.5px] text-center hover:bg-teal-100 transition-colors">
                                 <i class="{{ $res->fileIcon() }} mr-1"></i> {{ $res->fileActionLabel() }}
                             </a>
                         @else
