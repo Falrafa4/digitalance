@@ -5,12 +5,19 @@ namespace Tests\Feature;
 use App\Models\Administrator;
 use App\Models\Client;
 use App\Models\Freelancer;
+use App\Models\Loker;
+use App\Models\LokerApplication;
+use App\Models\Negotiation;
 use App\Models\Offer;
 use App\Models\Order;
+use App\Models\Result;
+use App\Models\Review;
 use App\Models\Service;
 use App\Models\ServiceCategory;
 use App\Models\SkomdaStudent;
+use App\Models\Transaction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
@@ -169,6 +176,442 @@ class RestApiCanonicalRoutesTest extends TestCase
             ->assertForbidden();
     }
 
+    public function test_client_can_create_price_negotiation_on_canonical_route(): void
+    {
+        Event::fake();
+        [, $client, , $order] = $this->makeOrderFixture();
+
+        Sanctum::actingAs($client);
+
+        $this->postJson('/api/v1/negotiations', [
+            'order_id' => $order->id,
+            'reason' => 'Budget perlu disesuaikan.',
+            'new_price' => 1250000,
+            'description' => 'Scope tetap sama, hanya penyesuaian harga.',
+        ])
+            ->assertCreated()
+            ->assertJsonPath('data.sender', 'client')
+            ->assertJsonPath('data.status', 'Pending')
+            ->assertJsonPath('data.reason', 'Budget perlu disesuaikan.');
+
+        $this->assertDatabaseHas('negotiations', [
+            'order_id' => $order->id,
+            'sender' => 'client',
+            'proposed_price' => 1250000,
+            'status' => 'Pending',
+        ]);
+
+        $this->assertDatabaseHas('orders', [
+            'id' => $order->id,
+            'status' => 'Negotiated',
+            'agreed_price' => 1250000,
+        ]);
+    }
+
+    public function test_freelancer_can_accept_negotiation_on_canonical_route(): void
+    {
+        [, , $freelancer, $order] = $this->makeOrderFixture();
+        $negotiation = $this->makeNegotiation($order);
+
+        Sanctum::actingAs($freelancer);
+
+        $this->postJson('/api/v1/negotiations/'.$negotiation->id.'/accept')
+            ->assertOk()
+            ->assertJsonPath('data.status', 'Accepted');
+
+        $this->assertDatabaseHas('negotiations', [
+            'id' => $negotiation->id,
+            'status' => 'Accepted',
+        ]);
+    }
+
+    public function test_freelancer_cannot_view_negotiation_owned_by_another_freelancer(): void
+    {
+        [, , , $order] = $this->makeOrderFixture();
+        $negotiation = $this->makeNegotiation($order);
+        $otherFreelancer = $this->makeFreelancer('other-negotiation-freelancer@example.com');
+
+        Sanctum::actingAs($otherFreelancer);
+
+        $this->getJson('/api/v1/negotiations/'.$negotiation->id)
+            ->assertForbidden();
+    }
+
+    public function test_freelancer_can_create_result_link_on_canonical_route(): void
+    {
+        [, , $freelancer, $order] = $this->makeOrderFixture();
+
+        Sanctum::actingAs($freelancer);
+
+        $this->postJson('/api/v1/results', [
+            'order_id' => $order->id,
+            'result_mode' => 'link',
+            'result_link' => 'https://files.digitalance.test/result.zip',
+            'note' => 'Final delivery via API.',
+            'version' => 'v1.0',
+        ])
+            ->assertCreated()
+            ->assertJsonPath('data.order_id', $order->id)
+            ->assertJsonPath('data.result_mode', 'link')
+            ->assertJsonPath('data.version', 'v1.0');
+
+        $this->assertDatabaseHas('results', [
+            'order_id' => $order->id,
+            'file_url' => 'https://files.digitalance.test/result.zip',
+            'result_mode' => 'link',
+            'version' => 'v1.0',
+        ]);
+
+        $this->assertDatabaseHas('orders', [
+            'id' => $order->id,
+            'status' => 'In Progress',
+        ]);
+    }
+
+    public function test_client_can_view_result_owned_by_their_order(): void
+    {
+        [, $client, , $order] = $this->makeOrderFixture();
+        $result = $this->makeResult($order);
+
+        Sanctum::actingAs($client);
+
+        $this->getJson('/api/v1/results/'.$result->id)
+            ->assertOk()
+            ->assertJsonPath('data.id', $result->id)
+            ->assertJsonPath('data.order.client.id', $client->id);
+    }
+
+    public function test_freelancer_cannot_view_result_owned_by_another_freelancer(): void
+    {
+        [, , , $order] = $this->makeOrderFixture();
+        $result = $this->makeResult($order);
+        $otherFreelancer = $this->makeFreelancer('other-result-freelancer@example.com');
+
+        Sanctum::actingAs($otherFreelancer);
+
+        $this->getJson('/api/v1/results/'.$result->id)
+            ->assertForbidden();
+    }
+
+    public function test_admin_can_update_result_with_put_on_canonical_route(): void
+    {
+        [$admin, , , $order] = $this->makeOrderFixture();
+        $result = $this->makeResult($order);
+
+        Sanctum::actingAs($admin);
+
+        $this->putJson('/api/v1/results/'.$result->id, [
+            'note' => 'Catatan hasil diperbarui oleh admin.',
+            'version' => 'v1.1',
+        ])
+            ->assertOk()
+            ->assertJsonPath('data.note', 'Catatan hasil diperbarui oleh admin.')
+            ->assertJsonPath('data.version', 'v1.1');
+
+        $this->assertDatabaseHas('results', [
+            'id' => $result->id,
+            'note' => 'Catatan hasil diperbarui oleh admin.',
+            'version' => 'v1.1',
+        ]);
+    }
+
+    public function test_admin_can_delete_result_on_canonical_route(): void
+    {
+        [$admin, , , $order] = $this->makeOrderFixture();
+        $result = $this->makeResult($order);
+
+        Sanctum::actingAs($admin);
+
+        $this->deleteJson('/api/v1/results/'.$result->id)
+            ->assertOk();
+
+        $this->assertDatabaseMissing('results', [
+            'id' => $result->id,
+        ]);
+    }
+
+    public function test_client_can_create_review_on_canonical_route(): void
+    {
+        [, $client, , $order] = $this->makeOrderFixture();
+        $order->update(['status' => 'Completed']);
+
+        Sanctum::actingAs($client);
+
+        $this->postJson('/api/v1/reviews', [
+            'order_id' => $order->id,
+            'rating' => 5,
+            'comment' => 'Hasil sangat rapi dan komunikatif.',
+        ])
+            ->assertCreated()
+            ->assertJsonPath('data.order_id', $order->id)
+            ->assertJsonPath('data.rating', 5);
+
+        $this->assertDatabaseHas('reviews', [
+            'order_id' => $order->id,
+            'rating' => 5,
+        ]);
+    }
+
+    public function test_client_can_view_review_owned_by_their_order(): void
+    {
+        [, $client, , $order] = $this->makeOrderFixture();
+        $review = $this->makeReview($order);
+
+        Sanctum::actingAs($client);
+
+        $this->getJson('/api/v1/reviews/'.$review->id)
+            ->assertOk()
+            ->assertJsonPath('data.id', $review->id)
+            ->assertJsonPath('data.order.client.id', $client->id);
+    }
+
+    public function test_other_client_cannot_view_review_owned_by_different_order(): void
+    {
+        [, , , $order] = $this->makeOrderFixture();
+        $review = $this->makeReview($order);
+
+        $otherClient = Client::create([
+            'name' => 'Other Client',
+            'email' => 'other-client-review@example.com',
+            'phone' => '081333333333',
+            'password' => Hash::make('password'),
+            'profile_photo' => 'profiles/placeholder.webp',
+        ]);
+
+        Sanctum::actingAs($otherClient);
+
+        $this->getJson('/api/v1/reviews/'.$review->id)
+            ->assertForbidden();
+    }
+
+    public function test_admin_can_update_review_with_put_on_canonical_route(): void
+    {
+        [$admin, , , $order] = $this->makeOrderFixture();
+        $review = $this->makeReview($order);
+
+        Sanctum::actingAs($admin);
+
+        $this->putJson('/api/v1/reviews/'.$review->id, [
+            'rating' => 4,
+            'comment' => 'Review diperbarui oleh admin.',
+        ])
+            ->assertOk()
+            ->assertJsonPath('data.rating', 4)
+            ->assertJsonPath('data.comment', 'Review diperbarui oleh admin.');
+
+        $this->assertDatabaseHas('reviews', [
+            'id' => $review->id,
+            'rating' => 4,
+            'comment' => 'Review diperbarui oleh admin.',
+        ]);
+    }
+
+    public function test_owner_client_can_delete_review_on_canonical_route(): void
+    {
+        [, $client, , $order] = $this->makeOrderFixture();
+        $review = $this->makeReview($order);
+
+        Sanctum::actingAs($client);
+
+        $this->deleteJson('/api/v1/reviews/'.$review->id)
+            ->assertOk();
+
+        $this->assertDatabaseMissing('reviews', [
+            'id' => $review->id,
+        ]);
+    }
+
+    public function test_admin_can_create_transaction_on_canonical_route(): void
+    {
+        [$admin, , , $order] = $this->makeOrderFixture();
+
+        Sanctum::actingAs($admin);
+
+        $this->postJson('/api/v1/transactions', [
+            'order_id' => $order->id,
+            'amount' => 1500000,
+            'type' => 'Full',
+            'status' => 'Paid',
+        ])
+            ->assertCreated()
+            ->assertJsonPath('data.order_id', $order->id)
+            ->assertJsonPath('data.amount', 1500000)
+            ->assertJsonPath('data.type', 'Full')
+            ->assertJsonPath('data.status', 'Paid');
+
+        $this->assertDatabaseHas('transactions', [
+            'order_id' => $order->id,
+            'type' => 'Full',
+            'status' => 'Paid',
+        ]);
+    }
+
+    public function test_client_can_view_transaction_owned_by_their_order(): void
+    {
+        [, $client, , $order] = $this->makeOrderFixture();
+        $transaction = $this->makeTransaction($order);
+
+        Sanctum::actingAs($client);
+
+        $this->getJson('/api/v1/transactions/'.$transaction->id)
+            ->assertOk()
+            ->assertJsonPath('data.id', $transaction->id)
+            ->assertJsonPath('data.order.client.id', $client->id);
+    }
+
+    public function test_other_freelancer_cannot_view_transaction_owned_by_different_order(): void
+    {
+        [, , , $order] = $this->makeOrderFixture();
+        $transaction = $this->makeTransaction($order);
+        $otherFreelancer = $this->makeFreelancer('other-transaction-freelancer@example.com');
+
+        Sanctum::actingAs($otherFreelancer);
+
+        $this->getJson('/api/v1/transactions/'.$transaction->id)
+            ->assertForbidden();
+    }
+
+    public function test_admin_can_update_transaction_with_put_on_canonical_route(): void
+    {
+        [$admin, , , $order] = $this->makeOrderFixture();
+        $transaction = $this->makeTransaction($order);
+
+        Sanctum::actingAs($admin);
+
+        $this->putJson('/api/v1/transactions/'.$transaction->id, [
+            'amount' => 1750000,
+            'type' => 'Refund',
+            'status' => 'Failed',
+        ])
+            ->assertOk()
+            ->assertJsonPath('data.amount', 1750000)
+            ->assertJsonPath('data.type', 'Refund')
+            ->assertJsonPath('data.status', 'Failed');
+
+        $this->assertDatabaseHas('transactions', [
+            'id' => $transaction->id,
+            'amount' => 1750000,
+            'type' => 'Refund',
+            'status' => 'Failed',
+        ]);
+    }
+
+    public function test_admin_can_delete_transaction_on_canonical_route(): void
+    {
+        [$admin, , , $order] = $this->makeOrderFixture();
+        $transaction = $this->makeTransaction($order);
+
+        Sanctum::actingAs($admin);
+
+        $this->deleteJson('/api/v1/transactions/'.$transaction->id)
+            ->assertOk();
+
+        $this->assertDatabaseMissing('transactions', [
+            'id' => $transaction->id,
+        ]);
+    }
+
+    public function test_client_can_create_loker_on_canonical_route(): void
+    {
+        [, $client, , , $service] = $this->makeOrderFixture();
+
+        Sanctum::actingAs($client);
+
+        $this->postJson('/api/v1/lokers', [
+            'title' => 'Butuh UI Designer Landing Page',
+            'description' => 'Mencari freelancer untuk desain landing page campaign sekolah selama dua minggu.',
+            'category_id' => $service->category_id,
+            'budget_min' => 500000,
+            'budget_max' => 1000000,
+            'deadline' => now()->addDays(7)->toDateString(),
+        ])
+            ->assertCreated()
+            ->assertJsonPath('data.title', 'Butuh UI Designer Landing Page')
+            ->assertJsonPath('data.status', 'Open')
+            ->assertJsonPath('data.client.id', $client->id);
+
+        $this->assertDatabaseHas('lokkers', [
+            'client_id' => $client->id,
+            'title' => 'Butuh UI Designer Landing Page',
+            'status' => 'Open',
+        ]);
+    }
+
+    public function test_freelancer_can_apply_to_open_loker_on_canonical_route(): void
+    {
+        [, $client, $freelancer, , $service] = $this->makeOrderFixture();
+        $loker = $this->makeLoker($client, $service->category_id);
+
+        Sanctum::actingAs($freelancer);
+
+        $this->postJson('/api/v1/lokers/'.$loker->id.'/applications', [
+            'proposal' => 'Saya siap membantu mengerjakan loker ini dengan alur revisi yang terstruktur dan komunikasi rutin.',
+            'proposed_price' => 850000,
+        ])
+            ->assertCreated()
+            ->assertJsonPath('data.loker_id', $loker->id)
+            ->assertJsonPath('data.freelancer_id', $freelancer->id)
+            ->assertJsonPath('data.status', 'Pending');
+
+        $this->assertDatabaseHas('loker_applications', [
+            'loker_id' => $loker->id,
+            'freelancer_id' => $freelancer->id,
+            'status' => 'Pending',
+        ]);
+    }
+
+    public function test_client_can_approve_loker_application_and_create_order(): void
+    {
+        [, $client, $freelancer, , $service] = $this->makeOrderFixture();
+        $loker = $this->makeLoker($client, $service->category_id);
+        $application = $this->makeLokerApplication($loker, $freelancer);
+
+        Sanctum::actingAs($client);
+
+        $this->postJson('/api/v1/loker-applications/'.$application->id.'/approve')
+            ->assertOk()
+            ->assertJsonPath('data.application.status', 'Approved')
+            ->assertJsonPath('data.order.freelancer_id', $freelancer->id)
+            ->assertJsonPath('data.order.loker_application_id', $application->id);
+
+        $this->assertDatabaseHas('loker_applications', [
+            'id' => $application->id,
+            'status' => 'Approved',
+        ]);
+
+        $this->assertDatabaseHas('lokkers', [
+            'id' => $loker->id,
+            'status' => 'Closed',
+        ]);
+
+        $this->assertDatabaseHas('orders', [
+            'client_id' => $client->id,
+            'freelancer_id' => $freelancer->id,
+            'loker_application_id' => $application->id,
+            'status' => 'Pending',
+        ]);
+    }
+
+    public function test_other_client_cannot_approve_loker_application_owned_by_different_client(): void
+    {
+        [, $client, $freelancer, , $service] = $this->makeOrderFixture();
+        $loker = $this->makeLoker($client, $service->category_id);
+        $application = $this->makeLokerApplication($loker, $freelancer);
+
+        $otherClient = Client::create([
+            'name' => 'Other Loker Client',
+            'email' => 'other-loker-client@example.com',
+            'phone' => '081444444444',
+            'password' => Hash::make('password'),
+            'profile_photo' => 'profiles/placeholder.webp',
+        ]);
+
+        Sanctum::actingAs($otherClient);
+
+        $this->postJson('/api/v1/loker-applications/'.$application->id.'/approve')
+            ->assertForbidden();
+    }
+
     private function makeOrderFixture(): array
     {
         $admin = Administrator::create([
@@ -246,6 +689,74 @@ class RestApiCanonicalRoutesTest extends TestCase
             'offered_price' => 1500000,
             'deadline' => now()->addDays(7)->toDateString(),
             'status' => 'Sent',
+        ]);
+    }
+
+    private function makeNegotiation(Order $order): Negotiation
+    {
+        return Negotiation::create([
+            'order_id' => $order->id,
+            'sender' => 'client',
+            'message' => 'Negosiasi harga: Budget perlu disesuaikan.',
+            'proposed_price' => 1250000,
+            'reason' => 'Budget perlu disesuaikan.',
+            'description' => 'Scope tetap sama.',
+            'status' => 'Pending',
+        ]);
+    }
+
+    private function makeResult(Order $order): Result
+    {
+        return Result::create([
+            'order_id' => $order->id,
+            'file_url' => 'https://files.digitalance.test/result.zip',
+            'result_mode' => 'link',
+            'note' => 'Result untuk test API.',
+            'version' => 'v1.0',
+        ]);
+    }
+
+    private function makeReview(Order $order): Review
+    {
+        return Review::create([
+            'order_id' => $order->id,
+            'rating' => 5,
+            'comment' => 'Review untuk test API.',
+        ]);
+    }
+
+    private function makeTransaction(Order $order): Transaction
+    {
+        return Transaction::create([
+            'order_id' => $order->id,
+            'amount' => 1500000,
+            'type' => 'Full',
+            'status' => 'Paid',
+        ]);
+    }
+
+    private function makeLoker(Client $client, ?int $categoryId = null): Loker
+    {
+        return Loker::create([
+            'client_id' => $client->id,
+            'category_id' => $categoryId,
+            'title' => 'Butuh Desainer Poster Event',
+            'description' => 'Membutuhkan freelancer untuk mendesain poster event sekolah dengan revisi maksimal dua kali.',
+            'budget_min' => 400000,
+            'budget_max' => 900000,
+            'deadline' => now()->addDays(5)->toDateString(),
+            'status' => 'Open',
+        ]);
+    }
+
+    private function makeLokerApplication(Loker $loker, Freelancer $freelancer): LokerApplication
+    {
+        return LokerApplication::create([
+            'loker_id' => $loker->id,
+            'freelancer_id' => $freelancer->id,
+            'proposal' => 'Saya siap mengerjakan kebutuhan desain ini dengan timeline yang jelas dan revisi terkontrol.',
+            'proposed_price' => 750000,
+            'status' => 'Pending',
         ]);
     }
 }
