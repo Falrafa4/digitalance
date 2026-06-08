@@ -17,7 +17,7 @@
                     <i class="ri-verified-badge-line text-xl"></i>
                 </div>
                 <div>
-                    <h4 class="text-emerald-950 font-extrabold text-[14.5px]">Akun Terverifikasi & Jalur Karir Terkunci</h4>
+                    <h4 class="text-emerald-950 font-extrabold text-[14.5px]">Jalur Karier Disetujui</h4>
                     <p class="text-emerald-700/80 text-[13px] font-medium mt-0.5">Spesialisasi Anda saat ini adalah: <strong class="text-emerald-950">{{ $freelancer->career_track }}</strong>.</p>
                 </div>
             </div>
@@ -27,7 +27,7 @@
                     <i class="ri-time-line text-xl"></i>
                 </div>
                 <div>
-                    <h4 class="text-amber-950 font-extrabold text-[14.5px]">Menunggu Verifikasi Admin</h4>
+                    <h4 class="text-amber-950 font-extrabold text-[14.5px]">Menunggu Review Admin</h4>
                     <p class="text-amber-700/80 text-[13px] font-medium mt-0.5">Pengajuan spesialisasi jalur karir (<strong class="text-amber-950">{{ $freelancer->career_track }}</strong>) sedang ditinjau oleh administrator.</p>
                 </div>
             </div>
@@ -37,7 +37,7 @@
                     <i class="ri-error-warning-line text-xl"></i>
                 </div>
                 <div class="flex-1">
-                    <h4 class="text-red-950 font-extrabold text-[14.5px]">Verifikasi Ditolak / Dibatalkan</h4>
+                    <h4 class="text-red-950 font-extrabold text-[14.5px]">Pengajuan Jalur Karier Ditolak</h4>
                     <p class="text-red-700/80 text-[13px] font-medium mt-0.5">Alasan: <span class="italic font-bold">{{ $freelancer->reject_reason ?? 'Tidak ada alasan spesifik.' }}</span></p>
                     <p class="text-red-700/80 text-[12px] font-medium mt-1">Silakan isi form di bawah untuk mengajukan ulang pemetaan karir Anda.</p>
                 </div>
@@ -48,8 +48,8 @@
                     <i class="ri-information-line text-xl"></i>
                 </div>
                 <div>
-                    <h4 class="text-teal-950 font-extrabold text-[14.5px]">Langkah Wajib: Ajukan Verifikasi Akun</h4>
-                    <p class="text-teal-700/80 text-[13px] font-medium mt-0.5">Agar dapat menerima order dan tampil di pencarian klien, Anda wajib menyetujui pemetaan karir dan mengajukan verifikasi ke admin.</p>
+                    <h4 class="text-teal-950 font-extrabold text-[14.5px]">Langkah Wajib: Ajukan Jalur Karier</h4>
+                    <p class="text-teal-700/80 text-[13px] font-medium mt-0.5">Agar dapat menerima order dan tampil di pencarian klien, Anda perlu memilih jalur karier dan mengajukannya untuk direview oleh admin.</p>
                 </div>
             </div>
         @endif
@@ -240,9 +240,9 @@
                         <i class="ri-shield-user-line text-3xl"></i>
                     </div>
                     <div>
-                        <h3 class="text-xl font-black text-slate-900">Ajukan Aktivasi & Verifikasi Akun</h3>
+                        <h3 class="text-xl font-black text-slate-900">Ajukan Jalur Karier</h3>
                         <p class="text-slate-500 text-sm mt-1.5 leading-relaxed">
-                            Dengan mengajukan jalur karir <strong class="text-slate-900">"{{ $careerMap['career_track'] }}"</strong> ini, profil dan portfolio Anda akan dikirim ke admin untuk direview dan diverifikasi sebagai freelancer resmi Digitalance.
+                            Dengan mengajukan jalur karir <strong class="text-slate-900">"{{ $careerMap['career_track'] }}"</strong> ini, profil dan portofolio Anda akan direview oleh tim Digitalance untuk menentukan kelayakan dan kecocokan Anda pada jalur karier tersebut.
                         </p>
                     </div>
 
@@ -260,7 +260,7 @@
 
                         <button type="submit" id="submit-verification-btn" disabled 
                                 class="w-full max-w-sm py-3 rounded-xl bg-slate-400 text-white font-extrabold text-[13.5px] cursor-not-allowed transition-all shadow-md">
-                            Kirim Pengajuan Verifikasi ke Admin
+                            Kirim Pengajuan ke Admin
                         </button>
                     </form>
 
