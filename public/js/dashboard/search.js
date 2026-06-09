@@ -49,7 +49,8 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         const q = this.value.trim();
         if (q) {
-            window.location.href = `/admin/search?q=${encodeURIComponent(q)}`;
+            var segment = window.location.pathname.split('/')[1] || 'admin';
+            window.location.href = '/' + segment + '/search?q=' + encodeURIComponent(q);
         }
     }
   });

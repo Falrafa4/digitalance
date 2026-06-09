@@ -576,9 +576,15 @@ class DashboardController extends Controller
                     return $item;
                 });
 
-            // Search Services
-            $services = Service::where('title', 'like', $fuzzy)
-                ->orWhere('description', 'like', $fuzzy)
+            // Search Services (hanya yang Approved & dari freelancer aktif)
+            $services = Service::where('status', 'Approved')
+                ->whereHas('freelancer', function ($q) {
+                    $q->where('status', 'Approved');
+                })
+                ->where(function ($query) use ($fuzzy) {
+                    $query->where('title', 'like', $fuzzy)
+                        ->orWhere('description', 'like', $fuzzy);
+                })
                 ->get()->map(function ($item) {
                     $item->search_type = 'Service';
                     $item->search_url = route('client.services.show', $item->id);

@@ -141,7 +141,7 @@
                             Email: {{ $item->email }} <br />
                             NIS: {{ $item->nis }}
                         @elseif($item->search_type === 'Service')
-                            Harga: Rp{{ number_format($item->price ?? 0, 0, ',', '.') }}<br />
+                            Harga: Rp{{ number_format(($item->price_min ?? $item->price_max ?? 0), 0, ',', '.') }}<br />
                             Kategori: {{ $item->service_category->name ?? '-' }}
                         @elseif($item->search_type === 'Category')
                             Jumlah Layanan: {{ $item->services_count ?? 0 }}

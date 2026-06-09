@@ -126,8 +126,8 @@
                             Kelola Pesanan Ini
                         </a>
                         <form action="{{ route('admin.results.destroy', $result->id) }}" method="POST"
-                            onsubmit="return confirm('Hapus hasil ini? Tindakan ini permanen.')">
-                            @csrf @method('DELETE')
+                                onsubmit="return window.handleDeleteConfirmation(event, 'Hapus hasil ini? Tindakan ini permanen.')">
+                                @csrf @method('DELETE')
                             <button type="submit"
                                 class="w-full py-3 bg-red-50 text-red-500 font-bold rounded-2xl text-[12px] hover:bg-red-500 hover:text-white transition-all">
                                 Hapus Hasil
@@ -138,4 +138,16 @@
             </div>
         </div>
     </div>
+@endsection
+
+@section('scripts')
+    <script>
+        window.handleDeleteConfirmation = async function(e, message) {
+            if (window.customConfirm) {
+                const confirmed = await window.customConfirm(message);
+                return confirmed;
+            }
+            return confirm(message);
+        };
+    </script>
 @endsection

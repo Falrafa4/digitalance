@@ -59,7 +59,7 @@
                             </a>
                             @if($offer->status === 'Sent')
                                 <form action="{{ route('client.offers.accept', $offer->id) }}" method="POST" class="flex-1"
-                                    onsubmit="return confirm('Terima penawaran ini?')">
+                                    onsubmit="return window.handleAcceptConfirmation(event)">
                                     @csrf
                                     <button type="submit"
                                         class="w-full py-2.5 rounded-[10px] bg-[#0f766e] text-white font-bold text-[12.5px] hover:bg-[#0d6b63] transition-all">
@@ -73,4 +73,17 @@
             </div>
         @endif
     </div>
+    </div>
+@endsection
+
+@section('scripts')
+    <script>
+        window.handleAcceptConfirmation = async function(e) {
+            if (window.customConfirm) {
+                const confirmed = await window.customConfirm('Terima penawaran ini?');
+                return confirmed;
+            }
+            return confirm('Terima penawaran ini?');
+        };
+    </script>
 @endsection

@@ -34,7 +34,7 @@
             <div class="flex gap-4">
                 <form action="{{ route('freelancer.negotiations.reject', $negotiation->id) }}" method="POST" class="flex-1">
                     @csrf
-                    <button type="submit" onclick="return confirm('Tolak negosiasi ini?')" class="w-full py-3.5 rounded-[14px] bg-white border border-red-200 text-red-600 font-bold text-[14px] hover:bg-red-50 transition-all flex items-center justify-center gap-2">
+                    <button type="submit" onclick="return window.handleNegotiationReject(event)" class="w-full py-3.5 rounded-[14px] bg-white border border-red-200 text-red-600 font-bold text-[14px] hover:bg-red-50 transition-all flex items-center justify-center gap-2">
                         <i class="ri-close-circle-line"></i>
                         Tolak
                     </button>

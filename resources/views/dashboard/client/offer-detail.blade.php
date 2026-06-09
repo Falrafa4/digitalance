@@ -65,9 +65,9 @@
                             <i class="ri-chat-history-line"></i>
                             Ajukan Negosiasi
                         </button>
-                        <form action="{{ route('client.offers.accept', $offer->id) }}" method="POST" class="flex-1">
-                            @csrf
-                            <button type="submit" onclick="return confirm('Terima penawaran ini?')"
+<form action="{{ route('client.offers.accept', $offer->id) }}" method="POST" class="flex-1">
+                             @csrf
+                             <button type="submit" onclick="return window.handleAcceptConfirmation(event)"
                                 class="w-full py-3.5 rounded-[14px] bg-[#0f766e] text-white font-bold text-[14px] shadow-teal-sm hover:bg-[#0a5e58] hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2">
                                 <i class="ri-check-line"></i>
                                 Terima Penawaran
@@ -142,7 +142,19 @@
                         </div>
                     </div>
                 </div>
-            @endif
-        </div>
-    </div>
+@endif
+         </div>
+     </div>
+
+    @section('scripts')
+        <script>
+            window.handleAcceptConfirmation = async function(e) {
+                if (window.customConfirm) {
+                    const confirmed = await window.customConfirm('Terima penawaran ini?');
+                    return confirmed;
+                }
+                return confirm('Terima penawaran ini?');
+            };
+        </script>
+    @endsection
 @endsection
