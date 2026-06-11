@@ -280,6 +280,41 @@ class RestApiCanonicalRoutesTest extends TestCase
         ]);
     }
 
+    public function test_client_can_upload_order_attachment_without_file(): void
+    {
+        Storage::fake('public');
+        [, $client, , $order] = $this->makeOrderFixture();
+
+        Sanctum::actingAs($client);
+
+        $this->postJson('/api/v1/orders/'.$order->id.'/attachments', [])
+            ->assertOk()
+            ->assertJsonPath('success', true)
+            ->assertJsonCount(0, 'data.attachments')
+            ->assertJsonPath('data.order.id', $order->id);
+
+        $this->assertDatabaseCount('order_attachments', 0);
+    }
+
+    public function test_client_cannot_upload_invalid_order_attachment_file_type(): void
+    {
+        Storage::fake('public');
+        [, $client, , $order] = $this->makeOrderFixture();
+
+        Sanctum::actingAs($client);
+
+        $this->postJson('/api/v1/orders/'.$order->id.'/attachments', [
+            'file' => [
+                UploadedFile::fake()->create('brief.txt', 10, 'text/plain'),
+            ],
+        ])
+            ->assertUnprocessable()
+            ->assertJsonPath('success', false)
+            ->assertJsonValidationErrors(['file.0']);
+
+        $this->assertDatabaseCount('order_attachments', 0);
+    }
+
     public function test_admin_can_manage_service_category_on_canonical_route(): void
     {
         $admin = Administrator::create([

@@ -17,8 +17,8 @@ class OrderAttachmentStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'file' => ['required', 'array', 'max:10'],
-            'file.*' => ['file', 'max:51200'],
+            'file' => ['nullable', 'array', 'max:10'],
+            'file.*' => ['file', 'max:51200', 'mimes:pdf,jpg,jpeg,png,webp', 'mimetypes:application/pdf,image/jpeg,image/png,image/webp'],
         ];
     }
 }

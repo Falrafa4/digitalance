@@ -6,6 +6,9 @@ use App\View\Composers\NotificationComposer;
 use Dedoc\Scramble\Scramble;
 use Dedoc\Scramble\Support\Generator\OpenApi;
 use Dedoc\Scramble\Support\Generator\SecurityScheme;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
@@ -32,5 +35,12 @@ class AppServiceProvider extends ServiceProvider
                     SecurityScheme::http('bearer')
                 );
             });
+
+        RateLimiter::for('api', function (Request $request) {
+            return [
+                Limit::perMinute(30)->by('user:' . ($request->user()?->id ?? 'guest')),
+                Limit::perMinute(10)->by('ip:' . $request->ip()),
+            ];
+        });
     }
 }

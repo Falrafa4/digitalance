@@ -202,8 +202,8 @@ class OrderController extends Controller
         abort_unless($order->client_id === $client->id, 403);
 
         $request->validate([
-            'file' => 'required|array|max:10',
-            'file.*' => 'file|max:51200',
+            'file' => 'nullable|array|max:10',
+            'file.*' => 'file|max:51200|mimes:pdf,jpg,jpeg,png,webp|mimetypes:application/pdf,image/jpeg,image/png,image/webp',
         ]);
 
         $this->storeUploadedAttachments($order, $request->file('file') ?? [], 'client');
