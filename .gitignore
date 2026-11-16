@@ -28,3 +28,5 @@ database/seeders/data/*.xlsx
 .codex/
 .agents/
 AUDIT_REPORT.md
+/bootstrap/cache/*
+!/bootstrap/cache/.gitignore
