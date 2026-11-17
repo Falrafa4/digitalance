@@ -14,7 +14,7 @@
                     </div>
                     <h1
                         class="font-display text-[clamp(2rem,4vw,3.6rem)] font-extrabold leading-[1.1] tracking-tight text-slate-900 max-w-3xl">
-                        Temukan layanan <span class="gradient-text">SKOMDA</span> yang paling sesuai.
+                        Temukan layanan <span class="gradient-text">Siswa SMK Surabaya</span> yang paling sesuai.
                     </h1>
                     <p class="text-slate-500 text-lg leading-relaxed max-w-2xl mt-4">
                         Telusuri layanan yang sudah dipublish freelancer, difilter berdasarkan kategori, dan cari lewat kata

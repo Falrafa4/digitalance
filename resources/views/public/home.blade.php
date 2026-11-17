@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Digitalance - Platform Freelance SKOMDA')
+@section('title', 'Digitalance - Platform Freelance Siswa SMK Surabaya')
 
 @section('content')
     <!-- HERO -->
@@ -15,19 +15,19 @@
                         <path
                             d="M12 21.75c-4.694 0-8.5-3.51-8.5-7.75 0-.5 4.203-1.273 9.663-1.273 5.46 0 9.663.773 9.663 1.273 0 4.24-3.806 7.75-8.5 7.75z" />
                     </svg>
-                    <span class="truncate">Platform Freelance Terbaik untuk Siswa SMK Telkom Sidoarjo</span>
+                    <span class="truncate">Platform Freelance Terverifikasi Siswa SMK Surabaya</span>
                 </div>
 
                 <h1
                     class="hero-anim font-display text-[clamp(2rem,5vw,3.8rem)] font-extrabold leading-[1.13] tracking-tight text-slate-900">
                     Digitalance:
-                    <span class="gradient-text">Expert SKOMDA</span><br />
+                    <span class="gradient-text">Talenta SMK Surabaya</span><br />
                     <span id="typingTarget" class="typing-cursor">Freelance Solutions</span>
                 </h1>
 
                 <p class="hero-anim text-base sm:text-lg text-slate-500 leading-relaxed max-w-xl">
-                    Menghubungkan industri kreatif dengan talenta muda
-                    terbaik dari SKOMDA. Karya berkualitas, harga
+                    Menghubungkan UMKM dan industri kreatif dengan talenta muda
+                    terbaik siswa SMK di Surabaya. Karya berkualitas, harga
                     terjangkau, dedikasi tanpa batas.
                 </p>
 
@@ -184,11 +184,11 @@
                         Mengapa Digitalance
                     </div>
                     <h2 class="font-display text-[clamp(1.6rem,4vw,2.5rem)] font-extrabold leading-snug mb-4">
-                        Platform Freelance<br /><span class="gradient-text">Khusus SKOMDA</span>
+                        Platform Freelance<br /><span class="gradient-text">Khusus Siswa SMK Surabaya</span>
                     </h2>
                     <p class="text-sm sm:text-base lg:text-lg text-slate-500 leading-relaxed mb-8">
-                        Kami memahami kebutuhan unik siswa/i SKOMDA dan
-                        industri yang mencari talenta muda berbakat.
+                        Kami memahami potensi besar 59.000+ siswa SMK di Surabaya dan
+                        kebutuhan 106.000+ UMKM yang mencari solusi kreatif berkualitas.
                     </p>
 
                     <div class="flex flex-col gap-3">
@@ -203,7 +203,7 @@
                                         <polyline points="22 4 12 14.01 9 11.01" />
                                     </svg>
                                 </div>
-                                <span class="flex-1 font-bold text-sm sm:text-[1.02rem]">Siswa SKOMDA Terverifikasi</span>
+                                <span class="flex-1 font-bold text-sm sm:text-[1.02rem]">Siswa SMK Terverifikasi</span>
                                 <svg class="accordion-chevron w-5 h-5 text-slate-400 shrink-0" viewBox="0 0 24 24"
                                     fill="none" stroke="currentColor" stroke-width="2">
                                     <polyline points="6 9 12 15 18 9" />
@@ -211,9 +211,9 @@
                             </div>
                             <div class="accordion-content pl-12 sm:pl-14 text-slate-500 font-medium leading-relaxed text-xs sm:text-sm">
                                 Semua freelancer terverifikasi sebagai
-                                siswa/i aktif SKOMDA dengan portfolio yang
-                                telah divalidasi. Jaminan kualitas dari
-                                institusi terpercaya.
+                                siswa/i aktif SMK di Surabaya dengan portofolio yang
+                                telah divalidasi oleh sekolah atau guru pembimbing. Jaminan kualitas karya
+                                dari talenta muda berdaya saing.
                             </div>
                         </div>
                         
@@ -259,7 +259,7 @@
                             <div class="accordion-content pl-12 sm:pl-14 text-slate-500 font-medium leading-relaxed text-xs sm:text-sm">
                                 Tim support siap membantu 24/7. Plus
                                 mentoring untuk freelancer pemula dari
-                                senior SKOMDA yang berpengalaman.
+                                mentor dan komunitas vokasi yang berpengalaman.
                             </div>
                         </div>
                     </div>
@@ -395,8 +395,8 @@
                             Tinjau Proposal
                         </h3>
                         <p class="text-white/65 leading-relaxed text-xs sm:text-sm">
-                            Terima proposal dari freelancer SKOMDA
-                            berbakat. Tinjau portofolio dan pilih yang
+                            Terima proposal dari talenta siswa SMK berbakat
+                            di Surabaya. Tinjau portofolio dan pilih yang
                             terbaik.
                         </p>
                     </div>
@@ -613,9 +613,9 @@
                             </svg>
                         </div>
                         <div class="faq-answer px-4 sm:px-5 text-slate-500 font-medium leading-relaxed text-xs sm:text-sm">
-                            Hanya siswa/i aktif SKOMDA yang terverifikasi.
-                            Kamu perlu mengunggah ID siswa dan portofolio untuk
-                            persetujuan.
+                            Hanya siswa/i aktif SMK di Surabaya yang terverifikasi.
+                            Pendaftaran divalidasi menggunakan identitas siswa/sekolah dan kurasi
+                            portofolio untuk persetujuan.
                         </div>
                     </div>
                     
@@ -736,8 +736,8 @@
                         Siap Memulai Perjalanan Freelance?<br /><span class="text-white/80">Gabung Sekarang!</span>
                     </h2>
                     <p class="text-sm sm:text-base lg:text-lg text-white/80 font-medium leading-relaxed max-w-2xl mx-auto mb-8 sm:mb-10">
-                        Bergabunglah dengan ratusan siswa/i SKOMDA yang sudah sukses
-                        mendapatkan proyek dan penghasilan dari
+                        Bergabunglah bersama talenta siswa SMK di Surabaya yang sudah sukses
+                        mendapatkan proyek nyata dan penghasilan dari
                         Digitalance.
                     </p>
                     

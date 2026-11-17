@@ -9,7 +9,7 @@
         <div>
             <h1 class="font-display text-[2.1rem] font-extrabold text-slate-900">Manajemen Pengguna</h1>
             <p class="text-slate-500 text-[0.95rem] mt-1">Kelola seluruh pengguna platform: Client, Freelancer, dan Siswa
-                Skomda.</p>
+                SMK.</p>
         </div>
         <div class="flex items-center gap-3">
             <div class="bg-white px-5 py-3 rounded-2xl border border-slate-100 flex items-center gap-3 shadow-sm">
@@ -45,7 +45,7 @@
             </a>
             <a href="{{ route('admin.clients.index', ['role' => 'Skomda Student']) }}"
                 class="px-[18px] py-2 rounded-full border-[1.5px] font-bold text-[12.5px] transition-all {{ $role === 'Skomda Student' ? 'border-[#0f766e] bg-[#0f766e] text-white shadow-teal-sm' : 'border-slate-200 bg-white text-slate-500 hover:border-[#0f766e]' }}">
-                Siswa Skomda
+                Siswa SMK
             </a>
         </div>
 
@@ -181,7 +181,7 @@
                         <button type="button" onclick="window.setAddRole('Freelancer')" id="role-btn-Freelancer"
                             class="role-selector py-3 rounded-2xl border-2 border-slate-100 font-black text-[11px] uppercase tracking-wider text-slate-400 hover:border-[#0f766e] hover:text-[#0f766e] transition-all">Freelancer</button>
                         <button type="button" onclick="window.setAddRole('Skomda Student')" id="role-btn-Student"
-                            class="role-selector py-3 rounded-2xl border-2 border-slate-100 font-black text-[11px] uppercase tracking-wider text-slate-400 hover:border-[#0f766e] hover:text-[#0f766e] transition-all">Siswa</button>
+                            class="role-selector py-3 rounded-2xl border-2 border-slate-100 font-black text-[11px] uppercase tracking-wider text-slate-400 hover:border-[#0f766e] hover:text-[#0f766e] transition-all">Siswa SMK</button>
                     </div>
                 </div>
 
@@ -306,10 +306,10 @@
                                             class="flex-1 px-4 py-2.5 bg-white border border-slate-200 rounded-l-xl outline-none focus:border-[#0f766e] transition-all font-bold text-slate-700"
                                             placeholder="username" oninput="updateStudentEmail()">
                                         <span
-                                            class="px-4 py-2.5 bg-teal-100 text-[#0f766e] font-bold text-[11px] whitespace-nowrap border-l border-teal-200">@student.smktelkom-sda.sch.id</span>
+                                            class="px-4 py-2.5 bg-teal-100 text-[#0f766e] font-bold text-[11px] whitespace-nowrap border-l border-teal-200">@student.smk.sch.id</span>
                                     </div>
                                     <p class="text-[9px] text-slate-400 mt-1.5">Email otomatis:
-                                        @student.smktelkom-sda.sch.id</p>
+                                        @student.smk.sch.id</p>
                                     <input type="hidden" name="email" id="input-email-full">
                                 </div>
                             </div>
@@ -387,7 +387,7 @@
                                     <div>
                                         <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Nama</label>
                                         <input type="text" value="${u.name || ''}" class="w-full px-4 py-2.5 bg-slate-100 border border-slate-200 rounded-xl font-bold text-slate-500" disabled>
-                                        <p class="text-[9px] text-slate-400 mt-1">Nama diatur oleh data siswa SKOMDA</p>
+                                        <p class="text-[9px] text-slate-400 mt-1">Nama diatur oleh data siswa SMK</p>
                                     </div>
                                     <div class="md:col-start-1 md:col-span-2">
                                         <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Bio</label>
@@ -478,7 +478,7 @@
                         <!-- Gradient Header -->
                         <div class="h-24 bg-gradient-to-r ${gradientClass} flex items-center px-7 relative">
                             <div class="flex-1">
-                                <h2 class="text-white font-black text-xl tracking-tight">${role === 'Client' ? 'Profil Klien' : (role === 'Freelancer' ? 'Profil Freelancer' : 'Profil Siswa SKOMDA')}</h2>
+                                <h2 class="text-white font-black text-xl tracking-tight">${role === 'Client' ? 'Profil Klien' : (role === 'Freelancer' ? 'Profil Freelancer' : 'Profil Siswa SMK')}</h2>
                                 <p class="text-white/70 text-[10px] font-bold uppercase tracking-[0.2em]">ID Pengguna: #UID-${u.id}</p>
                             </div>
                             <button onclick="window.closeUserModal()" class="w-10 h-10 bg-white/20 text-white rounded-full flex items-center justify-center hover:bg-white/30 transition">
@@ -776,7 +776,7 @@
             const prefix = document.getElementById('input-email-prefix')?.value || '';
             const emailFull = document.getElementById('input-email-full');
             if (emailFull) {
-                emailFull.value = prefix + '@student.smktelkom-sda.sch.id';
+                emailFull.value = prefix + '@student.smk.sch.id';
             }
         };
 

@@ -542,7 +542,7 @@
             '<img src="' + avatarUrl + '" class="w-12 h-12 rounded-xl shadow-sm border" />' +
             '<div>' +
             '<h3 class="text-[1.3rem] font-black text-slate-900 leading-tight">' + escapeHtml(v.skomda_student?.name || 'Tidak tersedia') + '</h3>' +
-            '<p class="text-xs font-semibold text-slate-400 uppercase mt-0.5">' + escapeHtml(v.skomda_student?.major || 'Siswa Skomda') + '</p>' +
+            '<p class="text-xs font-semibold text-slate-400 uppercase mt-0.5">' + escapeHtml(v.skomda_student?.major || 'Siswa SMK') + '</p>' +
             '</div>' +
             '</div>' +
             '</div>' +

@@ -193,7 +193,7 @@
                                         <span
                                             class="font-bold text-[14px] text-slate-900 user-name block truncate">{{ $v->skomda_student->name ?? 'Freelancer' }}</span>
                                         <p class="text-[11px] text-slate-400 font-medium uppercase tracking-tight">
-                                            {{ $v->skomda_student->major ?? 'Siswa Skomda' }}
+                                            {{ $v->skomda_student->major ?? 'Siswa SMK' }}
                                         </p>
                                     </div>
                                 </div>

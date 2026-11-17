@@ -43,7 +43,7 @@
                 <div class="min-w-0 flex-1">
                   <p class="font-black text-slate-900 text-base truncate">{{ optional($f->skomda_student)->name ?? 'Freelancer' }}</p>
                   <p class="text-slate-400 text-[11px] font-bold uppercase tracking-tight mt-0.5">
-                    {{ optional($f->skomda_student)->major ?? 'Siswa SKOMDA' }}</p>
+                    {{ optional($f->skomda_student)->major ?? 'Siswa SMK' }}</p>
                   <p class="text-slate-500 text-[13px] mt-3 line-clamp-2 leading-relaxed font-medium">
                     {{ $f->bio ?? 'Belum ada bio.' }}</p>
                 </div>

@@ -9,11 +9,11 @@
              class="h-14 w-auto">
                 </div>
                 <p class="text-slate-500 italic font-medium leading-relaxed">
-                    Platform freelance eksklusif untuk siswa/i SKOMDA. Menghubungkan talenta dengan peluang.
+                    Platform freelance terpercaya untuk siswa/i SMK di Surabaya. Menghubungkan talenta muda vokasi dengan peluang industri dan UMKM.
                 </p>
                 <div class="flex items-center gap-3 mt-1">
                     <!-- Email -->
-                    <a href="mailto:digitalance@skomda.ac.id"
+                    <a href="mailto:contact@digitalance.my.id"
                         class="bg-white text-slate-500 hover:text-primary border border-slate-200 rounded-full w-11 h-11 flex items-center justify-center transition-colors"
                         aria-label="Email">
                         <!-- Icon Email -->
@@ -138,15 +138,14 @@
                     berikut:
                 </p>
                 <ul class="list-decimal pl-5">
-                    <li>Hanya siswa/i SKOMDA yang boleh mendaftar sebagai freelancer di marketplace ini.</li>
+                    <li>Hanya siswa/i SMK aktif di Surabaya yang terverifikasi yang boleh mendaftar sebagai freelancer di marketplace ini.</li>
                     <li>Setiap pengguna wajib mengisi data akurat dan bertanggung jawab atas data pribadi serta hasil
                         karyanya.</li>
                     <li>Transaksi dilakukan secara aman di dalam platform, admin Digitalance bertindak sebagai perantara
                         jika terjadi sengketa transaksi.</li>
                     <li>Dilarang melakukan aktivitas curang, membagikan kontak pribadi sebelum deal, atau
                         memperjualbelikan akun.</li>
-                    <li>Konten portofolio, deskripsi jasa, dan komunikasi wajib mengikuti norma, hukum, dan etika SKOMDA
-                        & Indonesia.</li>
+                    <li>Konten portofolio, deskripsi jasa, dan komunikasi wajib mengikuti norma, hukum, dan etika pendidikan vokasi di Indonesia.</li>
                     <li>Pelaku pelanggaran dapat dikenai sanksi mulai dari teguran hingga penghapusan akun secara
                         permanen tanpa pengembalian saldo.</li>
                 </ul>

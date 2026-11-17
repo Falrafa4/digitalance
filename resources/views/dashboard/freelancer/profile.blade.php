@@ -124,7 +124,7 @@
                                 <label class="text-[11px] font-bold text-slate-500 uppercase tracking-[.1em]">Nama Lengkap</label>
                                 <input type="text" value="{{ $user->name }}" disabled
                                     class="py-[10px] px-[13px] bg-slate-100 text-slate-500 border-[1.5px] border-slate-200 rounded-[11px] text-[13.5px] outline-none cursor-not-allowed" />
-                                <p class="text-[10px] text-slate-400 mt-0.5">Nama didapatkan dari data Skomda.</p>
+                                <p class="text-[10px] text-slate-400 mt-0.5">Nama didapatkan dari data induk siswa SMK.</p>
                             </div>
                             <div class="flex flex-col gap-1.5">
                                 <label class="text-[11px] font-bold text-slate-500 uppercase tracking-[.1em]">Email</label>
@@ -230,7 +230,7 @@
             {{-- Delete Account --}}
             <div class="bg-white rounded-[18px] border border-red-100 p-5">
                 <h3 class="font-display font-bold text-red-600 mb-2">Hapus Akun Freelancer</h3>
-                <p class="text-sm text-slate-500 mb-4">Menghapus akun akan mengembalikan data SkomdaStudent apabila email sekolah terdeteksi.</p>
+                <p class="text-sm text-slate-500 mb-4">Menghapus akun akan mengatur ulang status pendaftaran siswa apabila email sekolah terdeteksi.</p>
                 <form action="{{ route('freelancer.delete') }}" method="POST" onsubmit="event.preventDefault(); customConfirm('Yakin ingin menghapus akun? Semua data terkait akan dihapus.').then(res => { if(res) this.submit(); });">
                     @csrf
                     <div class="mb-3">

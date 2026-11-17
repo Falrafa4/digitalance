@@ -37,7 +37,7 @@
                             Selamat Datang di Digitalance!
                         </span>
                         <h2 class="font-display text-xl md:text-2xl font-extrabold tracking-tight mb-3 leading-snug" id="overlayTitle">
-                            Eksplorasi Talent Terbaik Skomda di Sini.
+                            Eksplorasi Talenta Terbaik Siswa SMK Surabaya di Sini.
                         </h2>
                         <p class="text-white/70 text-xs leading-relaxed" id="overlayDesc">
                             Temukan freelancer siswa berkompeten untuk menyelesaikan projek digital Anda dengan kualitas profesional.
@@ -174,10 +174,10 @@
                                 </div>
                             </div>
 
-                            <!-- INPUT BIDANG KHUSUS UNTUK FREELANCER (SISWA SKOMDA) -->
+                            <!-- INPUT BIDANG KHUSUS UNTUK FREELANCER (SISWA SMK) -->
                             <div id="freelancerFields" class="space-y-3 hidden">
                                 <div>
-                                    <label class="block text-[11px] font-semibold text-slate-700 mb-1">Data Siswa Skomda</label>
+                                    <label class="block text-[11px] font-semibold text-slate-700 mb-1">Data Induk Siswa SMK</label>
                                     <div class="relative">
                                         <button type="button" id="studentSelectBtn" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-left text-xs text-slate-400 flex justify-between items-center focus:outline-none focus:ring-2 focus:ring-slate-950">
                                             <span id="selectedStudentLabel">-- Cari nama atau NISN Anda --</span>
@@ -325,7 +325,7 @@
             
             <div class="space-y-4">
                 <p class="text-xs text-slate-600 leading-relaxed">
-                    Untuk alasan keamanan data siswa Skomda, pemulihan akun serta perubahan kata sandi wajib diproses secara langsung oleh administrator sistem.
+                    Untuk alasan keamanan data siswa SMK, pemulihan akun serta perubahan kata sandi wajib diproses secara langsung oleh administrator sistem.
                 </p>
                 <!-- KOTAK INFORMASI DENGAN IKON PROPORSIONAL (REVISI DESIGN OVERFLOW) -->
                 <div class="p-4 bg-slate-50 rounded-xl border border-slate-100 flex items-start gap-3">
@@ -337,7 +337,7 @@
                     </div>
                     <div class="text-[11px] text-slate-600 leading-relaxed">
                         <strong class="text-slate-900 block mb-1">Langkah Pemulihan:</strong>
-                        Hubungi Unit IT Skomda atau Admin Digitalance melalui tautan WhatsApp untuk verifikasi NISN atau data identitas Anda.
+                        Hubungi Admin Digitalance melalui tautan WhatsApp untuk verifikasi NISN atau data identitas Anda.
                     </div>
                 </div>
             </div>

@@ -7,7 +7,7 @@
         $displayName = $student->name ?? $freelancer->name ?? 'Freelancer';
         $displayEmail = $student->email ?? '-';
         $displayPhone = $student->phone ?? '-';
-        $displayMajor = $student->major ?? 'Siswa SKOMDA';
+        $displayMajor = $student->major ?? 'Siswa SMK';
         $displayClass = $student->class ?? '-';
         $displayNis = $student->nis ?? '-';
         $avatarUrl = $freelancer->profile_photo 

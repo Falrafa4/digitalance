@@ -10,7 +10,7 @@
     $statusLabel = $statusKey === '' || $statusKey === '-' ? 'Tidak Diketahui' : \Illuminate\Support\Str::headline($status);
 
     if (in_array($statusKey, ['skomda student', 'skomda'], true)) {
-        $statusLabel = 'Skomda Students';
+        $statusLabel = 'Siswa SMK';
     }
 
     $map = [

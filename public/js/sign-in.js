@@ -144,7 +144,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Swap Dynamic Overlay Texts
         if (overlayTitle) overlayTitle.textContent = "Mulai Langkah Profesionalmu Di Sini.";
-        if (overlayDesc) overlayDesc.textContent = "Bergabunglah bersama ribuan ekosistem digital Skomda untuk menciptakan projek besar bersama.";
+        if (overlayDesc) overlayDesc.textContent = "Bergabunglah bersama ekosistem talenta siswa SMK di Surabaya untuk menciptakan projek nyata bersama.";
         
         if (heroImg1 && heroImg2) {
             heroImg1.classList.remove("active");
@@ -169,7 +169,7 @@ document.addEventListener("DOMContentLoaded", () => {
         loginPanel.classList.add("active");
 
         // Swap Dynamic Overlay Texts
-        if (overlayTitle) overlayTitle.textContent = "Eksplorasi Talent Terbaik Skomda di Sini.";
+        if (overlayTitle) overlayTitle.textContent = "Eksplorasi Talenta Terbaik Siswa SMK Surabaya di Sini.";
         if (overlayDesc) overlayDesc.textContent = "Temukan freelancer siswa berkompeten untuk menyelesaikan projek digital Anda dengan kualitas profesional.";
         
         if (heroImg1 && heroImg2) {
