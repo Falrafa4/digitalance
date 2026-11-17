@@ -21,7 +21,11 @@
                   <div class="min-w-0">
                     <p class="font-extrabold text-slate-900">Order #{{ $o->id }}</p>
                     <p class="text-slate-500 text-[13px] mt-1 truncate">
-                      {{ optional($o->service)->title ?? '-' }}
+                      @if($o->lokerApplication)
+                        <span class="text-indigo-600 font-bold">Lowongan:</span> {{ $o->lokerApplication->loker?->title ?? ($o->brief ? \Illuminate\Support\Str::limit($o->brief, 40) : 'Proyek Kustom') }}
+                      @else
+                        {{ optional($o->service)->title ?? '-' }}
+                      @endif
                     </p>
                     <p class="text-slate-400 text-[12px] font-bold mt-2">
                       Agreed: Rp{{ number_format((float) ($o->agreed_price ?? 0), 0, ',', '.') }}

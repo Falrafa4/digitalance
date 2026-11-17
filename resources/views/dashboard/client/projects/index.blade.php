@@ -27,7 +27,13 @@
               <div class="flex items-start justify-between gap-4">
                 <div class="min-w-0">
                   <p class="font-extrabold text-slate-900">Order #{{ $p->id }}</p>
-                  <p class="text-slate-500 text-[13px] mt-1 truncate">{{ $p->service->title ?? '-' }}</p>
+                  <p class="text-slate-500 text-[13px] mt-1 truncate">
+                    @if($p->lokerApplication)
+                      <span class="text-indigo-600 font-bold">Lowongan:</span> {{ $p->lokerApplication->loker?->title ?? ($p->brief ? \Illuminate\Support\Str::limit($p->brief, 40) : 'Proyek Kustom') }}
+                    @else
+                      {{ $p->service?->title ?? '-' }}
+                    @endif
+                  </p>
                 </div>
                 <x-ui.status-badge :status="$p->status ?? '-'" />
               </div>
@@ -37,10 +43,17 @@
                   class="px-4 py-2.5 rounded-[12px] bg-slate-900 text-white font-bold text-[12.5px] hover:bg-black transition-all">
                   Rincian
                 </a>
-                <a href="{{ route('client.services.show', $p->service_id) }}" class="px-4 py-2.5 rounded-[12px] bg-white border border-slate-200 text-slate-700 font-bold text-[12.5px]
-                              hover:border-[#0f766e] hover:text-[#0f766e] transition-all">
-                  Layanan
-                </a>
+                @if($p->service_id && $p->service)
+                  <a href="{{ route('client.services.show', $p->service_id) }}" class="px-4 py-2.5 rounded-[12px] bg-white border border-slate-200 text-slate-700 font-bold text-[12.5px]
+                                hover:border-[#0f766e] hover:text-[#0f766e] transition-all">
+                    Layanan
+                  </a>
+                @elseif($p->lokerApplication?->loker_id)
+                  <a href="{{ route('client.loker.index') }}" class="px-4 py-2.5 rounded-[12px] bg-white border border-slate-200 text-slate-700 font-bold text-[12.5px]
+                                hover:border-[#0f766e] hover:text-[#0f766e] transition-all">
+                    Lowongan
+                  </a>
+                @endif
               </div>
             </div>
           @endforeach

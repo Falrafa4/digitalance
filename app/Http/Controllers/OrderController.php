@@ -215,7 +215,7 @@ class OrderController extends Controller
     {
         $client = auth('client')->user();
 
-        $projects = Order::with(['service'])
+        $projects = Order::with(['service', 'lokerApplication.loker'])
             ->where('client_id', $client->id)
             ->whereIn('status', ['Pending', 'Negotiated', 'Paid', 'In Progress', 'Revision'])
             ->latest()
@@ -228,7 +228,7 @@ class OrderController extends Controller
     {
         $client = auth('client')->user();
 
-        $orders = Order::with(['service', 'review'])
+        $orders = Order::with(['service', 'review', 'lokerApplication.loker'])
             ->where('client_id', $client->id)
             ->whereIn('status', ['Completed', 'Cancelled'])
             ->latest()
