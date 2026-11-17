@@ -7,6 +7,7 @@ use App\Models\Loker;
 use App\Models\ServiceCategory;
 use App\Support\GroqClient;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class ClientAiRecommendationController extends Controller
 {
@@ -37,66 +38,69 @@ class ClientAiRecommendationController extends Controller
         $recommendations = [];
 
         if ($activeLoker || $customQuery) {
-            // Try Groq API first
             $apiKey = config('services.groq.key');
             $aiData = null;
 
             if (!empty($apiKey) && $freelancers->isNotEmpty()) {
-                // Prepare data for the prompt to keep context size reasonable
+                // Prepare concise profile data for LLM context
                 $freelancerContext = $freelancers->map(function ($f) {
+                    $servicesSummary = $f->services->take(3)->map(fn($s) => $s->title . ': ' . $s->description)->implode(' | ');
+                    $portfoliosSummary = $f->portofolios->take(3)->map(fn($p) => $p->title . ': ' . $p->description)->implode(' | ');
+                    $completedCount = \App\Models\Order::where('freelancer_id', $f->id)->where('status', 'Completed')->count();
+                    $avgRating = (float) (\App\Models\Review::whereHas('order.service', fn($q) => $q->where('freelancer_id', $f->id))->avg('rating') ?? 4.0);
+
                     return [
                         'id' => $f->id,
                         'name' => $f->skomda_student->name ?? 'Freelancer',
                         'major' => $f->skomda_student->major ?? 'IT',
                         'bio' => $f->bio ?? '',
-                        'services' => $f->services->map(fn($s) => $s->title . ': ' . $s->description),
-                        'portfolios' => $f->portofolios->map(fn($p) => $p->title . ': ' . $p->description),
-                        'completed_orders' => \App\Models\Order::where('freelancer_id', $f->id)->where('status', 'Completed')->count(),
-                        'avg_rating' => \App\Models\Review::whereHas('order.service', fn($q) => $q->where('freelancer_id', $f->id))->avg('rating') ?? 4.0
+                        'services' => $servicesSummary,
+                        'portfolios' => $portfoliosSummary,
+                        'completed_orders' => $completedCount,
+                        'avg_rating' => round($avgRating, 1)
                     ];
                 })->toArray();
 
                 $requirementContext = $activeLoker 
-                    ? "Job Title: {$activeLoker->title}\nDescription: {$activeLoker->description}" 
-                    : "Custom Search Query: {$customQuery}";
+                    ? "Judul Lowongan: {$activeLoker->title}\nDeskripsi: {$activeLoker->description}" 
+                    : "Kueri Kebutuhan Klien: {$customQuery}";
 
-                $systemPrompt = "You are an AI recruiter assistant for a school-based digital marketplace called Digitalance.
-Your task is to analyze the client's job requirements and match them with the list of student freelancers provided.
-You MUST respond with a valid JSON object only. Do not output markdown codeblocks, notes or extra text outside the JSON.
-The JSON format must strictly be:
+                $systemPrompt = "Anda adalah asisten AI Recruiter profesional untuk platform talenta siswa SMK Digitalance.
+Tugas Anda: Analisis kebutuhan klien dan cocokkan dengan data talenta siswa freelancer yang disediakan.
+Aturan Penilaian:
+1. Cocokkan teknologi, framework, dan domain keahlian secara ketat (misal JavaScript, Node.js, Web, Backend, Frontend, UI/UX, Jaringan).
+2. Siswa yang memiliki portofolio/layanan/bio yang relevan dengan tech stack yang dicari berikan skor tinggi (75 - 95).
+3. Siswa yang bidangnya tidak relevan (misal teknisi jaringan/CCTV saat klien butuh developer kode) berikan skor rendah (20 - 40) dengan analisis yang jujur dan objektif.
+4. Jangan pernah menyertakan kata penghubung umum seperti 'yang', 'dan', 'di' sebagai kata kunci keahlian.
+5. Format output WAJIB HANYA JSON VALID tanpa formatting markdown atau teks pengantar, dengan skema:
 {
   \"recommendations\": [
     {
       \"freelancer_id\": 1,
-      \"score\": 95,
-      \"analysis\": \"Detail explanation in Bahasa Indonesia of why they match the requirements based on their major, services, portfolios, and rating.\",
+      \"score\": 85,
+      \"analysis\": \"Penjelasan dalam Bahasa Indonesia yang ringkas dan jelas mengapa freelancer ini cocok/kurang cocok berdasarkan portofolio, keahlian, dan pengalamannya.\",
       \"breakdown\": {
-        \"skills\": 90,
-        \"category\": 100,
-        \"performance\": 95
+        \"skills\": 85,
+        \"category\": 90,
+        \"performance\": 80
       }
     }
   ]
 }";
 
-                $userPrompt = "Job Requirements:\n{$requirementContext}\n\nList of Freelancers:\n" . json_encode($freelancerContext) . "\n\nPlease calculate the match score (0-100), detailed breakdown scores for 'skills', 'category', 'performance', and write a concise Indonesian analysis for each freelancer. Return the JSON object now.";
+                $userPrompt = "Kebutuhan Klien:\n{$requirementContext}\n\nDaftar Talenta Siswa:\n" . json_encode($freelancerContext, JSON_UNESCAPED_UNICODE) . "\n\nBerikan evaluasi rekomendasi JSON sekarang.";
 
-                $responseContent = GroqClient::generate($systemPrompt, $userPrompt);
+                $responseContent = GroqClient::generate($systemPrompt, $userPrompt, ['max_tokens' => 2000]);
 
                 if ($responseContent) {
-                    // Try to clean markdown formatting if the model output it inside a code block
-                    $cleaned = trim($responseContent);
-                    if (str_starts_with($cleaned, '```json')) {
-                        $cleaned = substr($cleaned, 7);
-                    }
-                    if (str_ends_with($cleaned, '```')) {
-                        $cleaned = substr($cleaned, 0, -3);
-                    }
-                    $cleaned = trim($cleaned);
-
-                    $decoded = json_decode($cleaned, true);
-                    if (isset($decoded['recommendations'])) {
-                        $aiData = $decoded['recommendations'];
+                    // Extract JSON substring safely using regex
+                    if (preg_match('/\{[\s\S]*\}/', $responseContent, $matches)) {
+                        $decoded = json_decode($matches[0], true);
+                        if (isset($decoded['recommendations']) && is_array($decoded['recommendations'])) {
+                            $aiData = $decoded['recommendations'];
+                        }
+                    } else {
+                        Log::warning('Failed to extract JSON from Groq response: ' . $responseContent);
                     }
                 }
             }
@@ -110,12 +114,24 @@ The JSON format must strictly be:
                         $aiRec = $aiDataMap->get($f->id);
                         $recommendations[] = [
                             'freelancer' => $f,
-                            'score' => $aiRec['score'] ?? 50,
-                            'analysis' => $aiRec['analysis'] ?? 'Relevan dengan keahlian.',
-                            'breakdown' => $aiRec['breakdown'] ?? [
-                                'skills' => 50,
-                                'category' => 50,
-                                'performance' => 50
+                            'score' => (int) ($aiRec['score'] ?? 50),
+                            'analysis' => $aiRec['analysis'] ?? 'Profil relevan dengan keahlian yang dibutuhkan.',
+                            'breakdown' => [
+                                'skills' => (int) ($aiRec['breakdown']['skills'] ?? 50),
+                                'category' => (int) ($aiRec['breakdown']['category'] ?? 50),
+                                'performance' => (int) ($aiRec['breakdown']['performance'] ?? 50),
+                            ]
+                        ];
+                    } else {
+                        // If model omitted this freelancer, compute safe baseline
+                        $recommendations[] = [
+                            'freelancer' => $f,
+                            'score' => 30,
+                            'analysis' => 'Profil belum memiliki portofolio yang cocok dengan spesifikasi kueri.',
+                            'breakdown' => [
+                                'skills' => 25,
+                                'category' => 30,
+                                'performance' => 40,
                             ]
                         ];
                     }
@@ -126,7 +142,7 @@ The JSON format must strictly be:
                     return $b['score'] <=> $a['score'];
                 });
             } else {
-                // Use Local Fallback
+                // Use Local Offline Fallback Engine
                 $fallbackData = GroqClient::getLocalRecommendationFallback($freelancers->all(), $activeLoker?->toArray(), $customQuery);
                 $fallbackMap = collect($fallbackData)->keyBy('freelancer_id');
 

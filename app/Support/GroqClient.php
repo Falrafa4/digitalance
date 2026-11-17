@@ -8,52 +8,69 @@ use Illuminate\Support\Facades\Log;
 class GroqClient
 {
     /**
-     * Call the Groq Chat Completion API.
+     * Call the Groq Chat Completion API with automatic fallback models.
      *
      * @param string $systemPrompt
      * @param string $userPrompt
+     * @param array $options
      * @return string|null
      */
-    public static function generate(string $systemPrompt, string $userPrompt): ?string
+    public static function generate(string $systemPrompt, string $userPrompt, array $options = []): ?string
     {
         $apiKey = config('services.groq.key');
-        $model = config('services.groq.model', 'llama-3.1-8b-instant');
 
         if (empty($apiKey)) {
             Log::warning('Groq API Key is not set. Falling back to local offline engine.');
             return null;
         }
 
-        try {
-            $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . $apiKey,
-                'Content-Type' => 'application/json',
-            ])->timeout(15)->post('https://api.groq.com/openai/v1/chat/completions', [
-                'model' => $model,
-                'messages' => [
-                    ['role' => 'system', 'content' => $systemPrompt],
-                    ['role' => 'user', 'content' => $userPrompt]
-                ],
-                'temperature' => 0.2,
-                'response_format' => ['type' => 'json_object']
-            ]);
+        $primaryModel = config('services.groq.model', 'openai/gpt-oss-20b');
+        $candidateModels = array_values(array_unique([
+            $primaryModel,
+            'openai/gpt-oss-20b',
+            'qwen/qwen3.8-27b',
+            'openai/gpt-oss-120b',
+        ]));
 
-            if ($response->successful()) {
-                $data = $response->json();
-                return $data['choices'][0]['message']['content'] ?? null;
+        $temperature = $options['temperature'] ?? 0.1;
+        $maxTokens = $options['max_tokens'] ?? 1500;
+
+        foreach ($candidateModels as $model) {
+            try {
+                $response = Http::withHeaders([
+                    'Authorization' => 'Bearer ' . $apiKey,
+                    'Content-Type' => 'application/json',
+                ])->timeout(20)->post('https://api.groq.com/openai/v1/chat/completions', [
+                    'model' => $model,
+                    'messages' => [
+                        ['role' => 'system', 'content' => $systemPrompt],
+                        ['role' => 'user', 'content' => $userPrompt]
+                    ],
+                    'temperature' => $temperature,
+                    'max_tokens' => $maxTokens,
+                ]);
+
+                if ($response->successful()) {
+                    $data = $response->json();
+                    $content = $data['choices'][0]['message']['content'] ?? null;
+                    if (!empty($content)) {
+                        return $content;
+                    }
+                }
+
+                Log::warning("Groq API call with model [{$model}] failed (HTTP {$response->status()}): " . $response->body());
+            } catch (\Throwable $e) {
+                Log::warning("Exception during Groq API call with model [{$model}]: " . $e->getMessage());
             }
-
-            Log::error('Groq API error response: ' . $response->body());
-        } catch (\Throwable $e) {
-            Log::error('Exception during Groq API call: ' . $e->getMessage());
         }
 
+        Log::error('All Groq model attempts exhausted. Falling back to local offline recommendation engine.');
         return null;
     }
 
     /**
      * Local Offline Fallback for Client Freelancer Recommendation.
-     * Computes similarity scores using category matching, string token overlaps, and reputation.
+     * Computes similarity scores using category matching, technical skill token overlaps, and reputation.
      */
     public static function getLocalRecommendationFallback(array $freelancers, ?array $loker = null, ?string $customQuery = null): array
     {
@@ -73,17 +90,12 @@ class GroqClient
         foreach ($freelancers as $f) {
             $scoreSkills = 0;
             $scoreCategory = 0;
-            $scorePerformance = 0;
 
-            // 1. Category Match (30%)
+            // 1. Category Match (25%)
             if ($categoryId) {
-                // Check if freelancer has services in this category
                 $hasCategoryService = collect($f->services)->contains('category_id', $categoryId);
-                if ($hasCategoryService) {
-                    $scoreCategory = 100;
-                }
+                $scoreCategory = $hasCategoryService ? 100 : 30;
             } else {
-                // If custom query, match query words against category names
                 $matchedCategories = 0;
                 foreach ($f->services as $service) {
                     $catName = strtolower($service->category->name ?? '');
@@ -94,63 +106,79 @@ class GroqClient
                         }
                     }
                 }
-                $scoreCategory = $matchedCategories > 0 ? 100 : 30;
+                $scoreCategory = $matchedCategories > 0 ? 100 : 35;
             }
 
-            // 2. Skill Text Match (40%)
-            $freelancerText = ($f->bio ?? '') . ' ';
-            foreach ($f->services as $service) {
-                $freelancerText .= ($service->title ?? '') . ' ' . ($service->description ?? '') . ' ';
-            }
+            // 2. Skill Text Match (50%)
+            // Separate portfolio, service, and bio tokens for weighted precision
+            $portfolioText = '';
             foreach ($f->portofolios as $portfolio) {
-                $freelancerText .= ($portfolio->title ?? '') . ' ' . ($portfolio->description ?? '') . ' ';
+                $portfolioText .= ($portfolio->title ?? '') . ' ' . ($portfolio->description ?? '') . ' ';
             }
+            $portfolioWords = self::tokenize($portfolioText);
+
+            $serviceText = '';
+            foreach ($f->services as $service) {
+                $serviceText .= ($service->title ?? '') . ' ' . ($service->description ?? '') . ' ';
+            }
+            $serviceWords = self::tokenize($serviceText);
+
+            $bioText = ($f->bio ?? '') . ' ';
             if ($f->skomda_student) {
-                $freelancerText .= ($f->skomda_student->major ?? '') . ' ' . ($f->skomda_student->class ?? '');
+                $bioText .= ($f->skomda_student->major ?? '') . ' ' . ($f->skomda_student->class ?? '');
             }
+            $bioWords = self::tokenize($bioText);
 
-            $freelancerWords = self::tokenize($freelancerText);
-            $intersection = array_intersect($queryWords, $freelancerWords);
-            
+            $portfolioMatches = array_intersect($queryWords, $portfolioWords);
+            $serviceMatches = array_intersect($queryWords, $serviceWords);
+            $bioMatches = array_intersect($queryWords, $bioWords);
+
+            $allMatchedWords = array_values(array_unique(array_merge($portfolioMatches, $serviceMatches, $bioMatches)));
+
             if (count($queryWords) > 0) {
-                $skillMatchRatio = count($intersection) / count($queryWords);
-                $scoreSkills = min(100, 30 + ($skillMatchRatio * 70));
+                if (count($allMatchedWords) > 0) {
+                    // Match found: weight portfolio highest, then services, then bio
+                    $scoreSkills = min(100, 30 + (count($portfolioMatches) * 35) + (count($serviceMatches) * 25) + (count($bioMatches) * 15));
+                } else {
+                    // No skill/keyword match found at all
+                    $scoreSkills = 20;
+                }
             } else {
-                $scoreSkills = 50; // default medium match
+                $scoreSkills = 50; // default medium match when query is empty
             }
 
-            // 3. Performance Metric (30%)
-            // Average Review Rating (max 5.0 -> 15%)
+            // 3. Performance Metric (25%)
             $avgRating = \App\Models\Review::whereHas('order.service', function ($q) use ($f) {
                 $q->where('freelancer_id', $f->id);
-            })->avg('rating') ?? 4.0; // default 4 if no review
+            })->avg('rating') ?? 4.0;
             $scoreRating = min(100, $avgRating * 20);
 
-            // Completed orders count (max 5 orders -> 10%)
             $completedOrdersCount = \App\Models\Order::where('freelancer_id', $f->id)
                 ->where('status', 'Completed')
                 ->count();
-            $scoreOrders = min(100, $completedOrdersCount * 20);
+            $scoreOrders = min(100, $completedOrdersCount * 25);
 
-            // Verified Status Bonus (5%)
-            $scoreVerified = $f->status === 'Approved' ? 100 : 20;
-
+            $scoreVerified = $f->status === 'Approved' ? 100 : 30;
             $scorePerformance = ($scoreRating * 0.5) + ($scoreOrders * 0.3) + ($scoreVerified * 0.2);
 
-            // Calculate final weighted score
-            $finalScore = (int) round(($scoreCategory * 0.3) + ($scoreSkills * 0.4) + ($scorePerformance * 0.3));
+            // Calculate final weighted score (Skills 50%, Category 25%, Performance 25%)
+            $finalScore = (int) round(($scoreSkills * 0.50) + ($scoreCategory * 0.25) + ($scorePerformance * 0.25));
             $finalScore = max(0, min(100, $finalScore));
 
-            // Generate analysis text based on variables
-            $matchedSkillsStr = implode(', ', array_slice($intersection, 0, 3));
-            $analysis = "Freelancer cocok berdasarkan kategori " . ($f->skomda_student->major ?? 'IT') . ". ";
-            if (!empty($matchedSkillsStr)) {
-                $analysis .= "Ditemukan kata kunci relevan: [{$matchedSkillsStr}]. ";
-            }
-            if ($completedOrdersCount > 0) {
-                $analysis .= "Telah sukses menyelesaikan {$completedOrdersCount} proyek dengan reputasi bintang " . number_format($avgRating, 1) . ".";
+            // Generate professional analysis text without stopwords
+            $majorName = $f->skomda_student->major ?? 'IT';
+            if (!empty($allMatchedWords)) {
+                $matchedSkillsStr = implode(', ', array_slice($allMatchedWords, 0, 4));
+                $analysis = "Memiliki keahlian dan portofolio relevan pada: [{$matchedSkillsStr}]. ";
             } else {
-                $analysis .= "Siswa bertalenta yang siap mengerjakan proyek pertama dengan bimbingan pendamping.";
+                $analysis = "Profil belum secara spesifik mencantumkan kata kunci keahlian yang dicari. ";
+            }
+
+            $analysis .= "Siswa jurusan {$majorName}";
+            if ($completedOrdersCount > 0) {
+                $analysis .= " dengan rekam jejak {$completedOrdersCount} proyek sukses (rating " . number_format($avgRating, 1) . "★).";
+            } else {
+                $analysis .= " yang siap mengerjakan proyek perdana dengan pendampingan.";
             }
 
             $results[] = [
@@ -181,7 +209,6 @@ class GroqClient
         $major = strtoupper($profileData['major'] ?? 'SIJA');
         $completedCount = $profileData['completed_count'] ?? 0;
         
-        // XP calculation: 100 XP per completed project + baseline 100
         $xp = 100 + ($completedCount * 100);
         $level = 'Junior Specialist';
         $xpToNext = 300 - $xp;
@@ -219,7 +246,6 @@ class GroqClient
                 ['name' => 'Version Control (Git)', 'recommended_action' => 'Biasakan melakukan commit dan push proyek sekolah Anda ke GitHub.']
             ];
         } else {
-            // Default or TJAT
             $track = 'Network & Telecommunication Specialist';
             $learningRoadmap = 'Fokus pada pemahaman topologi jaringan, konfigurasi perangkat jaringan pintar (MikroTik, Cisco), perancangan infrastruktur akses fiber optic, dan cybersecurity dasar.';
             $lokerCriteria = 'Jaringan Komputer, IT Support';
@@ -251,19 +277,63 @@ class GroqClient
     }
 
     /**
-     * Helper to tokenize a string.
+     * Clean and tokenize text into meaningful keywords, stripping stopwords and preserving tech stacks.
+     *
+     * @param string $text
+     * @return array
      */
-    private static function tokenize(string $text): array
+    public static function tokenize(string $text): array
     {
-        $text = strtolower(strip_tags($text));
-        $text = preg_replace('/[^a-z0-9\s]/', ' ', $text);
-        $words = explode(' ', $text);
-        
-        // Remove empty or very short tokens
-        $filtered = array_filter($words, function ($w) {
-            return strlen($w) > 2;
-        });
+        // Whitelist for valid short tech tokens (length <= 2)
+        $techWhitelist = ['js', 'ts', 'go', 'ai', 'ui', 'ux', 'db', 'qa', 'ci', 'cd', 'php', 'py', 'c', 'r', 'it', 'ip'];
 
-        return array_values(array_unique($filtered));
+        // Comprehensive stopwords in Indonesian and English
+        $stopwords = [
+            'yang', 'dan', 'di', 'ke', 'dari', 'ini', 'itu', 'untuk', 'pada', 'adalah', 'sebagai',
+            'dengan', 'bisa', 'butuh', 'mencari', 'ingin', 'mau', 'tolong', 'ada', 'atau', 'juga',
+            'akan', 'sudah', 'saya', 'kami', 'anda', 'kamu', 'mereka', 'dia', 'saja', 'hanya',
+            'lagi', 'bila', 'jika', 'agar', 'supaya', 'oleh', 'karena', 'tentang', 'seperti',
+            'dalam', 'bagi', 'antara', 'tanpa', 'serta', 'namun', 'tetapi', 'jasa', 'bantu',
+            'proyek', 'project', 'kerja', 'kerjaan', 'orang', 'buat', 'bikin', 'punya', 'ahli',
+            'tau', 'tahu', 'mohon', 'tolonglah', 'dong', 'nih', 'tuh', 'lah', 'kah', 'sih',
+            'the', 'a', 'an', 'and', 'or', 'in', 'on', 'at', 'to', 'for', 'with', 'by', 'of',
+            'is', 'are', 'was', 'were', 'be', 'been', 'have', 'has', 'had', 'do', 'does', 'did',
+            'can', 'could', 'will', 'would', 'should', 'need', 'want', 'looking', 'help',
+            'please', 'make', 'create', 'build', 'find', 'get'
+        ];
+
+        $normalized = strtolower(strip_tags($text));
+
+        // Tech normalization: merge punctuated tech phrases into single alphanumeric tokens
+        $normalized = preg_replace('/\bnode[\.\s_-]?js\b/', ' nodejs ', $normalized);
+        $normalized = preg_replace('/\breact[\.\s_-]?js\b/', ' reactjs ', $normalized);
+        $normalized = preg_replace('/\bvue[\.\s_-]?js\b/', ' vuejs ', $normalized);
+        $normalized = preg_replace('/\bnext[\.\s_-]?js\b/', ' nextjs ', $normalized);
+        $normalized = preg_replace('/\bangular[\.\s_-]?js\b/', ' angularjs ', $normalized);
+        $normalized = preg_replace('/\bc\+\+\b/', ' cpp ', $normalized);
+        $normalized = preg_replace('/\bc#\b/', ' csharp ', $normalized);
+        $normalized = preg_replace('/\b\.net\b/', ' dotnet ', $normalized);
+
+        // Replace any remaining non-alphanumeric characters with spaces
+        $normalized = preg_replace('/[^a-z0-9\s]/', ' ', $normalized);
+
+        $words = array_filter(explode(' ', $normalized));
+        $tokens = [];
+
+        foreach ($words as $word) {
+            $w = trim($word);
+            if (empty($w)) {
+                continue;
+            }
+            if (in_array($w, $stopwords, true)) {
+                continue;
+            }
+            if (strlen($w) <= 2 && !in_array($w, $techWhitelist, true)) {
+                continue;
+            }
+            $tokens[] = $w;
+        }
+
+        return array_values(array_unique($tokens));
     }
 }
